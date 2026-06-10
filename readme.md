@@ -31,15 +31,15 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 
 | Guía | Descripción |
 |------|-------------|
-| [guia_css_daw.html](guia_css_daw.html) | Dominando CSS — selectores, box model, flexbox, animaciones para 2º DAW |
-| [guia_redes_daw.html](guia_redes_daw.html) | Fundamentos de Redes — OSI, TCP/IP, IPv4, subredes, VLSM para 1º DAW |
-| [guia_react_encuesta.html](guia_react_encuesta.html) | Encuesta en React — hooks, componentes y app de votaciones en tiempo real |
-| [guia_responsive_bootstrap.html](guia_responsive_bootstrap.html) | De Web Fija a Web Responsive — Bootstrap y diseño adaptable |
-| [guia_batch_windows.html](guia_batch_windows.html) | Scripts Batch — automatización en Windows con .BAT y CMD |
-| [guia_prompts.html](guia_prompts.html) | Escribe Prompts que Funcionan — entrenamiento de 4 semanas en ingeniería de prompts |
-| [guia-ia-bachillerato.html](guia-ia-bachillerato.html) | La IA como Herramienta de Estudio — EBAU y técnicas de estudio con IA |
-| [guia-ia-fp.html](guia-ia-fp.html) | La IA como Herramienta de Estudio (FP) — IA para Formación Profesional |
-| [guia-que-ia-usar.html](guia-que-ia-usar.html) | Qué IA Usar para Cada Tarea — comparativa visual de herramientas de IA |
+| [guia_css_daw.html](https://actionperformed.github.io/guias_html/guia_css_daw.html) | Dominando CSS — selectores, box model, flexbox, animaciones para 2º DAW |
+| [guia_redes_daw.html](https://actionperformed.github.io/guias_html/guia_redes_daw.html) | Fundamentos de Redes — OSI, TCP/IP, IPv4, subredes, VLSM para 1º DAW |
+| [guia_react_encuesta.html](https://actionperformed.github.io/guias_html/guia_react_encuesta.html) | Encuesta en React — hooks, componentes y app de votaciones en tiempo real |
+| [guia_responsive_bootstrap.html](https://actionperformed.github.io/guias_html/guia_responsive_bootstrap.html) | De Web Fija a Web Responsive — Bootstrap y diseño adaptable |
+| [guia_batch_windows.html](https://actionperformed.github.io/guias_html/guia_batch_windows.html) | Scripts Batch — automatización en Windows con .BAT y CMD |
+| [guia_prompts.html](https://actionperformed.github.io/guias_html/guia_prompts.html) | Escribe Prompts que Funcionan — entrenamiento de 4 semanas en ingeniería de prompts |
+| [guia-ia-bachillerato.html](https://actionperformed.github.io/guias_html/guia-ia-bachillerato.html) | La IA como Herramienta de Estudio — EBAU y técnicas de estudio con IA |
+| [guia-ia-fp.html](https://actionperformed.github.io/guias_html/guia-ia-fp.html) | La IA como Herramienta de Estudio (FP) — IA para Formación Profesional |
+| [guia-que-ia-usar.html](https://actionperformed.github.io/guias_html/guia-que-ia-usar.html) | Qué IA Usar para Cada Tarea — comparativa visual de herramientas de IA |
 
 ---
 
