@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qué IA usar para cada tarea · Marzo 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0d0f14;
+    --surface: #141720;
+    --card:    #1b1f2e;
+    --border:  #252a3a;
+    --text:    #e8eaf2;
+    --muted:   #6b7280;
+    --dim:     #9ca3af;
+
+    --math:    #f59e0b;
+    --code:    #22d3ee;
+    --slides:  #a78bfa;
+    --study:   #34d399;
+    --research:#fb923c;
+    --teach:   #f472b6;
+    --media:   #60a5fa;
+    --privacy: #4ade80;
+    --quick:   #e2e8f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* grain overlay */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    opacity: .04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+    z-index: 9999;
+  }
+
+  /* ─── PROGRESS ─── */
+  #progress {
+    position: fixed; top: 0; left: 0;
+    height: 2px; background: var(--code);
+    z-index: 300; width: 0%; transition: width .1s;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,15,20,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: .7rem 2rem; gap: 1rem;
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: .85rem;
+    color: var(--code); letter-spacing: -1px;
+    white-space: nowrap;
+  }
+  .nav-links {
+    display: flex; gap: 1.25rem;
+    list-style: none; flex-wrap: wrap;
+  }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: .75rem; font-weight: 500;
+    transition: color .2s; white-space: nowrap;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 4.5rem 2rem 3.5rem;
+    background: radial-gradient(ellipse 70% 60% at 60% 0%, rgba(34,211,238,.07) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 10% 80%, rgba(167,139,250,.06) 0%, transparent 60%);
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(34,211,238,.1);
+    border: 1px solid rgba(34,211,238,.25);
+    color: var(--code);
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: .3rem .8rem; border-radius: 99px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .5s ease both;
+  }
+  .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--code); animation: pulse 2s infinite; }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -2px; margin-bottom: 1rem;
+    animation: fadeUp .5s .08s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--code); }
+
+  .hero p {
+    font-size: 1.05rem; font-weight: 300;
+    color: var(--dim); max-width: 560px;
+    animation: fadeUp .5s .16s ease both;
+  }
+
+  /* grid deco */
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  /* ─── INDEX ─── */
+  .index-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+  }
+  .index-inner { max-width: 900px; margin: 0 auto; }
+  .index-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+  .index-chips {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+  }
+  .index-chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .35rem .75rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    text-decoration: none;
+    font-size: .75rem; font-weight: 600;
+    color: var(--dim);
+    transition: all .2s;
+  }
+  .index-chip:hover { color: var(--text); border-color: currentColor; transform: translateY(-1px); }
+  .index-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ─── LAYOUT ─── */
+  main { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+  section { padding: 3.5rem 0 1rem; }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-head {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .sec-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .sec-title-wrap {}
+  .sec-num {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: .15rem;
+  }
+  .sec-title {
+    font-size: 1.25rem; font-weight: 700;
+    letter-spacing: -.5px; line-height: 1.2;
+  }
+  .sec-intro {
+    color: var(--muted); font-size: .88rem;
+    font-weight: 300; margin-bottom: 1.5rem;
+    max-width: 600px; line-height: 1.6;
+  }
+  hr.sec-divider {
+    border: none; border-top: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ─── TOOLS ROW (protagonistas) ─── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    transition: transform .2s, border-color .2s;
+  }
+  .tool-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.12); }
+  .tool-card-top {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: .6rem;
+  }
+  .tool-name {
+    font-family: 'Space Mono', monospace;
+    font-size: .8rem; font-weight: 700;
+    color: var(--text);
+  }
+  .tool-free {
+    font-size: .65rem; font-weight: 600;
+    padding: .2rem .55rem; border-radius: 99px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .free-unlimited { color: #34d399; border-color: rgba(52,211,153,.3); background: rgba(52,211,153,.07); }
+  .free-generous  { color: #60a5fa; border-color: rgba(96,165,250,.3); background: rgba(96,165,250,.07); }
+  .free-edu       { color: #a78bfa; border-color: rgba(167,139,250,.3); background: rgba(167,139,250,.07); }
+  .free-credits   { color: #f59e0b; border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.07); }
+  .free-discount  { color: #fb923c; border-color: rgba(251,146,36,.3); background: rgba(251,146,36,.07); }
+
+  .tool-super {
+    font-size: .8rem; font-weight: 600;
+    color: var(--text); margin-bottom: .35rem;
+  }
+  .tool-ideal { font-size: .78rem; color: var(--muted); font-weight: 300; }
+
+  /* ─── STEP TABLES ─── */
+  .step-list {
+    display: flex; flex-direction: column; gap: .5rem;
+    margin-bottom: 1.25rem;
+  }
+  .step-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 1fr;
+    gap: .75rem;
+    align-items: start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    transition: border-color .2s;
+  }
+  .step-row:hover { border-color: rgba(255,255,255,.1); }
+  .step-num-badge {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem; font-weight: 700;
+    background: var(--border); color: var(--dim);
+    flex-shrink: 0; margin-top: .1rem;
+  }
+  .step-task { font-size: .85rem; font-weight: 400; color: var(--dim); }
+  .step-rec  { font-size: .85rem; }
+  .step-rec strong { font-weight: 700; }
+  .step-rec .why { display: block; font-size: .75rem; color: var(--muted); font-weight: 300; margin-top: .2rem; }
+
+  /* ─── FLOW BOX ─── */
+  .flow-box {
+    background: rgba(34,211,238,.05);
+    border: 1px solid rgba(34,211,238,.15);
+    border-radius: 10px;
+    padding: .85rem 1.1rem;
+    font-size: .82rem;
+    color: var(--dim);
+    margin-bottom: 1.5rem;
+  }
+  .flow-box strong { color: var(--code); font-weight: 600; }
+  .flow-box .flow-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--code); margin-bottom: .35rem;
+  }
+
+  /* ─── TASK TABLE (quick ref) ─── */
+  .task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: .5rem;
+    margin-bottom: 1rem;
+  }
+  .task-row {
+    display: flex; align-items: baseline; gap: .75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem .9rem;
+    font-size: .82rem;
+    transition: border-color .2s;
+  }
+  .task-row:hover { border-color: rgba(255,255,255,.1); }
+  .task-if { color: var(--muted); flex: 1; font-weight: 300; }
+  .task-use { font-weight: 700; color: var(--text); white-space: nowrap; }
+
+  /* ─── PRIVACY TABLE ─── */
+  .privacy-grid {
+    display: flex; flex-direction: column; gap: .5rem;
+    margin-bottom: 1rem;
+  }
+  .privacy-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: .75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    font-size: .83rem;
+    align-items: start;
+  }
+  @media (max-width: 600px) {
+    .privacy-row { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .step-row { grid-template-columns: 28px 1fr; }
+    .step-rec { display: none; }
+  }
+  .privacy-level { font-weight: 600; color: var(--text); }
+  .privacy-tool  { font-weight: 700; }
+  .privacy-why   { color: var(--muted); font-weight: 300; font-size: .78rem; }
+  .privacy-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: .75rem;
+    padding: .4rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: .6rem; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ─── COLOR ACCENTS PER SECTION ─── */
+  .c-research { color: var(--research); }
+  .c-math     { color: var(--math); }
+  .c-code     { color: var(--code); }
+  .c-slides   { color: var(--slides); }
+  .c-study    { color: var(--study); }
+  .c-teach    { color: var(--teach); }
+  .c-media    { color: var(--media); }
+  .c-privacy  { color: var(--privacy); }
+  .c-quick    { color: var(--quick); }
+
+  .bg-research { background: rgba(251,146,36,.12); }
+  .bg-math     { background: rgba(245,158,11,.12); }
+  .bg-code     { background: rgba(34,211,238,.12); }
+  .bg-slides   { background: rgba(167,139,250,.12); }
+  .bg-study    { background: rgba(52,211,153,.12); }
+  .bg-teach    { background: rgba(244,114,182,.12); }
+  .bg-media    { background: rgba(96,165,250,.12); }
+  .bg-privacy  { background: rgba(74,222,128,.12); }
+  .bg-quick    { background: rgba(226,232,240,.08); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .3; }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: .78rem;
+  }
+  footer strong { color: var(--dim); font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">¿QUÉ IA USO?</div>
+  <ul class="nav-links">
+    <li><a href="#protagonistas">Las 9 IAs</a></li>
+    <li><a href="#investigacion">Investigación</a></li>
+    <li><a href="#matematicas">Mates</a></li>
+    <li><a href="#programacion">Código</a></li>
+    <li><a href="#presentaciones">Slides</a></li>
+    <li><a href="#estudio">Estudio</a></li>
+    <li><a href="#docencia">Docencia</a></li>
+    <li><a href="#multimedia">Multimedia</a></li>
+    <li><a href="#privacidad">Privacidad</a></li>
+    <li><a href="#rapida">Guía rápida</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span></span> Actualizado · Marzo 2026</div>
+    <h1>Qué <em>IA</em> usar<br>para cada tarea</h1>
+    <p>Guía visual para estudiantes y docentes. Todas las herramientas incluidas tienen versión gratuita funcional.</p>
+  </div>
+</header>
+
+<!-- ÍNDICE -->
+<div class="index-bar">
+  <div class="index-inner">
+    <div class="index-label">Ir a sección</div>
+    <div class="index-chips">
+      <a href="#protagonistas" class="index-chip"><span class="dot" style="background:var(--code)"></span>Las 9 IAs</a>
+      <a href="#investigacion" class="index-chip"><span class="dot" style="background:var(--research)"></span>Investigación</a>
+      <a href="#matematicas"   class="index-chip"><span class="dot" style="background:var(--math)"></span>Matemáticas</a>
+      <a href="#programacion"  class="index-chip"><span class="dot" style="background:var(--code)"></span>Programación</a>
+      <a href="#presentaciones" class="index-chip"><span class="dot" style="background:var(--slides)"></span>Presentaciones</a>
+      <a href="#estudio"       class="index-chip"><span class="dot" style="background:var(--study)"></span>Estudio</a>
+      <a href="#docencia"      class="index-chip"><span class="dot" style="background:var(--teach)"></span>Docencia</a>
+      <a href="#multimedia"    class="index-chip"><span class="dot" style="background:var(--media)"></span>Multimedia</a>
+      <a href="#privacidad"    class="index-chip"><span class="dot" style="background:var(--privacy)"></span>Privacidad</a>
+      <a href="#rapida"        class="index-chip"><span class="dot" style="background:var(--quick)"></span>Guía rápida</a>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 01. LAS 9 PROTAGONISTAS -->
+  <section id="protagonistas">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-code" style="font-size:1.3rem;">🏆</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-code">01 — Las protagonistas</div>
+        <div class="sec-title">Las 9 IAs que necesitas conocer</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Todas tienen versión gratuita. Cada una tiene un superpoder distinto: conocerlas te ahorra tiempo y te da mejores resultados.</p>
+    <hr class="sec-divider">
+
+    <div class="tools-grid reveal">
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">DeepSeek</div>
+          <div class="tool-free free-unlimited">♾ Ilimitada</div>
+        </div>
+        <div class="tool-super">Razonamiento paso a paso + búsqueda web activable</div>
+        <div class="tool-ideal">Matemáticas, código, análisis profundo</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">ChatGPT</div>
+          <div class="tool-free free-generous">🆓 Generosa</div>
+        </div>
+        <div class="tool-super">Analiza imágenes + genera con DALL-E</div>
+        <div class="tool-ideal">Explicaciones visuales, consultas rápidas</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Claude Sonnet 4</div>
+          <div class="tool-free free-generous">🆓 Generosa</div>
+        </div>
+        <div class="tool-super">Crea PowerPoint/Word/Excel + 1M de contexto</div>
+        <div class="tool-ideal">Documentos largos, presentaciones rápidas</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Perplexity AI</div>
+          <div class="tool-free free-discount">🎓 Standard gratis</div>
+        </div>
+        <div class="tool-super">Búsqueda con citas verificables</div>
+        <div class="tool-ideal">Trabajos académicos, fuentes fiables</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">NotebookLM</div>
+          <div class="tool-free free-unlimited">♾ Ilimitada</div>
+        </div>
+        <div class="tool-super">Genera podcasts automáticos con tus apuntes</div>
+        <div class="tool-ideal">Repasar escuchando, sintetizar documentos</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Gamma</div>
+          <div class="tool-free free-credits">✨ 400 créditos</div>
+        </div>
+        <div class="tool-super">Diseño profesional de presentaciones</div>
+        <div class="tool-ideal">Exposiciones con impacto visual</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Qwen 3.5 Plus</div>
+          <div class="tool-free free-unlimited">♾ Ilimitada</div>
+        </div>
+        <div class="tool-super">Analiza vídeos de hasta 2h + dibujos → código</div>
+        <div class="tool-ideal">Resumir clases grabadas, prototipado</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Google Gemini</div>
+          <div class="tool-free free-edu">🏫 Cuenta educativa</div>
+        </div>
+        <div class="tool-super">Integrado con Drive, Docs y Gmail</div>
+        <div class="tool-ideal">Docentes del ecosistema Google</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-name">Canva Education</div>
+          <div class="tool-free free-edu">👩‍🏫 Docentes verificados</div>
+        </div>
+        <div class="tool-super">Plantillas + IA para diseño educativo</div>
+        <div class="tool-ideal">Crear materiales didácticos atractivos</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02. INVESTIGACIÓN -->
+  <section id="investigacion">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-research">📚</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-research">02 — Investigación</div>
+        <div class="sec-title">Trabajos académicos</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">El flujo ideal combina tres herramientas: primero buscas fuentes fiables, luego profundizas y finalmente sintetizas.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">1</div>
+        <div class="step-task">Buscar fuentes con citas verificables</div>
+        <div class="step-rec"><strong class="c-research">Perplexity AI</strong><span class="why">Cada respuesta incluye enlaces a las fuentes originales</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">2</div>
+        <div class="step-task">Profundizar en el tema</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(activa 🌐 búsqueda)</span><span class="why">Razonamiento profundo + datos actualizados</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">3</div>
+        <div class="step-task">Sintetizar varios PDFs o documentos</div>
+        <div class="step-rec"><strong class="c-study">NotebookLM</strong><span class="why">Resúmenes y preguntas interactivas sobre tus materiales</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">4</div>
+        <div class="step-task">Explicar un concepto difícil</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT</strong><span class="why">Estilo conversacional muy natural y adaptable</span></div>
+      </div>
+    </div>
+
+    <div class="flow-box reveal">
+      <div class="flow-label">🔁 Flujo ideal</div>
+      <strong>Perplexity</strong> (citas) → <strong>DeepSeek</strong> (profundizar) → <strong>NotebookLM</strong> (sintetizar)
+    </div>
+  </section>
+
+  <!-- 03. MATEMÁTICAS -->
+  <section id="matematicas">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-math">🧮</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-math">03 — Matemáticas</div>
+        <div class="sec-title">Resolución y razonamiento</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Para matemáticas, la clave no es obtener el resultado, sino entender el proceso. Estas herramientas te muestran cada paso.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Resolver problemas paso a paso</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong><span class="why">Entrenado específicamente en razonamiento matemático</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Verificar tu propio procedimiento</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong><span class="why">Muestra todo el proceso, no solo el resultado final</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Problemas con gráficos o diagramas</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT</strong><span class="why">Puede analizar imágenes que le subas directamente</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Crear ejercicios para practicar</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(búsqueda 🌐 desactivada)</span><span class="why">Genera problemas similares sin distracciones</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04. PROGRAMACIÓN -->
+  <section id="programacion">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-code">💻</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-code">04 — Programación</div>
+        <div class="sec-title">FP Informática y código</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Cada herramienta tiene un rol distinto: Claude para contexto amplio, DeepSeek para depurar, Qwen para prototipado visual.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Proyectos grandes con muchos archivos</div>
+        <div class="step-rec"><strong class="c-code">Claude Sonnet 4</strong><span class="why">1M de tokens: lee el repositorio completo de una vez</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Depurar bugs lógicos complejos</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong><span class="why">Razonamiento paso a paso para encontrar fallos ocultos</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Buscar documentación actualizada</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(activa 🌐 búsqueda)</span><span class="why">Accede a librerías y frameworks recientes</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Convertir un boceto en código frontend</div>
+        <div class="step-rec"><strong class="c-slides">Qwen 3.5 Plus</strong><span class="why">Foto de un dibujo → HTML/CSS funcional directamente</span></div>
+      </div>
+    </div>
+
+    <div class="flow-box reveal">
+      <div class="flow-label">🔁 Flujo ideal</div>
+      <strong>Claude</strong> (contexto completo) → <strong>DeepSeek</strong> (depurar) → <strong>Qwen</strong> (prototipado visual)
+    </div>
+  </section>
+
+  <!-- 05. PRESENTACIONES -->
+  <section id="presentaciones">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-slides">📊</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-slides">05 — Presentaciones</div>
+        <div class="sec-title">Slides y exposiciones</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Separa el trabajo de contenido del trabajo de diseño: cada herramienta sobresale en su parte.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">1</div>
+        <div class="step-task">Generar estructura y contenido</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(activa 🌐 si es necesario)</span><span class="why">Organiza el guion con razonamiento sólido</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">2A</div>
+        <div class="step-task">Crear el .pptx directamente</div>
+        <div class="step-rec"><strong class="c-code">Claude Sonnet 4</strong><span class="why">Genera el archivo listo para descargar y editar</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">2B</div>
+        <div class="step-task">Dar un diseño profesional</div>
+        <div class="step-rec"><strong class="c-slides">Gamma</strong><span class="why">Plantillas automáticas con diseño de calidad</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">Alt</div>
+        <div class="step-task">Diapositivas con imágenes de calidad</div>
+        <div class="step-rec"><strong class="c-teach">Canva Education</strong><span class="why">Biblioteca enorme de recursos educativos gratuitos</span></div>
+      </div>
+    </div>
+
+    <div class="flow-box reveal">
+      <div class="flow-label">🔁 Flujo ideal</div>
+      <strong>DeepSeek</strong> (estructura) → <strong>Claude</strong> (archivo rápido) o <strong>Gamma</strong> (diseño profesional)
+    </div>
+  </section>
+
+  <!-- 06. ESTUDIO Y REPASO -->
+  <section id="estudio">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-study">🎓</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-study">06 — Estudio y repaso</div>
+        <div class="sec-title">Aprende más en menos tiempo</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Usa la IA no solo para entender, sino para practicar activamente: genera ejercicios, simula exámenes y repasa mientras te mueves.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Convertir tus apuntes en podcast</div>
+        <div class="step-rec"><strong class="c-study">NotebookLM</strong><span class="why">Dos voces debaten el tema como un programa de radio</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Hacer preguntas sobre tus materiales</div>
+        <div class="step-rec"><strong class="c-study">NotebookLM</strong><span class="why">Responde solo con lo que has subido, sin inventar</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Ampliar conceptos de tus apuntes</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(activa 🌐 búsqueda)</span><span class="why">Encuentra ejemplos y contextos actualizados</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Resumir una clase grabada</div>
+        <div class="step-rec"><strong class="c-slides">Qwen 3.5 Plus</strong><span class="why">Analiza vídeos de hasta 2 horas de duración</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Generar preguntas de autoevaluación</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong><span class="why">Crea exámenes de práctica personalizados al instante</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07. DOCENCIA -->
+  <section id="docencia">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-teach">👩‍🏫</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-teach">07 — Docencia</div>
+        <div class="sec-title">Preparar clases y materiales</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Para el profesorado, la IA ahorra tiempo en las tareas repetitivas y libera espacio para lo que importa: la relación con el alumnado.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Planificar una unidad didáctica</div>
+        <div class="step-rec"><strong class="c-privacy">Google Gemini</strong> <span style="color:var(--muted);font-size:.75rem;">(cuenta educativa)</span><span class="why">Integrado con Drive y Docs; datos protegidos</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Buscar ejemplos actualizados</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong> <span style="color:var(--muted);font-size:.75rem;">(activa 🌐 búsqueda)</span><span class="why">Accede a noticias y casos reales recientes</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Crear materiales visuales</div>
+        <div class="step-rec"><strong class="c-teach">Canva Education</strong><span class="why">Plantillas educativas gratuitas con IA integrada</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Generar podcast de repaso para el alumnado</div>
+        <div class="step-rec"><strong class="c-study">NotebookLM</strong><span class="why">Subes tus materiales → podcast automático listo</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Elaborar rúbricas de evaluación</div>
+        <div class="step-rec"><strong class="c-math">DeepSeek</strong><span class="why">Razonamiento estructurado para criterios claros y detallados</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Dar feedback personalizado al alumnado</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT for Teachers</strong><span class="why">Versión con protección FERPA disponible para centros</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08. MULTIMEDIA -->
+  <section id="multimedia">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-media">🖼️</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-media">08 — Multimedia</div>
+        <div class="sec-title">Imágenes y vídeos</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Analizar, generar y transcribir contenido visual: herramientas distintas para cada necesidad.</p>
+    <hr class="sec-divider">
+
+    <div class="step-list reveal">
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Analizar gráficos y diagramas</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT</strong><span class="why">Sube la imagen y pregunta directamente sobre ella</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Generar imágenes para trabajos</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT</strong> <span style="color:var(--muted);font-size:.75rem;">(DALL-E)</span><span class="why">Integrado en el chat con límites generosos</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Resumir vídeos largos (clases grabadas)</div>
+        <div class="step-rec"><strong class="c-slides">Qwen 3.5 Plus</strong><span class="why">Analiza hasta 2 horas de vídeo de una sola vez</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num-badge">→</div>
+        <div class="step-task">Convertir foto de pizarra en texto</div>
+        <div class="step-rec"><strong class="c-media">ChatGPT</strong> o <strong class="c-slides">Qwen</strong><span class="why">Ambas tienen OCR integrado y funcionan bien con pizarras</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09. PRIVACIDAD -->
+  <section id="privacidad">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-privacy">⚠️</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num c-privacy">09 — Privacidad</div>
+        <div class="sec-title">Importante para centros educativos</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Cuando trabajes con datos del alumnado o menores, usa solo las herramientas con políticas educativas específicas.</p>
+    <hr class="sec-divider">
+
+    <div class="privacy-grid reveal">
+      <div class="privacy-header">
+        <div>Nivel de sensibilidad</div>
+        <div>IA recomendada</div>
+        <div>Motivo</div>
+      </div>
+      <div class="privacy-row" style="border-color:rgba(74,222,128,.2);">
+        <div class="privacy-level" style="color:var(--privacy);">Datos de menores / FERPA</div>
+        <div class="privacy-tool c-privacy">Google Gemini <span style="font-weight:300;font-size:.75rem;">(cuenta educativa)</span></div>
+        <div class="privacy-why">No usa datos para entrenamiento; políticas educativas específicas</div>
+      </div>
+      <div class="privacy-row" style="border-color:rgba(74,222,128,.2);">
+        <div class="privacy-level" style="color:var(--privacy);">Datos de menores / FERPA</div>
+        <div class="privacy-tool c-privacy">Perplexity <span style="font-weight:300;font-size:.75rem;">(cuenta verificada)</span></div>
+        <div class="privacy-why">Políticas académicas con protecciones específicas</div>
+      </div>
+      <div class="privacy-row" style="border-color:rgba(74,222,128,.2);">
+        <div class="privacy-level" style="color:var(--privacy);">Datos de menores / FERPA</div>
+        <div class="privacy-tool c-privacy">ChatGPT for Teachers</div>
+        <div class="privacy-why">Versión educativa con protección FERPA para centros</div>
+      </div>
+      <div class="privacy-row">
+        <div class="privacy-level">Sin datos sensibles</div>
+        <div class="privacy-tool" style="color:var(--dim);">DeepSeek, Claude, Qwen</div>
+        <div class="privacy-why">Gratuitas y funcionales para uso personal o de aula sin datos de alumnado</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. GUÍA RÁPIDA -->
+  <section id="rapida">
+    <div class="sec-head reveal">
+      <div class="sec-icon bg-quick" style="font-size:1.2rem;">⚡</div>
+      <div class="sec-title-wrap">
+        <div class="sec-num" style="color:var(--dim);">10 — Referencia rápida</div>
+        <div class="sec-title">Busca tu tarea, usa esta IA</div>
+      </div>
+    </div>
+    <p class="sec-intro reveal">Tabla de consulta rápida. Si buscas orientación en menos de 10 segundos, empieza aquí.</p>
+    <hr class="sec-divider">
+
+    <div class="task-grid reveal">
+      <div class="task-row"><span class="task-if">Citas verificables para un trabajo</span><span class="task-use c-research">Perplexity AI</span></div>
+      <div class="task-row"><span class="task-if">Resolver un problema de matemáticas</span><span class="task-use c-math">DeepSeek</span></div>
+      <div class="task-row"><span class="task-if">Explicar un concepto con palabras sencillas</span><span class="task-use c-media">ChatGPT</span></div>
+      <div class="task-row"><span class="task-if">Analizar un gráfico o imagen</span><span class="task-use c-media">ChatGPT</span></div>
+      <div class="task-row"><span class="task-if">Generar una imagen para una presentación</span><span class="task-use c-media">ChatGPT (DALL-E)</span></div>
+      <div class="task-row"><span class="task-if">Crear un PowerPoint rápido</span><span class="task-use c-code">Claude Sonnet 4</span></div>
+      <div class="task-row"><span class="task-if">Presentación con buen diseño</span><span class="task-use c-slides">Gamma</span></div>
+      <div class="task-row"><span class="task-if">Repasar apuntes mientras caminas</span><span class="task-use c-study">NotebookLM</span></div>
+      <div class="task-row"><span class="task-if">Resumir una clase grabada de 2 horas</span><span class="task-use c-slides">Qwen 3.5 Plus</span></div>
+      <div class="task-row"><span class="task-if">Depurar código con bugs complejos</span><span class="task-use c-math">DeepSeek</span></div>
+      <div class="task-row"><span class="task-if">Leer un repositorio de código completo</span><span class="task-use c-code">Claude Sonnet 4</span></div>
+      <div class="task-row"><span class="task-if">Convertir un dibujo en página web</span><span class="task-use c-slides">Qwen 3.5 Plus</span></div>
+      <div class="task-row"><span class="task-if">Preparar una unidad didáctica</span><span class="task-use c-privacy">Google Gemini</span></div>
+      <div class="task-row"><span class="task-if">Diseñar fichas y materiales bonitos</span><span class="task-use c-teach">Canva Education</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong>¿QUÉ IA USO? · Asturias</strong></p>
+  <p style="margin-top:.4rem;">Guía para estudiantes y docentes · Marzo 2026 · Todas las herramientas tienen versión gratuita</p>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement;
+    document.getElementById('progress').style.width =
+      (s.scrollTop / (s.scrollHeight - s.clientHeight) * 100) + '%';
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Claude Code
+/.claude/
+Claude.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

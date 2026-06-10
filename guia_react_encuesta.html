@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta en React · Guía Didáctica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════
+   TOKENS
+════════════════════════════════════ */
+:root {
+  --bg:       #0e0c0a;
+  --s1:       #161310;
+  --s2:       #1f1b16;
+  --s3:       #2a2520;
+  --border:   #352e26;
+  --accent:   #f97316;
+  --acc2:     #fb923c;
+  --acc3:     #fbbf24;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --text:     #f5efe8;
+  --muted:    #8a7d72;
+  --code-bg:  #080705;
+  --r:        10px;
+  --rl:       16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Lora',Georgia,serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.75;
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero{
+  position:relative;
+  padding:88px 24px 64px;
+  text-align:center;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%,rgba(249,115,22,.2) 0%,transparent 65%),
+    radial-gradient(ellipse 30% 25% at 85% 90%,rgba(251,191,36,.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+/* grid lines */
+.hero-bg::after{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(249,115,22,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(249,115,22,.04) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);
+  background:rgba(249,115,22,.1);
+  border:1px solid rgba(249,115,22,.3);
+  padding:5px 14px;border-radius:20px;
+  margin-bottom:24px;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.2rem,6vw,3.8rem);
+  font-weight:800;line-height:1.05;
+  margin-bottom:20px;
+  letter-spacing:-.02em;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--accent),var(--acc3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-lead{
+  font-size:1rem;color:var(--muted);
+  max-width:480px;margin:0 auto 36px;
+  font-style:italic;
+}
+.hero-tags{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.htag{
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+  color:var(--muted);
+  background:var(--s2);border:1px solid var(--border);
+  padding:4px 12px;border-radius:5px;
+}
+.htag span{color:var(--acc3);}
+
+/* ════════════════════════════════════
+   STICKY NAV
+════════════════════════════════════ */
+.snav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(14,12,10,.9);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+.snav::-webkit-scrollbar{display:none;}
+.snav-inner{
+  display:flex;max-width:960px;margin:0 auto;
+  min-width:max-content;
+}
+.snav a{
+  display:flex;align-items:center;gap:6px;
+  padding:13px 16px;
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;
+  color:var(--muted);text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.snav a:hover{color:var(--text);border-bottom-color:var(--accent);}
+.snav a .n{
+  background:var(--s2);color:var(--accent);
+  padding:1px 6px;border-radius:4px;font-size:.6rem;
+}
+
+/* ════════════════════════════════════
+   LAYOUT
+════════════════════════════════════ */
+.wrap{max-width:960px;margin:0 auto;padding:40px 24px 80px;}
+
+/* ════════════════════════════════════
+   SECTION TITLES
+════════════════════════════════════ */
+.stitle{
+  display:flex;align-items:center;gap:14px;
+  margin:60px 0 28px;
+}
+.stitle-badge{
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  font-weight:600;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--accent);
+  background:rgba(249,115,22,.1);
+  border:1px solid rgba(249,115,22,.25);
+  padding:5px 11px;border-radius:6px;flex-shrink:0;
+}
+.stitle h2{
+  font-family:'Syne',sans-serif;
+  font-size:1.45rem;font-weight:700;
+}
+.stitle-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+
+/* ════════════════════════════════════
+   PROSE
+════════════════════════════════════ */
+p{font-size:.9rem;color:rgba(245,239,232,.82);margin-bottom:10px;}
+strong{color:var(--text);font-weight:600;}
+code{
+  font-family:'IBM Plex Mono',monospace;font-size:.78em;
+  background:rgba(249,115,22,.12);color:var(--acc2);
+  padding:1px 5px;border-radius:4px;
+}
+
+/* ════════════════════════════════════
+   LIVE DEMO
+════════════════════════════════════ */
+.demo-wrap{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:var(--rl);
+  overflow:hidden;
+  margin-bottom:32px;
+}
+.demo-titlebar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  background:var(--s2);
+  border-bottom:1px solid var(--border);
+}
+.demo-dot{width:11px;height:11px;border-radius:50%;}
+.demo-label{
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;
+  color:var(--muted);margin-left:4px;
+}
+.demo-live-tag{
+  margin-left:auto;
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  color:var(--green);
+  background:rgba(74,222,128,.1);
+  border:1px solid rgba(74,222,128,.25);
+  padding:2px 8px;border-radius:4px;
+  display:flex;align-items:center;gap:5px;
+}
+.live-pulse{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 5px var(--green);
+  animation:lp 1.8s ease-in-out infinite;
+}
+@keyframes lp{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+.demo-inner{padding:24px;}
+
+/* The actual app UI inside demo */
+.app-header{text-align:center;margin-bottom:20px;}
+.app-title{
+  font-family:'Syne',sans-serif;
+  font-size:1.3rem;font-weight:800;
+  color:var(--text);
+}
+.app-stats{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.stat-pill{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 18px;
+  font-size:.82rem;text-align:center;
+}
+.stat-val{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:1.4rem;font-weight:600;
+  color:var(--acc3);display:block;
+}
+.stat-label{color:var(--muted);font-size:.7rem;}
+
+.options-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.opt-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 16px;
+  transition:border-color .2s;
+  position:relative;overflow:hidden;
+}
+.opt-row.winner{border-color:rgba(251,191,36,.4);}
+.opt-row::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  background:rgba(249,115,22,.06);
+  width:var(--bar,0%);
+  transition:width .5s ease;
+}
+.opt-name{font-size:.88rem;font-weight:500;flex:1;position:relative;}
+.opt-votes{
+  font-family:'IBM Plex Mono',monospace;font-size:.9rem;
+  color:var(--acc2);min-width:28px;text-align:right;
+  position:relative;
+}
+.opt-btn{
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;
+  color:var(--accent);
+  background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);
+  padding:5px 13px;border-radius:6px;cursor:pointer;
+  transition:all .15s;position:relative;
+}
+.opt-btn:hover{background:rgba(249,115,22,.2);border-color:var(--accent);}
+.opt-btn:active{transform:scale(.96);}
+.winner-tag{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  background:rgba(251,191,36,.15);color:var(--acc3);
+  border:1px solid rgba(251,191,36,.3);
+  padding:2px 6px;border-radius:4px;position:relative;
+}
+.reset-btn{
+  display:block;width:100%;
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;
+  color:var(--muted);background:transparent;
+  border:1px solid var(--border);
+  padding:8px;border-radius:var(--r);
+  cursor:pointer;transition:all .2s;
+}
+.reset-btn:hover{color:var(--text);border-color:var(--muted);}
+
+/* ════════════════════════════════════
+   CONCEPT ACCORDION
+════════════════════════════════════ */
+.acc-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin-bottom:14px;
+  transition:border-color .2s;
+}
+.acc-card:hover{border-color:rgba(249,115,22,.3);}
+.acc-head{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 20px;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-head:hover{background:rgba(255,255,255,.015);}
+.acc-ico{
+  width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.ic-o{background:rgba(249,115,22,.15);}
+.ic-y{background:rgba(251,191,36,.12);}
+.ic-g{background:rgba(74,222,128,.12);}
+.ic-b{background:rgba(96,165,250,.12);}
+.ic-p{background:rgba(167,139,250,.12);}
+.acc-titles h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;}
+.acc-titles small{font-size:.72rem;color:var(--muted);}
+.acc-chev{
+  margin-left:auto;color:var(--muted);flex-shrink:0;
+  transition:transform .3s;
+}
+.acc-card.open .acc-chev{transform:rotate(180deg);}
+.acc-body{
+  display:none;
+  padding:4px 20px 22px;
+  border-top:1px solid var(--border);
+}
+.acc-card.open .acc-body{display:block;}
+.acc-body > * + *{margin-top:14px;}
+
+/* ════════════════════════════════════
+   CODE
+════════════════════════════════════ */
+.cw{
+  position:relative;
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  margin-top:12px;
+}
+.ch{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 14px;
+  background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+}
+.clang{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.cpybtn{
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;
+  color:var(--muted);background:none;
+  border:1px solid var(--border);padding:2px 8px;border-radius:4px;
+  cursor:pointer;transition:all .2s;
+}
+.cpybtn:hover{color:var(--accent);border-color:var(--accent);}
+.cpybtn.ok{color:var(--green);border-color:var(--green);}
+pre{
+  padding:16px;
+  font-family:'IBM Plex Mono',monospace;font-size:.76rem;
+  line-height:1.65;
+  overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+/* syntax tokens */
+pre .cm{color:#5c6370;}
+pre .kw{color:#c678dd;}
+pre .fn{color:#61afef;}
+pre .st{color:#98c379;}
+pre .tg{color:#e06c75;}
+pre .at{color:#d19a66;}
+pre .nu{color:#d19a66;}
+pre .cl{color:var(--acc2);}
+pre .tx{color:var(--text);}
+pre .op{color:#56b6c2;}
+
+/* ════════════════════════════════════
+   BEFORE/AFTER
+════════════════════════════════════ */
+.ba{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin-top:12px;
+}
+.ba-tabs{display:flex;border-bottom:1px solid var(--border);}
+.ba-tab{
+  flex:1;padding:10px 14px;font-size:.76rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  color:var(--muted);border-bottom:2px solid transparent;
+  transition:all .2s;user-select:none;
+}
+.ba-tab.active.bad{color:var(--red);border-bottom-color:var(--red);background:rgba(248,113,113,.04);}
+.ba-tab.active.good{color:var(--green);border-bottom-color:var(--green);background:rgba(74,222,128,.04);}
+.ba-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02);}
+.ba-pane{display:none;padding:16px;}
+.ba-pane.active{display:block;}
+.ba-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:3px 9px;border-radius:4px;margin-bottom:10px;
+}
+.bb-bad{background:rgba(248,113,113,.12);color:var(--red);}
+.bb-good{background:rgba(74,222,128,.12);color:var(--green);}
+
+/* ════════════════════════════════════
+   FLOW
+════════════════════════════════════ */
+.flow{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);padding:24px;
+  margin-top:12px;
+}
+.flow-steps{display:flex;flex-direction:column;gap:0;}
+.flow-step{
+  display:flex;gap:16px;position:relative;
+}
+.flow-step + .flow-step{margin-top:4px;}
+.flow-left{
+  display:flex;flex-direction:column;align-items:center;
+  width:36px;flex-shrink:0;
+}
+.flow-dot{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;
+  color:var(--accent);background:rgba(249,115,22,.08);
+  flex-shrink:0;position:relative;z-index:1;
+  transition:all .2s;
+}
+.flow-step:hover .flow-dot{border-color:var(--accent);box-shadow:0 0 12px rgba(249,115,22,.3);}
+.flow-connector{
+  flex:1;width:2px;background:linear-gradient(to bottom,var(--border),transparent);
+  min-height:24px;
+}
+.flow-content{
+  padding:4px 0 20px;
+  font-size:.84rem;
+}
+.flow-content strong{color:var(--acc2);}
+.flow-content span{color:var(--muted);font-size:.78rem;display:block;margin-top:2px;}
+
+/* ════════════════════════════════════
+   TABLE
+════════════════════════════════════ */
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin:10px 0;}
+th{
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);
+  padding:7px 12px;border-bottom:1px solid var(--border);text-align:left;
+}
+td{padding:8px 12px;border-bottom:1px solid rgba(53,46,38,.5);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.012);}
+
+/* ════════════════════════════════════
+   CALLOUT
+════════════════════════════════════ */
+.callout{
+  border-left:3px solid var(--accent);
+  background:rgba(249,115,22,.05);
+  padding:12px 16px;border-radius:0 var(--r) var(--r) 0;
+  font-size:.83rem;margin:12px 0;
+}
+.callout.warn{border-left-color:var(--red);background:rgba(248,113,113,.05);}
+.callout.tip {border-left-color:var(--acc3);background:rgba(251,191,36,.05);}
+.callout.info{border-left-color:var(--blue);background:rgba(96,165,250,.05);}
+.callout strong{color:var(--accent);}
+.callout.warn strong{color:var(--red);}
+.callout.tip  strong{color:var(--acc3);}
+.callout.info strong{color:var(--blue);}
+
+/* ════════════════════════════════════
+   EXERCISES
+════════════════════════════════════ */
+.ex-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);margin-bottom:14px;overflow:hidden;
+  transition:border-color .2s;
+}
+.ex-card:hover{border-color:rgba(249,115,22,.35);}
+.ex-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;cursor:pointer;
+}
+.ex-num{
+  width:34px;height:34px;border-radius:8px;
+  background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:600;
+  color:var(--accent);flex-shrink:0;
+}
+.ex-info h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
+.ex-info small{font-size:.7rem;color:var(--muted);}
+.ex-chev{margin-left:auto;color:var(--muted);transition:transform .3s;flex-shrink:0;}
+.ex-card.open .ex-chev{transform:rotate(180deg);}
+.ex-body{display:none;border-top:1px solid var(--border);padding:18px 20px;}
+.ex-card.open .ex-body{display:block;}
+
+.hint-box{
+  display:flex;align-items:flex-start;gap:9px;
+  background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);
+  border-radius:var(--r);padding:10px 14px;
+  font-size:.8rem;color:var(--acc3);margin:12px 0;
+}
+
+.sol-toggle-btn{
+  display:flex;align-items:center;gap:7px;
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;
+  color:var(--muted);background:var(--s2);
+  border:1px solid var(--border);
+  padding:7px 14px;border-radius:6px;cursor:pointer;
+  transition:all .2s;margin-top:12px;
+}
+.sol-toggle-btn:hover{color:var(--green);border-color:var(--green);}
+.sol-toggle-btn.open{color:var(--green);border-color:var(--green);background:rgba(74,222,128,.05);}
+.sol-block{display:none;}
+.sol-block.visible{display:block;}
+
+/* ════════════════════════════════════
+   STRUCT TREE
+════════════════════════════════════ */
+.file-tree{
+  background:var(--code-bg);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 20px;
+  font-family:'IBM Plex Mono',monospace;font-size:.78rem;
+  line-height:2;
+}
+.file-tree .dir{color:var(--acc2);}
+.file-tree .file{color:var(--text);}
+.file-tree .comment{color:var(--muted);}
+.file-tree .indent1{padding-left:20px;}
+.file-tree .indent2{padding-left:40px;}
+
+/* ════════════════════════════════════
+   RESOURCES
+════════════════════════════════════ */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:480px){.res-grid{grid-template-columns:1fr;}}
+.res-a{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);text-decoration:none;
+  color:var(--text);font-size:.82rem;font-weight:500;
+  transition:all .2s;font-family:'Syne',sans-serif;
+}
+.res-a:hover{border-color:var(--accent);color:var(--acc2);}
+.res-ico{
+  width:32px;height:32px;border-radius:7px;
+  background:rgba(249,115,22,.12);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;
+}
+
+/* ════════════════════════════════════
+   FOOTER
+════════════════════════════════════ */
+.footer{
+  text-align:center;
+  padding:28px 24px 48px;
+  border-top:1px solid var(--border);
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;
+  color:var(--muted);
+}
+
+/* ════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════ */
+.acc-card,.ex-card{animation:fu .4s ease both;}
+@keyframes fu{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.acc-card:nth-child(1){animation-delay:.04s}
+.acc-card:nth-child(2){animation-delay:.08s}
+.acc-card:nth-child(3){animation-delay:.12s}
+.acc-card:nth-child(4){animation-delay:.16s}
+.acc-card:nth-child(5){animation-delay:.20s}
+
+/* ════════════════════════════════════
+   CHIP TAGS
+════════════════════════════════════ */
+.chip{
+  display:inline-flex;align-items:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+  background:rgba(249,115,22,.08);color:var(--acc2);
+  border:1px solid rgba(249,115,22,.2);
+  padding:2px 9px;border-radius:5px;margin:2px;
+}
+.chip.g{background:rgba(74,222,128,.08);color:var(--green);border-color:rgba(74,222,128,.2);}
+.chip.r{background:rgba(248,113,113,.08);color:var(--red);border-color:rgba(248,113,113,.2);}
+
+/* layout grid for code+explanation side by side */
+.code-explain{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;
+}
+@media(max-width:600px){.code-explain{grid-template-columns:1fr;}}
+.explain-list{display:flex;flex-direction:column;gap:7px;}
+.el-row{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:8px 10px;background:var(--s2);border-radius:7px;
+  font-size:.78rem;border:1px solid transparent;transition:border-color .2s;
+}
+.el-row:hover{border-color:var(--border);}
+.el-row code{flex-shrink:0;}
+.el-desc{color:var(--muted);font-size:.72rem;}
+
+/* reduce table highlight */
+.tbl-hl td:last-child{color:var(--green);}
+.tbl-hl tr:last-child td{color:var(--acc2);}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-eyebrow">⚛ React · Hooks · Componentes</div>
+  <h1>Encuesta<br><em>en React</em></h1>
+  <p class="hero-lead">Guía didáctica para construir una app de votaciones en tiempo real, paso a paso.</p>
+  <div class="hero-tags">
+    <span class="htag"><span>useState</span></span>
+    <span class="htag"><span>props</span></span>
+    <span class="htag"><span>map()</span></span>
+    <span class="htag"><span>reduce()</span></span>
+    <span class="htag"><span>callbacks</span></span>
+    <span class="htag">DAW · React 18</span>
+  </div>
+</section>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav class="snav">
+  <div class="snav-inner">
+    <a href="#s1"><span class="n">01</span> Descripción</a>
+    <a href="#s2"><span class="n">02</span> Estructura</a>
+    <a href="#s3"><span class="n">03</span> Conceptos</a>
+    <a href="#s4"><span class="n">04</span> Código</a>
+    <a href="#s5"><span class="n">05</span> Flujo</a>
+    <a href="#s6"><span class="n">06</span> Ejercicios</a>
+    <a href="#s7"><span class="n">07</span> Recursos</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══════════════ SECCIÓN 1 ══════════════ -->
+<div id="s1">
+  <div class="stitle">
+    <div class="stitle-badge">01</div>
+    <h2>Descripción de la Aplicación</h2>
+    <div class="stitle-line"></div>
+  </div>
+
+  <p>Una <strong>encuesta</strong> interactiva donde los usuarios votan por opciones y ven las estadísticas actualizarse en tiempo real — sin recargar la página.</p>
+
+  <!-- LIVE DEMO -->
+  <div class="demo-wrap">
+    <div class="demo-titlebar">
+      <div class="demo-dot" style="background:#ff5f57"></div>
+      <div class="demo-dot" style="background:#febc2e;margin-left:5px"></div>
+      <div class="demo-dot" style="background:#28c840;margin-left:5px"></div>
+      <span class="demo-label">App de encuesta — demo interactiva</span>
+      <div class="demo-live-tag"><div class="live-pulse"></div>React simulado</div>
+    </div>
+    <div class="demo-inner" id="liveDemo">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <div class="callout info"><strong>Esta demo es funcional:</strong> Los botones de arriba hacen exactamente lo que hará tu aplicación React. Úsala para entender el comportamiento antes de leer el código.</div>
+</div>
+
+<!-- ══════════════ SECCIÓN 2 ══════════════ -->
+<div id="s2">
+  <div class="stitle">
+    <div class="stitle-badge">02</div>
+    <h2>Estructura del Proyecto</h2>
+    <div class="stitle-line"></div>
+  </div>
+
+  <div class="file-tree">
+    <div><span class="dir">solucion/ejercicio2/</span></div>
+    <div class="indent1"><span class="dir">src/</span></div>
+    <div class="indent2"><span class="file">App.jsx</span> <span class="comment">← Componente principal (estado + lógica)</span></div>
+    <div class="indent2"><span class="file">App.css</span></div>
+    <div class="indent2"><span class="file">main.jsx</span> <span class="comment">← Punto de entrada</span></div>
+    <div class="indent2"><span class="file">index.css</span></div>
+    <div class="indent2"><span class="dir">components/</span></div>
+    <div class="indent2" style="padding-left:60px"><span class="file">Option.jsx</span> <span class="comment">← Componente hijo (presentacional)</span></div>
+    <div class="indent2" style="padding-left:60px"><span class="file">Option.css</span></div>
+    <div class="indent1"><span class="dir">public/</span></div>
+    <div class="indent1"><span class="file">index.html</span></div>
+    <div class="indent1"><span class="file">package.json</span></div>
+  </div>
+
+  <p style="margin-top:14px">El punto de entrada <code>main.jsx</code> monta el componente raíz en el DOM:</p>
+  <div class="cw">
+    <div class="ch"><span class="clang">main.jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+    <pre><span class="kw">import</span> <span class="tx">{ StrictMode } </span><span class="kw">from</span> <span class="st">'react'</span>
+<span class="kw">import</span> <span class="tx">{ createRoot } </span><span class="kw">from</span> <span class="st">'react-dom/client'</span>
+<span class="kw">import</span> <span class="st">'./index.css'</span>
+<span class="kw">import</span> <span class="tx">App </span><span class="kw">from</span> <span class="st">'./App.jsx'</span>
+
+<span class="fn">createRoot</span><span class="tx">(document.</span><span class="fn">getElementById</span><span class="tx">(</span><span class="st">'root'</span><span class="tx">)).</span><span class="fn">render</span><span class="tx">(</span>
+  <span class="tg">&lt;StrictMode&gt;</span>
+    <span class="tg">&lt;App /&gt;</span>
+  <span class="tg">&lt;/StrictMode&gt;</span><span class="tx">,</span>
+<span class="tx">)</span></pre>
+  </div>
+
+  <table style="margin-top:14px">
+    <tr><th>Línea</th><th>Concepto</th></tr>
+    <tr><td><code>createRoot</code></td><td>Crea la raíz de React 18 — nueva API más eficiente</td></tr>
+    <tr><td><code>getElementById('root')</code></td><td>Localiza el <code>&lt;div id="root"&gt;</code> en <code>index.html</code></td></tr>
+    <tr><td><code>render(&lt;App /&gt;)</code></td><td>Renderiza el árbol de componentes dentro de ese div</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════ SECCIÓN 3 ══════════════ -->
+<div id="s3">
+  <div class="stitle">
+    <div class="stitle-badge">03</div>
+    <h2>Conceptos Fundamentales</h2>
+    <div class="stitle-line"></div>
+  </div>
+
+  <!-- 3.1 Componentes -->
+  <div class="acc-card open">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-o">🧩</div>
+      <div class="acc-titles">
+        <h3>3.1 Componentes</h3>
+        <small>Funciones que devuelven JSX</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <p>Un <strong>componente</strong> es una función JavaScript que retorna JSX — una sintaxis que parece HTML pero es JavaScript.</p>
+
+      <div class="callout"><strong>Reglas:</strong> siempre empiezan con <strong>Mayúscula</strong>, retornan JSX, y pueden recibir props.</div>
+
+      <div class="code-explain">
+        <div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Componente padre (App):</p>
+          <div class="cw">
+            <div class="ch"><span class="clang">App.jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+            <pre><span class="kw">function</span> <span class="fn">App</span><span class="tx">() {</span>
+  <span class="cm">// Lógica del componente</span>
+  <span class="kw">return</span> <span class="tg">&lt;div&gt;</span><span class="tx">...</span><span class="tg">&lt;/div&gt;</span>
+<span class="tx">}</span></pre>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Componente hijo (Option):</p>
+          <div class="cw">
+            <div class="ch"><span class="clang">Option.jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+            <pre><span class="kw">function</span> <span class="fn">Option</span><span class="tx">({ texto, votos, onVotar }) {</span>
+  <span class="kw">return</span> <span class="tx">(</span>
+    <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"option-card"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;span&gt;</span><span class="tx">{texto}</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;span&gt;</span><span class="tx">{votos}</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">onClick=</span><span class="tx">{onVotar}</span><span class="tg">&gt;</span>Votar<span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tx">)</span>
+<span class="tx">}</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 Props -->
+  <div class="acc-card">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-y">📦</div>
+      <div class="acc-titles">
+        <h3>3.2 Props (Propiedades)</h3>
+        <small>Argumentos que el padre pasa al hijo</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <p>Las <strong>props</strong> son la única forma de que el padre envíe datos al hijo. El hijo los recibe como parámetros y <em>no puede modificarlos</em>.</p>
+
+      <div class="ba">
+        <div class="ba-tabs">
+          <div class="ba-tab bad active" onclick="baTab(this,'p','padre')">⬇ Padre — envía props</div>
+          <div class="ba-tab good" onclick="baTab(this,'p','hijo')">⬆ Hijo — recibe props</div>
+        </div>
+        <div class="ba-pane active" data-ba="p" data-side="padre">
+          <div class="ba-badge bb-bad">App.jsx — el padre</div>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="cm">// App.jsx — el PADRE pasa props al hijo</span>
+<span class="tg">&lt;Option</span>
+  <span class="at">texto=</span><span class="st">"Opción A"</span>
+  <span class="at">votos=</span><span class="tx">{5}</span>
+  <span class="at">onVotar=</span><span class="tx">{() =></span> <span class="fn">handleVoto</span><span class="tx">(1)}</span>
+<span class="tg">/&gt;</span></pre></div>
+        </div>
+        <div class="ba-pane" data-ba="p" data-side="hijo">
+          <div class="ba-badge bb-good">Option.jsx — el hijo</div>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="cm">// Option.jsx — el HIJO recibe las props</span>
+<span class="kw">function</span> <span class="fn">Option</span><span class="tx">({ texto, votos, onVotar }) {</span>
+  <span class="cm">// texto   = "Opción A"</span>
+  <span class="cm">// votos   = 5</span>
+  <span class="cm">// onVotar = función del padre</span>
+<span class="tx">}</span></pre></div>
+        </div>
+      </div>
+      <div class="callout tip" style="margin-top:12px"><strong>Analogía:</strong> Las props son como los argumentos de una función, pero para componentes visuales.</div>
+    </div>
+  </div>
+
+  <!-- 3.3 useState -->
+  <div class="acc-card">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-g">⚡</div>
+      <div class="acc-titles">
+        <h3>3.3 Estado con useState</h3>
+        <small>Datos que cambian y provocan re-renders</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <p>El <strong>estado</strong> son datos que pueden cambiar durante la vida del componente. Cuando cambian, React re-renderiza el componente automáticamente.</p>
+      <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+      <pre><span class="kw">import</span> <span class="tx">{ useState } </span><span class="kw">from</span> <span class="st">'react'</span>
+
+<span class="kw">function</span> <span class="fn">App</span><span class="tx">() {</span>
+  <span class="cm">// useState devuelve: [valorActual, funciónParaActualizar]</span>
+  <span class="kw">const</span> <span class="tx">[opciones, setOpciones] = </span><span class="fn">useState</span><span class="tx">([</span>
+    <span class="tx">{ id: </span><span class="nu">1</span><span class="tx">, texto: </span><span class="st">'Opción A'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> }</span>
+  <span class="tx">])</span>
+  <span class="kw">return</span> <span class="tg">&lt;div&gt;</span><span class="tx">...</span><span class="tg">&lt;/div&gt;</span>
+<span class="tx">}</span></pre></div>
+
+      <div class="ba" style="margin-top:12px">
+        <div class="ba-tabs">
+          <div class="ba-tab bad active" onclick="baTab(this,'us','mal')">❌ Incorrecto</div>
+          <div class="ba-tab good" onclick="baTab(this,'us','bien')">✅ Correcto</div>
+        </div>
+        <div class="ba-pane active" data-ba="us" data-side="mal">
+          <div class="ba-badge bb-bad">Mutación directa — NUNCA hacer esto</div>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span></div>
+          <pre><span class="cm">// ❌ Modifica el estado directamente → React no se entera</span>
+<span class="tx">opciones.</span><span class="fn">push</span><span class="tx">(nuevoElemento)</span>
+<span class="tx">opciones[</span><span class="nu">0</span><span class="tx">].votos++</span></pre></div>
+        </div>
+        <div class="ba-pane" data-ba="us" data-side="bien">
+          <div class="ba-badge bb-good">Actualización inmutable — React detecta el cambio</div>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="cm">// ✅ Crea nuevo array — React detecta el cambio y re-renderiza</span>
+<span class="fn">setOpciones</span><span class="tx">(opciones.</span><span class="fn">map</span><span class="tx">(op => ...))</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.4 map -->
+  <div class="acc-card">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-b">🔁</div>
+      <div class="acc-titles">
+        <h3>3.4 Renderizado de Listas con map()</h3>
+        <small>Transforma un array en elementos JSX</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <p>Para renderizar listas dinámicas, usamos <code>map()</code>. Cada elemento necesita una <code>key</code> única para que React optimice los re-renders.</p>
+      <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+      <pre><span class="tx">{opciones.</span><span class="fn">map</span><span class="tx">(opcion => (</span>
+  <span class="tg">&lt;Option</span>
+    <span class="at">key=</span><span class="tx">{opcion.id}</span>         <span class="cm">// ← obligatorio</span>
+    <span class="at">texto=</span><span class="tx">{opcion.texto}</span>
+    <span class="at">votos=</span><span class="tx">{opcion.votos}</span>
+    <span class="at">onVotar=</span><span class="tx">{() =></span> <span class="fn">handleVoto</span><span class="tx">(opcion.id)}</span>
+  <span class="tg">/&gt;</span>
+<span class="tx">))}</span></pre></div>
+
+      <table style="margin-top:12px">
+        <tr><th>Parte</th><th>Función</th></tr>
+        <tr><td><code>opciones.map(...)</code></td><td>Itera cada elemento del array</td></tr>
+        <tr><td><code>opcion =&gt; (...)</code></td><td>Transforma cada elemento en JSX</td></tr>
+        <tr><td><code>key={opcion.id}</code></td><td>Identificador único — React lo necesita para reconciliación</td></tr>
+        <tr><td><code>&lt;Option .../&gt;</code></td><td>JSX que se renderiza por cada opción</td></tr>
+      </table>
+
+      <div class="callout warn" style="margin-top:10px"><strong>Sin key</strong>, React muestra un aviso en consola y puede comportarse de forma inesperada al actualizar la lista.</div>
+    </div>
+  </div>
+
+  <!-- 3.5 Callbacks -->
+  <div class="acc-card">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-p">📡</div>
+      <div class="acc-titles">
+        <h3>3.5 Funciones Callback como Props</h3>
+        <small>Comunicación del hijo al padre</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <p>Las props solo bajan (padre → hijo). Para que el hijo "informe" al padre de algo, el padre le pasa una <strong>función callback</strong> como prop. El hijo la llama cuando ocurre el evento.</p>
+
+      <div class="code-explain">
+        <div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px">App.jsx — define y pasa la función:</p>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="kw">const</span> <span class="fn">handleVoto</span> <span class="op">=</span> <span class="tx">(id) => {</span>
+  <span class="fn">setOpciones</span><span class="tx">(opciones.</span><span class="fn">map</span><span class="tx">(...))</span>
+<span class="tx">}</span>
+
+<span class="tg">&lt;Option</span>
+  <span class="at">onVotar=</span><span class="tx">{() =></span> <span class="fn">handleVoto</span><span class="tx">(opcion.id)}</span>
+<span class="tg">/&gt;</span></pre></div>
+        </div>
+        <div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Option.jsx — llama la función:</p>
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="kw">function</span> <span class="fn">Option</span><span class="tx">({ onVotar }) {</span>
+  <span class="kw">return</span> <span class="tx">(</span>
+    <span class="tg">&lt;button</span> <span class="at">onClick=</span><span class="tx">{onVotar}</span><span class="tg">&gt;</span>
+      Votar
+    <span class="tg">&lt;/button&gt;</span>
+  <span class="tx">)</span>
+<span class="tx">}</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /s3 -->
+
+<!-- ══════════════ SECCIÓN 4 ══════════════ -->
+<div id="s4">
+  <div class="stitle">
+    <div class="stitle-badge">04</div>
+    <h2>Análisis del Código</h2>
+    <div class="stitle-line"></div>
+  </div>
+
+  <!-- 4.1 App.jsx -->
+  <div class="acc-card open">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-o">📄</div>
+      <div class="acc-titles">
+        <h3>4.1 App.jsx — Componente Principal</h3>
+        <small>Estado + lógica + renderizado</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <div class="cw"><div class="ch"><span class="clang">App.jsx — completo</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+      <pre><span class="kw">import</span> <span class="tx">{ useState } </span><span class="kw">from</span> <span class="st">'react'</span>
+<span class="kw">import</span> <span class="tx">Option </span><span class="kw">from</span> <span class="st">'./components/Option'</span>
+<span class="kw">import</span> <span class="st">'./App.css'</span>
+
+<span class="kw">const</span> <span class="tx">opcionesIniciales = [</span>
+  <span class="tx">{ id: </span><span class="nu">1</span><span class="tx">, texto: </span><span class="st">'Opción A'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+  <span class="tx">{ id: </span><span class="nu">2</span><span class="tx">, texto: </span><span class="st">'Opción B'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+  <span class="tx">{ id: </span><span class="nu">3</span><span class="tx">, texto: </span><span class="st">'Opción C'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+<span class="tx">]</span>
+
+<span class="kw">function</span> <span class="fn">App</span><span class="tx">() {</span>
+  <span class="kw">const</span> <span class="tx">[opciones, setOpciones] = </span><span class="fn">useState</span><span class="tx">(opcionesIniciales)</span>
+
+  <span class="cm">// Incrementa los votos de la opción con ese id</span>
+  <span class="kw">const</span> <span class="fn">handleVoto</span> <span class="op">=</span> <span class="tx">(id) => {</span>
+    <span class="fn">setOpciones</span><span class="tx">(opciones.</span><span class="fn">map</span><span class="tx">(op =></span>
+      <span class="tx">op.id </span><span class="op">===</span><span class="tx"> id ? { ...op, votos: op.votos </span><span class="op">+</span> <span class="nu">1</span><span class="tx"> } : op</span>
+    <span class="tx">))</span>
+  <span class="tx">}</span>
+
+  <span class="kw">const</span> <span class="tx">totalVotos = opciones.</span><span class="fn">reduce</span><span class="tx">((sum, op) => sum </span><span class="op">+</span><span class="tx"> op.votos, </span><span class="nu">0</span><span class="tx">)</span>
+
+  <span class="kw">const</span> <span class="tx">opcionGanadora = opciones.</span><span class="fn">reduce</span><span class="tx">((max, op) =></span>
+    <span class="tx">op.votos </span><span class="op">&gt;</span><span class="tx"> max.votos ? op : max, opciones[</span><span class="nu">0</span><span class="tx">])</span>
+
+  <span class="kw">return</span> <span class="tx">(</span>
+    <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"container"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;h1&gt;</span>Encuesta<span class="tg">&lt;/h1&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"stats"</span><span class="tg">&gt;</span>
+        <span class="tg">&lt;p&gt;</span>Total: <span class="tg">&lt;strong&gt;</span><span class="tx">{totalVotos}</span><span class="tg">&lt;/strong&gt;&lt;/p&gt;</span>
+        <span class="tg">&lt;p&gt;</span>Ganador: <span class="tg">&lt;strong&gt;</span><span class="tx">{opcionGanadora.texto}</span><span class="tg">&lt;/strong&gt;&lt;/p&gt;</span>
+      <span class="tg">&lt;/div&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"options"</span><span class="tg">&gt;</span>
+        <span class="tx">{opciones.</span><span class="fn">map</span><span class="tx">(opcion => (</span>
+          <span class="tg">&lt;Option</span>
+            <span class="at">key=</span><span class="tx">{opcion.id}</span>
+            <span class="at">texto=</span><span class="tx">{opcion.texto}</span>
+            <span class="at">votos=</span><span class="tx">{opcion.votos}</span>
+            <span class="at">onVotar=</span><span class="tx">{() =></span> <span class="fn">handleVoto</span><span class="tx">(opcion.id)}</span>
+          <span class="tg">/&gt;</span>
+        <span class="tx">))}</span>
+      <span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tx">)</span>
+<span class="tx">}</span>
+
+<span class="kw">export default</span> App</pre></div>
+
+      <p style="margin-top:16px"><strong>handleVoto</strong> detallado — dos versiones equivalentes:</p>
+      <div class="ba" style="margin-top:8px">
+        <div class="ba-tabs">
+          <div class="ba-tab bad active" onclick="baTab(this,'hv','larga')">Versión larga (más clara)</div>
+          <div class="ba-tab good" onclick="baTab(this,'hv','corta')">Versión compacta (ternario)</div>
+        </div>
+        <div class="ba-pane active" data-ba="hv" data-side="larga">
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="kw">const</span> <span class="fn">handleVoto</span> <span class="op">=</span> <span class="tx">(id) => {</span>
+  <span class="fn">setOpciones</span><span class="tx">(</span>
+    <span class="tx">opciones.</span><span class="fn">map</span><span class="tx">(op => {</span>
+      <span class="kw">if</span> <span class="tx">(op.id </span><span class="op">===</span><span class="tx"> id) {</span>
+        <span class="kw">return</span> <span class="tx">{ ...op, votos: op.votos </span><span class="op">+</span> <span class="nu">1</span><span class="tx"> } </span><span class="cm">// spread + nuevo votos</span>
+      <span class="tx">} </span><span class="kw">else</span> <span class="tx">{</span>
+        <span class="kw">return</span> <span class="tx">op </span><span class="cm">// sin cambios</span>
+      <span class="tx">}</span>
+    <span class="tx">})</span>
+  <span class="tx">)</span>
+<span class="tx">}</span></pre></div>
+        </div>
+        <div class="ba-pane" data-ba="hv" data-side="corta">
+          <div class="cw"><div class="ch"><span class="clang">jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="kw">const</span> <span class="fn">handleVoto</span> <span class="op">=</span> <span class="tx">(id) => {</span>
+  <span class="fn">setOpciones</span><span class="tx">(</span>
+    <span class="tx">opciones.</span><span class="fn">map</span><span class="tx">(op =></span>
+      <span class="tx">op.id </span><span class="op">===</span><span class="tx"> id</span>
+        <span class="tx">? { ...op, votos: op.votos </span><span class="op">+</span> <span class="nu">1</span><span class="tx"> }</span>
+        <span class="tx">: op</span>
+    <span class="tx">)</span>
+  <span class="tx">)</span>
+<span class="tx">}</span></pre></div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px"><strong>reduce() — total de votos</strong> explicado visualmente:</p>
+      <div class="ba" style="margin-top:8px">
+        <div class="ba-tabs">
+          <div class="ba-tab bad active" onclick="baTab(this,'red','bucle')">Con for (más código)</div>
+          <div class="ba-tab good" onclick="baTab(this,'red','reduce')">Con reduce (elegante)</div>
+        </div>
+        <div class="ba-pane active" data-ba="red" data-side="bucle">
+          <div class="cw"><div class="ch"><span class="clang">js</span></div>
+          <pre><span class="kw">let</span> <span class="tx">total </span><span class="op">=</span> <span class="nu">0</span>
+<span class="kw">for</span> <span class="tx">(</span><span class="kw">let</span> <span class="tx">i </span><span class="op">=</span> <span class="nu">0</span><span class="tx">; i </span><span class="op">&lt;</span><span class="tx"> opciones.length; i++) {</span>
+  <span class="tx">total </span><span class="op">+=</span><span class="tx"> opciones[i].votos</span>
+<span class="tx">}</span></pre></div>
+        </div>
+        <div class="ba-pane" data-ba="red" data-side="reduce">
+          <div class="cw"><div class="ch"><span class="clang">js</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+          <pre><span class="kw">const</span> <span class="tx">totalVotos = opciones.</span><span class="fn">reduce</span><span class="tx">((acum, op) => {</span>
+  <span class="kw">return</span><span class="tx"> acum </span><span class="op">+</span><span class="tx"> op.votos</span>
+<span class="tx">}, </span><span class="nu">0</span><span class="tx">)   </span><span class="cm">// ← 0 es el valor inicial del acumulador</span></pre></div>
+        </div>
+      </div>
+
+      <p style="margin-top:14px"><strong>reduce() para el ganador</strong> — cómo itera:</p>
+      <table class="tbl-hl" style="margin-top:8px">
+        <tr><th>Iteración</th><th>max actual</th><th>op.votos</th><th>¿Mayor?</th><th>Resultado</th></tr>
+        <tr><td>1 (inicial)</td><td>{votos: 0}</td><td>5</td><td>—</td><td>{id:1, votos:5}</td></tr>
+        <tr><td>2</td><td>{id:1, votos:5}</td><td>3</td><td>No</td><td>{id:1, votos:5}</td></tr>
+        <tr><td>3</td><td>{id:1, votos:5}</td><td>8</td><td>Sí ✓</td><td>{id:3, votos:8}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4.2 Option.jsx -->
+  <div class="acc-card">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-ico ic-b">🧱</div>
+      <div class="acc-titles">
+        <h3>4.2 Option.jsx — Componente Hijo</h3>
+        <small>Presentacional: sin estado propio</small>
+      </div>
+      <svg class="acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="acc-body">
+      <div class="cw"><div class="ch"><span class="clang">Option.jsx</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+      <pre><span class="kw">import</span> <span class="st">'./Option.css'</span>
+
+<span class="kw">function</span> <span class="fn">Option</span><span class="tx">({ texto, votos, onVotar }) {</span>
+  <span class="kw">return</span> <span class="tx">(</span>
+    <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"option-card"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;span</span> <span class="at">className=</span><span class="st">"option-text"</span><span class="tg">&gt;</span><span class="tx">{texto}</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;span</span> <span class="at">className=</span><span class="st">"option-votes"</span><span class="tg">&gt;</span>Votos: <span class="tx">{votos}</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">className=</span><span class="st">"vote-btn"</span> <span class="at">onClick=</span><span class="tx">{onVotar}</span><span class="tg">&gt;</span>
+        Votar
+      <span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tx">)</span>
+<span class="tx">}</span>
+
+<span class="kw">export default</span> Option</pre></div>
+
+      <div class="explain-list" style="margin-top:12px">
+        <div class="el-row"><code>texto, votos, onVotar</code><span class="el-desc">3 props — recibe todo del padre</span></div>
+        <div class="el-row"><code>sin useState</code><span class="el-desc">No tiene estado propio. Solo muestra datos</span></div>
+        <div class="el-row"><code>onClick={onVotar}</code><span class="el-desc">El clic dispara la función del padre</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /s4 -->
+
+<!-- ══════════════ SECCIÓN 5 ══════════════ -->
+<div id="s5">
+  <div class="stitle">
+    <div class="stitle-badge">05</div>
+    <h2>Flujo de Datos</h2>
+    <div class="stitle-line"></div>
+  </div>
+
+  <p>Cómo viajan los datos y los eventos en la aplicación — de arriba a abajo y de vuelta arriba.</p>
+
+  <div class="flow">
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>Usuario hace clic en "Votar"</strong>
+          <span>El botón en Option.jsx detecta el evento click</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>onClick={onVotar} se activa</strong>
+          <span>Option.jsx llama a la función que recibió como prop</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>handleVoto(id) se ejecuta en App.jsx</strong>
+          <span>La función del padre recibe el id de la opción votada</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>setOpciones(map(...)) actualiza el estado</strong>
+          <span>Se crea un nuevo array con los votos incrementados (inmutabilidad)</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot">5</div>
+          <div class="flow-connector" style="background:transparent"></div>
+        </div>
+        <div class="flow-content">
+          <strong>React re-renderiza la interfaz</strong>
+          <span>Todos los Option reciben las nuevas props. Los totales se recalculan. La pantalla se actualiza.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+    <div class="callout info"><strong>Datos: siempre hacia abajo</strong> — El padre pasa props al hijo. El hijo nunca modifica el estado del padre directamente.</div>
+    <div class="callout"><strong>Eventos: siempre hacia arriba</strong> — El hijo llama al callback del padre. El padre decide qué hacer con esa notificación.</div>
+  </div>
+</div>
+
+<!-- ══════════════ SECCIÓN 6 ══════════════ -->
+<div id="s6">
+  <div class="stitle">
+    <div class="stitle-badge">06</div>
+    <h2>Ejercicios Propuestos</h2>
+    <div class="stitle-line"></div>
+  </div>
+  <p>Modifica los archivos de tu proyecto para implementar cada mejora. Despliega el ejercicio, intenta resolverlo y revela la solución solo si te atasca.</p>
+
+  <!-- EJ 1 -->
+  <div class="ex-card open">
+    <div class="ex-head" onclick="toggleEx(this)">
+      <div class="ex-num">01</div>
+      <div class="ex-info"><h4>Añadir una nueva opción</h4><small>📄 opcionesIniciales en App.jsx</small></div>
+      <svg class="ex-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ex-body">
+      <p>Modifica el array <code>opcionesIniciales</code> para añadir una cuarta opción "Opción D".</p>
+      <div class="hint-box">💡 Solo necesitas añadir un objeto más al array con <code>id: 4</code></div>
+      <button class="sol-toggle-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+      <div class="sol-block">
+        <div class="cw" style="margin-top:10px"><div class="ch"><span class="clang">App.jsx — Solución</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="kw">const</span> <span class="tx">opcionesIniciales = [</span>
+  <span class="tx">{ id: </span><span class="nu">1</span><span class="tx">, texto: </span><span class="st">'Opción A'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+  <span class="tx">{ id: </span><span class="nu">2</span><span class="tx">, texto: </span><span class="st">'Opción B'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+  <span class="tx">{ id: </span><span class="nu">3</span><span class="tx">, texto: </span><span class="st">'Opción C'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },</span>
+  <span class="tx">{ id: </span><span class="nu">4</span><span class="tx">, texto: </span><span class="st">'Opción D'</span><span class="tx">, votos: </span><span class="nu">0</span><span class="tx"> },  </span><span class="cm">// ← añadida</span>
+<span class="tx">]</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 2 -->
+  <div class="ex-card">
+    <div class="ex-head" onclick="toggleEx(this)">
+      <div class="ex-num">02</div>
+      <div class="ex-info"><h4>Reset de votos</h4><small>📄 App.jsx — añadir botón y función</small></div>
+      <svg class="ex-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ex-body">
+      <p>Añade un botón "Resetear" que ponga todos los votos a 0.</p>
+      <div class="hint-box">💡 Usa <code>setOpciones(opcionesIniciales)</code> o un <code>map()</code> que ponga todos los votos a 0</div>
+      <button class="sol-toggle-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+      <div class="sol-block">
+        <div class="cw" style="margin-top:10px"><div class="ch"><span class="clang">App.jsx — Solución</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="cm">// Añade esta función en App():</span>
+<span class="kw">const</span> <span class="fn">handleReset</span> <span class="op">=</span> <span class="tx">() => {</span>
+  <span class="fn">setOpciones</span><span class="tx">(opcionesIniciales)</span>
+<span class="tx">}</span>
+
+<span class="cm">// Añade este botón en el JSX (dentro de &lt;div className="stats"&gt;):</span>
+<span class="tg">&lt;button</span> <span class="at">onClick=</span><span class="tx">{handleReset}</span><span class="tg">&gt;</span>Resetear<span class="tg">&lt;/button&gt;</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 3 -->
+  <div class="ex-card">
+    <div class="ex-head" onclick="toggleEx(this)">
+      <div class="ex-num">03</div>
+      <div class="ex-info"><h4>Mostrar porcentaje de votos</h4><small>📄 Option.jsx — añadir cálculo</small></div>
+      <svg class="ex-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ex-body">
+      <p>Pasa el <code>totalVotos</code> como prop a <code>Option</code> y muestra el porcentaje de votos de cada opción.</p>
+      <div class="hint-box">💡 Fórmula: <code>Math.round((votos / totalVotos) * 100)</code>. Recuerda manejar el caso <code>totalVotos === 0</code></div>
+      <button class="sol-toggle-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+      <div class="sol-block">
+        <div class="cw" style="margin-top:10px"><div class="ch"><span class="clang">App.jsx — pasar totalVotos</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="tg">&lt;Option</span>
+  <span class="at">key=</span><span class="tx">{opcion.id}</span>
+  <span class="at">texto=</span><span class="tx">{opcion.texto}</span>
+  <span class="at">votos=</span><span class="tx">{opcion.votos}</span>
+  <span class="at">totalVotos=</span><span class="tx">{totalVotos}</span>   <span class="cm">// ← nueva prop</span>
+  <span class="at">onVotar=</span><span class="tx">{() =></span> <span class="fn">handleVoto</span><span class="tx">(opcion.id)}</span>
+<span class="tg">/&gt;</span></pre></div>
+        <div class="cw" style="margin-top:8px"><div class="ch"><span class="clang">Option.jsx — mostrar porcentaje</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="kw">function</span> <span class="fn">Option</span><span class="tx">({ texto, votos, totalVotos, onVotar }) {</span>
+  <span class="kw">const</span> <span class="tx">porcentaje = totalVotos </span><span class="op">&gt;</span> <span class="nu">0</span>
+    <span class="tx">? Math.</span><span class="fn">round</span><span class="tx">((votos / totalVotos) </span><span class="op">*</span> <span class="nu">100</span><span class="tx">)</span>
+    <span class="tx">: </span><span class="nu">0</span>
+  <span class="kw">return</span> <span class="tx">(</span>
+    <span class="tg">&lt;div</span> <span class="at">className=</span><span class="st">"option-card"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;span&gt;</span><span class="tx">{texto}</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;span&gt;</span><span class="tx">{votos} votos ({porcentaje}%)</span><span class="tg">&lt;/span&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">onClick=</span><span class="tx">{onVotar}</span><span class="tg">&gt;</span>Votar<span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tx">)</span>
+<span class="tx">}</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 4 -->
+  <div class="ex-card">
+    <div class="ex-head" onclick="toggleEx(this)">
+      <div class="ex-num">04</div>
+      <div class="ex-info"><h4>Ordenar por votos</h4><small>📄 App.jsx — modificar el renderizado</small></div>
+      <svg class="ex-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ex-body">
+      <p>Que las opciones aparezcan siempre de mayor a menor número de votos.</p>
+      <div class="hint-box">💡 Añade <code>.sort((a, b) =&gt; b.votos - a.votos)</code> antes del <code>.map()</code> — pero sobre una copia del array (<code>[...opciones]</code>)</div>
+      <button class="sol-toggle-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+      <div class="sol-block">
+        <div class="cw" style="margin-top:10px"><div class="ch"><span class="clang">App.jsx — Solución</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="cm">// En el JSX, cambia opciones.map(...) por:</span>
+<span class="tx">{[...opciones]</span>
+  <span class="tx">.</span><span class="fn">sort</span><span class="tx">((a, b) => b.votos </span><span class="op">-</span><span class="tx"> a.votos)</span>  <span class="cm">// mayor a menor</span>
+  <span class="tx">.</span><span class="fn">map</span><span class="tx">(opcion => (</span>
+    <span class="tg">&lt;Option</span> <span class="at">key=</span><span class="tx">{opcion.id}</span> <span class="tx">...</span> <span class="tg">/&gt;</span>
+  <span class="tx">))}</span>
+
+<span class="cm">// IMPORTANTE: [...opciones] crea una copia.
+// sort() muta el array original, lo que violaría la inmutabilidad.</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 5 -->
+  <div class="ex-card">
+    <div class="ex-head" onclick="toggleEx(this)">
+      <div class="ex-num">05</div>
+      <div class="ex-info"><h4>Mostrar "Sin votos" cuando no hay votos</h4><small>📄 App.jsx — renderizado condicional</small></div>
+      <svg class="ex-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ex-body">
+      <p>Si nadie ha votado todavía, muestra "Sin votos todavía" en lugar del nombre del ganador.</p>
+      <div class="hint-box">💡 Usa un ternario: <code>totalVotos === 0 ? "Sin votos todavía" : opcionGanadora.texto</code></div>
+      <button class="sol-toggle-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+      <div class="sol-block">
+        <div class="cw" style="margin-top:10px"><div class="ch"><span class="clang">App.jsx — Solución</span><button class="cpybtn" onclick="cp(this)">Copiar</button></div>
+        <pre><span class="cm">// Cambia la línea del ganador en el JSX:</span>
+<span class="tg">&lt;p</span> <span class="at">className=</span><span class="st">"winner"</span><span class="tg">&gt;</span>
+  Ganador actual:&nbsp;
+  <span class="tg">&lt;strong&gt;</span>
+    <span class="tx">{totalVotos </span><span class="op">===</span> <span class="nu">0</span>
+      <span class="tx">? </span><span class="st">'Sin votos todavía'</span>
+      <span class="tx">: opcionGanadora.texto</span>
+    <span class="tx">}</span>
+  <span class="tg">&lt;/strong&gt;</span>
+<span class="tg">&lt;/p&gt;</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /s6 -->
+
+<!-- ══════════════ SECCIÓN 7 ══════════════ -->
+<div id="s7">
+  <div class="stitle">
+    <div class="stitle-badge">07</div>
+    <h2>Recursos Adicionales</h2>
+    <div class="stitle-line"></div>
+  </div>
+  <p>Documentación oficial para profundizar en cada concepto.</p>
+  <div class="res-grid">
+    <a class="res-a" href="https://es.react.dev/learn" target="_blank"><div class="res-ico">⚛</div>Tutorial interactivo de React</a>
+    <a class="res-a" href="https://react.dev" target="_blank"><div class="res-ico">📚</div>Documentación oficial React</a>
+    <a class="res-a" href="https://react.dev/reference/react/useState" target="_blank"><div class="res-ico">⚡</div>useState en profundidad</a>
+    <a class="res-a" href="https://es.react.dev/learn/thinking-in-react" target="_blank"><div class="res-ico">🧠</div>Pensar en React</a>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  Guía Didáctica · React 18 · Hooks · DAW<br>
+  <span style="opacity:.4;margin-top:3px;display:block">¿Dudas? Consulta con tu profesor o la documentación oficial de React.</span>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</div>
+
+<script>
+/* ══════════════════════════════
+   LIVE DEMO — simulated React state
+══════════════════════════════ */
+let demoState = [
+  { id: 1, texto: 'Opción A', votos: 0 },
+  { id: 2, texto: 'Opción B', votos: 0 },
+  { id: 3, texto: 'Opción C', votos: 0 },
+];
+
+function renderDemo() {
+  const total = demoState.reduce((s, o) => s + o.votos, 0);
+  const winner = demoState.reduce((max, o) => o.votos > max.votos ? o : max, demoState[0]);
+  const el = document.getElementById('liveDemo');
+
+  const bars = demoState.map(o => {
+    const pct = total > 0 ? Math.round((o.votos / total) * 100) : 0;
+    const isWin = o.id === winner.id && total > 0;
+    return `
+      <div class="opt-row ${isWin ? 'winner' : ''}" style="--bar:${pct}%">
+        <span class="opt-name">${o.texto}</span>
+        ${isWin ? '<span class="winner-tag">👑 líder</span>' : ''}
+        <span class="opt-votes">${o.votos}</span>
+        <button class="opt-btn" onclick="demoVote(${o.id})">Votar</button>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="app-header">
+      <div class="app-title">Encuesta</div>
+    </div>
+    <div class="app-stats">
+      <div class="stat-pill">
+        <span class="stat-val">${total}</span>
+        <span class="stat-label">Total votos</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val" style="color:var(--acc3);font-size:1rem">${total === 0 ? '—' : winner.texto}</span>
+        <span class="stat-label">Ganador actual</span>
+      </div>
+    </div>
+    <div class="options-list">${bars}</div>
+    <button class="reset-btn" onclick="demoReset()">↩ Resetear votos</button>
+  `;
+}
+
+function demoVote(id) {
+  // Immutable update — exactly like React's setOpciones(map(...))
+  demoState = demoState.map(o =>
+    o.id === id ? { ...o, votos: o.votos + 1 } : o
+  );
+  renderDemo();
+}
+
+function demoReset() {
+  demoState = demoState.map(o => ({ ...o, votos: 0 }));
+  renderDemo();
+}
+
+renderDemo();
+
+/* ══════════════════════════════
+   ACCORDION CONCEPTS
+══════════════════════════════ */
+function toggleAcc(head) {
+  head.closest('.acc-card').classList.toggle('open');
+}
+
+/* ══════════════════════════════
+   ACCORDION EXERCISES
+══════════════════════════════ */
+function toggleEx(head) {
+  head.closest('.ex-card').classList.toggle('open');
+}
+
+/* ══════════════════════════════
+   BEFORE/AFTER TABS
+══════════════════════════════ */
+function baTab(tab, comp, side) {
+  const container = tab.closest('.ba');
+  container.querySelectorAll('.ba-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  container.querySelectorAll('.ba-pane').forEach(p => {
+    p.classList.toggle('active', p.dataset.ba === comp && p.dataset.side === side);
+  });
+}
+
+/* ══════════════════════════════
+   SOLUTION TOGGLE
+══════════════════════════════ */
+function toggleSol(btn) {
+  const block = btn.nextElementSibling;
+  const open = block.classList.toggle('visible');
+  btn.classList.toggle('open', open);
+  btn.innerHTML = open ? '🔓 Ocultar solución' : '🔒 Ver solución';
+}
+
+/* ══════════════════════════════
+   COPY CODE
+══════════════════════════════ */
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 2000);
+  }).catch(() => { btn.textContent = 'Error'; setTimeout(() => btn.textContent = 'Copiar', 2000); });
+}
+</script>
+</body>
+</html>

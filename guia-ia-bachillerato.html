@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA para Bachillerato · Guía de Aprendizaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --ink: #1a1612;
+    --card: #ffffff;
+    --accent1: #7c3aed;
+    --accent2: #0369a1;
+    --accent3: #15803d;
+    --accent4: #b45309;
+    --muted: #6b6560;
+    --border: #e0dbd2;
+    --tag-bg: #1a1612;
+    --tag-fg: #f5f2eb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 150px;
+    z-index: 9999;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem 2rem;
+    gap: 1rem;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -.5px;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--accent1); }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  .nav-links a {
+    color: var(--bg);
+    text-decoration: none;
+    font-size: .8rem;
+    font-weight: 500;
+    opacity: .7;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 4rem 2rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: .3rem .75rem;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .6s ease both;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 1.25rem;
+    animation: fadeUp .6s .1s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent1); }
+  .hero p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 580px;
+    opacity: .8;
+    animation: fadeUp .6s .2s ease both;
+  }
+  .hero-deco {
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    border: 60px solid rgba(124,58,237,.15);
+    pointer-events: none;
+  }
+  .hero-deco2 {
+    position: absolute;
+    right: 60px; bottom: -120px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 30px solid rgba(3,105,161,.15);
+    pointer-events: none;
+  }
+
+  /* ─── PROGRESS ─── */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent1);
+    z-index: 200;
+    width: 0%;
+    transition: width .1s;
+  }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 4rem 0 2rem; }
+
+  .section-num {
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  .section-intro {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 620px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 0 0 3rem;
+  }
+
+  /* ─── INDEX ─── */
+  .index-section {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 3rem 2rem 4rem;
+  }
+  .index-inner { max-width: 860px; margin: 0 auto; }
+  .index-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: 1.25rem;
+  }
+  .index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem;
+  }
+  .index-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    text-decoration: none;
+    color: var(--bg);
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+  .index-item:hover {
+    background: rgba(255,255,255,.1);
+    border-color: rgba(124,58,237,.5);
+    transform: translateY(-3px);
+  }
+  .index-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--accent1);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+  .index-text strong {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    display: block;
+    margin-bottom: .2rem;
+  }
+  .index-text span { font-size: .78rem; opacity: .5; font-weight: 300; }
+
+  /* ─── CARDS ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform .25s, box-shadow .25s;
+    cursor: default;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+  .card-icon { font-size: 1.8rem; margin-bottom: .75rem; }
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+  }
+  .card p { font-size: .88rem; color: var(--muted); font-weight: 300; line-height: 1.55; }
+  .card.accent1 { border-top: 4px solid var(--accent1); }
+  .card.accent2 { border-top: 4px solid var(--accent2); }
+  .card.accent3 { border-top: 4px solid var(--accent3); }
+  .card.accent4 { border-top: 4px solid var(--accent4); }
+
+  /* ─── PROMPT BUILDER ─── */
+  .prompt-builder {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .prompt-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #ffbd2e; }
+  .dot.g { background: #28c940; }
+  .prompt-body { padding: 1.5rem; }
+  .formula-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .formula-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .9rem;
+    border-radius: 99px;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: default;
+    border: 1.5px solid transparent;
+    transition: transform .15s;
+  }
+  .formula-pill:hover { transform: scale(1.05); }
+  .pill-role    { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+  .pill-context { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  .pill-task    { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .pill-format  { background: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+  .pill-plus    { background: transparent; color: var(--muted); font-size: 1.1rem; border: none; cursor: default; }
+
+  .example-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  @media (max-width: 600px) {
+    .example-compare { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+  .ex-box {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: .85rem;
+    line-height: 1.55;
+  }
+  .ex-bad  { background: #fff1f2; border: 1.5px solid #fecdd3; }
+  .ex-good { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .ex-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+  .ex-bad .ex-label  { color: #be123c; }
+  .ex-good .ex-label { color: #15803d; }
+
+  /* ─── ACCORDION ─── */
+  .tip-accordion {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .tip-item { border-bottom: 1.5px solid var(--border); }
+  .tip-item:last-child { border-bottom: none; }
+  .tip-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: left;
+    transition: background .15s;
+  }
+  .tip-trigger:hover { background: #fafaf8; }
+  .tip-trigger-left { display: flex; align-items: center; gap: .75rem; }
+  .tip-icon-wrap {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .tip-arrow {
+    font-size: .75rem;
+    color: var(--muted);
+    transition: transform .25s;
+    flex-shrink: 0;
+  }
+  .tip-item.open .tip-arrow { transform: rotate(180deg); }
+  .tip-content {
+    display: none;
+    padding: 0 1.25rem 1.25rem 4rem;
+    font-size: .9rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .tip-item.open .tip-content { display: block; }
+
+  /* ─── STEPS ─── */
+  .steps-list {
+    counter-reset: steps;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color .2s;
+  }
+  .steps-list li:hover { border-color: var(--accent1); }
+  .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+  .step-text strong { font-weight: 600; display: block; margin-bottom: .25rem; font-size: .95rem; }
+  .step-text span   { font-size: .87rem; color: var(--muted); font-weight: 300; }
+
+  /* ─── CASO PRÁCTICO ─── */
+  .caso-practico {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .caso-practico::before {
+    content: '"';
+    position: absolute;
+    top: -1.5rem; right: 2rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 12rem;
+    font-weight: 800;
+    color: rgba(255,255,255,.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .caso-tag {
+    display: inline-block;
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: .25rem .6rem;
+    border-radius: 3px;
+    margin-bottom: 1.25rem;
+  }
+  .caso-practico h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: .75rem;
+    letter-spacing: -.5px;
+  }
+  .caso-practico p {
+    font-size: .9rem;
+    opacity: .75;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    max-width: 560px;
+  }
+  .file-tree {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    font-size: .82rem;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+  }
+  .tree-folder  { color: var(--accent4); font-weight: 600; }
+  .tree-file    { color: rgba(245,242,235,.8); }
+  .tree-comment { color: rgba(245,242,235,.35); font-style: italic; }
+  .tree-indent  { display: inline-block; width: 1.5rem; }
+  .sysprompt-block {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(124,58,237,.3);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-size: .85rem;
+    line-height: 1.7;
+    color: rgba(245,242,235,.85);
+    font-weight: 300;
+  }
+  .sysprompt-block strong { font-weight: 600; color: #fff; }
+  .sysprompt-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .6rem;
+  }
+
+  /* ─── USE CASES ─── */
+  .use-case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .use-case-item {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: .87rem;
+  }
+  .use-case-item .uc-module {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .4rem;
+  }
+  .use-case-item p { color: var(--muted); font-weight: 300; font-size: .83rem; line-height: 1.5; }
+
+  /* ─── ÉTICA ─── */
+  .ethics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .ethics-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+  .ethics-card .e-head {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    margin-bottom: .4rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .ethics-card p { font-weight: 300; color: var(--muted); }
+  .ec-do   { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .ec-do .e-head   { color: #15803d; }
+  .ec-dont { background: #fff1f2; border: 1.5px solid #fecdd3; }
+  .ec-dont .e-head { color: #be123c; }
+  .ec-note { background: #fffbeb; border: 1.5px solid #fde68a; }
+  .ec-note .e-head { color: #92400e; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    margin-top: 4rem;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  footer p { opacity: .5; font-size: .82rem; font-weight: 300; }
+  footer strong { opacity: 1; font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  code {
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    background: #ede9e0;
+    padding: .1rem .35rem;
+    border-radius: 4px;
+    font-size: .83em;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IA<span>·</span>Bach</div>
+  <ul class="nav-links">
+    <li><a href="#prompting">01 · Prompting</a></li>
+    <li><a href="#proyectos">02 · Proyectos Claude</a></li>
+    <li><a href="#modalidades">03 · Por asignatura</a></li>
+    <li><a href="#etica">04 · Uso responsable</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Guía para el alumnado · Bachillerato</div>
+    <h1>La IA como tu<br><em>herramienta</em> de estudio</h1>
+    <p>Aprende a usar la inteligencia artificial para estudiar mejor, preparar la EBAU y sacar el máximo partido a cada asignatura.</p>
+  </div>
+</header>
+
+<!-- ÍNDICE -->
+<div class="index-section">
+  <div class="index-inner">
+    <div class="index-label">Contenidos de esta guía</div>
+    <div class="index-grid">
+      <a href="#prompting" class="index-item">
+        <div class="index-num">01</div>
+        <div class="index-text">
+          <strong>Prompting</strong>
+          <span>Cómo hacer buenas preguntas</span>
+        </div>
+      </a>
+      <a href="#proyectos" class="index-item">
+        <div class="index-num">02</div>
+        <div class="index-text">
+          <strong>Proyectos de Claude</strong>
+          <span>Tu asistente personalizado</span>
+        </div>
+      </a>
+      <a href="#modalidades" class="index-item">
+        <div class="index-num">03</div>
+        <div class="index-text">
+          <strong>Ideas por asignatura</strong>
+          <span>Matemáticas, Historia, Inglés...</span>
+        </div>
+      </a>
+      <a href="#etica" class="index-item">
+        <div class="index-num">04</div>
+        <div class="index-text">
+          <strong>Uso responsable</strong>
+          <span>La IA como herramienta real</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 01. PROMPTING -->
+<section id="prompting">
+  <div class="container">
+    <div class="section-num">01 — Prompting</div>
+    <h2>Cómo hacer buenas<br>preguntas</h2>
+    <p class="section-intro">Un buen prompt es como una buena pregunta en clase: cuanto más claro eres, mejor respuesta obtienes. Usa esta fórmula como punto de partida.</p>
+    <hr class="divider">
+
+    <div class="prompt-builder reveal">
+      <div class="prompt-header">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        La fórmula del prompt perfecto
+      </div>
+      <div class="prompt-body">
+        <div class="formula-row">
+          <span class="formula-pill pill-role">🎭 Rol</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-context">📚 Contexto</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-task">✅ Tarea concreta</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-format">📝 Formato</span>
+        </div>
+        <p style="font-size:.85rem; color:var(--muted); margin-bottom:1rem;">Despliega cada elemento para ver qué significa y cómo usarlo:</p>
+
+        <div class="tip-accordion">
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#f3e8ff;">🎭</div>
+                <strong>Rol — ¿Quién eres?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Dile a la IA qué papel debe adoptar. Ejemplo: <em>"Actúa como un profesor de Historia que prepara alumnos para la EBAU en Asturias..."</em> — esto cambia completamente el nivel y el enfoque de la respuesta.
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#dbeafe;">📚</div>
+                <strong>Contexto — ¿Cuál es la situación?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Explica qué estás estudiando, qué ya sabes y qué no. Ejemplo: <em>"Estoy en 2º de Bachillerato de Humanidades, preparando el tema de la Transición Española. Entiendo los hechos generales pero no consigo relacionarlos con el contexto internacional."</em>
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#dcfce7;">✅</div>
+                <strong>Tarea — ¿Qué quieres exactamente?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Sé específico. Evita "explícame esto" y usa frases como: <em>"Hazme un esquema comparativo"</em>, <em>"Corrígeme este análisis de texto indicando qué argumentos faltan"</em>, <em>"Genera 5 preguntas tipo EBAU sobre este tema con su criterio de corrección"</em>.
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#fce7f3;">📝</div>
+                <strong>Formato — ¿Cómo quieres la respuesta?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Indica la forma: <em>"Respóndeme en menos de 200 palabras"</em>, <em>"Usa una tabla comparativa"</em>, <em>"Dame un esquema con los puntos clave para memorizar"</em>, <em>"Redacta como si fuera una respuesta de examen de nivel EBAU"</em>.
+            </div>
+          </div>
+        </div>
+
+        <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; margin: 1.5rem 0 .75rem;">Antes vs. después</p>
+        <div class="example-compare">
+          <div class="ex-box ex-bad">
+            <div class="ex-label">❌ Prompt vago</div>
+            "Explícame la Segunda Guerra Mundial"
+            <br><br>
+            <span style="font-size:.8rem; opacity:.6;">→ Obtienes una respuesta genérica de Wikipedia que no te ayuda a estudiar para tu examen.</span>
+          </div>
+          <div class="ex-box ex-good">
+            <div class="ex-label">✅ Prompt efectivo</div>
+            "Actúa como un profe de Historia de 2º de Bachillerato. Necesito entender las causas de la Segunda Guerra Mundial para la EBAU. Explícame las 3 causas más importantes relacionándolas entre sí, en menos de 250 palabras, con un esquema visual al final."
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trucos rápidos -->
+    <h3 style="font-family:'Syne',sans-serif; font-weight:700; margin-bottom:1rem; font-size:1.1rem;" class="reveal">Trucos rápidos de prompting</h3>
+    <div class="tip-accordion reveal">
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">💬</div>
+            Pide que te haga preguntas primero
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Escribe: <em>"Antes de responder, hazme 2-3 preguntas para entender mejor mi nivel y lo que ya sé."</em> Así la explicación se adapta exactamente a ti, no a un alumno genérico.
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">🔄</div>
+            Pide que cambie el enfoque
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Si no entiendes la explicación, di: <em>"No lo he entendido, explícamelo usando una analogía del mundo cotidiano, sin tecnicismos."</em> O bien: <em>"Explícamelo como si tuviera 12 años."</em>
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">🧪</div>
+            Simula un examen
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Escribe: <em>"Hazme 5 preguntas tipo EBAU sobre este tema, espera mis respuestas y después corrígelas indicando qué he acertado y qué falta."</em> Es el repaso más efectivo que existe.
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">✍️</div>
+            Mejora tus redacciones y comentarios
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Pega tu redacción o comentario de texto y escribe: <em>"Revisa este comentario de texto como lo haría un corrector de la EBAU. Señala qué argumentos faltan, qué está bien y cómo mejoraría la estructura."</em> No te da la respuesta: te enseña a mejorar la tuya.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02. PROYECTOS CLAUDE -->
+<section id="proyectos">
+  <div class="container">
+    <div class="section-num">02 — Proyectos de Claude</div>
+    <h2>Crea tu propio<br>asistente de asignatura</h2>
+    <p class="section-intro">Los Proyectos de Claude te permiten crear un asistente personalizado para cada asignatura. Configúralo una vez y la IA sabrá quién eres, qué estudias y cómo quieres aprender, en cada conversación.</p>
+    <hr class="divider">
+
+    <ul class="steps-list reveal">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Entra en claude.ai y crea un proyecto nuevo</strong>
+          <span>En el panel lateral verás la opción "Proyectos". Dale un nombre descriptivo: por ejemplo, <code>Historia de España — 2º Bach</code>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Escribe las instrucciones del proyecto</strong>
+          <span>Aquí le dices a Claude cómo debe comportarse siempre: su rol, tu modalidad, la asignatura, qué temas te cuestan más y cómo quieres que te explique las cosas. Esto se aplica automáticamente en cada conversación.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Sube los materiales de la asignatura</strong>
+          <span>Puedes subir PDFs de apuntes, el temario oficial, esquemas, comentarios de texto corregidos por tu profesor, criterios de evaluación de la EBAU... Claude los leerá y los usará como referencia.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong>¡Empieza a estudiar!</strong>
+          <span>Desde ese momento, cada conversación dentro del proyecto ya tendrá todo el contexto. Sin repetir quién eres ni qué estás preparando.</span>
+        </div>
+      </li>
+    </ul>
+
+    <!-- CASO PRÁCTICO -->
+    <div class="caso-practico reveal">
+      <div class="caso-tag">📖 Caso práctico real</div>
+      <h3>Ejemplo: Proyecto para Historia de España (2º Bach · Humanidades)</h3>
+      <p>Así es como una alumna de 2º de Bachillerato llamada Laura lo configuraría para preparar la EBAU de Historia.</p>
+
+      <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.8rem; letter-spacing:1px; text-transform:uppercase; color:rgba(245,242,235,.5); margin-bottom:.5rem;">📁 Archivos que subiría al proyecto</p>
+      <div class="file-tree">
+        <span class="tree-folder">📁 Proyecto: Historia de España — 2º Bach</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 temario-historia.pdf</span> <span class="tree-comment">// Apuntes del curso completos</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 criterios-ebau-asturias.pdf</span> <span class="tree-comment">// Criterios oficiales de corrección</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 examenes-anteriores.pdf</span> <span class="tree-comment">// Exámenes EBAU de años pasados</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📝 temas-que-me-cuestan.txt</span> <span class="tree-comment">// Lista de bloques más difíciles</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📝 comentarios-corregidos.md</span> <span class="tree-comment">// Comentarios de texto con feedback del profe</span><br>
+        <span class="tree-indent">└─</span> <span class="tree-file" style="color:#e8c76a;">📋 instrucciones-proyecto.txt</span> <span class="tree-comment">// ← las instrucciones, también como fichero</span>
+      </div>
+
+      <div style="background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.3); border-radius:10px; padding:.85rem 1.1rem; margin-bottom:1.25rem; font-size:.82rem; color:rgba(245,242,235,.8); font-weight:300;">
+        💡 <strong style="color:#fff; font-weight:600;">Truco:</strong> guarda las instrucciones también como fichero <code style="background:rgba(255,255,255,.1); color:#fff;">instrucciones-proyecto.txt</code> y súbelo al proyecto. Si en algún momento Claude parece "olvidar" cómo comportarse, escribe simplemente: <em>"Recuerda las instrucciones del fichero instrucciones-proyecto.txt"</em> sin tener que reescribirlas.
+      </div>
+
+      <div class="sysprompt-label">✏️ Instrucciones que escribiría en el proyecto</div>
+      <div class="sysprompt-block">
+        <strong>Eres mi tutora personal de Historia de España</strong> para la preparación de la EBAU en Asturias.<br><br>
+        Me llamo Laura y estoy en 2º de Bachillerato de Humanidades y Ciencias Sociales. Entiendo bien los hechos históricos aislados, pero me cuesta establecer relaciones de causa-efecto entre períodos y conectar la historia de España con el contexto europeo e internacional.<br><br>
+        <strong>Cómo quiero que me respondas:</strong><br>
+        — Usa siempre el criterio de corrección oficial de la EBAU de Asturias como referencia.<br>
+        — Cuando me expliques un tema, termina siempre con un esquema de 3-5 puntos clave para memorizar.<br>
+        — Si te pido que corrijas un comentario de texto, dime exactamente qué argumentos faltan y en qué nivel de examen quedaría.<br>
+        — Si no entiendo algo, propón una analogía con situaciones actuales o cotidianas.<br>
+        — Si cometo un error histórico, corrígeme y explícame por qué es incorrecto, no solo la respuesta correcta.<br><br>
+        <strong>Usa los documentos del proyecto</strong> (temario, criterios EBAU, exámenes anteriores) como referencia principal para todas mis preguntas.
+      </div>
+    </div>
+
+    <div class="card reveal" style="border: 2px dashed var(--accent1); background: #faf5ff;">
+      <div class="card-icon">💡</div>
+      <h3 style="color:var(--accent1);">El truco está en las instrucciones</h3>
+      <p>Cuanto más detalladas sean las instrucciones del proyecto, más útil será el asistente. Puedes actualizarlas cuando cambies de tema o cuando detectes que hay algo que no te está explicando como necesitas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03. IDEAS POR ASIGNATURA -->
+<section id="modalidades">
+  <div class="container">
+    <div class="section-num">03 — Ideas por asignatura</div>
+    <h2>Ideas para<br>cada asignatura</h2>
+    <p class="section-intro">Ejemplos concretos de cómo usar la IA en las asignaturas más habituales de Bachillerato, sea cual sea tu modalidad.</p>
+    <hr class="divider">
+
+    <div class="use-case-grid reveal">
+      <div class="use-case-item">
+        <div class="uc-module">Matemáticas</div>
+        <p>Pídele que resuelva un ejercicio paso a paso explicando cada operación, o que genere 5 problemas similares al que no has entendido para practicar hasta dominarlo.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Física y Química</div>
+        <p>Comparte el enunciado de un problema y pídele que identifique qué concepto aplica y qué fórmula usar antes de resolver. Perfecto para entender, no solo copiar.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Biología y Geología</div>
+        <p>Pídele que te explique procesos complejos (mitosis, ciclos biogeoquímicos) con analogías visuales, o que genere preguntas tipo test con sus justificaciones para repasar.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Historia de España</div>
+        <p>Pídele que corrija tus redacciones con el criterio EBAU, que relacione causas y consecuencias entre períodos, o que simule las preguntas de examen de años anteriores.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Lengua Castellana</div>
+        <p>Pídele que corrija tu redacción marcando errores de coherencia, cohesión y adecuación, proponiendo mejoras frase por frase sin reescribirla por ti.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Inglés</div>
+        <p>Escríbele en inglés y pídele que corrija gramática, vocabulario y registro. O que simule un examen oral haciéndote preguntas y evaluando tus respuestas.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Filosofía</div>
+        <p>Pídele que te explique la posición de un filósofo ante una cuestión concreta, con argumentos y contraargumentos. Ideal para los comentarios de texto filosóficos.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Geografía</div>
+        <p>Pídele que te explique la relación entre factores físicos y humanos en un territorio, o que genere comentarios de mapas y gráficos estadísticos para practicar.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Economía</div>
+        <p>Pídele que te explique conceptos abstractos (elasticidad, política monetaria) con ejemplos de noticias actuales que ya conozcas, para que los fijes mejor.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Historia del Arte</div>
+        <p>Pídele que te guíe en el análisis de una obra: contexto, estilo, iconografía y significado, siguiendo la estructura que exige tu profesor o los criterios EBAU.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Literatura</div>
+        <p>Pídele que corrija un comentario de texto señalando qué recursos literarios has identificado correctamente y cuáles te faltan, con el nivel exigido en la EBAU.</p>
+      </div>
+      <div class="use-case-item">
+        <div class="uc-module">Cualquier asignatura</div>
+        <p>Escribe: <em>"Hazme 5 preguntas tipo EBAU sobre este tema, espera mis respuestas y corrígelas."</em> Funciona para cualquier materia y es el repaso más efectivo que existe.</p>
+      </div>
+    </div>
+        <div class="use-case-item">
+          <div class="uc-module">Filosofía</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04. USO RESPONSABLE -->
+<section id="etica">
+  <div class="container">
+    <div class="section-num">04 — Uso responsable</div>
+    <h2>La IA es una herramienta,<br>no un atajo</h2>
+    <p class="section-intro">La EBAU la haces tú, sin IA. Úsala para llegar bien preparado, no para sustituir el trabajo que solo tú puedes hacer.</p>
+    <hr class="divider">
+
+    <div class="ethics-grid reveal">
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Úsala para entender</div>
+        <p>Pídele explicaciones, esquemas, correcciones. El objetivo es que <em>tú</em> entiendas, no que la IA haga el trabajo por ti.</p>
+      </div>
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Verifica las respuestas</div>
+        <p>La IA puede cometer errores históricos, matemáticos o científicos. Contrasta siempre con tus apuntes o con tu profesor.</p>
+      </div>
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Úsala para practicar</div>
+        <p>Generar ejercicios extra, simular exámenes, pedir corrección de tus redacciones: esto sí potencia tu aprendizaje real.</p>
+      </div>
+      <div class="ethics-card ec-dont">
+        <div class="e-head">❌ No copies sin entender</div>
+        <p>Si entregas un trabajo que la IA escribió y no sabes defenderlo, no has aprendido nada. Y en el examen oral o la EBAU, se notará.</p>
+      </div>
+      <div class="ethics-card ec-dont">
+        <div class="e-head">❌ No la uses en exámenes</div>
+        <p>Salvo que el profesor lo indique expresamente, usar IA en evaluaciones es trampa y puede tener consecuencias académicas serias.</p>
+      </div>
+      <div class="ethics-card ec-note">
+        <div class="e-head">⚠️ Cuidado con el plagio</div>
+        <p>Entregar como propios textos generados por IA puede considerarse plagio. Usa la IA para mejorar tus ideas, no para sustituirlas.</p>
+      </div>
+    </div>
+
+    <div class="card reveal" style="background: var(--ink); color: var(--bg); border-color: var(--ink);">
+      <div class="card-icon">🏆</div>
+      <h3 style="color:#fff;">La habilidad que te hará diferente</h3>
+      <p style="color:rgba(245,242,235,.7);">En la universidad y en el trabajo, saber usar bien la IA será tan esperado como saber buscar información en internet. Los que destaquen serán quienes sepan <strong style="color:#fff;">combinar su propio criterio con el uso inteligente de estas herramientas</strong>. Eso es exactamente lo que estás empezando a desarrollar ahora.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>IA · Bachillerato · Asturias</strong></p>
+  <p style="margin-top:.5rem;">Guía para el alumnado · Curso 2025–26 · Elaborada con Claude</p>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement;
+    const pct = (s.scrollTop / (s.scrollHeight - s.clientHeight)) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  function toggleTip(btn) {
+    btn.closest('.tip-item').classList.toggle('open');
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

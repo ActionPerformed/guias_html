@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redes · Guía Didáctica · 1º DAW</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════
+   TOKENS
+══════════════════════════════ */
+:root {
+  --bg:      #05111f;
+  --bg2:     #071826;
+  --s1:      #0a2035;
+  --s2:      #0d2847;
+  --border:  #1a4060;
+  --blue:    #2d9cff;
+  --blue2:   #5eb3ff;
+  --teal:    #00d4c8;
+  --gold:    #f4c430;
+  --red:     #ff6b6b;
+  --green:   #4ecb71;
+  --purple:  #a78bfa;
+  --text:    #ddeeff;
+  --text2:   #7a9ab8;
+  --muted:   #3a6080;
+  --r:       8px;
+  --rl:      14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* blueprint grid bg */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(45,156,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(45,156,255,.04) 1px,transparent 1px),
+    linear-gradient(rgba(45,156,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(45,156,255,.015) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,16px 16px,16px 16px;
+  pointer-events:none;z-index:0;
+}
+body > *{position:relative;z-index:1;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--blue);}
+
+/* ══════════════════════════════
+   HERO
+══════════════════════════════ */
+.hero{
+  padding:80px 24px 60px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(45,156,255,.14) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--teal);
+  background:rgba(0,212,200,.08);border:1px solid rgba(0,212,200,.25);
+  padding:5px 16px;border-radius:20px;
+  display:inline-block;margin-bottom:22px;
+}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,9vw,6rem);
+  letter-spacing:.04em;line-height:.95;
+  color:var(--text);
+  margin-bottom:10px;
+}
+.hero h1 span{
+  color:var(--blue);
+  text-shadow:0 0 40px rgba(45,156,255,.4);
+}
+.hero-sub{
+  font-size:.95rem;color:var(--text2);
+  max-width:500px;margin:0 auto 32px;
+  font-weight:300;
+}
+.hero-badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.hbadge{
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:5px 13px;border-radius:5px;border:1px solid var(--border);
+  color:var(--text2);
+}
+
+/* ══════════════════════════════
+   STICKY NAV
+══════════════════════════════ */
+.snav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(5,17,31,.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+.snav::-webkit-scrollbar{display:none;}
+.snav-inner{display:flex;max-width:1060px;margin:0 auto;min-width:max-content;}
+.snav a{
+  display:flex;align-items:center;gap:6px;
+  padding:12px 16px;
+  font-family:'DM Mono',monospace;font-size:.67rem;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.snav a:hover{color:var(--blue2);border-bottom-color:var(--blue);}
+.snav a .n{
+  background:var(--s2);color:var(--blue);
+  padding:1px 6px;border-radius:4px;font-size:.6rem;
+}
+
+/* ══════════════════════════════
+   LAYOUT
+══════════════════════════════ */
+.wrap{max-width:1060px;margin:0 auto;padding:36px 20px 80px;}
+
+/* ══════════════════════════════
+   SECTION HEADERS
+══════════════════════════════ */
+.stitle{
+  display:flex;align-items:center;gap:14px;
+  margin:60px 0 26px;
+}
+.stitle-num{
+  font-family:'Bebas Neue',sans-serif;font-size:2.2rem;
+  color:var(--blue);opacity:.25;line-height:1;flex-shrink:0;
+}
+.stitle h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.7rem;letter-spacing:.06em;
+  color:var(--text);
+}
+.stitle-bar{
+  flex:1;height:1px;
+  background:linear-gradient(to right,var(--border),transparent);
+}
+
+/* ══════════════════════════════
+   PROSE
+══════════════════════════════ */
+p{font-size:.87rem;color:rgba(221,238,255,.8);margin-bottom:10px;}
+strong{color:var(--text);font-weight:600;}
+code{
+  font-family:'DM Mono',monospace;font-size:.8em;
+  background:rgba(45,156,255,.1);color:var(--blue2);
+  padding:1px 6px;border-radius:4px;
+  border:1px solid rgba(45,156,255,.18);
+}
+
+/* ══════════════════════════════
+   OSI INTERACTIVE STACK
+══════════════════════════════ */
+.osi-layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  align-items:start;
+}
+@media(max-width:680px){.osi-layout{grid-template-columns:1fr;}}
+
+.osi-stack{display:flex;flex-direction:column;gap:4px;}
+.osi-layer{
+  display:flex;align-items:stretch;
+  border-radius:var(--r);overflow:hidden;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .2s;
+  border:1px solid transparent;
+  position:relative;
+}
+.osi-layer:hover{transform:translateX(6px);box-shadow:0 0 20px rgba(45,156,255,.15);}
+.osi-layer.active{border-color:var(--blue);box-shadow:0 0 18px rgba(45,156,255,.25);}
+.osi-num{
+  width:32px;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;
+  flex-shrink:0;
+}
+.osi-content{
+  flex:1;padding:8px 12px;
+  display:flex;align-items:center;gap:10px;
+}
+.osi-name{
+  font-family:'DM Mono',monospace;font-size:.72rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.08em;
+  min-width:90px;flex-shrink:0;
+}
+.osi-fn{font-size:.74rem;color:rgba(221,238,255,.65);flex:1;}
+.osi-proto{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  opacity:.6;text-align:right;flex-shrink:0;
+}
+
+/* layer colors */
+.l7{background:rgba(167,139,250,.12)}.l7 .osi-num{background:rgba(167,139,250,.25);color:#c4b5fd;}
+.l6{background:rgba(96,165,250,.12)}.l6 .osi-num{background:rgba(96,165,250,.25);color:#93c5fd;}
+.l5{background:rgba(45,156,255,.12)}.l5 .osi-num{background:rgba(45,156,255,.25);color:var(--blue2);}
+.l4{background:rgba(0,212,200,.12)}.l4 .osi-num{background:rgba(0,212,200,.25);color:var(--teal);}
+.l3{background:rgba(78,203,113,.12)}.l3 .osi-num{background:rgba(78,203,113,.25);color:var(--green);}
+.l2{background:rgba(244,196,48,.12)}.l2 .osi-num{background:rgba(244,196,48,.25);color:var(--gold);}
+.l1{background:rgba(255,107,107,.12)}.l1 .osi-num{background:rgba(255,107,107,.25);color:var(--red);}
+
+.osi-detail{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);padding:20px;
+  min-height:280px;
+}
+.osi-detail-title{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.15em;
+  color:var(--muted);margin-bottom:14px;
+}
+.osi-detail-name{
+  font-family:'Bebas Neue',sans-serif;font-size:2rem;
+  line-height:1;margin-bottom:4px;
+}
+.osi-detail-num{font-size:.78rem;color:var(--muted);margin-bottom:14px;}
+.osi-detail-fn{font-size:.84rem;color:var(--text2);margin-bottom:12px;}
+.proto-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.pchip{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  padding:3px 9px;border-radius:4px;
+  background:rgba(45,156,255,.1);color:var(--blue2);
+  border:1px solid rgba(45,156,255,.2);
+}
+.osi-mnemonic{
+  margin-top:16px;padding:10px 14px;
+  background:rgba(244,196,48,.06);border:1px solid rgba(244,196,48,.2);
+  border-radius:var(--r);font-size:.8rem;color:var(--gold);
+  font-style:italic;
+}
+
+/* TCP/IP */
+.tcpip-grid{
+  display:grid;grid-template-columns:1fr;gap:6px;
+  margin-top:12px;
+}
+.tcpip-row{
+  display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;align-items:center;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:8px 12px;
+  font-size:.78rem;transition:background .2s;
+}
+.tcpip-row:hover{background:rgba(45,156,255,.06);}
+.tcpip-layer{
+  font-family:'DM Mono',monospace;font-size:.68rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--blue2);
+}
+.tcpip-osi{font-size:.7rem;color:var(--muted);}
+.tcpip-proto{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--teal);}
+
+/* ══════════════════════════════
+   DEVICES TABLE
+══════════════════════════════ */
+.devices-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;margin-top:8px;
+}
+.dev-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);padding:18px;
+  transition:all .2s;cursor:default;
+}
+.dev-card:hover{border-color:var(--blue);box-shadow:0 0 20px rgba(45,156,255,.1);transform:translateY(-2px);}
+.dev-icon{font-size:2rem;margin-bottom:10px;}
+.dev-name{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
+  letter-spacing:.06em;margin-bottom:4px;
+}
+.dev-layer{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:10px;padding:2px 8px;
+  border-radius:4px;display:inline-block;
+}
+.dl1{background:rgba(255,107,107,.12);color:var(--red);border:1px solid rgba(255,107,107,.2);}
+.dl2{background:rgba(244,196,48,.12);color:var(--gold);border:1px solid rgba(244,196,48,.2);}
+.dl3{background:rgba(78,203,113,.12);color:var(--green);border:1px solid rgba(78,203,113,.2);}
+.dev-fn{font-size:.8rem;color:var(--text2);margin-bottom:8px;}
+.dev-smart{font-size:.72rem;color:var(--muted);}
+.dev-analogy{
+  margin-top:10px;padding:8px 10px;
+  background:rgba(45,156,255,.05);border:1px solid var(--border);
+  border-radius:var(--r);font-size:.75rem;color:var(--blue2);
+  font-style:italic;
+}
+
+/* ══════════════════════════════
+   BINARY CALCULATOR (interactive)
+══════════════════════════════ */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:640px){.calc-grid{grid-template-columns:1fr;}}
+
+.calc-box{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;
+}
+.calc-header{
+  padding:10px 16px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+}
+.calc-body{padding:16px;}
+
+.bit-row{
+  display:flex;gap:3px;margin-bottom:10px;
+}
+.bit-cell{
+  flex:1;text-align:center;cursor:pointer;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:5px;padding:6px 2px;
+  transition:all .15s;user-select:none;
+}
+.bit-cell:hover{border-color:var(--blue);}
+.bit-cell.on{background:rgba(45,156,255,.2);border-color:var(--blue);color:var(--blue);}
+.bit-cell.on .bit-val{color:var(--blue2);}
+.bit-pow{font-family:'DM Mono',monospace;font-size:.55rem;color:var(--muted);}
+.bit-val{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;color:var(--text2);}
+
+.calc-result{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;
+  background:rgba(45,156,255,.06);border:1px solid rgba(45,156,255,.2);
+  border-radius:var(--r);margin-top:8px;
+}
+.calc-result-lbl{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;}
+.calc-result-val{
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;
+  color:var(--blue);letter-spacing:.04em;
+}
+
+/* decimal input */
+.dec-input-row{
+  display:flex;gap:8px;align-items:center;margin-bottom:12px;
+}
+.dec-input{
+  flex:1;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-family:'DM Mono',monospace;font-size:1rem;
+  padding:8px 12px;border-radius:var(--r);outline:none;
+  transition:border-color .2s;
+}
+.dec-input:focus{border-color:var(--blue);}
+.calc-btn{
+  font-family:'DM Mono',monospace;font-size:.7rem;
+  color:var(--bg);background:var(--blue);
+  border:none;padding:8px 14px;border-radius:var(--r);
+  cursor:pointer;transition:background .15s;white-space:nowrap;letter-spacing:.06em;
+}
+.calc-btn:hover{background:var(--blue2);}
+.bin-output{
+  font-family:'DM Mono',monospace;font-size:1.2rem;
+  color:var(--teal);letter-spacing:.15em;
+  padding:10px 12px;
+  background:rgba(0,212,200,.06);border:1px solid rgba(0,212,200,.2);
+  border-radius:var(--r);text-align:center;
+  min-height:42px;
+}
+
+/* ══════════════════════════════
+   SUBNET CALCULATOR
+══════════════════════════════ */
+.subnet-calc{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;
+  margin-top:8px;
+}
+.sc-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+}
+.sc-live{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pb 1.8s ease-in-out infinite;}
+@keyframes pb{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sc-body{padding:18px;}
+.sc-inputs{
+  display:grid;grid-template-columns:1fr 80px;gap:10px;margin-bottom:16px;
+}
+.sc-input{
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-family:'DM Mono',monospace;font-size:.88rem;
+  padding:9px 12px;border-radius:var(--r);outline:none;
+  transition:border-color .2s;
+}
+.sc-input:focus{border-color:var(--blue);}
+.sc-results{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+@media(max-width:480px){.sc-results{grid-template-columns:1fr;}}
+.sc-result-card{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 14px;
+  transition:border-color .2s;
+}
+.sc-result-card:hover{border-color:var(--blue);}
+.sc-label{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:3px;}
+.sc-value{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--blue2);}
+.sc-error{color:var(--red);font-size:.78rem;font-family:'DM Mono',monospace;}
+
+/* ══════════════════════════════
+   GENERAL TABLE
+══════════════════════════════ */
+.tbl-wrap{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin:12px 0;
+}
+table{width:100%;border-collapse:collapse;font-size:.79rem;}
+thead tr{background:var(--s2);}
+th{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);padding:8px 14px;
+  border-bottom:1px solid var(--border);text-align:left;
+}
+tbody tr{border-bottom:1px solid rgba(26,64,96,.4);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(45,156,255,.04);}
+td{padding:8px 14px;color:var(--text2);}
+td:first-child{color:var(--text);font-weight:500;}
+
+/* ══════════════════════════════
+   CLASSES VISUAL
+══════════════════════════════ */
+.class-ruler{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);padding:18px;margin:12px 0;
+  overflow:hidden;
+}
+.ruler-label{font-family:'DM Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px;}
+.ruler-track{
+  display:flex;height:44px;border-radius:6px;overflow:hidden;border:1px solid var(--border);
+}
+.ruler-seg{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-family:'DM Mono',monospace;font-size:.6rem;font-weight:500;
+  gap:1px;cursor:pointer;transition:filter .15s;border-right:1px solid rgba(255,255,255,.05);
+}
+.ruler-seg:last-child{border-right:none;}
+.ruler-seg:hover{filter:brightness(1.3);}
+.rs-a{flex:14;background:rgba(78,203,113,.25);color:var(--green);}
+.rs-l{flex:2;background:rgba(244,196,48,.2);color:var(--gold);}
+.rs-b{flex:7;background:rgba(45,156,255,.25);color:var(--blue2);}
+.rs-c{flex:3;background:rgba(167,139,250,.25);color:var(--purple);}
+.rs-d{flex:1;background:rgba(255,107,107,.2);color:var(--red);}
+.rs-e{flex:1;background:rgba(255,107,107,.1);color:rgba(255,107,107,.5);}
+.ruler-seg .rs-name{font-size:.58rem;font-weight:700;}
+.ruler-seg .rs-range{font-size:.5rem;opacity:.7;}
+
+/* ══════════════════════════════
+   FORMULAS
+══════════════════════════════ */
+.formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0;}
+.formula-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;
+  transition:border-color .2s;
+}
+.formula-card:hover{border-color:var(--blue);}
+.formula-label{font-size:.72rem;color:var(--text2);margin-bottom:6px;}
+.formula-expr{
+  font-family:'DM Mono',monospace;font-size:1rem;
+  color:var(--teal);
+  background:rgba(0,212,200,.06);
+  padding:6px 10px;border-radius:5px;border:1px solid rgba(0,212,200,.15);
+  text-align:center;
+}
+
+/* ══════════════════════════════
+   WORKED EXAMPLES
+══════════════════════════════ */
+.example-box{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin:12px 0;
+}
+.ex-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+}
+.ex-num-badge{
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;
+  background:rgba(45,156,255,.15);color:var(--blue2);
+  border:1px solid rgba(45,156,255,.3);
+  width:28px;height:28px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.ex-title{font-size:.85rem;font-weight:600;}
+.ex-body{padding:16px;}
+.step-list{display:flex;flex-direction:column;gap:8px;}
+.step{
+  display:flex;gap:12px;font-size:.82rem;
+}
+.step-dot{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(45,156,255,.12);border:1px solid rgba(45,156,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:.6rem;color:var(--blue2);
+  flex-shrink:0;margin-top:1px;
+}
+.step-content{color:var(--text2);}
+.step-content strong{color:var(--text);}
+
+/* subnet table inside examples */
+.sn-table{margin-top:12px;font-size:.78rem;}
+.sn-table td:first-child{color:var(--muted);}
+.sn-table td:nth-child(2){color:var(--blue2);font-family:'DM Mono',monospace;}
+.sn-table td:nth-child(3){color:var(--text2);font-family:'DM Mono',monospace;font-size:.72rem;}
+.sn-table td:last-child{color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;}
+
+/* ══════════════════════════════
+   ACTIVITIES
+══════════════════════════════ */
+.act-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);margin-bottom:12px;overflow:hidden;
+  transition:border-color .2s;
+}
+.act-card:hover{border-color:rgba(45,156,255,.35);}
+.act-head{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;cursor:pointer;user-select:none;
+}
+.act-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;
+  background:rgba(45,156,255,.12);border:1px solid rgba(45,156,255,.25);
+  color:var(--blue2);
+  width:36px;height:36px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.act-info h3{font-size:.9rem;font-weight:600;}
+.act-info small{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+.act-chev{margin-left:auto;color:var(--muted);transition:transform .3s;flex-shrink:0;}
+.act-card.open .act-chev{transform:rotate(180deg);}
+.act-body{display:none;border-top:1px solid var(--border);padding:16px 18px;}
+.act-card.open .act-body{display:block;}
+.act-body > * + *{margin-top:12px;}
+
+.enunciado{
+  background:rgba(45,156,255,.05);
+  border-left:3px solid var(--blue);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:10px 14px;font-size:.83rem;color:var(--text2);
+}
+.hint{
+  background:rgba(244,196,48,.05);
+  border-left:3px solid var(--gold);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:8px 12px;font-size:.78rem;color:rgba(244,196,48,.85);
+}
+.hint::before{content:'💡 ';} 
+
+.sol-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'DM Mono',monospace;font-size:.7rem;
+  color:var(--muted);background:var(--s2);
+  border:1px solid var(--border);
+  padding:7px 14px;border-radius:var(--r);
+  cursor:pointer;transition:all .2s;letter-spacing:.06em;
+}
+.sol-btn:hover{color:var(--green);border-color:var(--green);}
+.sol-btn.open{color:var(--green);border-color:var(--green);background:rgba(78,203,113,.05);}
+.sol-block{display:none;}
+.sol-block.visible{display:block;}
+
+/* ══════════════════════════════
+   COMMANDS BLOCK
+══════════════════════════════ */
+.cmd-block{
+  background:#020d18;border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin:12px 0;
+}
+.cmd-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+}
+.cmd-dot{width:9px;height:9px;border-radius:50%;}
+.cmd-title{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);letter-spacing:.1em;margin-left:4px;}
+pre{
+  padding:14px;
+  font-family:'DM Mono',monospace;font-size:.76rem;
+  line-height:1.7;overflow-x:auto;
+}
+pre .cm{color:var(--muted);}
+pre .kw{color:var(--teal);}
+pre .st{color:var(--blue2);}
+.copy-btn{
+  margin-left:auto;
+  font-family:'DM Mono',monospace;font-size:.6rem;
+  color:var(--muted);background:none;
+  border:1px solid var(--border);padding:2px 8px;border-radius:3px;
+  cursor:pointer;transition:all .2s;
+}
+.copy-btn:hover{color:var(--blue2);border-color:var(--blue);}
+.copy-btn.ok{color:var(--green);border-color:var(--green);}
+
+/* ══════════════════════════════
+   SUMMARY TABLE
+══════════════════════════════ */
+.summary-wrap{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;margin-top:8px;
+}
+.summary-wrap td:nth-child(2){
+  font-family:'DM Mono',monospace;font-size:.74rem;
+  color:var(--teal);
+}
+
+/* ══════════════════════════════
+   FLSM vs VLSM COMPARE
+══════════════════════════════ */
+.compare-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+@media(max-width:540px){.compare-cols{grid-template-columns:1fr;}}
+.comp-box{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rl);overflow:hidden;
+}
+.comp-hdr{
+  padding:9px 14px;border-bottom:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:.68rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;
+}
+.comp-hdr.flsm{background:rgba(244,196,48,.08);color:var(--gold);}
+.comp-hdr.vlsm{background:rgba(78,203,113,.08);color:var(--green);}
+.comp-body{padding:12px;}
+.comp-row{
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;color:var(--text2);
+  padding:4px 0;border-bottom:1px solid rgba(26,64,96,.3);
+}
+.comp-row:last-child{border-bottom:none;}
+.comp-badge{
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  padding:2px 7px;border-radius:3px;flex-shrink:0;
+}
+.cb-f{background:rgba(244,196,48,.1);color:var(--gold);}
+.cb-v{background:rgba(78,203,113,.1);color:var(--green);}
+
+/* FOOTER */
+.footer{
+  text-align:center;padding:28px 24px 48px;
+  border-top:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);
+}
+
+/* ANIMATIONS */
+.act-card,.dev-card,.formula-card{animation:fu .4s ease both;}
+@keyframes fu{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.act-card:nth-child(1){animation-delay:.04s}
+.act-card:nth-child(2){animation-delay:.08s}
+.act-card:nth-child(3){animation-delay:.12s}
+.act-card:nth-child(4){animation-delay:.16s}
+.act-card:nth-child(5){animation-delay:.20s}
+.act-card:nth-child(6){animation-delay:.24s}
+
+.callout{
+  border-left:3px solid var(--blue);
+  background:rgba(45,156,255,.05);
+  padding:10px 14px;border-radius:0 var(--r) var(--r) 0;
+  font-size:.82rem;color:var(--text2);margin:10px 0;
+}
+.callout strong{color:var(--blue2);}
+.callout.tip{border-left-color:var(--gold);background:rgba(244,196,48,.04);}
+.callout.tip strong{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">Sistemas Informáticos · 1º DAW · Redes</div>
+  <h1>FUNDAMENTOS<br>DE <span>REDES</span></h1>
+  <p class="hero-sub">OSI, TCP/IP, IPv4, subredes, VLSM y cálculo de redes con herramientas interactivas.</p>
+  <div class="hero-badges">
+    <span class="hbadge">Modelo OSI</span>
+    <span class="hbadge">TCP/IP</span>
+    <span class="hbadge">IPv4 / CIDR</span>
+    <span class="hbadge">FLSM · VLSM</span>
+    <span class="hbadge">Calculadoras</span>
+    <span class="hbadge">6 Actividades</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="snav">
+  <div class="snav-inner">
+    <a href="#s1"><span class="n">01</span> OSI & TCP/IP</a>
+    <a href="#s2"><span class="n">02</span> Dispositivos</a>
+    <a href="#s3"><span class="n">03</span> IPv4</a>
+    <a href="#s4"><span class="n">04</span> Calculadoras</a>
+    <a href="#s5"><span class="n">05</span> Ejemplos</a>
+    <a href="#s6"><span class="n">06</span> Actividades</a>
+    <a href="#s7"><span class="n">07</span> Resumen</a>
+    <a href="#s8"><span class="n">08</span> Comandos</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ S1: OSI & TCP/IP ══ -->
+<div id="s1">
+  <div class="stitle"><div class="stitle-num">01</div><h2>Modelo OSI y TCP/IP</h2><div class="stitle-bar"></div></div>
+
+  <div class="osi-layout">
+    <!-- OSI Stack -->
+    <div>
+      <p style="margin-bottom:10px;font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">OSI — 7 capas (haz clic)</p>
+      <div class="osi-stack" id="osiStack">
+        <div class="osi-layer l7" onclick="selectLayer(this,7)">
+          <div class="osi-num">7</div>
+          <div class="osi-content">
+            <span class="osi-name">Aplicación</span>
+            <span class="osi-fn">Interfaz con el usuario</span>
+            <span class="osi-proto">HTTP·FTP·SMTP</span>
+          </div>
+        </div>
+        <div class="osi-layer l6" onclick="selectLayer(this,6)">
+          <div class="osi-num">6</div>
+          <div class="osi-content">
+            <span class="osi-name">Presentación</span>
+            <span class="osi-fn">Traducción, cifrado</span>
+            <span class="osi-proto">SSL·JPEG·ASCII</span>
+          </div>
+        </div>
+        <div class="osi-layer l5" onclick="selectLayer(this,5)">
+          <div class="osi-num">5</div>
+          <div class="osi-content">
+            <span class="osi-name">Sesión</span>
+            <span class="osi-fn">Gestión de diálogos</span>
+            <span class="osi-proto">NetBIOS·RPC</span>
+          </div>
+        </div>
+        <div class="osi-layer l4" onclick="selectLayer(this,4)">
+          <div class="osi-num">4</div>
+          <div class="osi-content">
+            <span class="osi-name">Transporte</span>
+            <span class="osi-fn">Segmentación, puertos</span>
+            <span class="osi-proto">TCP·UDP</span>
+          </div>
+        </div>
+        <div class="osi-layer l3" onclick="selectLayer(this,3)">
+          <div class="osi-num">3</div>
+          <div class="osi-content">
+            <span class="osi-name">Red</span>
+            <span class="osi-fn">Enrutamiento, IP</span>
+            <span class="osi-proto">IPv4·IPv6·ICMP</span>
+          </div>
+        </div>
+        <div class="osi-layer l2" onclick="selectLayer(this,2)">
+          <div class="osi-num">2</div>
+          <div class="osi-content">
+            <span class="osi-name">Enlace</span>
+            <span class="osi-fn">Direccionamiento MAC</span>
+            <span class="osi-proto">Ethernet·Switch</span>
+          </div>
+        </div>
+        <div class="osi-layer l1" onclick="selectLayer(this,1)">
+          <div class="osi-num">1</div>
+          <div class="osi-content">
+            <span class="osi-name">Físico</span>
+            <span class="osi-fn">Bits, cables, señales</span>
+            <span class="osi-proto">RJ45·Fibra·Hub</span>
+          </div>
+        </div>
+      </div>
+      <div class="osi-mnemonic" style="margin-top:12px">
+        <strong>Mnemotécnica (arriba→abajo):</strong><br>
+        "Algunos Problemas Sencillos Tienen Respuestas Extremadamente Fáciles"
+      </div>
+    </div>
+	
+    <!-- Detail panel -->
+    <div class="osi-detail" id="osiDetail">
+      <div class="osi-detail-title">→ Selecciona una capa</div>
+      <div id="osiDetailContent">
+        <p style="color:var(--muted);font-size:.82rem">Haz clic en cualquier capa del modelo OSI para ver sus detalles, función y protocolos asociados.</p>
+         <div style="margin-top:20px"></div>
+      </div>
+    </div>
+	
+	<div style="margin-top:20px">
+	  <p style="font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px">Modelo TCP/IP equivalente</p>
+	  <div class="tcpip-grid">
+		<div class="tcpip-row"><div class="tcpip-layer">Aplicación</div><div class="tcpip-osi">Cap. 5+6+7 OSI</div><div class="tcpip-proto">HTTP·DNS·SSH·SMTP</div></div>
+		<div class="tcpip-row"><div class="tcpip-layer">Transporte</div><div class="tcpip-osi">Cap. 4 OSI</div><div class="tcpip-proto">TCP·UDP</div></div>
+		<div class="tcpip-row"><div class="tcpip-layer">Internet</div><div class="tcpip-osi">Cap. 3 OSI</div><div class="tcpip-proto">IP·ICMP</div></div>
+		<div class="tcpip-row"><div class="tcpip-layer">Acceso red</div><div class="tcpip-osi">Cap. 1+2 OSI</div><div class="tcpip-proto">Ethernet·Wi-Fi·ARP·PPP</div></div>
+	  </div>
+	</div>
+  </div>
+</div>
+
+<!-- ══ S2: DISPOSITIVOS ══ -->
+<div id="s2">
+  <div class="stitle"><div class="stitle-num">02</div><h2>Hub, Switch, Bridge y Router</h2><div class="stitle-bar"></div></div>
+
+  <div class="devices-grid">
+    <div class="dev-card">
+      <div class="dev-icon">📢</div>
+      <div class="dev-name">Hub</div>
+      <div class="dev-layer dl1">Capa 1 — Físico</div>
+      <div class="dev-fn">Repite la señal a <strong>todos</strong> los puertos. No filtra ni aprende direcciones.</div>
+      <div class="dev-smart">❌ Sin inteligencia · Half-duplex · Colisiones frecuentes</div>
+      <div class="dev-analogy">Como un altavoz: todos oyen aunque no vaya para ellos.</div>
+    </div>
+    <div class="dev-card">
+      <div class="dev-icon">🌉</div>
+      <div class="dev-name">Bridge</div>
+      <div class="dev-layer dl2">Capa 2 — Enlace</div>
+      <div class="dev-fn">Conecta dos segmentos y filtra por <strong>dirección MAC</strong>. Reduce colisiones.</div>
+      <div class="dev-smart">✅ Parcial · Aprende direcciones MAC · 2 puertos típicos</div>
+      <div class="dev-analogy">Portero entre dos salas: decide quién puede pasar.</div>
+    </div>
+    <div class="dev-card">
+      <div class="dev-icon">🔀</div>
+      <div class="dev-name">Switch</div>
+      <div class="dev-layer dl2">Capa 2 — Enlace</div>
+      <div class="dev-fn">Conmuta tramas solo al puerto destino según <strong>tabla MAC</strong>. Full-duplex.</div>
+      <div class="dev-smart">✅ Inteligente · Microsegmentación · Sin colisiones</div>
+      <div class="dev-analogy">Recepcionista: entrega solo a quien corresponde.</div>
+    </div>
+    <div class="dev-card">
+      <div class="dev-icon">🗺️</div>
+      <div class="dev-name">Router</div>
+      <div class="dev-layer dl3">Capa 3 — Red</div>
+      <div class="dev-fn">Conecta <strong>redes distintas</strong>. Decide la ruta óptima según la IP de destino.</div>
+      <div class="dev-smart">✅ Muy inteligente · NAT · Firewall · Tablas de enrutamiento</div>
+      <div class="dev-analogy">Oficina de correos: encamina entre ciudades diferentes.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S3: IPv4 ══ -->
+<div id="s3">
+  <div class="stitle"><div class="stitle-num">03</div><h2>IPv4: Binario, Decimal y Subredes</h2><div class="stitle-bar"></div></div>
+
+  <!-- Bit table -->
+  <p>Una dirección IPv4 tiene <strong>32 bits</strong> divididos en 4 octetos (bytes). Cada octeto vale entre 0 y 255.</p>
+
+  <div class="tbl-wrap" style="margin-top:14px">
+    <table>
+      <thead><tr>
+        <th>Potencia</th><th>2⁷</th><th>2⁶</th><th>2⁵</th><th>2⁴</th><th>2³</th><th>2²</th><th>2¹</th><th>2⁰</th>
+      </tr></thead>
+      <tbody><tr>
+        <td>Valor</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">128</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">64</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">32</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">16</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">8</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">4</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">2</td>
+        <td style="color:var(--blue2);font-family:'DM Mono',monospace">1</td>
+      </tr></tbody>
+    </table>
+  </div>
+
+  <!-- Clases -->
+  <p style="margin-top:18px;margin-bottom:10px"><strong>Clases de red IPv4</strong> — haz clic en cada segmento:</p>
+  <div class="class-ruler">
+    <div class="ruler-label">Espacio de direcciones 0–255 (primer octeto)</div>
+    <div class="ruler-track">
+      <div class="ruler-seg rs-a" onclick="showClassInfo('A','1–126','255.0.0.0 (/8)','8 bits red / 24 bits host','Grandes empresas (16M+ hosts por red)')"><div class="rs-name">A</div><div class="rs-range">1–126</div></div>
+      <div class="ruler-seg rs-l" onclick="showClassInfo('Loop','127','—','Reservado','Loopback: 127.0.0.1 = localhost')"><div class="rs-name">Lo</div><div class="rs-range">127</div></div>
+      <div class="ruler-seg rs-b" onclick="showClassInfo('B','128–191','255.255.0.0 (/16)','16 bits red / 16 bits host','Universidades y empresas medianas')"><div class="rs-name">B</div><div class="rs-range">128–191</div></div>
+      <div class="ruler-seg rs-c" onclick="showClassInfo('C','192–223','255.255.255.0 (/24)','24 bits red / 8 bits host','Pequeñas redes (254 hosts)')"><div class="rs-name">C</div><div class="rs-range">192–223</div></div>
+      <div class="ruler-seg rs-d" onclick="showClassInfo('D','224–239','No aplica','—','Multicast: videoconferencia, streaming')"><div class="rs-name">D</div><div class="rs-range">224–239</div></div>
+      <div class="ruler-seg rs-e" onclick="showClassInfo('E','240–255','No aplica','—','Experimental / Investigación')"><div class="rs-name">E</div><div class="rs-range">240+</div></div>
+    </div>
+    <div id="classInfo" style="margin-top:12px;min-height:48px;padding:10px 12px;background:rgba(45,156,255,.05);border:1px solid var(--border);border-radius:var(--r);font-size:.8rem;color:var(--text2)">
+      <span style="color:var(--muted)">← Haz clic en un segmento para ver los detalles de la clase</span>
+    </div>
+  </div>
+
+  <!-- Máscara / Broadcast -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+    <div>
+      <p style="margin-bottom:8px"><strong>Máscara de Red</strong></p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>CIDR</th><th>Máscara</th><th>Hosts útiles</th></tr></thead>
+          <tbody>
+            <tr><td>/8</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.0.0.0</td><td style="font-family:'DM Mono',monospace">16,777,214</td></tr>
+            <tr><td>/16</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.0.0</td><td style="font-family:'DM Mono',monospace">65,534</td></tr>
+            <tr><td>/24</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.0</td><td style="font-family:'DM Mono',monospace">254</td></tr>
+            <tr><td>/25</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.128</td><td style="font-family:'DM Mono',monospace">126</td></tr>
+            <tr><td>/26</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.192</td><td style="font-family:'DM Mono',monospace">62</td></tr>
+            <tr><td>/27</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.224</td><td style="font-family:'DM Mono',monospace">30</td></tr>
+            <tr><td>/28</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.240</td><td style="font-family:'DM Mono',monospace">14</td></tr>
+            <tr><td>/30</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.252</td><td style="font-family:'DM Mono',monospace">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <p style="margin-bottom:8px"><strong>Red, Broadcast y Rango</strong></p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Concepto</th><th>Cálculo</th></tr></thead>
+          <tbody>
+            <tr><td>Dir. Red</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">IP AND Máscara</td></tr>
+            <tr><td>Broadcast</td><td style="font-family:'DM Mono',monospace;color:var(--red)">Red OR (NOT Máscara)</td></tr>
+            <tr><td>1er host</td><td style="font-family:'DM Mono',monospace;color:var(--green)">Dir.Red + 1</td></tr>
+            <tr><td>Últ. host</td><td style="font-family:'DM Mono',monospace;color:var(--green)">Broadcast - 1</td></tr>
+            <tr><td>Hosts útiles</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">2^(bits_host) - 2</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout tip" style="margin-top:10px"><strong>Gateway:</strong> normalmente la primera (.1) o última (.254) IP útil de la red. Conecta tu red con Internet.</div>
+    </div>
+  </div>
+
+  <!-- FLSM vs VLSM -->
+  <p style="margin-top:18px;margin-bottom:8px"><strong>FLSM vs VLSM</strong></p>
+  <div class="compare-cols">
+    <div class="comp-box">
+      <div class="comp-hdr flsm">FLSM — Máscara Fija</div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-badge cb-f">Fixed</span>Todas las subredes del mismo tamaño</div>
+        <div class="comp-row"><span class="comp-badge cb-f">/26</span>192.168.1.0/26 · .64/26 · .128/26 · .192/26</div>
+        <div class="comp-row"><span class="comp-badge cb-f">Simple</span>Fácil de calcular y gestionar</div>
+        <div class="comp-row"><span class="comp-badge cb-f">Waste</span>Puede desperdiciar IPs si las necesidades son dispares</div>
+      </div>
+    </div>
+    <div class="comp-box">
+      <div class="comp-hdr vlsm">VLSM — Máscara Variable</div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-badge cb-v">Variable</span>Cada subred tiene el tamaño justo necesario</div>
+        <div class="comp-row"><span class="comp-badge cb-v">Orden</span>Siempre de <strong>mayor a menor</strong> necesidad</div>
+        <div class="comp-row"><span class="comp-badge cb-v">Ahorro</span>Minimiza el desperdicio de direcciones</div>
+        <div class="comp-row"><span class="comp-badge cb-v">/30</span>Para enlaces entre routers: solo 2 hosts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulas -->
+  <p style="margin-top:18px;margin-bottom:8px"><strong>Fórmulas clave</strong></p>
+  <div class="formula-grid">
+    <div class="formula-card"><div class="formula-label">Hosts útiles por subred</div><div class="formula-expr">2^(bits_host) − 2</div></div>
+    <div class="formula-card"><div class="formula-label">Bits de host</div><div class="formula-expr">32 − bits_red</div></div>
+    <div class="formula-card"><div class="formula-label">Nº subredes (FLSM)</div><div class="formula-expr">2^(bits_prestados)</div></div>
+    <div class="formula-card"><div class="formula-label">Bits prestados mínimos</div><div class="formula-expr">⌈log₂(nº_subredes)⌉</div></div>
+  </div>
+</div>
+
+<!-- ══ S4: CALCULADORAS ══ -->
+<div id="s4">
+  <div class="stitle"><div class="stitle-num">04</div><h2>Calculadoras Interactivas</h2><div class="stitle-bar"></div></div>
+
+  <div class="calc-grid">
+    <!-- Binary toggle -->
+    <div class="calc-box">
+      <div class="calc-header">Binario → Decimal (haz clic en los bits)</div>
+      <div class="calc-body">
+        <div class="bit-row" id="bitRow">
+          <div class="bit-cell" data-pow="7" onclick="toggleBit(this)"><div class="bit-pow">2⁷=128</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="6" onclick="toggleBit(this)"><div class="bit-pow">2⁶=64</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="5" onclick="toggleBit(this)"><div class="bit-pow">2⁵=32</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="4" onclick="toggleBit(this)"><div class="bit-pow">2⁴=16</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="3" onclick="toggleBit(this)"><div class="bit-pow">2³=8</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="2" onclick="toggleBit(this)"><div class="bit-pow">2²=4</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="1" onclick="toggleBit(this)"><div class="bit-pow">2¹=2</div><div class="bit-val">0</div></div>
+          <div class="bit-cell" data-pow="0" onclick="toggleBit(this)"><div class="bit-pow">2⁰=1</div><div class="bit-val">0</div></div>
+        </div>
+        <div class="calc-result">
+          <span class="calc-result-lbl">Decimal</span>
+          <span class="calc-result-val" id="bitResult">0</span>
+        </div>
+        <div style="margin-top:8px;text-align:center">
+          <button class="calc-btn" onclick="clearBits()" style="background:transparent;color:var(--muted);border:1px solid var(--border);font-size:.62rem;padding:5px 10px;">LIMPIAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decimal to binary -->
+    <div class="calc-box">
+      <div class="calc-header">Decimal → Binario</div>
+      <div class="calc-body">
+        <div class="dec-input-row">
+          <input class="dec-input" type="number" id="decInput" min="0" max="255" placeholder="0–255" oninput="decToBin()">
+        </div>
+        <div class="bin-output" id="binOutput">00000000</div>
+        <div style="margin-top:10px">
+          <p style="font-family:'DM Mono',monospace;font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">Desglose</p>
+          <div id="decBreakdown" style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text2);min-height:20px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subnet calculator -->
+  <p style="margin-top:20px;margin-bottom:8px"><strong>Calculadora de Subred</strong></p>
+  <div class="subnet-calc">
+    <div class="sc-header">
+      <div class="sc-live"></div>
+      Calculadora interactiva — introduce IP y máscara CIDR
+    </div>
+    <div class="sc-body">
+      <div class="sc-inputs">
+        <input class="sc-input" type="text" id="scIP" placeholder="192.168.1.45" oninput="calcSubnet()">
+        <input class="sc-input" type="number" id="scCIDR" min="1" max="30" placeholder="/24" oninput="calcSubnet()" style="text-align:center">
+      </div>
+      <div id="scError" class="sc-error" style="display:none;margin-bottom:10px"></div>
+      <div class="sc-results" id="scResults">
+        <div class="sc-result-card"><div class="sc-label">Dirección de Red</div><div class="sc-value" id="scNet">—</div></div>
+        <div class="sc-result-card"><div class="sc-label">Broadcast</div><div class="sc-value" id="scBcast" style="color:var(--red)">—</div></div>
+        <div class="sc-result-card"><div class="sc-label">Primer Host</div><div class="sc-value" id="scFirst" style="color:var(--green)">—</div></div>
+        <div class="sc-result-card"><div class="sc-label">Último Host</div><div class="sc-value" id="scLast" style="color:var(--green)">—</div></div>
+        <div class="sc-result-card"><div class="sc-label">Máscara</div><div class="sc-value" id="scMask" style="color:var(--teal)">—</div></div>
+        <div class="sc-result-card"><div class="sc-label">Hosts Útiles</div><div class="sc-value" id="scHosts" style="color:var(--gold)">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S5: EJEMPLOS ══ -->
+<div id="s5">
+  <div class="stitle"><div class="stitle-num">05</div><h2>Ejemplos Prácticos</h2><div class="stitle-bar"></div></div>
+
+  <!-- Ejemplo 1 -->
+  <div class="example-box">
+    <div class="ex-header">
+      <div class="ex-num-badge">1</div>
+      <div class="ex-title">Red, Broadcast y Rango — 172.25.15.50 /20</div>
+    </div>
+    <div class="ex-body">
+      <div class="step-list">
+        <div class="step"><div class="step-dot">1</div><div class="step-content">Bits red = 20 → bits host = <strong>12</strong></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-content">Máscara /20 = <code>255.255.240.0</code></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-content">Red = IP AND Máscara:<br>
+          <code>172.25.15.50</code> AND <code>255.255.240.0</code> → <strong style="color:var(--blue2)">172.25.0.0</strong><br>
+          <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)">(tercer octeto: 00001111 AND 11110000 = 00000000)</span>
+        </div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-content">Broadcast = Red + 2¹² - 1 = 172.25.0.0 + 4095 → <strong style="color:var(--red)">172.25.15.255</strong></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-content">Rango útil: <strong style="color:var(--green)">172.25.0.1 — 172.25.15.254</strong> · Hosts: 2¹² - 2 = <strong>4094</strong></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ejemplo 2 FLSM -->
+  <div class="example-box">
+    <div class="ex-header">
+      <div class="ex-num-badge">2</div>
+      <div class="ex-title">FLSM — Dividir 192.168.1.0/24 en 4 subredes iguales</div>
+    </div>
+    <div class="ex-body">
+      <div class="step-list">
+        <div class="step"><div class="step-dot">1</div><div class="step-content">4 subredes → 2ⁿ ≥ 4 → <strong>n = 2 bits prestados</strong></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-content">Nueva máscara: /24 + 2 = <strong>/26</strong> = 255.255.255.192</div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-content">Tamaño de subred: 2⁶ = <strong>64 direcciones</strong> → 62 hosts útiles cada una</div></div>
+      </div>
+      <div class="tbl-wrap sn-table" style="margin-top:14px">
+        <table>
+          <thead><tr><th>Subred</th><th>Dir. Red</th><th>Rango útil</th><th>Broadcast</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>192.168.1.0/26</td><td>.1 — .62</td><td>.63</td></tr>
+            <tr><td>2</td><td>192.168.1.64/26</td><td>.65 — .126</td><td>.127</td></tr>
+            <tr><td>3</td><td>192.168.1.128/26</td><td>.129 — .190</td><td>.191</td></tr>
+            <tr><td>4</td><td>192.168.1.192/26</td><td>.193 — .254</td><td>.255</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ejemplo 3 VLSM -->
+  <div class="example-box">
+    <div class="ex-header">
+      <div class="ex-num-badge">3</div>
+      <div class="ex-title">VLSM — 192.168.10.0/24 · Red A:50h, B:25h, C:10h</div>
+    </div>
+    <div class="ex-body">
+      <div class="callout tip"><strong>Regla VLSM:</strong> ordenar siempre de mayor a menor necesidad antes de asignar.</div>
+      <div class="tbl-wrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Red</th><th>Hosts necesarios</th><th>Potencia 2</th><th>Prefijo</th><th>Máscara</th><th>Rango asignado</th><th>Broadcast</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>50</td><td>2⁶=64</td><td>/26</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.192</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.0 — .63</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.63</td></tr>
+            <tr><td>B</td><td>25</td><td>2⁵=32</td><td>/27</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.224</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.64 — .95</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.95</td></tr>
+            <tr><td>C</td><td>10</td><td>2⁴=16</td><td>/28</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.255.240</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.96 — .111</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.111</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout" style="margin-top:10px"><strong>Ahorro vs FLSM:</strong> Con FLSM para 50 hosts usarías /26 para todos → desperdiciarías 14 IPs en red B y 54 en red C.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S6: ACTIVIDADES ══ -->
+<div id="s6">
+  <div class="stitle"><div class="stitle-num">06</div><h2>Actividades Propuestas</h2><div class="stitle-bar"></div></div>
+
+  <!-- ACT 1 -->
+  <div class="act-card open">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">1</div>
+      <div class="act-info"><h3>Conversión Binario ↔ Decimal</h3><small>Usa la calculadora de arriba para comprobar</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">
+        <strong>Decimal → Binario:</strong> 200, 45, 10, 255, 0<br>
+        <strong>Binario → Decimal:</strong> 11000000, 00101010, 11111111, 00001111
+      </div>
+      <div class="hint">Usa la tabla de potencias (128·64·32·16·8·4·2·1). El máximo de 8 bits es 255.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>Decimal</th><th>Binario</th><th>Desglose</th></tr></thead>
+            <tbody>
+              <tr><td>200</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">11001000</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">128+64+8</td></tr>
+              <tr><td>45</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">00101101</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">32+8+4+1</td></tr>
+              <tr><td>10</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">00001010</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">8+2</td></tr>
+              <tr><td>255</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">11111111</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">128+64+32+16+8+4+2+1</td></tr>
+              <tr><td>0</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">00000000</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tbl-wrap" style="margin-top:8px">
+          <table>
+            <thead><tr><th>Binario</th><th>Decimal</th><th>Desglose</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:'DM Mono',monospace">11000000</td><td style="color:var(--blue2);font-family:'DM Mono',monospace">192</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">128+64</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">00101010</td><td style="color:var(--blue2);font-family:'DM Mono',monospace">42</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">32+8+2</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">11111111</td><td style="color:var(--blue2);font-family:'DM Mono',monospace">255</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">todos</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">00001111</td><td style="color:var(--blue2);font-family:'DM Mono',monospace">15</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">8+4+2+1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 2 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">2</div>
+      <div class="act-info"><h3>Calcular Red, Broadcast y Rango</h3><small>10.50.100.200 con máscara /16</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">IP <code>10.50.100.200</code> con máscara <code>/16</code>. Calcula: dirección de red, broadcast, primer y último host útil, y número total de hosts útiles.</div>
+      <div class="hint">/16 = 255.255.0.0. Los primeros 16 bits son red, los 16 últimos son host.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>Concepto</th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td>Máscara</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">255.255.0.0</td></tr>
+              <tr><td>Dirección de red</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">10.50.0.0</td></tr>
+              <tr><td>Broadcast</td><td style="font-family:'DM Mono',monospace;color:var(--red)">10.50.255.255</td></tr>
+              <tr><td>Primer host</td><td style="font-family:'DM Mono',monospace;color:var(--green)">10.50.0.1</td></tr>
+              <tr><td>Último host</td><td style="font-family:'DM Mono',monospace;color:var(--green)">10.50.255.254</td></tr>
+              <tr><td>Hosts útiles</td><td style="font-family:'DM Mono',monospace;color:var(--gold)">2¹⁶ - 2 = 65,534</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 3 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">3</div>
+      <div class="act-info"><h3>FLSM — 8 Subredes Iguales</h3><small>172.20.0.0/16</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Red <code>172.20.0.0/16</code>. Necesitas <strong>8 subredes</strong> del mismo tamaño. ¿Qué máscara usarás? ¿Cuántos hosts por subred? Escribe las 3 primeras direcciones de red.</div>
+      <div class="hint">2ⁿ ≥ 8 → n = 3 bits prestados. Nueva máscara: /16+3 = /19.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th></th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td>Bits prestados</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">3 → máscara /19 = 255.255.224.0</td></tr>
+              <tr><td>Bits host</td><td style="font-family:'DM Mono',monospace;color:var(--teal)">32 - 19 = 13</td></tr>
+              <tr><td>Hosts por subred</td><td style="font-family:'DM Mono',monospace;color:var(--gold)">2¹³ - 2 = 8,190</td></tr>
+              <tr><td>Subred 1</td><td style="font-family:'DM Mono',monospace;color:var(--green)">172.20.0.0/19</td></tr>
+              <tr><td>Subred 2</td><td style="font-family:'DM Mono',monospace;color:var(--green)">172.20.32.0/19</td></tr>
+              <tr><td>Subred 3</td><td style="font-family:'DM Mono',monospace;color:var(--green)">172.20.64.0/19</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 4 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">4</div>
+      <div class="act-info"><h3>VLSM — Optimización Real</h3><small>192.168.1.0/24 · Profes, Alumnos, Admin, Enlace</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Red <code>192.168.1.0/24</code>. Necesidades: VLAN Alumnos: 80h · VLAN Profesores: 30h · VLAN Admin: 12h · Enlace routers: 2h. Asigna rangos VLSM sin desperdiciar.</div>
+      <div class="hint">Ordena de mayor a menor. Para 2 hosts usa /30. Para 80 hosts usa /25.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>VLAN</th><th>Hosts</th><th>Prefijo</th><th>Subred</th><th>Rango útil</th><th>Broadcast</th></tr></thead>
+            <tbody>
+              <tr><td>Alumnos</td><td>80</td><td style="font-family:'DM Mono',monospace">/25</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">192.168.1.0</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.1—.126</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.127</td></tr>
+              <tr><td>Profesores</td><td>30</td><td style="font-family:'DM Mono',monospace">/27</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">.128</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.129—.158</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.159</td></tr>
+              <tr><td>Admin</td><td>12</td><td style="font-family:'DM Mono',monospace">/28</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">.160</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.161—.174</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.175</td></tr>
+              <tr><td>Enlace R.</td><td>2</td><td style="font-family:'DM Mono',monospace">/30</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">.176</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.177—.178</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.179</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 5 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">5</div>
+      <div class="act-info"><h3>Identificar Clase y Tipo</h3><small>8.8.8.8 · 192.168.0.1 · 172.31.255.255 · 224.0.0.1 · 127.0.0.1</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Clasifica estas IPs indicando su clase y uso: <code>8.8.8.8</code>, <code>192.168.0.1</code>, <code>172.31.255.255</code>, <code>224.0.0.1</code>, <code>127.0.0.1</code></div>
+      <div class="hint">Mira el primer octeto. A:1–126, B:128–191, C:192–223, D:224–239, Loopback:127.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>IP</th><th>Clase</th><th>Tipo / Uso</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:'DM Mono',monospace">8.8.8.8</td><td style="color:var(--green)">A</td><td>DNS de Google (pública)</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">192.168.0.1</td><td style="color:var(--purple)">C</td><td>Privada — redes domésticas y empresas pequeñas</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">172.31.255.255</td><td style="color:var(--blue2)">B</td><td>Privada — rango 172.16–172.31</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">224.0.0.1</td><td style="color:var(--red)">D</td><td>Multicast — todos los hosts de red</td></tr>
+              <tr><td style="font-family:'DM Mono',monospace">127.0.0.1</td><td style="color:var(--gold)">Loopback</td><td>localhost — pruebas locales, nunca sale a la red</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 6 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">6</div>
+      <div class="act-info"><h3>Diseño de Red de Empresa</h3><small>10.0.0.0/24 · RRHH 20h · Ventas 55h · IT 8h</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Red <code>10.0.0.0/24</code> para 3 departamentos: Ventas (55h), RRHH (20h), IT (8h). Diseña esquema VLSM. ¿Cuántas IPs desperdicias en total?</div>
+      <div class="hint">256 direcciones disponibles en total. Busca la potencia de 2 justo superior a cada necesidad.</div>
+      <button class="sol-btn" onclick="toggleSol(this)">🔍 Ver resolución</button>
+      <div class="sol-block">
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>Dpto</th><th>Necesidad</th><th>Potencia</th><th>Prefijo</th><th>Subred</th><th>Rango útil</th><th>Broadcast</th></tr></thead>
+            <tbody>
+              <tr><td>Ventas</td><td>55</td><td>2⁶=64</td><td style="font-family:'DM Mono',monospace">/26</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">10.0.0.0</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.1—.62</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.63</td></tr>
+              <tr><td>RRHH</td><td>20</td><td>2⁵=32</td><td style="font-family:'DM Mono',monospace">/27</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">10.0.0.64</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.65—.94</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.95</td></tr>
+              <tr><td>IT</td><td>8</td><td>2⁴=16</td><td style="font-family:'DM Mono',monospace">/28</td><td style="font-family:'DM Mono',monospace;color:var(--blue2)">10.0.0.96</td><td style="font-family:'DM Mono',monospace;color:var(--green)">.97—.110</td><td style="font-family:'DM Mono',monospace;color:var(--red)">.111</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout" style="margin-top:10px">
+          <strong>Desperdicio:</strong> Ventas: 7 IPs libres · RRHH: 10 IPs libres · IT: 6 IPs libres · Total: <strong>23 IPs libres</strong><br>
+          <strong>Sin asignar:</strong> .112—.255 = 144 IPs disponibles para expansión futura.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S7: RESUMEN ══ -->
+<div id="s7">
+  <div class="stitle"><div class="stitle-num">07</div><h2>Resumen Rápido</h2><div class="stitle-bar"></div></div>
+  <div class="summary-wrap">
+    <table>
+      <thead><tr><th>Concepto</th><th>Fórmula / Regla</th></tr></thead>
+      <tbody>
+        <tr><td>Hosts válidos por subred</td><td>2^(bits_host) − 2</td></tr>
+        <tr><td>Bits de host</td><td>32 − bits_red</td></tr>
+        <tr><td>Máscara /24</td><td>254 hosts útiles · 255.255.255.0</td></tr>
+        <tr><td>Máscara /16</td><td>65,534 hosts útiles · 255.255.0.0</td></tr>
+        <tr><td>Red y Broadcast</td><td>No asignables a dispositivos</td></tr>
+        <tr><td>Gateway</td><td>Primera o última IP útil (por convención)</td></tr>
+        <tr><td>Orden en VLSM</td><td>Siempre de mayor a menor necesidad</td></tr>
+        <tr><td>Ahorro VLSM</td><td>Mayor cuando las necesidades son muy dispares</td></tr>
+        <tr><td>Loopback</td><td>127.0.0.0/8 — 127.0.0.1 = localhost</td></tr>
+        <tr><td>Enlace entre routers</td><td>/30 — solo 2 hosts útiles</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ S8: COMANDOS ══ -->
+<div id="s8">
+  <div class="stitle"><div class="stitle-num">08</div><h2>Comandos Útiles</h2><div class="stitle-bar"></div></div>
+  <div class="cmd-block">
+    <div class="cmd-bar">
+      <div class="cmd-dot" style="background:#ff5f57"></div>
+      <div class="cmd-dot" style="background:#febc2e;margin-left:5px"></div>
+      <div class="cmd-dot" style="background:#28c840;margin-left:5px"></div>
+      <span class="cmd-title">comandos de red — Windows / Linux / macOS</span>
+      <button class="copy-btn" onclick="cpPre(this)">COPY</button>
+    </div>
+    <pre><span class="cm"># Windows — Ver configuración IP completa</span>
+<span class="kw">ipconfig /all</span>
+
+<span class="cm"># Windows — Ver tabla de enrutamiento</span>
+<span class="kw">route print</span>
+
+<span class="cm"># Linux — Ver configuración de interfaces</span>
+<span class="kw">ip addr show</span>
+
+<span class="cm"># Linux — Ver tabla de enrutamiento</span>
+<span class="kw">ip route show</span>
+
+<span class="cm"># Linux — Calcular subred con ipcalc</span>
+<span class="kw">ipcalc 192.168.1.45/24</span>
+
+<span class="cm"># macOS/Linux — Ver puerta de enlace</span>
+<span class="kw">netstat -rn | grep default</span>
+
+<span class="cm"># Todos — Comprobar conectividad</span>
+<span class="kw">ping 8.8.8.8</span></pre>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  Fundamentos de Redes · Sistemas Informáticos · 1º DAW<br>
+  <span style="opacity:.4;margin-top:3px;display:block">¿Dudas? Consulta con tu profesor o usa la calculadora de la sección 04.</span>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</div>
+
+<script>
+/* ══════════════════════════════
+   OSI LAYER DETAIL
+══════════════════════════════ */
+const osiData = {
+  7: {name:'Aplicación', color:'#c4b5fd', fn:'Interfaz entre las aplicaciones del usuario y la red. Gestiona protocolos de nivel de usuario.', protos:['HTTP','HTTPS','FTP','SMTP','DNS','SSH','Telnet','BGP','SIP'], device:'Servidor / PC'},
+  6: {name:'Presentación', color:'#93c5fd', fn:'Traduce, cifra y comprime los datos. Garantiza que los datos sean entendibles por la capa de Aplicación.', protos:['SSL/TLS','JPEG','MPEG','ASCII','UTF-8'], device:'S/O'},
+  5: {name:'Sesión', color:'#5eb3ff', fn:'Establece, gestiona y cierra sesiones de comunicación entre aplicaciones.', protos:['NetBIOS','RPC','PPTP'], device:'S/O'},
+  4: {name:'Transporte', color:'#00d4c8', fn:'Segmentación, control de flujo y control de errores extremo a extremo. Gestiona puertos.', protos:['TCP','UDP'], device:'Firewall avanzado'},
+  3: {name:'Red', color:'#4ecb71', fn:'Enrutamiento de paquetes entre redes. Usa direcciones IP lógicas para encontrar la ruta óptima.', protos:['IPv4','IPv6','ICMP','OSPF'], device:'Router'},
+  2: {name:'Enlace de Datos', color:'#f4c430', fn:'Direccionamiento físico mediante MAC. Detecta y corrige errores del nivel físico. Organiza bits en tramas.', protos:['Ethernet','Wi-Fi (802.11)','ARP','PPP','HDLC'], device:'Switch · Bridge'},
+  1: {name:'Físico', color:'#ff6b6b', fn:'Transmisión de bits en bruto por el medio físico. Define voltajes, frecuencias, conectores y cables.', protos:['RJ45','Fibra óptica','Coaxial','RS-232'], device:'Hub · Repetidor'},
+};
+
+function selectLayer(el, num) {
+  document.querySelectorAll('.osi-layer').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+  const d = osiData[num];
+  document.getElementById('osiDetailContent').innerHTML = `
+    <div class="osi-detail-name" style="color:${d.color}">${d.name}</div>
+    <div class="osi-detail-num">Capa ${num} del Modelo OSI · Dispositivo: ${d.device}</div>
+    <div class="osi-detail-fn">${d.fn}</div>
+    <p style="font-family:'DM Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px">Protocolos y estándares</p>
+    <div class="proto-chips">${d.protos.map(p=>`<span class="pchip">${p}</span>`).join('')}</div>
+  `;
+}
+
+/* ══════════════════════════════
+   CLASS RULER
+══════════════════════════════ */
+function showClassInfo(cls, range, mask, bits, desc) {
+  document.getElementById('classInfo').innerHTML =
+    `<strong style="color:var(--blue2)">Clase ${cls}</strong> &nbsp;·&nbsp; Rango: <code>${range}</code> &nbsp;·&nbsp; Máscara: <code>${mask}</code> &nbsp;·&nbsp; ${bits}<br><span style="color:var(--muted)">${desc}</span>`;
+}
+
+/* ══════════════════════════════
+   BINARY CALCULATOR
+══════════════════════════════ */
+function toggleBit(cell) {
+  const on = cell.classList.toggle('on');
+  cell.querySelector('.bit-val').textContent = on ? '1' : '0';
+  updateBitResult();
+}
+function updateBitResult() {
+  let total = 0;
+  document.querySelectorAll('.bit-cell').forEach(c => {
+    if (c.classList.contains('on')) total += Math.pow(2, parseInt(c.dataset.pow));
+  });
+  document.getElementById('bitResult').textContent = total;
+}
+function clearBits() {
+  document.querySelectorAll('.bit-cell').forEach(c => {
+    c.classList.remove('on');
+    c.querySelector('.bit-val').textContent = '0';
+  });
+  document.getElementById('bitResult').textContent = '0';
+}
+
+/* ══════════════════════════════
+   DECIMAL TO BINARY
+══════════════════════════════ */
+function decToBin() {
+  const v = parseInt(document.getElementById('decInput').value);
+  if (isNaN(v) || v < 0 || v > 255) {
+    document.getElementById('binOutput').textContent = '— rango 0–255 —';
+    document.getElementById('decBreakdown').textContent = '';
+    return;
+  }
+  const bin = v.toString(2).padStart(8,'0');
+  document.getElementById('binOutput').textContent = bin;
+  // breakdown
+  const pows = [128,64,32,16,8,4,2,1];
+  let parts = [], rem = v;
+  for (const p of pows) { if (rem >= p) { parts.push(p); rem -= p; } }
+  document.getElementById('decBreakdown').textContent = parts.length ? parts.join(' + ') + ' = ' + v : '0';
+}
+
+/* ══════════════════════════════
+   SUBNET CALCULATOR
+══════════════════════════════ */
+function ipToNum(ip) {
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) return null;
+  return (parts[0]<<24)|(parts[1]<<16)|(parts[2]<<8)|parts[3];
+}
+function numToIP(n) {
+  return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+}
+function calcSubnet() {
+  const ipStr = document.getElementById('scIP').value.trim();
+  const cidr  = parseInt(document.getElementById('scCIDR').value);
+  const errEl = document.getElementById('scError');
+
+  if (!ipStr || isNaN(cidr)) { clearSubnet(); return; }
+  if (cidr < 1 || cidr > 30) { errEl.textContent='CIDR debe estar entre /1 y /30'; errEl.style.display='block'; clearSubnet(); return; }
+
+  const ipNum = ipToNum(ipStr);
+  if (ipNum === null) { errEl.textContent='IP no válida. Formato: 192.168.1.1'; errEl.style.display='block'; clearSubnet(); return; }
+  errEl.style.display='none';
+
+  const mask = cidr === 0 ? 0 : (0xFFFFFFFF << (32 - cidr)) >>> 0;
+  const network   = (ipNum & mask) >>> 0;
+  const broadcast = (network | (~mask >>> 0)) >>> 0;
+  const first     = network + 1;
+  const last      = broadcast - 1;
+  const hosts     = Math.pow(2, 32-cidr) - 2;
+
+  document.getElementById('scNet').textContent   = numToIP(network);
+  document.getElementById('scBcast').textContent = numToIP(broadcast);
+  document.getElementById('scFirst').textContent = numToIP(first);
+  document.getElementById('scLast').textContent  = numToIP(last);
+  document.getElementById('scMask').textContent  = numToIP(mask);
+  document.getElementById('scHosts').textContent = hosts.toLocaleString();
+}
+function clearSubnet() {
+  ['scNet','scBcast','scFirst','scLast','scMask','scHosts'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+}
+
+/* ══════════════════════════════
+   ACCORDION
+══════════════════════════════ */
+function toggleAct(head) {
+  head.closest('.act-card').classList.toggle('open');
+}
+
+/* ══════════════════════════════
+   SOLUTION
+══════════════════════════════ */
+function toggleSol(btn) {
+  const block = btn.nextElementSibling;
+  const open = block.classList.toggle('visible');
+  btn.classList.toggle('open', open);
+  btn.innerHTML = open ? '🔼 Ocultar resolución' : '🔍 Ver resolución';
+}
+
+/* ══════════════════════════════
+   COPY CODE
+══════════════════════════════ */
+function cpPre(btn) {
+  const pre = btn.closest('.cmd-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'OK!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* ══════════════════════════════
+   INIT: auto-select layer 4
+══════════════════════════════ */
+setTimeout(() => {
+  const l4 = document.querySelector('.osi-layer.l4');
+  if (l4) selectLayer(l4, 4);
+}, 300);
+</script>
+</body>
+</html>

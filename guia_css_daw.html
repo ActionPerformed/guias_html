@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS · Guía Didáctica · 2º DAW</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Fira+Code:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════ */
+    :root {
+      --ink: #0e0e10;
+      --ink2: #18181c;
+      --ink3: #222228;
+      --border: #2e2e38;
+      --border2: #3a3a48;
+      --mag: #e8006f;
+      --mag2: #ff2d8e;
+      --mag-dim: rgba(232, 0, 111, .12);
+      --mag-glow: rgba(232, 0, 111, .25);
+      --cyan: #00d4c8;
+      --gold: #f5c518;
+      --green: #3ddc97;
+      --purple: #b388ff;
+      --text: #f0eef5;
+      --text2: #8a8596;
+      --code-bg: #080810;
+      --r: 8px;
+      --rl: 14px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      background: var(--ink);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--ink);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--mag);
+    }
+
+    /* ════════════════════════════════════
+   HERO — the page demonstrates itself
+════════════════════════════════════ */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 80px 24px 64px;
+      text-align: center;
+    }
+
+    /* gradient that demos "background: linear-gradient" */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 30% 50%, rgba(232, 0, 111, .12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 75% 40%, rgba(0, 212, 200, .07) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* fine dot pattern */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--mag);
+      border: 1px solid var(--mag);
+      background: var(--mag-dim);
+      padding: 5px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 10vw, 6.5rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: .92;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 .word-css {
+      display: inline-block;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--mag);
+      position: relative;
+    }
+
+    .hero h1 .word-css::after {
+      content: 'CSS';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--mag);
+      clip-path: inset(0 100% 0 0);
+      animation: reveal 1.6s cubic-bezier(.77, 0, .18, 1) .3s forwards;
+    }
+
+    @keyframes reveal {
+      to {
+        clip-path: inset(0 0% 0 0);
+      }
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text2);
+      font-weight: 300;
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-tags {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .htag {
+      font-family: 'Fira Code', monospace;
+      font-size: .68rem;
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 4px 12px;
+      border-radius: 5px;
+      cursor: default;
+      transition: all .2s;
+    }
+
+    .htag:hover {
+      border-color: var(--mag);
+      color: var(--text);
+    }
+
+    /* ════════════════════════════════════
+   STICKY NAV
+════════════════════════════════════ */
+    .snav {
+      position: sticky;
+      top: 0;
+      z-index: 300;
+      background: rgba(14, 14, 16, .94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .snav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .snav-inner {
+      display: flex;
+      max-width: 1060px;
+      margin: 0 auto;
+      min-width: max-content;
+      padding: 0 8px;
+    }
+
+    .snav a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: .66rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--text2);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .snav a:hover {
+      color: var(--mag2);
+      border-bottom-color: var(--mag);
+    }
+
+    /* ════════════════════════════════════
+   WRAP
+════════════════════════════════════ */
+    .wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* ════════════════════════════════════
+   SECTION HEADERS
+════════════════════════════════════ */
+    .sec-head {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin: 64px 0 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-head h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+
+    .sec-head h2 span {
+      color: var(--mag);
+    }
+
+    .sec-tag {
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--mag);
+      background: var(--mag-dim);
+      border: 1px solid rgba(232, 0, 111, .3);
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-bottom: 3px;
+      flex-shrink: 0;
+    }
+
+    /* prose */
+    p {
+      font-size: .88rem;
+      color: rgba(240, 238, 245, .78);
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: var(--text);
+    }
+
+    /* ════════════════════════════════════
+   CODE BLOCKS
+════════════════════════════════════ */
+    .cw {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .cw-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, .025);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cw-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .cw-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .cw-lang {
+      font-family: 'Fira Code', monospace;
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--text2);
+      margin-left: 2px;
+    }
+
+    .cp-btn {
+      margin-left: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: .6rem;
+      color: var(--text2);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .cp-btn:hover {
+      color: var(--mag2);
+      border-color: var(--mag);
+    }
+
+    .cp-btn.ok {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    pre {
+      padding: 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: .77rem;
+      line-height: 1.72;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    /* syntax */
+    pre .prop {
+      color: #e89090;
+    }
+
+    pre .val {
+      color: #8fcf8f;
+    }
+
+    pre .sel {
+      color: #9eb8ff;
+    }
+
+    pre .cm {
+      color: #4a4a62;
+    }
+
+    pre .at {
+      color: #d19a66;
+    }
+
+    pre .kw {
+      color: var(--mag2);
+    }
+
+    pre .str {
+      color: var(--green);
+    }
+
+    pre .num {
+      color: var(--gold);
+    }
+
+    pre .tag {
+      color: var(--mag);
+    }
+
+    pre .atr {
+      color: #d19a66;
+    }
+
+    pre .tx {
+      color: var(--text);
+    }
+
+    /* ════════════════════════════════════
+   TABLES
+════════════════════════════════════ */
+    .tbl-wrap {
+      background: var(--ink2);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .8rem;
+    }
+
+    thead tr {
+      background: var(--ink3);
+    }
+
+    th {
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text2);
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(46, 46, 56, .6);
+      transition: background .15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(232, 0, 111, .04);
+    }
+
+    td {
+      padding: 8px 14px;
+      color: var(--text2);
+    }
+
+    td:first-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: .78em;
+      background: rgba(232, 0, 111, .1);
+      color: var(--mag2);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid rgba(232, 0, 111, .2);
+    }
+
+    /* ════════════════════════════════════
+   DEMO BLOCKS — each section shows itself
+════════════════════════════════════ */
+    .demo-panel {
+      background: var(--ink2);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .demo-label {
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--text2);
+      padding: 8px 14px;
+      background: var(--ink3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-label .live-pill {
+      color: var(--green);
+      background: rgba(61, 220, 151, .1);
+      border: 1px solid rgba(61, 220, 151, .25);
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-size: .58rem;
+    }
+
+    .demo-content {
+      padding: 20px;
+    }
+
+    /* DISPLAY demo */
+    .display-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .disp-item {
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 10px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: .72rem;
+    }
+
+    .disp-item code {
+      font-size: .7rem;
+    }
+
+    .d-block {
+      display: block;
+      background: rgba(232, 0, 111, .1);
+      border: 1px solid rgba(232, 0, 111, .3);
+      color: var(--mag2);
+      padding: 6px 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+    }
+
+    .d-inline1 {
+      display: inline;
+      background: rgba(0, 212, 200, .1);
+      border: 1px solid rgba(0, 212, 200, .3);
+      color: var(--cyan);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+    }
+
+    .d-inline2 {
+      display: inline;
+      background: rgba(0, 212, 200, .1);
+      border: 1px solid rgba(0, 212, 200, .3);
+      color: var(--cyan);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+      margin-left: 4px;
+    }
+
+    .d-iblock {
+      display: inline-block;
+      width: 80px;
+      height: 36px;
+      background: rgba(179, 136, 255, .1);
+      border: 1px solid rgba(179, 136, 255, .3);
+      color: var(--purple);
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+      text-align: center;
+      line-height: 36px;
+    }
+
+    .d-flex-wrap {
+      display: flex;
+      gap: 6px;
+      background: rgba(245, 197, 24, .05);
+      border: 1px solid rgba(245, 197, 24, .2);
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+
+    .d-flex-item {
+      background: rgba(245, 197, 24, .15);
+      border: 1px solid rgba(245, 197, 24, .3);
+      color: var(--gold);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+    }
+
+    /* BOX MODEL diagram */
+    .box-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .bm-margin {
+      background: rgba(245, 197, 24, .08);
+      border: 2px dashed rgba(245, 197, 24, .3);
+      border-radius: 8px;
+      padding: 16px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .bm-margin-label {
+      position: absolute;
+      top: -10px;
+      left: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      color: var(--gold);
+      background: var(--ink2);
+      padding: 0 4px;
+    }
+
+    .bm-border {
+      background: rgba(179, 136, 255, .08);
+      border: 2px solid rgba(179, 136, 255, .5);
+      border-radius: 6px;
+      padding: 14px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .bm-border-label {
+      position: absolute;
+      top: -10px;
+      left: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      color: var(--purple);
+      background: var(--ink2);
+      padding: 0 4px;
+    }
+
+    .bm-padding {
+      background: rgba(0, 212, 200, .08);
+      border: 2px dashed rgba(0, 212, 200, .3);
+      border-radius: 4px;
+      padding: 12px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .bm-padding-label {
+      position: absolute;
+      top: -10px;
+      left: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      color: var(--cyan);
+      background: var(--ink2);
+      padding: 0 4px;
+    }
+
+    .bm-content {
+      background: var(--mag-dim);
+      border: 1px solid rgba(232, 0, 111, .3);
+      border-radius: 4px;
+      padding: 12px 20px;
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+      color: var(--mag2);
+      white-space: nowrap;
+    }
+
+    /* FLEXBOX demo */
+    .flex-demo {
+      background: rgba(61, 220, 151, .04);
+      border: 1px solid rgba(61, 220, 151, .15);
+      border-radius: var(--r);
+      padding: 14px;
+      display: flex;
+      gap: 8px;
+      transition: all .5s ease;
+      min-height: 64px;
+      align-items: center;
+    }
+
+    .fd-item {
+      background: rgba(61, 220, 151, .15);
+      border: 1px solid rgba(61, 220, 151, .3);
+      color: var(--green);
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+      transition: all .4s;
+    }
+
+    .flex-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .flex-ctrl {
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .flex-ctrl:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .flex-ctrl.active {
+      background: rgba(61, 220, 151, .1);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* HOVER demo */
+    .hover-demo-area {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 8px;
+    }
+
+    .hover-card {
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 18px;
+      font-size: .82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hover-card::before {
+      content: ':hover';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(.8);
+      font-family: 'Fira Code', monospace;
+      font-size: .7rem;
+      color: var(--mag2);
+      opacity: 0;
+      transition: all .2s;
+    }
+
+    .hover-card:hover {
+      border-color: var(--mag);
+      box-shadow: 0 0 20px var(--mag-glow);
+      transform: scale(1.06);
+    }
+
+    .hover-card:hover::before {
+      opacity: .6;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .hover-card.scale:hover {
+      transform: scale(1.12);
+    }
+
+    .hover-card.color:hover {
+      background: rgba(232, 0, 111, .15);
+      color: var(--mag2);
+    }
+
+    .hover-card.move:hover {
+      transform: translateY(-6px);
+    }
+
+    .hover-card.glow:hover {
+      box-shadow: 0 0 30px rgba(0, 212, 200, .4);
+      border-color: var(--cyan);
+    }
+
+    /* ANIMATION demo */
+    .anim-stage {
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .anim-box {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--r);
+      background: var(--mag);
+      box-shadow: 0 0 16px var(--mag-glow);
+      flex-shrink: 0;
+    }
+
+    .anim-box.playing {
+      animation: var(--anim-name, none);
+    }
+
+    @keyframes slide {
+      0% {
+        transform: translateX(0);
+        background: var(--mag);
+      }
+
+      100% {
+        transform: translateX(220px);
+        background: var(--cyan);
+      }
+    }
+
+    @keyframes fadein {
+      0% {
+        opacity: 0;
+        transform: scale(.8);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-28px);
+      }
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .anim-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .anim-ctrl {
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 5px 11px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .anim-ctrl:hover {
+      border-color: var(--mag);
+      color: var(--mag2);
+    }
+
+    .anim-ctrl.active {
+      background: var(--mag-dim);
+      border-color: var(--mag);
+      color: var(--mag2);
+    }
+
+    /* GRADIENT demo */
+    .grad-preview {
+      height: 64px;
+      border-radius: var(--r);
+      transition: all .5s ease;
+      border: 1px solid var(--border);
+    }
+
+    .grad-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .grad-btn {
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .2s;
+      color: var(--text2);
+      background: var(--ink3);
+      border-color: var(--border);
+    }
+
+    .grad-btn:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .grad-btn.active {
+      border-color: var(--mag);
+      color: var(--mag2);
+    }
+
+    /* COLOR demo */
+    .color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .swatch {
+      border-radius: var(--r);
+      padding: 8px 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      cursor: pointer;
+      transition: transform .15s;
+      border: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .swatch:hover {
+      transform: scale(1.06);
+    }
+
+    /* FONT demo */
+    .font-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .font-row {
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background .15s;
+    }
+
+    .font-row:hover {
+      background: var(--ink2);
+    }
+
+    .font-label {
+      font-family: 'Fira Code', monospace;
+      font-size: .62rem;
+      color: var(--mag2);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .font-preview {
+      font-size: .92rem;
+      color: var(--text);
+    }
+
+    /* ════════════════════════════════════
+   LIVE PLAYGROUND — signature element
+════════════════════════════════════ */
+    .playground {
+      background: var(--ink2);
+      border: 1px solid var(--mag);
+      border-radius: var(--rl);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(232, 0, 111, .08);
+      margin: 12px 0;
+    }
+
+    .pg-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(232, 0, 111, .06);
+      border-bottom: 1px solid rgba(232, 0, 111, .25);
+    }
+
+    .pg-title {
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--mag);
+    }
+
+    .pg-live-pill {
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      color: var(--green);
+      background: rgba(61, 220, 151, .1);
+      border: 1px solid rgba(61, 220, 151, .25);
+      padding: 2px 7px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pg-live-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 4px var(--green);
+      animation: blink .9s step-end infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .2;
+      }
+    }
+
+    .pg-hint {
+      margin-left: auto;
+      font-size: .7rem;
+      color: var(--text2);
+    }
+
+    .pg-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 260px;
+    }
+
+    @media(max-width:620px) {
+      .pg-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pg-editor {
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pg-editor-label {
+      padding: 6px 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, .2);
+    }
+
+    .pg-textarea {
+      flex: 1;
+      resize: none;
+      background: var(--code-bg);
+      color: #8fcf8f;
+      font-family: 'Fira Code', monospace;
+      font-size: .76rem;
+      line-height: 1.7;
+      border: none;
+      outline: none;
+      padding: 12px;
+      min-height: 200px;
+    }
+
+    .pg-run-btn {
+      font-family: 'Fira Code', monospace;
+      font-size: .68rem;
+      color: var(--ink);
+      background: var(--mag);
+      border: none;
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: background .15s;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .pg-run-btn:hover {
+      background: var(--mag2);
+    }
+
+    .pg-preview {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pg-preview-label {
+      padding: 6px 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: .58rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, .2);
+    }
+
+    .pg-iframe-wrap {
+      flex: 1;
+      background: #fff;
+      min-height: 200px;
+    }
+
+    .pg-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      min-height: 200px;
+    }
+
+    /* ════════════════════════════════════
+   ACTIVITIES
+════════════════════════════════════ */
+    .act-card {
+      background: var(--ink2);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+
+    .act-card:hover {
+      border-color: rgba(232, 0, 111, .3);
+    }
+
+    .act-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .act-num {
+      font-family: 'Fira Code', monospace;
+      font-size: .8rem;
+      font-weight: 500;
+      background: var(--mag-dim);
+      border: 1px solid rgba(232, 0, 111, .3);
+      color: var(--mag2);
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .act-info h3 {
+      font-size: .9rem;
+      font-weight: 600;
+    }
+
+    .act-info small {
+      font-family: 'Fira Code', monospace;
+      font-size: .63rem;
+      color: var(--text2);
+    }
+
+    .act-chev {
+      margin-left: auto;
+      color: var(--text2);
+      transition: transform .3s;
+      flex-shrink: 0;
+    }
+
+    .act-card.open .act-chev {
+      transform: rotate(180deg);
+    }
+
+    .act-body {
+      display: none;
+      border-top: 1px solid var(--border);
+      padding: 16px 18px;
+    }
+
+    .act-card.open .act-body {
+      display: block;
+    }
+
+    .act-body>*+* {
+      margin-top: 12px;
+    }
+
+    .enunciado {
+      background: rgba(0, 212, 200, .04);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 10px 14px;
+      font-size: .83rem;
+      color: rgba(240, 238, 245, .8);
+    }
+
+    .hint {
+      background: rgba(245, 197, 24, .04);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 8px 12px;
+      font-size: .78rem;
+      color: rgba(245, 197, 24, .85);
+    }
+
+    .hint::before {
+      content: '// Pista: ';
+    }
+
+    .sol-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Fira Code', monospace;
+      font-size: .68rem;
+      color: var(--text2);
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .sol-btn:hover {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .sol-btn.open {
+      color: var(--green);
+      border-color: var(--green);
+      background: rgba(61, 220, 151, .05);
+    }
+
+    .sol-block {
+      display: none;
+    }
+
+    .sol-block.visible {
+      display: block;
+    }
+
+    /* try-in-playground button */
+    .try-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: .65rem;
+      color: var(--mag2);
+      background: var(--mag-dim);
+      border: 1px solid rgba(232, 0, 111, .3);
+      padding: 5px 12px;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all .2s;
+      margin-left: 8px;
+    }
+
+    .try-btn:hover {
+      background: rgba(232, 0, 111, .18);
+      border-color: var(--mag);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 28px 24px 48px;
+      border-top: 1px solid var(--border);
+      font-family: 'Fira Code', monospace;
+      font-size: .67rem;
+      color: var(--text2);
+    }
+
+    /* CALLOUT */
+    .callout {
+      border-left: 3px solid var(--mag);
+      background: var(--mag-dim);
+      padding: 10px 14px;
+      border-radius: 0 var(--r) var(--r) 0;
+      font-size: .82rem;
+      color: rgba(240, 238, 245, .8);
+      margin: 10px 0;
+    }
+
+    .callout strong {
+      color: var(--mag2);
+    }
+
+    /* SELECTOR visual demo */
+    .sel-demo {
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      font-family: 'Fira Code', monospace;
+      font-size: .75rem;
+      line-height: 2;
+    }
+
+    .sel-demo-html {
+      color: var(--text2);
+    }
+
+    .sel-demo-tag {
+      color: var(--mag2);
+    }
+
+    .sel-demo-id {
+      color: var(--gold);
+    }
+
+    .sel-demo-cls {
+      color: var(--cyan);
+    }
+
+    .sel-highlight {
+      background: rgba(232, 0, 111, .2);
+      border: 1px solid rgba(232, 0, 111, .4);
+      border-radius: 3px;
+      padding: 0 3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Diseño de Interfaces Web · 2º DAW</div>
+      <h1>Dominando<br><span class="word-css">CSS</span></h1>
+      <p class="hero-sub">Esta página está construida demostrando cada propiedad que enseña. Toca, experimenta, rompe
+        cosas.</p>
+      <div class="hero-tags">
+        <span class="htag">selectores</span>
+        <span class="htag">box model</span>
+        <span class="htag">flexbox</span>
+        <span class="htag">:hover</span>
+        <span class="htag">@keyframes</span>
+        <span class="htag">playground ↗</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="snav">
+    <div class="snav-inner">
+      <a href="#s1">01 Incluir CSS</a>
+      <a href="#s2">02 Selectores</a>
+      <a href="#s3">03 Color</a>
+      <a href="#s4">04 Alineación</a>
+      <a href="#s5">05 Box Model</a>
+      <a href="#s6">06 Display</a>
+      <a href="#s7">07 Hover</a>
+      <a href="#s8">08 Fuentes</a>
+      <a href="#s9">09 Animaciones</a>
+      <a href="#s10">10 Playground</a>
+      <a href="#s11">11 Actividades</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <!-- ══ S1: INCLUIR CSS ══ -->
+    <div id="s1">
+      <div class="sec-head">
+        <div class="sec-tag">01</div>
+        <h2>Cómo incluir <span>CSS</span> en HTML</h2>
+      </div>
+      <p>Hay tres formas de añadir estilos. La más recomendada para proyectos reales es el <strong>archivo
+          externo</strong>.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th>Sintaxis</th>
+              <th>Dónde va</th>
+              <th>Recomendado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Archivo externo</td>
+              <td><code>&lt;link rel="stylesheet" href="estilos.css"&gt;</code></td>
+              <td>En <code>&lt;head&gt;</code></td>
+              <td style="color:var(--green)">✓ Proyectos</td>
+            </tr>
+            <tr>
+              <td>Bloque interno</td>
+              <td><code>&lt;style&gt; ... &lt;/style&gt;</code></td>
+              <td>En <code>&lt;head&gt;</code></td>
+              <td style="color:var(--gold)">~ Prototipos</td>
+            </tr>
+            <tr>
+              <td>Inline</td>
+              <td><code>&lt;div style="color:red"&gt;</code></td>
+              <td>Atributo HTML</td>
+              <td style="color:var(--mag2)">✗ Evitar</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">html — archivo externo (recomendado)</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="tag">&lt;head&gt;</span>
+  <span class="cm">&lt;!-- Enlaza el archivo externo --&gt;</span>
+  <span class="tag">&lt;link</span> <span class="atr">rel=</span><span class="str">"stylesheet"</span> <span class="atr">href=</span><span class="str">"estilos.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/head&gt;</span></pre>
+      </div>
+    </div>
+
+    <!-- ══ S2: SELECTORES ══ -->
+    <div id="s2">
+      <div class="sec-head">
+        <div class="sec-tag">02</div>
+        <h2><span>Selectores</span> CSS</h2>
+      </div>
+      <p>Los selectores determinan <strong>a qué elementos</strong> del HTML se aplican los estilos.</p>
+
+      <div class="demo-panel" style="margin-bottom:14px">
+        <div class="demo-label">Estructura HTML y qué selecciona cada selector <span class="live-pill">demo
+            visual</span></div>
+        <div class="demo-content">
+          <div class="sel-demo">
+            <div><span class="sel-demo-tag">&lt;h1&gt;</span>Título<span class="sel-demo-tag">&lt;/h1&gt;</span> <span
+                style="color:var(--text2);font-size:.65rem">← seleccionado por <code>h1</code></span></div>
+            <div><span class="sel-demo-tag">&lt;p</span> <span class="sel-demo-id">id=<span
+                  class="sel-highlight">"principal"</span></span><span class="sel-demo-tag">&gt;</span>Texto<span
+                class="sel-demo-tag">&lt;/p&gt;</span> <span style="color:var(--text2);font-size:.65rem">← por
+                <code>#principal</code></span></div>
+            <div><span class="sel-demo-tag">&lt;p</span> <span class="sel-demo-cls">class=<span
+                  class="sel-highlight">"destacado"</span></span><span class="sel-demo-tag">&gt;</span>Destacado<span
+                class="sel-demo-tag">&lt;/p&gt;</span> <span style="color:var(--text2);font-size:.65rem">← por
+                <code>.destacado</code></span></div>
+            <div><span class="sel-demo-tag">&lt;div</span> <span class="sel-demo-cls">class=<span
+                  class="sel-highlight">"caja"</span></span><span class="sel-demo-tag">&gt;</span>Caja<span
+                class="sel-demo-tag">&lt;/div&gt;</span> <span style="color:var(--text2);font-size:.65rem">← por
+                <code>div.caja</code> (intersección)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>CSS</th>
+              <th>Qué selecciona</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Etiqueta</td>
+              <td><code>p { }</code></td>
+              <td>Todos los <code>&lt;p&gt;</code> del documento</td>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td><code>#nombre { }</code></td>
+              <td>El elemento con <code>id="nombre"</code> (único)</td>
+            </tr>
+            <tr>
+              <td>Clase</td>
+              <td><code>.clase { }</code></td>
+              <td>Todos los que tienen <code>class="clase"</code></td>
+            </tr>
+            <tr>
+              <td>Universal</td>
+              <td><code>* { }</code></td>
+              <td>Todos los elementos del documento</td>
+            </tr>
+            <tr>
+              <td>Unión</td>
+              <td><code>h1, h2 { }</code></td>
+              <td>Varios selectores a la vez</td>
+            </tr>
+            <tr>
+              <td>Intersección</td>
+              <td><code>div.caja { }</code></td>
+              <td>Solo <code>&lt;div&gt;</code> que tenga la clase <code>caja</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><strong>Orden de especificidad:</strong> ID &gt; Clase &gt; Etiqueta. Si dos reglas
+        contradictorias aplican al mismo elemento, gana la más específica.</div>
+    </div>
+
+    <!-- ══ S3: COLOR ══ -->
+    <div id="s3">
+      <div class="sec-head">
+        <div class="sec-tag">03</div>
+        <h2>Propiedades de <span>Color</span></h2>
+      </div>
+      <p>El color puede definirse con nombres, hexadecimal, RGB o HSL. Las tres formas son equivalentes.</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Tres formas de escribir el mismo color <span class="live-pill">interactivo</span></div>
+        <div class="demo-content">
+          <div class="color-swatches">
+            <div class="swatch" style="background:#e8006f;color:#fff" onclick="highlightColor('#e8006f')">#e8006f</div>
+            <div class="swatch" style="background:rgb(232,0,111);color:#fff" onclick="highlightColor('rgb(232,0,111)')">
+              rgb(232,0,111)</div>
+            <div class="swatch" style="background:hsl(335,100%,45%);color:#fff"
+              onclick="highlightColor('hsl(335,100%,45%)')">hsl(335,100%,45%)</div>
+            <div class="swatch" style="background:#00d4c8;color:#000" onclick="highlightColor('#00d4c8')">#00d4c8</div>
+            <div class="swatch" style="background:#f5c518;color:#000" onclick="highlightColor('#f5c518')">#f5c518</div>
+          </div>
+          <div id="colorResult"
+            style="margin-top:10px;padding:10px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);font-family:'Fira Code',monospace;font-size:.75rem;color:var(--text2)">
+            ← Haz clic en un color para ver cómo se escribe en CSS</div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — colores y degradados</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="cm">/* Color de texto — tres formatos equivalentes */</span>
+<span class="sel">p</span> { <span class="prop">color</span>: <span class="val">red</span>; }
+<span class="sel">p</span> { <span class="prop">color</span>: <span class="val">#ff0000</span>; }
+<span class="sel">p</span> { <span class="prop">color</span>: <span class="val">rgb(255, 0, 0)</span>; }
+
+<span class="cm">/* Fondo sólido */</span>
+<span class="sel">.caja</span> { <span class="prop">background-color</span>: <span class="val">#1a1a2e</span>; }
+
+<span class="cm">/* Degradado lineal */</span>
+<span class="sel">.banner</span> { <span class="prop">background</span>: <span class="val">linear-gradient(to right, #e8006f, #00d4c8)</span>; }</pre>
+      </div>
+
+      <div class="demo-panel" style="margin-top:12px">
+        <div class="demo-label">Degradados — haz clic para cambiar <span class="live-pill">interactivo</span></div>
+        <div class="demo-content">
+          <div class="grad-preview" id="gradPreview" style="background:linear-gradient(to right, #e8006f, #00d4c8)">
+          </div>
+          <div class="grad-btns">
+            <button class="grad-btn active" onclick="setGrad(this,'linear-gradient(to right, #e8006f, #00d4c8)')">→ Rosa
+              a Cyan</button>
+            <button class="grad-btn" onclick="setGrad(this,'linear-gradient(135deg, #f5c518, #e8006f)')">↗ Oro a
+              Magenta</button>
+            <button class="grad-btn" onclick="setGrad(this,'linear-gradient(to bottom, #b388ff, #0e0e10)')">↓ Púrpura a
+              Negro</button>
+            <button class="grad-btn" onclick="setGrad(this,'radial-gradient(circle, #00d4c8, #0e0e10)')">○ Radial
+              Cyan</button>
+            <button class="grad-btn" onclick="setGrad(this,'linear-gradient(to right, #f5c518, #3ddc97, #00d4c8)')">→
+              Triple</button>
+          </div>
+          <div id="gradCSS"
+            style="margin-top:8px;font-family:'Fira Code',monospace;font-size:.7rem;color:var(--text2);padding:6px 10px;background:var(--ink3);border-radius:var(--r)">
+            background: linear-gradient(to right, #e8006f, #00d4c8);</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S4: ALINEACIÓN / FLEXBOX ══ -->
+    <div id="s4">
+      <div class="sec-head">
+        <div class="sec-tag">04</div>
+        <h2>Alineación y <span>Flexbox</span></h2>
+      </div>
+      <p>Flexbox es la herramienta más poderosa para alinear y distribuir elementos. Practica los valores con el
+        simulador.</p>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — text-align y flexbox</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="cm">/* Alineación de texto */</span>
+<span class="sel">p</span> { <span class="prop">text-align</span>: <span class="val">left</span> | <span class="val">center</span> | <span class="val">right</span> | <span class="val">justify</span>; }
+
+<span class="cm">/* Flexbox — activa el modo flex en el contenedor */</span>
+<span class="sel">.contenedor</span> {
+  <span class="prop">display</span>: <span class="val">flex</span>;
+  <span class="prop">justify-content</span>: <span class="val">center</span>;  <span class="cm">/* eje horizontal */</span>
+  <span class="prop">align-items</span>: <span class="val">center</span>;     <span class="cm">/* eje vertical */</span>
+  <span class="prop">gap</span>: <span class="val">16px</span>;               <span class="cm">/* espacio entre hijos */</span>
+}</pre>
+      </div>
+
+      <div class="demo-panel">
+        <div class="demo-label">Simulador Flexbox — cambia los valores <span class="live-pill">interactivo</span></div>
+        <div class="demo-content">
+          <div style="margin-bottom:8px">
+            <p
+              style="font-family:'Fira Code',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);margin-bottom:5px">
+              justify-content:</p>
+            <div class="flex-controls" id="jcControls">
+              <button class="flex-ctrl active" onclick="setFlex('jc','flex-start',this)">flex-start</button>
+              <button class="flex-ctrl" onclick="setFlex('jc','center',this)">center</button>
+              <button class="flex-ctrl" onclick="setFlex('jc','flex-end',this)">flex-end</button>
+              <button class="flex-ctrl" onclick="setFlex('jc','space-between',this)">space-between</button>
+              <button class="flex-ctrl" onclick="setFlex('jc','space-around',this)">space-around</button>
+            </div>
+            <p
+              style="font-family:'Fira Code',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);margin-bottom:5px;margin-top:8px">
+              align-items:</p>
+            <div class="flex-controls" id="aiControls">
+              <button class="flex-ctrl active" onclick="setFlex('ai','stretch',this)">stretch</button>
+              <button class="flex-ctrl" onclick="setFlex('ai','center',this)">center</button>
+              <button class="flex-ctrl" onclick="setFlex('ai','flex-start',this)">flex-start</button>
+              <button class="flex-ctrl" onclick="setFlex('ai','flex-end',this)">flex-end</button>
+            </div>
+          </div>
+          <div class="flex-demo" id="flexDemo" style="justify-content:flex-start;align-items:stretch;height:80px">
+            <div class="fd-item">A</div>
+            <div class="fd-item">B</div>
+            <div class="fd-item">C</div>
+          </div>
+          <div id="flexCSS"
+            style="margin-top:8px;font-family:'Fira Code',monospace;font-size:.7rem;color:var(--text2);padding:6px 10px;background:var(--ink3);border-radius:var(--r)">
+            justify-content: flex-start; &nbsp; align-items: stretch;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S5: BOX MODEL ══ -->
+    <div id="s5">
+      <div class="sec-head">
+        <div class="sec-tag">05</div>
+        <h2>Tamaño y <span>Box Model</span></h2>
+      </div>
+      <p>Todo en CSS es una caja. El modelo de caja define el espacio que ocupa cada elemento: contenido, padding, borde
+        y margen.</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Modelo de caja — visualización interactiva</div>
+        <div class="demo-content">
+          <div class="box-diagram">
+            <div class="bm-margin">
+              <span class="bm-margin-label">margin</span>
+              <div class="bm-border">
+                <span class="bm-border-label">border</span>
+                <div class="bm-padding">
+                  <span class="bm-padding-label">padding</span>
+                  <div class="bm-content">contenido (width × height)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — box model completo</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="sel">.elemento</span> {
+  <span class="prop">width</span>: <span class="num">200px</span>;            <span class="cm">/* ancho del contenido */</span>
+  <span class="prop">height</span>: <span class="num">100px</span>;           <span class="cm">/* alto del contenido */</span>
+  <span class="prop">padding</span>: <span class="num">10px</span>;           <span class="cm">/* espacio interior (entre contenido y borde) */</span>
+  <span class="prop">border</span>: <span class="num">2px</span> <span class="val">solid</span> <span class="val">black</span>;  <span class="cm">/* borde visible */</span>
+  <span class="prop">margin</span>: <span class="num">20px</span>;            <span class="cm">/* espacio exterior (separa del resto) */</span>
+  <span class="prop">border-radius</span>: <span class="num">10px</span>;    <span class="cm">/* esquinas redondeadas */</span>
+}</pre>
+      </div>
+    </div>
+
+    <!-- ══ S6: DISPLAY ══ -->
+    <div id="s6">
+      <div class="sec-head">
+        <div class="sec-tag">06</div>
+        <h2>Propiedad <span>display</span></h2>
+      </div>
+      <p>La propiedad <code>display</code> controla cómo se coloca un elemento en el flujo del documento.</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Comportamiento de cada valor de display <span class="live-pill">demo visual</span></div>
+        <div class="demo-content">
+          <div class="display-grid">
+            <div class="disp-item">
+              <code>display: block</code>
+              <div class="d-block">Ocupa todo el ancho</div>
+            </div>
+            <div class="disp-item">
+              <code>display: inline</code><br>
+              <span style="color:var(--text2);font-size:.7rem">Fluye en línea:</span>&nbsp;
+              <span class="d-inline1">elemento</span><span class="d-inline2">inline</span>
+            </div>
+            <div class="disp-item">
+              <code>display: inline-block</code><br>
+              <span style="color:var(--text2);font-size:.7rem">Respeta w/h:</span>&nbsp;
+              <span class="d-iblock">inline-block</span>
+            </div>
+            <div class="disp-item" style="flex:1 1 200px">
+              <code>display: flex</code>
+              <div class="d-flex-wrap">
+                <div class="d-flex-item">item</div>
+                <div class="d-flex-item">item</div>
+                <div class="d-flex-item">item</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tbl-wrap" style="margin-top:12px">
+        <table>
+          <thead>
+            <tr>
+              <th>Valor</th>
+              <th>Efecto principal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>block</code></td>
+              <td>Ocupa todo el ancho disponible, fuerza salto de línea antes y después</td>
+            </tr>
+            <tr>
+              <td><code>inline</code></td>
+              <td>Solo ocupa el espacio de su contenido, no acepta width/height</td>
+            </tr>
+            <tr>
+              <td><code>inline-block</code></td>
+              <td>Fluye en línea pero acepta width y height como un bloque</td>
+            </tr>
+            <tr>
+              <td><code>flex</code></td>
+              <td>Activa Flexbox en el contenedor — hijos se distribuyen en fila</td>
+            </tr>
+            <tr>
+              <td><code>none</code></td>
+              <td>El elemento desaparece del documento (no ocupa espacio)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ S7: HOVER ══ -->
+    <div id="s7">
+      <div class="sec-head">
+        <div class="sec-tag">07</div>
+        <h2>Pseudo-clase <span>:hover</span></h2>
+      </div>
+      <p>La pseudo-clase <code>:hover</code> aplica estilos cuando el ratón pasa por encima del elemento. Usa
+        <code>transition</code> para suavizar el cambio.</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Pasa el ratón — cada caja tiene un :hover diferente <span
+            class="live-pill">interactivo</span></div>
+        <div class="demo-content">
+          <div class="hover-demo-area">
+            <div class="hover-card color">Cambia color</div>
+            <div class="hover-card scale">Escala ×1.12</div>
+            <div class="hover-card move">Sube 6px</div>
+            <div class="hover-card glow">Brilla en cyan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — hover con transition</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="sel">button</span> {
+  <span class="prop">background-color</span>: <span class="val">#333</span>;
+  <span class="prop">transition</span>: <span class="val">all 0.3s ease</span>;  <span class="cm">/* suaviza el cambio */</span>
+}
+
+<span class="sel">button:hover</span> {
+  <span class="prop">background-color</span>: <span class="val">#e8006f</span>;
+  <span class="prop">transform</span>: <span class="val">scale(1.1)</span>;
+}</pre>
+      </div>
+    </div>
+
+    <!-- ══ S8: FUENTES ══ -->
+    <div id="s8">
+      <div class="sec-head">
+        <div class="sec-tag">08</div>
+        <h2>Propiedades de <span>Fuente</span></h2>
+      </div>
+      <p>El texto tiene mucha personalidad. Con cuatro propiedades puedes controlarlo completamente.</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Combinaciones de fuente en acción</div>
+        <div class="demo-content">
+          <div class="font-showcase">
+            <div class="font-row">
+              <span class="font-label">font-size</span>
+              <span class="font-preview" style="font-size:24px">Texto grande 24px</span>
+              <span class="font-label" style="margin-left:auto;font-size:.58rem;color:var(--text2)">font-size:
+                24px</span>
+            </div>
+            <div class="font-row">
+              <span class="font-label">font-weight</span>
+              <span class="font-preview" style="font-weight:300">Light 300 · <strong style="font-weight:700">Bold
+                  700</strong> · <span style="font-weight:900">Black 900</span></span>
+            </div>
+            <div class="font-row">
+              <span class="font-label">font-style</span>
+              <span class="font-preview" style="font-style:italic;font-family:Georgia,serif">Texto en itálica — añade
+                énfasis</span>
+            </div>
+            <div class="font-row">
+              <span class="font-label">font-family</span>
+              <span class="font-preview" style="font-family:'Fira Code',monospace">Monospace para código y datos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — propiedades de texto</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="sel">p</span> {
+  <span class="prop">font-family</span>: <span class="val">Arial, sans-serif</span>;  <span class="cm">/* fallback si no carga */</span>
+  <span class="prop">font-size</span>: <span class="num">16px</span>;
+  <span class="prop">font-weight</span>: <span class="val">bold</span>;            <span class="cm">/* normal | bold | 100–900 */</span>
+  <span class="prop">font-style</span>: <span class="val">italic</span>;
+  <span class="prop">line-height</span>: <span class="num">1.6</span>;             <span class="cm">/* interlineado */</span>
+  <span class="prop">letter-spacing</span>: <span class="num">0.05em</span>;       <span class="cm">/* espaciado entre letras */</span>
+}</pre>
+      </div>
+    </div>
+
+    <!-- ══ S9: ANIMACIONES ══ -->
+    <div id="s9">
+      <div class="sec-head">
+        <div class="sec-tag">09</div>
+        <h2><span>Animaciones</span> CSS</h2>
+      </div>
+      <p>Las animaciones CSS usan dos partes: <code>@keyframes</code> (define los estados) y <code>animation</code> (las
+        activa en el elemento).</p>
+
+      <div class="demo-panel">
+        <div class="demo-label">Animaciones en vivo — haz clic para activar <span class="live-pill">interactivo</span>
+        </div>
+        <div class="demo-content">
+          <div class="anim-stage">
+            <div class="anim-box" id="animBox"></div>
+            <div style="font-family:'Fira Code',monospace;font-size:.7rem;color:var(--text2)" id="animLabel">←
+              Selecciona una animación</div>
+          </div>
+          <div class="anim-controls">
+            <button class="anim-ctrl"
+              onclick="playAnim('slide','translateX 3s ease infinite alternate','slide → mueve horizontal', this)">slide
+              →</button>
+            <button class="anim-ctrl"
+              onclick="playAnim('fadein','fadein 1.5s ease infinite alternate','fade in / out', this)">fade in</button>
+            <button class="anim-ctrl"
+              onclick="playAnim('bounce','bounce 1s ease-in-out infinite','bouncing ↑', this)">bounce ↑</button>
+            <button class="anim-ctrl"
+              onclick="playAnim('rotate','rotate 2s linear infinite','rotate 360°', this)">rotate</button>
+            <button class="anim-ctrl" onclick="stopAnim()">■ stop</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — keyframes y animation</span><button class="cp-btn"
+            onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="cm">/* 1. Definir los estados */</span>
+<span class="kw">@keyframes</span> <span class="sel">miAnimacion</span> {
+  <span class="num">0%</span>   { <span class="prop">transform</span>: <span class="val">translateX(0)</span>;     <span class="prop">background</span>: <span class="val">green</span>; }
+  <span class="num">100%</span> { <span class="prop">transform</span>: <span class="val">translateX(200px)</span>;  <span class="prop">background</span>: <span class="val">red</span>; }
+}
+
+<span class="cm">/* 2. Aplicar al elemento */</span>
+<span class="sel">.elemento</span> {
+  <span class="prop">animation</span>: <span class="val">miAnimacion 2s ease-in-out infinite alternate</span>;
+  <span class="cm">/* nombre · duración · curva · repeticiones · dirección */</span>
+}</pre>
+      </div>
+    </div>
+
+    <!-- ══ S10: PLAYGROUND ══ -->
+    <div id="s10">
+      <div class="sec-head">
+        <div class="sec-tag">10</div>
+        <h2>Playground <span>en Vivo</span></h2>
+      </div>
+      <p>Escribe CSS real y observa el resultado al instante. Modifica el código y pulsa <strong>Ejecutar</strong> — o
+        edita y el resultado se actualiza solo.</p>
+
+      <div class="playground">
+        <div class="pg-bar">
+          <span class="pg-title">CSS Playground</span>
+          <div class="pg-live-pill">
+            <div class="pg-live-dot"></div>En vivo
+          </div>
+          <span class="pg-hint">Edita · Experimenta · Rompe cosas</span>
+        </div>
+        <div class="pg-layout">
+          <div class="pg-editor">
+            <div class="pg-editor-label">HTML + CSS — edita aquí</div>
+            <textarea class="pg-textarea" id="pgCode" oninput="runPG()" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #0e0e10;
+    font-family: Arial, sans-serif;
+  }
+
+  .tarjeta {
+    width: 200px;
+    padding: 24px;
+    background: #1a1a2e;
+    border: 2px solid #e8006f;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    transition: all 0.3s;
+  }
+
+  .tarjeta:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 30px #e8006f;
+  }
+
+  h2 { color: #e8006f; }
+</style>
+</head>
+<body>
+  <div class="tarjeta">
+    <h2>¡Hola CSS!</h2>
+    <p>Edita el código y mira los cambios.</p>
+  </div>
+</body>
+</html></textarea>
+            <button class="pg-run-btn" onclick="runPG()">▶ Ejecutar</button>
+          </div>
+          <div class="pg-preview">
+            <div class="pg-preview-label">Resultado</div>
+            <div class="pg-iframe-wrap">
+              <iframe class="pg-iframe" id="pgFrame" title="CSS preview"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S11: ACTIVIDADES ══ -->
+    <div id="s11">
+      <div class="sec-head">
+        <div class="sec-tag">11</div>
+        <h2>Actividades <span>Propuestas</span></h2>
+      </div>
+      <p>Intenta resolver cada actividad antes de ver la solución. Después, pruébala en el Playground de la sección 10.
+      </p>
+
+      <!-- ACT 1 -->
+      <div class="act-card open">
+        <div class="act-head" role="button" aria-expanded="true" aria-controls="act-body-1" onclick="toggleAct(this)">
+          <div class="act-num">01</div>
+          <div class="act-info">
+            <h3>Selector de clase</h3><small>Fondo amarillo solo a párrafos .destacado</small>
+          </div>
+          <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <div class="act-body" id="act-body-1">
+          <div class="enunciado">Crea un CSS que ponga fondo <strong>amarillo</strong> solo a los párrafos que tengan la
+            clase <code>destacado</code>. Los demás párrafos no deben verse afectados.</div>
+          <div class="hint">Usa el selector de intersección con punto: selector de etiqueta + clase.</div>
+          <div style="display:flex;align-items:center;gap:0">
+            <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+            <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+p.destacado {
+  background-color: yellow;
+  color: black;
+  padding: 8px;
+}
+</style></head>
+<body>
+  <p>Párrafo normal</p>
+  <p class=&quot;destacado&quot;>Párrafo destacado</p>
+  <p>Otro párrafo normal</p>
+  <p class=&quot;destacado&quot;>Otro destacado</p>
+</body>
+</html>`)" >↗ probar</button>
+</div>
+<div class="sol-block">
+  <div class="cw">
+    <div class="cw-bar">
+      <div class="cw-dots">
+        <div class="cw-dot" style="background:#ff5f57"></div>
+        <div class="cw-dot" style="background:#febc2e"></div>
+        <div class="cw-dot" style="background:#28c840"></div>
+      </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+    </div>
+    <pre><span class="sel">p.destacado</span> {
+  <span class="prop">background-color</span>: <span class="val">yellow</span>;
+}</pre>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ACT 2 -->
+<div class="act-card">
+  <div class="act-head" role="button" aria-expanded="false" aria-controls="act-body-2" onclick="toggleAct(this)">
+    <div class="act-num">02</div>
+    <div class="act-info">
+      <h3>Botón con hover</h3><small>:hover · transform: scale() · transition</small>
+    </div>
+    <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+  <div class="act-body" id="act-body-2">
+    <div class="enunciado">Haz que un botón cambie a color <strong>azul</strong> y aumente su tamaño un
+      <strong>10%</strong> al pasar el ratón. Añade transición suave.</div>
+    <div class="hint">Usa <code>:hover</code> y <code>transform: scale(1.1)</code>. Añade <code>transition: 0.3s</code>
+      al estado normal.</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#111}
+button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+button:hover {
+  background-color: blue;
+  transform: scale(1.1);
+}
+</style></head>
+<body><button>Pasa el ratón aquí</button></body></html>`)" >↗ probar</button>
+    </div>
+    <div class="sol-block">
+      <div class="cw">
+        <div class="cw-bar">
+          <div class="cw-dots">
+            <div class="cw-dot" style="background:#ff5f57"></div>
+            <div class="cw-dot" style="background:#febc2e"></div>
+            <div class="cw-dot" style="background:#28c840"></div>
+          </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+        </div>
+        <pre><span class="sel">button</span> {
+  <span class="prop">transition</span>: <span class="val">all 0.3s</span>;  <span class="cm">/* va en el estado base */</span>
+}
+<span class="sel">button:hover</span> {
+  <span class="prop">background-color</span>: <span class="val">blue</span>;
+  <span class="prop">transform</span>: <span class="val">scale(1.1)</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACT 3 -->
+<div class="act-card">
+  <div class="act-head" role="button" aria-expanded="false" aria-controls="act-body-3" onclick="toggleAct(this)">
+    <div class="act-num">03</div>
+    <div class="act-info">
+      <h3>Caja redondeada</h3><small>width · border · padding · border-radius</small>
+    </div>
+    <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+  <div class="act-body" id="act-body-3">
+    <div class="enunciado">Crea un <code>&lt;div&gt;</code> de <strong>200×200px</strong>, con borde negro de 2px,
+      padding de 20px y esquinas redondeadas de 15px.</div>
+    <div class="hint">Recuerda que <code>border-radius</code> redondea las esquinas.</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#f0f0f0}
+.caja {
+  width: 200px;
+  height: 200px;
+  border: 2px solid black;
+  padding: 20px;
+  border-radius: 15px;
+  background: white;
+  display:flex;align-items:center;justify-content:center;
+  font-family:sans-serif;
+}
+</style></head>
+<body><div class=&quot;caja&quot;>Caja redondeada
+    </div>
+    </body>
+
+    </html>`)" >↗ probar</button>
+  </div>
+  <div class="sol-block">
+    <div class="cw">
+      <div class="cw-bar">
+        <div class="cw-dots">
+          <div class="cw-dot" style="background:#ff5f57"></div>
+          <div class="cw-dot" style="background:#febc2e"></div>
+          <div class="cw-dot" style="background:#28c840"></div>
+        </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+      </div>
+      <pre><span class="sel">.caja</span> {
+  <span class="prop">width</span>: <span class="num">200px</span>;
+  <span class="prop">height</span>: <span class="num">200px</span>;
+  <span class="prop">border</span>: <span class="num">2px</span> <span class="val">solid black</span>;
+  <span class="prop">padding</span>: <span class="num">20px</span>;
+  <span class="prop">border-radius</span>: <span class="num">15px</span>;
+}</pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ACT 4 -->
+<div class="act-card">
+  <div class="act-head" role="button" aria-expanded="false" aria-controls="act-body-4" onclick="toggleAct(this)">
+    <div class="act-num">04</div>
+    <div class="act-info">
+      <h3>Texto centrado con Flexbox</h3><small>display: flex · justify-content · align-items</small>
+    </div>
+    <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+  <div class="act-body" id="act-body-4">
+    <div class="enunciado">Centra un texto dentro de un <code>&lt;div&gt;</code> de <strong>300×150px</strong> usando
+      Flexbox. Tanto horizontal como verticalmente.</div>
+    <div class="hint">Necesitas <code>display: flex</code> + <code>justify-content</code> (horizontal) +
+      <code>align-items</code> (vertical).</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#111}
+.contenedor {
+  width: 300px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: lightgray;
+  border-radius: 8px;
+}
+</style></head>
+<body>
+  <div class=&quot;contenedor&quot;>
+        <p>Texto centrado</p>
+    </div>
+    </body>
+    </html>`)" >↗ probar</button>
+  </div>
+  <div class="sol-block">
+    <div class="cw">
+      <div class="cw-bar">
+        <div class="cw-dots">
+          <div class="cw-dot" style="background:#ff5f57"></div>
+          <div class="cw-dot" style="background:#febc2e"></div>
+          <div class="cw-dot" style="background:#28c840"></div>
+        </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+      </div>
+      <pre><span class="sel">.contenedor</span> {
+  <span class="prop">width</span>: <span class="num">300px</span>;
+  <span class="prop">height</span>: <span class="num">150px</span>;
+  <span class="prop">display</span>: <span class="val">flex</span>;
+  <span class="prop">justify-content</span>: <span class="val">center</span>;  <span class="cm">/* horizontal */</span>
+  <span class="prop">align-items</span>: <span class="val">center</span>;      <span class="cm">/* vertical */</span>
+  <span class="prop">background</span>: <span class="val">lightgray</span>;
+}</pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ACT 5 -->
+<div class="act-card">
+  <div class="act-head" role="button" aria-expanded="false" aria-controls="act-body-5" onclick="toggleAct(this)">
+    <div class="act-num">05</div>
+    <div class="act-info">
+      <h3>Animación fade in</h3><small>@keyframes · opacity · animation</small>
+    </div>
+    <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+  <div class="act-body" id="act-body-5">
+    <div class="enunciado">Crea una animación que haga que un cuadrado rojo pase de <strong>opacidad 0 a 1</strong> en 2
+      segundos. La animación debe repetirse en bucle (alternando).</div>
+    <div class="hint">Usa <code>opacity</code> dentro de <code>@keyframes</code>. Para que vaya y vuelva:
+      <code>animation: ... infinite alternate</code>.</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#111}
+@keyframes aparecer {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.cuadrado {
+  width: 100px;
+  height: 100px;
+  background: red;
+  border-radius: 8px;
+  animation: aparecer 2s ease-in-out infinite alternate;
+}
+</style></head>
+<body><div class=&quot;cuadrado&quot;></div></body>
+</html>`)" >↗ probar</button>
+  </div>
+  <div class="sol-block">
+    <div class="cw">
+      <div class="cw-bar">
+        <div class="cw-dots">
+          <div class="cw-dot" style="background:#ff5f57"></div>
+          <div class="cw-dot" style="background:#febc2e"></div>
+          <div class="cw-dot" style="background:#28c840"></div>
+        </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+      </div>
+      <pre><span class="kw">@keyframes</span> <span class="sel">aparecer</span> {
+  <span class="val">from</span> { <span class="prop">opacity</span>: <span class="num">0</span>; }
+  <span class="val">to</span>   { <span class="prop">opacity</span>: <span class="num">1</span>; }
+}
+<span class="sel">.cuadrado</span> {
+  <span class="prop">width</span>: <span class="num">100px</span>;
+  <span class="prop">height</span>: <span class="num">100px</span>;
+  <span class="prop">background</span>: <span class="val">red</span>;
+  <span class="prop">animation</span>: <span class="val">aparecer 2s ease-in-out infinite alternate</span>;
+}</pre>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ACT 6 -->
+<div class="act-card">
+  <div class="act-head" role="button" aria-expanded="false" aria-controls="act-body-6" onclick="toggleAct(this)">
+    <div class="act-num">06</div>
+    <div class="act-info">
+      <h3>Cuadrado que se mueve y cambia de color</h3><small>translateX · background en keyframes · infinite
+        alternate</small>
+    </div>
+    <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+  <div class="act-body" id="act-body-6">
+    <div class="enunciado">Haz un cuadrado que se mueva <strong>200px a la derecha</strong> y cambie de <strong>verde a
+        azul</strong> en bucle continuo (ida y vuelta).</div>
+    <div class="hint"><code>infinite alternate</code> hace que la animación vaya y vuelva sin cortes abruptos.</div>
+    <div style="display:flex;align-items:center;gap:0">
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <button class="try-btn" onclick="loadPlayground(`<!DOCTYPE html>
+<html><head><style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#111}
+@keyframes mover {
+  0%   { transform: translateX(0);     background: green; }
+  100% { transform: translateX(200px); background: blue;  }
+}
+.cuadrado {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  animation: mover 2s ease-in-out infinite alternate;
+}
+</style></head>
+<body><div class=&quot;cuadrado&quot;></div></body>
+</html>`)" >↗ probar</button>
+  </div>
+  <div class="sol-block">
+    <div class="cw">
+      <div class="cw-bar">
+        <div class="cw-dots">
+          <div class="cw-dot" style="background:#ff5f57"></div>
+          <div class="cw-dot" style="background:#febc2e"></div>
+          <div class="cw-dot" style="background:#28c840"></div>
+        </div><span class="cw-lang">css — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button>
+      </div>
+      <pre><span class="kw">@keyframes</span> <span class="sel">mover</span> {
+  <span class="num">0%</span>   { <span class="prop">transform</span>: <span class="val">translateX(0)</span>;     <span class="prop">background</span>: <span class="val">green</span>; }
+  <span class="num">100%</span> { <span class="prop">transform</span>: <span class="val">translateX(200px)</span>; <span class="prop">background</span>: <span class="val">blue</span>; }
+}
+<span class="sel">.cuadrado</span> {
+  <span class="prop">width</span>: <span class="num">80px</span>;
+  <span class="prop">height</span>: <span class="num">80px</span>;
+  <span class="prop">animation</span>: <span class="val">mover 2s ease-in-out infinite alternate</span>;
+}</pre>
+    </div>
+  </div>
+</div>
+
+</div><!-- /s11 -->
+</div><!-- /wrap -->
+
+<div class="footer">
+  CSS · Diseño de Interfaces Web · 2º DAW<br>
+  <span style="opacity:.4;margin-top:3px;display:block">Experimenta en el Playground — no se puede romper nada.</span>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</div>
+
+<script>
+  /* ══════════════════════════════
+     PLAYGROUND
+  ══════════════════════════════ */
+  function runPG() {
+    const code = document.getElementById('pgCode').value;
+    const frame = document.getElementById('pgFrame');
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open(); doc.write(code); doc.close();
+  }
+  function loadPlayground(code) {
+    document.getElementById('pgCode').value = code;
+    runPG();
+    document.getElementById('s10').scrollIntoView({ behavior: 'smooth' });
+  }
+  // Init playground on load
+  window.addEventListener('load', () => { runPG(); });
+
+  /* ══════════════════════════════
+     COPY CODE
+  ══════════════════════════════ */
+  function cp(btn) {
+    const pre = btn.closest('.cw').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '✓'; btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = 'copiar'; btn.classList.remove('ok'); }, 2000);
+    });
+  }
+
+  /* ══════════════════════════════
+     ACCORDION ACTIVITIES
+  ══════════════════════════════ */
+  function toggleAct(head) {
+    const card = head.closest('.act-card');
+    const isOpen = card.classList.toggle('open');
+    head.setAttribute('aria-expanded', isOpen);
+  }
+
+  /* ══════════════════════════════
+     SOLUTION TOGGLE
+  ══════════════════════════════ */
+  function toggleSol(btn) {
+    const card = btn.closest('.act-card');
+    if (!card) return;
+    const block = card.querySelector('.sol-block');
+    if (!block) return;
+    const open = block.classList.toggle('visible');
+    btn.classList.toggle('open', open);
+    btn.textContent = open ? 'Ocultar' : 'Ver solución';
+  }
+
+  /* ══════════════════════════════
+     FLEXBOX DEMO
+  ══════════════════════════════ */
+  let flexJC = 'flex-start', flexAI = 'stretch';
+  function setFlex(type, val, btn) {
+    if (type === 'jc') {
+      flexJC = val;
+      document.querySelectorAll('#jcControls .flex-ctrl').forEach(b => b.classList.remove('active'));
+    } else {
+      flexAI = val;
+      document.querySelectorAll('#aiControls .flex-ctrl').forEach(b => b.classList.remove('active'));
+    }
+    btn.classList.add('active');
+    const demo = document.getElementById('flexDemo');
+    demo.style.justifyContent = flexJC;
+    demo.style.alignItems = flexAI;
+    document.getElementById('flexCSS').textContent = `justify-content: ${flexJC};   align-items: ${flexAI};`;
+  }
+
+  /* ══════════════════════════════
+     GRADIENT DEMO
+  ══════════════════════════════ */
+  function setGrad(btn, grad) {
+    document.getElementById('gradPreview').style.background = grad;
+    document.getElementById('gradCSS').textContent = `background: ${grad};`;
+    document.querySelectorAll('.grad-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  /* ══════════════════════════════
+     COLOR CLICK
+  ══════════════════════════════ */
+  function highlightColor(val) {
+    document.getElementById('colorResult').innerHTML =
+      `<span style="color:var(--text)">color: <span style="color:var(--mag2)">${val}</span>;</span>`;
+  }
+
+  /* ══════════════════════════════
+     ANIMATION DEMO
+  ══════════════════════════════ */
+  function playAnim(name, animStr, label, btn) {
+    const box = document.getElementById('animBox');
+    box.style.animation = 'none';
+    box.offsetHeight; // reflow
+    box.style.animation = name + ' ' + animStr.split(' ').slice(1).join(' ');
+    document.getElementById('animLabel').textContent = `animation: ${name} ${animStr.split(' ').slice(1).join(' ')}`;
+    document.querySelectorAll('.anim-ctrl').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  function stopAnim() {
+    document.getElementById('animBox').style.animation = 'none';
+    document.getElementById('animLabel').textContent = '← Selecciona una animación';
+    document.querySelectorAll('.anim-ctrl').forEach(b => b.classList.remove('active'));
+  }
+</script>
+</body>
+
+</html>

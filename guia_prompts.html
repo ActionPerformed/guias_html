@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metaprompt · Entrenamiento para prompts eficaces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f5f2eb;
+    --ink:     #1a1612;
+    --card:    #ffffff;
+    --accent1: #e8441a;
+    --accent2: #2563d4;
+    --accent3: #16a34a;
+    --accent4: #d97706;
+    --muted:   #6b6560;
+    --border:  #e0dbd2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 150px; z-index: 9999;
+  }
+
+  /* ─── PROGRESS ─── */
+  #progress {
+    position: fixed; top: 0; left: 0;
+    height: 3px; background: var(--accent1);
+    z-index: 200; width: 0%; transition: width .1s;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink); color: var(--bg);
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: .75rem 2rem; gap: 1rem;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1rem;
+    letter-spacing: -.5px; white-space: nowrap;
+  }
+  .nav-logo span { color: var(--accent1); }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; flex-wrap: wrap; }
+  .nav-links a {
+    color: var(--bg); text-decoration: none;
+    font-size: .8rem; font-weight: 500;
+    opacity: .7; transition: opacity .2s; white-space: nowrap;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--ink); color: var(--bg);
+    padding: 4rem 2rem 5rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 2; }
+  .hero-tag {
+    display: inline-block;
+    background: var(--accent1); color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: .3rem .75rem; border-radius: 2px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .6s ease both;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -2px; margin-bottom: 1.25rem;
+    animation: fadeUp .6s .1s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent1); }
+  .hero p {
+    font-size: 1.05rem; font-weight: 300;
+    max-width: 580px; opacity: .8;
+    animation: fadeUp .6s .2s ease both;
+  }
+  .hero-deco {
+    position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px; border-radius: 50%;
+    border: 60px solid rgba(232,68,26,.12); pointer-events: none;
+  }
+  .hero-deco2 {
+    position: absolute; right: 60px; bottom: -120px;
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 30px solid rgba(37,99,212,.15); pointer-events: none;
+  }
+
+  /* ─── INDEX ─── */
+  .index-section {
+    background: var(--ink); color: var(--bg);
+    padding: 2.5rem 2rem 3.5rem;
+  }
+  .index-inner { max-width: 860px; margin: 0 auto; }
+  .index-label {
+    font-family: 'Syne', sans-serif; font-size: .7rem;
+    font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent1);
+    margin-bottom: 1.25rem;
+  }
+  .index-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .75rem; }
+  .index-item {
+    display: flex; align-items: flex-start; gap: .85rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px; padding: 1rem 1.1rem;
+    text-decoration: none; color: var(--bg);
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+  .index-item:hover { background: rgba(255,255,255,.1); border-color: rgba(232,68,26,.5); transform: translateY(-3px); }
+  .index-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--accent1); line-height: 1; flex-shrink: 0; }
+  .index-text strong { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; display: block; margin-bottom: .2rem; }
+  .index-text span { font-size: .75rem; opacity: .5; font-weight: 300; }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 4rem 0 2rem; }
+
+  .section-num {
+    font-family: 'Syne', sans-serif; font-size: .7rem;
+    font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent1);
+    margin-bottom: .4rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800; letter-spacing: -1px;
+    line-height: 1.2; margin-bottom: 1rem;
+  }
+  .section-intro {
+    color: var(--muted); font-size: 1rem;
+    max-width: 620px; margin-bottom: 2.5rem; font-weight: 300;
+  }
+  .divider { border: none; border-top: 1.5px solid var(--border); margin: 0 0 3rem; }
+
+  /* ─── TIMELINE ─── */
+  .timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: 2rem; }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0 1.5rem;
+    position: relative;
+  }
+
+  .timeline-item:not(:last-child) .tl-spine::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 56px; bottom: 0;
+    width: 2px;
+    background: var(--border);
+    transform: translateX(-50%);
+  }
+
+  .tl-spine {
+    display: flex; flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
+  .tl-dot {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--ink); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+    flex-shrink: 0; z-index: 1;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .tl-dot.w1 { background: var(--accent1); box-shadow: 0 0 0 2px rgba(232,68,26,.3); }
+  .tl-dot.w2 { background: var(--accent2); box-shadow: 0 0 0 2px rgba(37,99,212,.3); }
+  .tl-dot.w3 { background: var(--accent4); box-shadow: 0 0 0 2px rgba(217,119,6,.3); }
+  .tl-dot.w4 { background: var(--accent3); box-shadow: 0 0 0 2px rgba(22,163,74,.3); }
+
+  .tl-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .tl-card:hover { transform: translateX(4px); box-shadow: 0 8px 24px rgba(0,0,0,.07); }
+
+  .tl-week-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .68rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: .35rem;
+  }
+  .tl-week-label.w1 { color: var(--accent1); }
+  .tl-week-label.w2 { color: var(--accent2); }
+  .tl-week-label.w3 { color: var(--accent4); }
+  .tl-week-label.w4 { color: var(--accent3); }
+
+  .tl-card h3 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.05rem; margin-bottom: .75rem; letter-spacing: -.3px;
+  }
+
+  .tl-tasks { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+  .tl-tasks li {
+    display: flex; align-items: flex-start; gap: .6rem;
+    font-size: .9rem; font-weight: 300; color: var(--muted);
+  }
+  .tl-tasks li::before {
+    content: '→'; color: var(--accent1);
+    font-weight: 700; flex-shrink: 0; margin-top: .05rem;
+  }
+
+  .tl-goal {
+    margin-top: 1rem;
+    background: var(--bg); border: 1.5px dashed var(--border);
+    border-radius: 10px; padding: .75rem 1rem;
+    font-size: .85rem; color: var(--muted);
+  }
+  .tl-goal strong { color: var(--ink); font-weight: 600; }
+
+  /* ─── ZONA ROJA ─── */
+  .zona-roja-search {
+    position: relative; margin-bottom: 1.25rem;
+  }
+  .zona-roja-search input {
+    width: 100%; padding: .7rem 1rem .7rem 2.75rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    background: var(--card); color: var(--ink);
+    transition: border-color .2s;
+  }
+  .zona-roja-search input:focus { outline: none; border-color: var(--accent1); }
+  .zona-roja-search::before {
+    content: '🔍'; position: absolute;
+    left: .85rem; top: 50%; transform: translateY(-50%);
+    font-size: .85rem; pointer-events: none;
+  }
+
+  .vague-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: .65rem;
+    margin-bottom: 1rem;
+  }
+
+  .vague-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.1rem;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    user-select: none;
+  }
+  .vague-card:hover { border-color: #fca5a5; transform: translateY(-2px); }
+  .vague-card.checked {
+    background: #fff1f0; border-color: var(--accent1);
+  }
+
+  .vague-card-top {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: .5rem;
+  }
+  .vague-term {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .9rem; color: var(--ink);
+  }
+  .vague-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; transition: all .2s;
+  }
+  .vague-card.checked .vague-check {
+    background: var(--accent1); border-color: var(--accent1); color: #fff;
+  }
+  .vague-question {
+    font-size: .78rem; color: var(--muted); font-weight: 300; line-height: 1.5;
+  }
+  .vague-card.hidden { display: none; }
+
+  /* progress zona roja */
+  .zona-progress-wrap { margin-bottom: 1.5rem; }
+  .zona-progress-bar {
+    background: var(--border); border-radius: 99px; height: 8px;
+    margin-bottom: .4rem; overflow: hidden;
+  }
+  .zona-progress-fill {
+    background: var(--accent1); height: 8px;
+    border-radius: 99px; width: 0%;
+    transition: width .3s;
+  }
+  .zona-progress-label { font-size: .8rem; color: var(--muted); }
+  .zona-progress-label strong { color: var(--ink); }
+
+  /* ─── R5 PLANTILLA ─── */
+  .r5-grid { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem; }
+
+  .r5-field {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 1.1rem 1.25rem;
+    transition: border-color .2s;
+  }
+  .r5-field:focus-within { border-color: var(--accent2); }
+
+  .r5-field-header {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: .6rem;
+  }
+  .r5-badge {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; flex-shrink: 0;
+  }
+  .r5-field-label {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .85rem;
+  }
+  .r5-field-sub { font-size: .75rem; color: var(--muted); font-weight: 300; margin-left: auto; }
+
+  .r5-input {
+    width: 100%; padding: .6rem .85rem;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: .88rem;
+    background: var(--bg); color: var(--ink);
+    transition: border-color .2s;
+  }
+  .r5-input:focus { outline: none; border-color: var(--accent2); background: var(--card); }
+
+  /* prompt area */
+  .prompt-area-wrap {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem;
+  }
+  .prompt-area-header {
+    background: var(--ink); color: var(--bg);
+    padding: .75rem 1.25rem;
+    display: flex; align-items: center; gap: .6rem;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem;
+  }
+  .prompt-area-dots { display: flex; gap: .35rem; }
+  .prompt-area-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .d-r { background: #ff5f57; } .d-y { background: #ffbd2e; } .d-g { background: #28c940; }
+
+  .prompt-textarea {
+    width: 100%; padding: 1rem 1.25rem;
+    border: none; resize: vertical;
+    font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    background: var(--card); color: var(--ink);
+    min-height: 120px; line-height: 1.65;
+  }
+  .prompt-textarea:focus { outline: none; }
+
+  /* specificity meter */
+  .spec-meter {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 1rem; align-items: center;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 1.1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .spec-meter-left {}
+  .spec-label {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .8rem; margin-bottom: .4rem;
+  }
+  .spec-bar-wrap { background: var(--border); border-radius: 99px; height: 8px; margin-bottom: .4rem; overflow: hidden; }
+  .spec-bar-fill { height: 8px; border-radius: 99px; width: 0%; transition: width .4s; background: var(--accent1); }
+  .spec-feedback { font-size: .8rem; color: var(--muted); font-weight: 300; }
+  .spec-value {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2rem; color: var(--ink); line-height: 1;
+    text-align: center; min-width: 70px;
+  }
+
+  /* r5 preview */
+  .r5-preview {
+    background: var(--ink); color: var(--bg);
+    border-radius: 12px; padding: 1.1rem 1.25rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem; line-height: 1.7; font-weight: 300;
+    white-space: pre-wrap; margin-bottom: 1.25rem;
+  }
+  .r5-preview strong { font-weight: 700; color: var(--accent1); }
+
+  /* action btn */
+  .action-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: var(--ink); color: var(--bg);
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .85rem; padding: .7rem 1.4rem;
+    border: none; border-radius: 99px; cursor: pointer;
+    transition: background .2s, transform .15s;
+    letter-spacing: .3px;
+  }
+  .action-btn:hover { background: var(--accent1); transform: translateY(-1px); }
+  .action-btn.secondary {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--border);
+  }
+  .action-btn.secondary:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ─── CHECKLIST ─── */
+  .checklist-grid { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.5rem; }
+
+  .chk-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: .9rem 1.1rem;
+    cursor: pointer; transition: border-color .2s, background .2s;
+    user-select: none;
+  }
+  .chk-item:hover { border-color: var(--accent3); }
+  .chk-item.done { background: #f0fdf4; border-color: var(--accent3); }
+
+  .chk-box {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; transition: all .2s; margin-top: .1rem;
+  }
+  .chk-item.done .chk-box { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+
+  .chk-text { font-size: .9rem; font-weight: 400; }
+  .chk-text em { font-style: normal; color: var(--muted); font-size: .8rem; font-weight: 300; display: block; margin-top: .1rem; }
+
+  /* premortem */
+  .premortem-box {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .premortem-header {
+    padding: .85rem 1.25rem;
+    background: #fffbeb; border-bottom: 1.5px solid #fde68a;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem;
+    color: #92400e;
+  }
+  .premortem-body { padding: 1.1rem 1.25rem; }
+  .premortem-body p { font-size: .85rem; color: var(--muted); font-weight: 300; margin-bottom: .75rem; }
+  .premortem-textarea {
+    width: 100%; padding: .7rem .9rem;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: .88rem;
+    background: var(--bg); color: var(--ink); resize: vertical;
+    min-height: 72px; line-height: 1.6;
+  }
+  .premortem-textarea:focus { outline: none; border-color: var(--accent4); }
+
+  /* ─── SUCCESS CARD ─── */
+  .success-card {
+    background: var(--ink); color: var(--bg);
+    border-radius: 16px; padding: 2rem;
+    text-align: center; margin-bottom: 2rem;
+  }
+  .success-card .big { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--accent3); letter-spacing: -2px; margin-bottom: .5rem; }
+  .success-card p { font-size: .9rem; opacity: .7; font-weight: 300; max-width: 460px; margin: 0 auto; }
+
+  /* ─── FOOTER ─── */
+  footer { margin-top: 4rem; background: var(--ink); color: var(--bg); padding: 2rem; text-align: center; }
+  footer p { opacity: .45; font-size: .78rem; font-weight: 300; }
+  footer strong { opacity: 1; font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  code {
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    background: #ede9e0; padding: .1rem .35rem;
+    border-radius: 4px; font-size: .83em;
+  }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .timeline-item { grid-template-columns: 40px 1fr; gap: 0 1rem; }
+    .tl-dot { width: 40px; height: 40px; font-size: .85rem; }
+    .vague-grid { grid-template-columns: 1fr; }
+    .spec-meter { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">META<span>·</span>PROMPT</div>
+  <ul class="nav-links">
+    <li><a href="#plan">01 · Plan 4 semanas</a></li>
+    <li><a href="#zonaroja">02 · Zona Roja</a></li>
+    <li><a href="#r5">03 · Plantilla R5</a></li>
+    <li><a href="#checklist">04 · Autochequeo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">🧠 Metacognición aplicada · Prompting eficaz</div>
+    <h1>Escribe prompts<br>que funcionan <em>a la primera</em></h1>
+    <p>Entrenamiento de 4 semanas para pasar de instrucciones vagas a prompts precisos. Basado en ciencias cognitivas, psicología y lingüística.</p>
+  </div>
+</header>
+
+<!-- ÍNDICE -->
+<div class="index-section">
+  <div class="index-inner">
+    <div class="index-label">Contenidos</div>
+    <div class="index-grid">
+      <a href="#plan" class="index-item">
+        <div class="index-num">01</div>
+        <div class="index-text"><strong>Plan 4 semanas</strong><span>De la conciencia a la automatización</span></div>
+      </a>
+      <a href="#zonaroja" class="index-item">
+        <div class="index-num">02</div>
+        <div class="index-text"><strong>Zona Roja</strong><span>20 términos vagos a evitar</span></div>
+      </a>
+      <a href="#r5" class="index-item">
+        <div class="index-num">03</div>
+        <div class="index-text"><strong>Plantilla R5</strong><span>Constructor de restricciones</span></div>
+      </a>
+      <a href="#checklist" class="index-item">
+        <div class="index-num">04</div>
+        <div class="index-text"><strong>Autochequeo</strong><span>1 minuto antes de enviar</span></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- 01. PLAN 4 SEMANAS -->
+  <section id="plan">
+    <div class="section-num">01 — Plan de entrenamiento</div>
+    <h2>4 semanas para<br>dominar el prompting</h2>
+    <p class="section-intro">Cada semana construye sobre la anterior. No necesitas más de 15 minutos al día: la clave está en la práctica deliberada, no en la cantidad.</p>
+    <hr class="divider">
+
+    <div class="timeline reveal">
+
+      <!-- Semana 1 -->
+      <div class="timeline-item">
+        <div class="tl-spine">
+          <div class="tl-dot w1">S1</div>
+        </div>
+        <div class="tl-card">
+          <div class="tl-week-label w1">Semana 1</div>
+          <h3>Conciencia — detectar la vaguedad</h3>
+          <ul class="tl-tasks">
+            <li>Compara el mismo prompt formulado de forma vaga vs. específica. Analiza la diferencia en las respuestas que obtienes.</li>
+            <li>Aprende a reconocer las «palabras fantasma»: términos que parecen precisos pero admiten cualquier interpretación.</li>
+            <li>Practica con la Zona Roja: para cada término vago que uses, responde su pregunta desencadenante antes de enviar.</li>
+          </ul>
+          <div class="tl-goal"><strong>🎯 Objetivo:</strong> identificar al menos 3 palabras vagas en tus propios prompts antes de escribir esta guía.</div>
+        </div>
+      </div>
+
+      <!-- Semana 2 -->
+      <div class="timeline-item">
+        <div class="tl-spine">
+          <div class="tl-dot w2">S2</div>
+        </div>
+        <div class="tl-card">
+          <div class="tl-week-label w2">Semana 2</div>
+          <h3>Estructura — aplicar la plantilla R5</h3>
+          <ul class="tl-tasks">
+            <li>Usa la plantilla R5 en cada prompt que escribas esta semana: Rol, Resultado, Restricciones numéricas, Reglas negativas y Referentes.</li>
+            <li>Practica el «otro mental»: antes de enviar, imagina que eres la IA e intenta responder tu propio prompt. ¿Qué interpretaciones son posibles?</li>
+          </ul>
+          <div class="tl-goal"><strong>🎯 Objetivo:</strong> escribir 5 prompts con todas las R5 completas y notar cómo cambian las respuestas.</div>
+        </div>
+      </div>
+
+      <!-- Semana 3 -->
+      <div class="timeline-item">
+        <div class="tl-spine">
+          <div class="tl-dot w3">S3</div>
+        </div>
+        <div class="tl-card">
+          <div class="tl-week-label w3">Semana 3</div>
+          <h3>Descomposición — divide para conquistar</h3>
+          <ul class="tl-tasks">
+            <li>Divide las tareas complejas en cadenas de prompts más pequeños. Un prompt bien acotado siempre supera a uno que pide demasiado a la vez.</li>
+            <li>Justifica causalmente cada restricción que añadas: si pones «máximo 200 palabras», explica por qué ese límite importa en tu contexto.</li>
+          </ul>
+          <div class="tl-goal"><strong>🎯 Objetivo:</strong> transformar un prompt largo y complejo en una cadena de 3 prompts encadenados.</div>
+        </div>
+      </div>
+
+      <!-- Semana 4 -->
+      <div class="timeline-item">
+        <div class="tl-spine">
+          <div class="tl-dot w4">S4</div>
+        </div>
+        <div class="tl-card">
+          <div class="tl-week-label w4">Semana 4</div>
+          <h3>Automatización — que sea un hábito</h3>
+          <ul class="tl-tasks">
+            <li>Aplica el pre-mortem antes de cada prompt: escribe dos formas concretas en que podría malinterpretarse. Esto solo toma 30 segundos.</li>
+            <li>Usa el índice de especificidad como referencia: por encima del 12% la probabilidad de respuesta útil al primer intento aumenta notablemente.</li>
+            <li>Interioriza el checklist de 1 minuto hasta no necesitar consultarlo.</li>
+          </ul>
+          <div class="tl-goal"><strong>🎯 Criterio de éxito final:</strong> en 90 segundos, escribe un prompt con ≥6 restricciones explícitas que sea útil al primer intento el 80% de las veces.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 02. ZONA ROJA -->
+  <section id="zonaroja">
+    <div class="section-num">02 — Zona Roja</div>
+    <h2>20 términos vagos<br>que debes evitar</h2>
+    <p class="section-intro">Si alguno de estos términos aparece en tu borrador, <strong>no envíes</strong> hasta responder la pregunta asociada. Haz clic en los que uses para marcarlos.</p>
+    <hr class="divider">
+
+    <div class="zona-progress-wrap reveal">
+      <div class="zona-progress-bar"><div class="zona-progress-fill" id="vagueProgressFill"></div></div>
+      <div class="zona-progress-label"><strong id="vagueCounter">0 de 20</strong> términos marcados en tu borrador — responde sus preguntas antes de enviar</div>
+    </div>
+
+    <div class="zona-roja-search reveal">
+      <input type="text" id="vagueSearch" placeholder="Busca un término vago..." oninput="filterVague(this.value)">
+    </div>
+
+    <div class="vague-grid reveal" id="vagueGrid"></div>
+  </section>
+
+  <!-- 03. PLANTILLA R5 -->
+  <section id="r5">
+    <div class="section-num">03 — Plantilla R5</div>
+    <h2>Constructor de<br>restricciones R5</h2>
+    <p class="section-intro">Rellena los cinco campos para estructurar tu prompt. La vista previa se actualiza en tiempo real. Cuando termines, copia el resultado y pégalo en tu IA.</p>
+    <hr class="divider">
+
+    <div class="r5-grid reveal">
+
+      <div class="r5-field">
+        <div class="r5-field-header">
+          <div class="r5-badge" style="background:#fef3c7;">🎭</div>
+          <div class="r5-field-label">R1 · Rol</div>
+          <div class="r5-field-sub">¿Quién eres o qué rol adopta la IA?</div>
+        </div>
+        <input type="text" id="r1" class="r5-input" placeholder="Ej: Actúa como un editor científico riguroso">
+      </div>
+
+      <div class="r5-field">
+        <div class="r5-field-header">
+          <div class="r5-badge" style="background:#dbeafe;">📄</div>
+          <div class="r5-field-label">R2 · Resultado</div>
+          <div class="r5-field-sub">Formato exacto de la respuesta</div>
+        </div>
+        <input type="text" id="r2" class="r5-input" placeholder="Ej: Tabla Markdown de 3 columnas, solo con viñetas">
+      </div>
+
+      <div class="r5-field">
+        <div class="r5-field-header">
+          <div class="r5-badge" style="background:#dcfce7;">🔢</div>
+          <div class="r5-field-label">R3 · Restricciones numéricas</div>
+          <div class="r5-field-sub">Límites cuantificables</div>
+        </div>
+        <input type="text" id="r3" class="r5-input" placeholder="Ej: Máx. 200 palabras, mínimo 3 fuentes, 5±1 viñetas">
+      </div>
+
+      <div class="r5-field">
+        <div class="r5-field-header">
+          <div class="r5-badge" style="background:#fff1f2;">🚫</div>
+          <div class="r5-field-label">R4 · Reglas negativas</div>
+          <div class="r5-field-sub">Qué NO debe incluir la respuesta</div>
+        </div>
+        <input type="text" id="r4" class="r5-input" placeholder="Ej: Sin juicios de valor, sin jerga legal, sin introducción genérica">
+      </div>
+
+      <div class="r5-field">
+        <div class="r5-field-header">
+          <div class="r5-badge" style="background:#fce7f3;">📎</div>
+          <div class="r5-field-label">R5 · Referentes concretos</div>
+          <div class="r5-field-sub">Ejemplos o modelos a seguir</div>
+        </div>
+        <input type="text" id="r5" class="r5-input" placeholder="Ej: Estilo similar a este párrafo: [pega tu ejemplo]">
+      </div>
+
+    </div>
+
+    <!-- Prompt completo -->
+    <div class="prompt-area-wrap reveal">
+      <div class="prompt-area-header">
+        <div class="prompt-area-dots"><span class="d-r"></span><span class="d-y"></span><span class="d-g"></span></div>
+        Tu prompt completo (borrador)
+      </div>
+      <textarea id="fullPrompt" class="prompt-textarea" placeholder="Escribe o pega aquí tu prompt..."></textarea>
+    </div>
+
+    <!-- Especificidad -->
+    <div class="spec-meter reveal">
+      <div class="spec-meter-left">
+        <div class="spec-label">📊 Índice de especificidad</div>
+        <div class="spec-bar-wrap"><div class="spec-bar-fill" id="specBarFill"></div></div>
+        <div class="spec-feedback" id="specFeedback">Escribe un prompt y pulsa calcular para medir su especificidad</div>
+      </div>
+      <div class="spec-value" id="specPercent">—</div>
+    </div>
+
+    <div style="display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.5rem;" class="reveal">
+      <button class="action-btn" id="calcSpecBtn">Calcular especificidad</button>
+      <button class="action-btn secondary" id="copyPromptBtn">📋 Copiar prompt + R5</button>
+    </div>
+
+    <!-- Preview R5 -->
+    <div class="r5-preview reveal" id="r5Preview">Rellena los campos R5 para ver la vista previa aquí...</div>
+
+  </section>
+
+  <!-- 04. CHECKLIST -->
+  <section id="checklist">
+    <div class="section-num">04 — Autochequeo</div>
+    <h2>1 minuto antes<br>de enviar</h2>
+    <p class="section-intro">Marca cada punto cuando lo hayas verificado. Cuando los cinco estén en verde, tu prompt está listo para enviar.</p>
+    <hr class="divider">
+
+    <div class="checklist-grid reveal" id="checklistGrid">
+
+      <div class="chk-item" onclick="toggleChk(this)">
+        <div class="chk-box">✓</div>
+        <div class="chk-text">
+          📐 ¿Has especificado el formato exacto de salida?
+          <em>Lista, JSON, tabla, código, párrafo... no lo dejes implícito.</em>
+        </div>
+      </div>
+
+      <div class="chk-item" onclick="toggleChk(this)">
+        <div class="chk-box">✓</div>
+        <div class="chk-text">
+          🔢 ¿Hay límites numéricos en todo lo que admita grados?
+          <em>Longitud, número de puntos, margen de error, proporción...</em>
+        </div>
+      </div>
+
+      <div class="chk-item" onclick="toggleChk(this)">
+        <div class="chk-box">✓</div>
+        <div class="chk-text">
+          ❌ ¿Incluiste al menos un contraejemplo de lo que NO quieres?
+          <em>Las reglas negativas eliminan interpretaciones no deseadas.</em>
+        </div>
+      </div>
+
+      <div class="chk-item" onclick="toggleChk(this)">
+        <div class="chk-box">✓</div>
+        <div class="chk-text">
+          🌍 ¿La IA no necesita adivinar nada del contexto?
+          <em>Sin pronombres ambiguos, sin referencias implícitas, sin «eso» sin antecedente.</em>
+        </div>
+      </div>
+
+      <div class="chk-item" onclick="toggleChk(this)" id="chkRedZoneItem">
+        <div class="chk-box">✓</div>
+        <div class="chk-text">
+          🔴 ¿Revisaste la Zona Roja y respondiste las preguntas?
+          <em>Si marcaste algún término vago arriba, asegúrate de haber resuelto la ambigüedad.</em>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pre-mortem -->
+    <div class="premortem-box reveal">
+      <div class="premortem-header">⚡ Pre-mortem — imagina el peor caso antes de enviar</div>
+      <div class="premortem-body">
+        <p>Escribe dos formas concretas en que este prompt podría ser malinterpretado. Solo tarda 30 segundos y puede ahorrarte varias iteraciones.</p>
+        <textarea id="premortem" class="premortem-textarea" placeholder="Ej: 1. La IA podría asumir que «breve» significa 500 palabras en lugar de 50.&#10;2. El término «profesional» podría llevarla a usar jerga técnica que quiero evitar."></textarea>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-card reveal">
+      <div class="big">≥ 12%</div>
+      <p>Si tu índice de especificidad supera el 12% y los cinco puntos del checklist están marcados, tienes una probabilidad muy alta de obtener una respuesta útil al primer intento. Sin iteraciones. Sin frustración.</p>
+    </div>
+
+  </section>
+
+</div><!-- /container -->
+
+<footer>
+  <p><strong>METAPROMPT · Entrenamiento metacognitivo</strong></p>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</footer>
+
+<script>
+  // ─── PROGRESS BAR ───
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement;
+    document.getElementById('progress').style.width =
+      (s.scrollTop / (s.scrollHeight - s.clientHeight) * 100) + '%';
+  });
+
+  // ─── SCROLL REVEAL ───
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  // ─── VAGUE TERMS ───
+  const vagueTermsList = [
+    { term: "claro",        question: "¿Qué nivel educativo o experiencia asumes en el lector?" },
+    { term: "resumen",      question: "¿100 palabras o 3 páginas? ¿Conservas números y ejemplos?" },
+    { term: "creativo",     question: "¿Qué recurso concreto: metáfora, ironía, estructura no lineal?" },
+    { term: "profesional",  question: "¿Tienes un documento modelo o ejemplo de empresa de referencia?" },
+    { term: "detallado",    question: "¿Cuántos niveles de profundidad? ¿Con ejemplos sí o no?" },
+    { term: "crítico",      question: "¿Solo fallos o pros+contras? ¿Bajo qué marco evaluativo?" },
+    { term: "natural",      question: "¿Puedes dar un ejemplo de lo que NO es natural en este contexto?" },
+    { term: "formal",       question: "¿Rasgos específicos: 'usted', sin contracciones, fórmulas de cortesía?" },
+    { term: "estratégico",  question: "¿Horizonte temporal? ¿Qué variables das por fijas?" },
+    { term: "ético",        question: "¿Qué principio concreto: no dañar, autonomía, justicia distributiva?" },
+    { term: "rápido",       question: "¿Cuántos segundos o minutos máximos? ¿Cuál es el límite inaceptable?" },
+    { term: "fácil",        question: "¿Qué 3 conceptos el lector NO debería necesitar buscar?" },
+    { term: "interesante",  question: "¿Para qué propósito: sorprender, ser novedoso, ser aplicable?" },
+    { term: "completo",     question: "¿2 temas que entren y 2 que queden fuera del alcance?" },
+    { term: "persuasivo",   question: "¿Técnica logos, pathos o ethos? ¿Tienes un texto modelo?" },
+    { term: "equilibrado",  question: "¿Proporción numérica exacta entre las partes (ej. 50/50)?" },
+    { term: "breve",        question: "¿Número exacto de palabras o caracteres máximos?" },
+    { term: "amigable",     question: "¿Qué métrica concreta: tiempo de tarea, nivel de vocabulario?" },
+    { term: "innovador",    question: "¿Respecto a qué estado del arte? ¿Ejemplo de algo NO innovador cercano?" },
+    { term: "preciso",      question: "¿Margen de error admitido? ¿Ejemplo de lo que sería impreciso?" }
+  ];
+
+  let checkState = new Array(20).fill(false);
+
+  function renderVague() {
+    const grid = document.getElementById('vagueGrid');
+    grid.innerHTML = '';
+    vagueTermsList.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'vague-card' + (checkState[idx] ? ' checked' : '');
+      card.dataset.idx = idx;
+      card.dataset.term = item.term.toLowerCase();
+      card.innerHTML = `
+        <div class="vague-card-top">
+          <span class="vague-term">${item.term}</span>
+          <div class="vague-check">${checkState[idx] ? '✓' : ''}</div>
+        </div>
+        <div class="vague-question">${item.question}</div>`;
+      card.addEventListener('click', () => {
+        checkState[idx] = !checkState[idx];
+        renderVague();
+        updateVagueProgress();
+        syncRedZone();
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  function updateVagueProgress() {
+    const n = checkState.filter(Boolean).length;
+    document.getElementById('vagueProgressFill').style.width = (n / 20 * 100) + '%';
+    document.getElementById('vagueCounter').textContent = n + ' de 20';
+  }
+
+  function filterVague(q) {
+    document.querySelectorAll('.vague-card').forEach(card => {
+      card.classList.toggle('hidden', q && !card.dataset.term.includes(q.toLowerCase()));
+    });
+  }
+
+  function syncRedZone() {
+    const item = document.getElementById('chkRedZoneItem');
+    if (checkState.some(Boolean) && !item.classList.contains('done')) {
+      item.style.borderColor = '#fca5a5';
+    } else {
+      item.style.borderColor = '';
+    }
+  }
+
+  // ─── R5 PREVIEW ───
+  function updateR5Preview() {
+    const r1 = document.getElementById('r1').value.trim();
+    const r2 = document.getElementById('r2').value.trim();
+    const r3 = document.getElementById('r3').value.trim();
+    const r4 = document.getElementById('r4').value.trim();
+    const r5 = document.getElementById('r5').value.trim();
+
+    if (!r1 && !r2 && !r3 && !r4 && !r5) {
+      document.getElementById('r5Preview').innerHTML = 'Rellena los campos R5 para ver la vista previa aquí...';
+      return;
+    }
+    let lines = '📌 Restricciones R5 aplicadas:\n\n';
+    if (r1) lines += `🎭 R1 (Rol): ${r1}\n`;
+    if (r2) lines += `📄 R2 (Resultado): ${r2}\n`;
+    if (r3) lines += `🔢 R3 (Numéricas): ${r3}\n`;
+    if (r4) lines += `🚫 R4 (Negativas): ${r4}\n`;
+    if (r5) lines += `📎 R5 (Referentes): ${r5}\n`;
+    document.getElementById('r5Preview').textContent = lines;
+  }
+
+  // ─── SPECIFICITY ───
+  function calcSpecificity() {
+    const prompt = document.getElementById('fullPrompt').value;
+    if (!prompt.trim()) {
+      document.getElementById('specPercent').textContent = '—';
+      document.getElementById('specFeedback').textContent = 'Escribe un prompt primero.';
+      document.getElementById('specBarFill').style.width = '0%';
+      document.getElementById('specBarFill').style.background = 'var(--accent1)';
+      return;
+    }
+    const patterns = [
+      /\d+ *(palabras|caracteres|párrafos|puntos|ítems)/gi,
+      /(tabla|json|lista|viñetas|código|markdown)/gi,
+      /(máximo|mínimo|límite|entre \d+ y \d+)/gi,
+      /no (incluir|usar|pongas)/gi,
+      /ejemplo:?/gi,
+      /formato:?/gi,
+      /[0-9]+%/gi,
+      /\d+ *(segundo|minuto|hora|día|vez|veces|ítem|fila|columna)/gi
+    ];
+    let concreteChars = 0;
+    for (const p of patterns) {
+      const m = prompt.match(p);
+      if (m) concreteChars += m.join(' ').length;
+    }
+    let pct = Math.min(100, (concreteChars / prompt.length) * 100);
+    document.getElementById('specPercent').textContent = pct.toFixed(1) + '%';
+    document.getElementById('specBarFill').style.width = Math.min(pct * 3, 100) + '%';
+
+    let feedback, color;
+    if (pct < 8) {
+      feedback = '⚠️ Muy vago (< 8%) — añade números, formato exacto o contraejemplos.';
+      color = '#e8441a';
+    } else if (pct <= 12) {
+      feedback = '🟡 Aceptable (8–12%) — puedes mejorar con más restricciones concretas.';
+      color = '#d97706';
+    } else {
+      feedback = '🎯 Óptimo (> 12%) — alta probabilidad de respuesta útil al primer intento.';
+      color = '#16a34a';
+    }
+    document.getElementById('specFeedback').textContent = feedback;
+    document.getElementById('specBarFill').style.background = color;
+    document.getElementById('specPercent').style.color = color;
+  }
+
+  // ─── COPY PROMPT ───
+  function copyPrompt() {
+    const base = document.getElementById('fullPrompt').value;
+    const r1 = document.getElementById('r1').value.trim();
+    const r2 = document.getElementById('r2').value.trim();
+    const r3 = document.getElementById('r3').value.trim();
+    const r4 = document.getElementById('r4').value.trim();
+    const r5 = document.getElementById('r5').value.trim();
+    let constraints = '';
+    if (r1 || r2 || r3 || r4 || r5) {
+      constraints = '\n\n--- RESTRICCIONES R5 ---\n';
+      if (r1) constraints += `R1 (Rol): ${r1}\n`;
+      if (r2) constraints += `R2 (Resultado): ${r2}\n`;
+      if (r3) constraints += `R3 (Numéricas): ${r3}\n`;
+      if (r4) constraints += `R4 (Negativas): ${r4}\n`;
+      if (r5) constraints += `R5 (Referentes): ${r5}\n`;
+    }
+    navigator.clipboard.writeText(base + constraints).then(() => {
+      const btn = document.getElementById('copyPromptBtn');
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copiado al portapapeles';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  }
+
+  // ─── CHECKLIST ───
+  function toggleChk(item) {
+    item.classList.toggle('done');
+    syncRedZone();
+  }
+
+  // ─── EVENT LISTENERS ───
+  document.getElementById('calcSpecBtn').addEventListener('click', calcSpecificity);
+  document.getElementById('copyPromptBtn').addEventListener('click', copyPrompt);
+  ['r1','r2','r3','r4','r5'].forEach(id => document.getElementById(id).addEventListener('input', updateR5Preview));
+  document.getElementById('fullPrompt').addEventListener('input', () => {
+    // reset spec display on edit
+    document.getElementById('specPercent').textContent = '—';
+    document.getElementById('specPercent').style.color = 'var(--ink)';
+    document.getElementById('specFeedback').textContent = 'Pulsa "Calcular especificidad" para analizar el prompt.';
+    document.getElementById('specBarFill').style.width = '0%';
+  });
+
+  // ─── INIT ───
+  renderVague();
+  updateVagueProgress();
+  updateR5Preview();
+</script>
+</body>
+</html>

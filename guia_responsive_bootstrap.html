@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Web Fija a Responsive · Guía Didáctica</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --bg:        #0d0f14;
+  --surface:   #151820;
+  --surface2:  #1d2130;
+  --border:    #2a2f45;
+  --accent:    #4f8ef7;
+  --accent2:   #a78bfa;
+  --green:     #34d399;
+  --amber:     #fbbf24;
+  --red:       #f87171;
+  --text:      #e2e8f0;
+  --muted:     #8892a4;
+  --code-bg:   #0a0c10;
+  --radius:    10px;
+  --radius-lg: 16px;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  position: relative;
+  padding: 80px 24px 60px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(79,142,247,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(167,139,250,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  background: rgba(79,142,247,0.1);
+  border: 1px solid rgba(79,142,247,0.3);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 18px;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  color: var(--muted);
+  font-size: 1.05rem;
+  font-weight: 300;
+  max-width: 520px;
+  margin: 0 auto 32px;
+}
+
+.hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.meta-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ═══════════════════════════════════════════
+   ÍNDICE
+═══════════════════════════════════════════ */
+.index-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,15,20,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.index-bar::-webkit-scrollbar { display: none; }
+
+.index-inner {
+  display: flex;
+  gap: 0;
+  max-width: 900px;
+  margin: 0 auto;
+  min-width: max-content;
+}
+
+.idx-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.idx-link:hover { color: var(--text); border-bottom-color: var(--accent); }
+.idx-link .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  background: var(--surface2);
+  color: var(--accent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION HEADERS
+═══════════════════════════════════════════ */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 56px 0 28px;
+}
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(79,142,247,0.1);
+  border: 1px solid rgba(79,142,247,0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+/* ═══════════════════════════════════════════
+   INTRO CARDS
+═══════════════════════════════════════════ */
+.intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+@media(max-width:600px){.intro-grid{grid-template-columns:1fr;}}
+
+.intro-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.intro-card.bad::before  { background: linear-gradient(to right, var(--red), transparent); }
+.intro-card.good::before { background: linear-gradient(to right, var(--green), transparent); }
+
+.intro-card-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.intro-card.bad  .intro-card-label { color: var(--red); }
+.intro-card.good .intro-card-label { color: var(--green); }
+
+.device-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.device-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+.device-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.device-bar-wrap {
+  flex: 1;
+  height: 28px;
+  background: var(--surface2);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.device-bar {
+  height: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  transition: width 0.6s ease;
+}
+.device-bar.full    { width: 100%; background: rgba(52,211,153,0.2); color: var(--green); }
+.device-bar.medium  { width: 70%;  background: rgba(251,191,36,0.2);  color: var(--amber); }
+.device-bar.partial { width: 30%;  background: rgba(248,113,113,0.2); color: var(--red);   }
+
+/* ═══════════════════════════════════════════
+   CONCEPT CARDS (GRID)
+═══════════════════════════════════════════ */
+.concept-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.concept-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.concept-header:hover { background: rgba(255,255,255,0.02); }
+
+.concept-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.concept-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.ic-blue   { background: rgba(79,142,247,0.15); }
+.ic-purple { background: rgba(167,139,250,0.15); }
+.ic-green  { background: rgba(52,211,153,0.15); }
+.ic-amber  { background: rgba(251,191,36,0.15); }
+
+.concept-header h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.concept-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+.chevron {
+  color: var(--muted);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.concept-card.open .chevron { transform: rotate(180deg); }
+
+.concept-body {
+  display: none;
+  padding: 0 22px 22px;
+  border-top: 1px solid var(--border);
+}
+.concept-card.open .concept-body { display: block; }
+.concept-body > * + * { margin-top: 16px; }
+
+/* ═══════════════════════════════════════════
+   GRID VISUAL
+═══════════════════════════════════════════ */
+.grid-viz {
+  margin: 16px 0;
+}
+.grid-row {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.grid-cell {
+  flex: 1;
+  height: 36px;
+  background: rgba(79,142,247,0.12);
+  border: 1px solid rgba(79,142,247,0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  cursor: default;
+  transition: background 0.2s;
+}
+.grid-cell:hover { background: rgba(79,142,247,0.25); }
+.grid-cell.span2 { flex: 2; background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.4); color: var(--accent2); }
+.grid-cell.span3 { flex: 3; background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.35); color: var(--green); }
+.grid-cell.span4 { flex: 4; background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: var(--amber); }
+.grid-cell.span6 { flex: 6; }
+.grid-cell.span12 { flex: 12; background: rgba(79,142,247,0.18); }
+
+.grid-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 5px; }
+
+/* ═══════════════════════════════════════════
+   BREAKPOINTS INTERACTIVE
+═══════════════════════════════════════════ */
+.bp-ruler {
+  position: relative;
+  height: 64px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 16px 0;
+  cursor: pointer;
+}
+.bp-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+.bp-seg {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 2px dashed var(--border);
+  transition: background 0.2s;
+  position: relative;
+}
+.bp-seg:last-child { border-right: none; }
+.bp-seg:hover { background: rgba(255,255,255,0.04); }
+.bp-seg.active { background: rgba(79,142,247,0.12); }
+.bp-name { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 700; color: var(--accent); }
+.bp-size { font-size: 0.6rem; color: var(--muted); }
+.bp-icon { font-size: 1rem; margin-bottom: 2px; }
+
+.bp-info {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  margin-top: 8px;
+  min-height: 56px;
+  transition: all 0.3s;
+}
+.bp-info .label { color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.bp-info .val   { color: var(--green); }
+.bp-info .cls   { color: var(--accent); }
+
+/* ═══════════════════════════════════════════
+   TABLE
+═══════════════════════════════════════════ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin: 12px 0;
+}
+th {
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(42,47,69,0.5);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.015); }
+code { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; background: rgba(79,142,247,0.12); color: var(--accent); padding: 1px 5px; border-radius: 4px; }
+
+/* ═══════════════════════════════════════════
+   BEFORE / AFTER COMPARATOR
+═══════════════════════════════════════════ */
+.comparator {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 20px 0;
+}
+.comp-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.comp-tab {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.2s;
+  user-select: none;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+}
+.comp-tab.active.before { color: var(--red);   border-bottom-color: var(--red);   background: rgba(248,113,113,0.05); }
+.comp-tab.active.after  { color: var(--green); border-bottom-color: var(--green); background: rgba(52,211,153,0.05); }
+.comp-tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.02); }
+
+.comp-pane { display: none; padding: 18px; }
+.comp-pane.active { display: block; }
+
+.comp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  border-radius: 5px;
+  margin-bottom: 12px;
+}
+.badge-before { background: rgba(248,113,113,0.15); color: var(--red);   }
+.badge-after  { background: rgba(52,211,153,0.15);  color: var(--green); }
+
+/* ═══════════════════════════════════════════
+   CODE BLOCK
+═══════════════════════════════════════════ */
+.code-wrap {
+  position: relative;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.copy-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { background: rgba(79,142,247,0.1); color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+pre {
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+pre .cm { color: #5c6370; }  /* comment */
+pre .tg { color: #e06c75; }  /* tag */
+pre .at { color: #d19a66; }  /* attr */
+pre .st { color: #98c379; }  /* string */
+pre .tx { color: var(--text); } /* normal */
+pre .kw { color: var(--accent2); } /* keyword */
+pre .cl { color: var(--accent); }  /* class */
+pre .va { color: var(--amber); }   /* value */
+pre .cs { color: var(--green); }   /* css value */
+
+/* ═══════════════════════════════════════════
+   CARD ANATOMY
+═══════════════════════════════════════════ */
+.card-anatomy {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+  margin: 12px 0;
+}
+@media(max-width:580px){.card-anatomy{grid-template-columns:1fr;}}
+
+.card-demo {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.8rem;
+}
+.cd-header {
+  background: rgba(79,142,247,0.2);
+  color: var(--accent);
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cd-header:hover { background: rgba(79,142,247,0.35); }
+.cd-img {
+  height: 80px;
+  background: linear-gradient(135deg, rgba(79,142,247,0.1), rgba(167,139,250,0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 1px solid var(--border);
+}
+.cd-body { padding: 12px; }
+.cd-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+.cd-sub { color: var(--muted); font-size: 0.72rem; margin-bottom: 8px; }
+.cd-text { font-size: 0.78rem; color: rgba(226,232,240,0.8); }
+.cd-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.card-classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: var(--surface2);
+  border-radius: 7px;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  cursor: default;
+}
+.cc-row:hover { border-color: var(--border); }
+.cc-row code { flex-shrink: 0; }
+.cc-desc { color: var(--muted); font-size: 0.72rem; }
+
+/* ═══════════════════════════════════════════
+   ORDER DEMO
+═══════════════════════════════════════════ */
+.order-demo {
+  margin: 16px 0;
+}
+.order-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.order-slider label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+#vpRange {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+#vpRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(79,142,247,0.5);
+}
+#vpLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  min-width: 50px;
+  text-align: right;
+}
+
+.order-grid {
+  display: grid;
+  gap: 8px;
+}
+.order-grid.mobile { grid-template-columns: 1fr; }
+.order-grid.desktop { grid-template-columns: 1fr 1fr; }
+
+.order-block {
+  padding: 14px;
+  border-radius: var(--radius);
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.4s ease;
+}
+.order-block.colA { background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.3); color: var(--accent); }
+.order-block.colB { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); color: var(--accent2); }
+.order-tag { font-size: 0.6rem; opacity: 0.6; margin-top: 3px; display: block; }
+
+/* ═══════════════════════════════════════════
+   EXERCISES
+═══════════════════════════════════════════ */
+.exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.exercise-card:hover { border-color: rgba(79,142,247,0.4); }
+
+.ex-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  cursor: pointer;
+}
+.ex-num {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(79,142,247,0.12);
+  border: 1px solid rgba(79,142,247,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.ex-title { font-size: 0.92rem; font-weight: 600; }
+.ex-file  { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+.ex-chevron { margin-left: auto; color: var(--muted); transition: transform 0.3s; flex-shrink: 0; }
+.exercise-card.open .ex-chevron { transform: rotate(180deg); }
+.ex-body { display: none; border-top: 1px solid var(--border); }
+.exercise-card.open .ex-body { display: block; }
+
+.ex-steps {
+  padding: 18px 22px;
+}
+.ex-step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 0.84rem;
+}
+.step-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(79,142,247,0.15);
+  border: 1px solid rgba(79,142,247,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ex-hint {
+  background: rgba(251,191,36,0.06);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: var(--amber);
+  margin: 0 22px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ex-sol-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px 16px;
+}
+.sol-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.sol-btn:hover { color: var(--green); border-color: var(--green); }
+.sol-btn.revealed { color: var(--green); border-color: var(--green); background: rgba(52,211,153,0.05); }
+
+.sol-code { display: none; padding: 0 22px 18px; }
+.sol-code.visible { display: block; }
+
+/* ═══════════════════════════════════════════
+   FLUJO RESPONSIVE
+═══════════════════════════════════════════ */
+.flow-diagram {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+@media(max-width:600px){.flow-diagram{grid-template-columns:1fr;}}
+
+.flow-node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+}
+.flow-node-icon { font-size: 2rem; margin-bottom: 10px; }
+.flow-node-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+.flow-node-classes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fnc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--accent);
+  background: rgba(79,142,247,0.08);
+  padding: 3px 7px;
+  border-radius: 4px;
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 1.2rem;
+  padding-top: 20px;
+}
+@media(max-width:600px){.flow-arrow{padding-top:0;}}
+
+/* ═══════════════════════════════════════════
+   RESOURCES
+═══════════════════════════════════════════ */
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+@media(max-width:500px){.resources-grid{grid-template-columns:1fr;}}
+
+.res-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.res-link:hover { border-color: var(--accent); background: rgba(79,142,247,0.06); color: var(--accent); }
+.res-icon {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  background: rgba(79,142,247,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+.footer {
+  text-align: center;
+  padding: 32px 24px 48px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+.mt12 { margin-top: 12px; }
+.mb12 { margin-bottom: 12px; }
+p { margin-bottom: 10px; font-size: 0.88rem; color: rgba(226,232,240,0.85); }
+
+.inline-note {
+  background: rgba(79,142,247,0.07);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.82rem;
+  margin: 12px 0;
+}
+.inline-note strong { color: var(--accent); }
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  background: rgba(79,142,247,0.1);
+  color: var(--accent);
+  border: 1px solid rgba(79,142,247,0.25);
+  padding: 3px 9px;
+  border-radius: 5px;
+  margin: 2px;
+  cursor: default;
+}
+.tag-chip:hover { background: rgba(79,142,247,0.2); }
+
+/* animate on enter */
+.concept-card, .exercise-card, .comparator, .flow-node {
+  animation: fadeUp 0.4s ease both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(14px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.concept-card:nth-child(1){ animation-delay:.05s }
+.concept-card:nth-child(2){ animation-delay:.1s }
+.concept-card:nth-child(3){ animation-delay:.15s }
+.concept-card:nth-child(4){ animation-delay:.2s }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+  HERO
+══════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-tag">DAW · Bootstrap 4 · Guía Didáctica</div>
+  <h1>De Web Fija a<br><span>Web Responsive</span></h1>
+  <p class="hero-sub">Aprende a transformar una web estática en una experiencia adaptable a cualquier dispositivo usando Bootstrap.</p>
+  <div class="hero-meta">
+    <div class="meta-pill"><div class="meta-dot"></div>6 Secciones</div>
+    <div class="meta-pill"><div class="meta-dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></div>6 Ejercicios</div>
+    <div class="meta-pill"><div class="meta-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>Bootstrap 4</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  NAV
+══════════════════════════════════════ -->
+<nav class="index-bar">
+  <div class="index-inner">
+    <a class="idx-link" href="#sec1"><span class="num">01</span> Introducción</a>
+    <a class="idx-link" href="#sec2"><span class="num">02</span> Conceptos</a>
+    <a class="idx-link" href="#sec3"><span class="num">03</span> Comparativa</a>
+    <a class="idx-link" href="#sec4"><span class="num">04</span> Flujo</a>
+    <a class="idx-link" href="#sec5"><span class="num">05</span> Ejercicios</a>
+    <a class="idx-link" href="#sec6"><span class="num">06</span> Recursos</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+  CONTENT
+══════════════════════════════════════ -->
+<div class="content">
+
+  <!-- ── SECCIÓN 1 ── -->
+  <div id="sec1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>¿Qué es el Diseño Responsive?</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <p>El diseño responsive permite que una página web se adapte automáticamente al tamaño de la pantalla del dispositivo, sin necesidad de hacer zoom ni scroll horizontal.</p>
+
+    <div class="intro-grid">
+      <div class="intro-card bad">
+        <div class="intro-card-label">❌ Sin responsive</div>
+        <div class="device-stack">
+          <div class="device-row">
+            <span class="device-icon">🖥️</span>
+            <div class="device-bar-wrap"><div class="device-bar full">OK – 100%</div></div>
+          </div>
+          <div class="device-row">
+            <span class="device-icon">📱</span>
+            <div class="device-bar-wrap"><div class="device-bar partial">~30% visible</div></div>
+          </div>
+          <div class="device-row">
+            <span class="device-icon">📟</span>
+            <div class="device-bar-wrap"><div class="device-bar medium">~60% visible</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="intro-card good">
+        <div class="intro-card-label">✅ Con responsive</div>
+        <div class="device-stack">
+          <div class="device-row">
+            <span class="device-icon">🖥️</span>
+            <div class="device-bar-wrap"><div class="device-bar full">OK – 3 columnas</div></div>
+          </div>
+          <div class="device-row">
+            <span class="device-icon">📱</span>
+            <div class="device-bar-wrap"><div class="device-bar full">OK – 1 columna</div></div>
+          </div>
+          <div class="device-row">
+            <span class="device-icon">📟</span>
+            <div class="device-bar-wrap"><div class="device-bar full">OK – 2 columnas</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inline-note">
+      <strong>Estructura del proyecto:</strong> La actividad compara dos carpetas: <code>No Responsive/</code> (CSS propio) y <code>Responsive/</code> (Bootstrap). Analiza las diferencias entre ambas versiones.
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN 2 ── -->
+  <div id="sec2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>Conceptos Fundamentales</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <!-- Grid -->
+    <div class="concept-card open" data-id="grid">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title-wrap">
+          <div class="concept-icon ic-blue">⊞</div>
+          <div>
+            <h3>2.1 Sistema de Rejilla (Grid)</h3>
+            <div class="concept-sub">Bootstrap divide la pantalla en 12 columnas</div>
+          </div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="concept-body">
+        <p>Bootstrap divide el ancho disponible en <strong>12 columnas</strong>. Puedes combinarlas para crear layouts de cualquier proporción.</p>
+        <div class="grid-viz">
+          <div class="grid-label">12 columnas individuales (col-1)</div>
+          <div class="grid-row" id="gridRow1">
+            <div class="grid-cell">1</div><div class="grid-cell">2</div><div class="grid-cell">3</div>
+            <div class="grid-cell">4</div><div class="grid-cell">5</div><div class="grid-cell">6</div>
+            <div class="grid-cell">7</div><div class="grid-cell">8</div><div class="grid-cell">9</div>
+            <div class="grid-cell">10</div><div class="grid-cell">11</div><div class="grid-cell">12</div>
+          </div>
+          <div class="grid-label">col-6 + col-6</div>
+          <div class="grid-row">
+            <div class="grid-cell span6">col-6 (50%)</div>
+            <div class="grid-cell span6">col-6 (50%)</div>
+          </div>
+          <div class="grid-label">col-4 + col-4 + col-4</div>
+          <div class="grid-row">
+            <div class="grid-cell span4">col-4</div>
+            <div class="grid-cell span4">col-4</div>
+            <div class="grid-cell span4">col-4</div>
+          </div>
+          <div class="grid-label">col-3 + col-3 + col-3 + col-3</div>
+          <div class="grid-row">
+            <div class="grid-cell span3">col-3</div><div class="grid-cell span3">col-3</div>
+            <div class="grid-cell span3">col-3</div><div class="grid-cell span3">col-3</div>
+          </div>
+          <div class="grid-label">col-12 (ancho completo)</div>
+          <div class="grid-row">
+            <div class="grid-cell span12">col-12 (100%)</div>
+          </div>
+        </div>
+        <table>
+          <tr><th>Clase</th><th>Columnas</th><th>% del ancho</th><th>Uso típico</th></tr>
+          <tr><td><code>col-12</code></td><td>12/12</td><td>100%</td><td>Móvil, bloque completo</td></tr>
+          <tr><td><code>col-6</code></td><td>6/12</td><td>50%</td><td>Dos columnas iguales</td></tr>
+          <tr><td><code>col-4</code></td><td>4/12</td><td>~33%</td><td>Tres columnas</td></tr>
+          <tr><td><code>col-3</code></td><td>3/12</td><td>25%</td><td>Cuatro columnas</td></tr>
+          <tr><td><code>col-md-6</code></td><td>6/12 en ≥768px</td><td>50% o 100%</td><td>Responsive adaptable</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Breakpoints -->
+    <div class="concept-card" data-id="bp">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title-wrap">
+          <div class="concept-icon ic-purple">📐</div>
+          <div>
+            <h3>2.2 Breakpoints (Puntos de Ruptura)</h3>
+            <div class="concept-sub">Haz clic en cada dispositivo para ver sus características</div>
+          </div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="concept-body">
+        <p>Los breakpoints son anchos de pantalla en los que el layout <strong>cambia</strong>. Bootstrap sigue una estrategia <strong>Mobile First</strong>: diseñas para móvil y añades reglas para pantallas más grandes.</p>
+
+        <div class="bp-ruler">
+          <div class="bp-track">
+            <div class="bp-seg active" style="flex:15" onclick="selectBp(this,'xs','< 576px','col-','Móvil pequeño. Sin prefijo — aplica a todos los tamaños.')">
+              <div class="bp-icon">📱</div>
+              <div class="bp-name">xs</div>
+              <div class="bp-size">&lt;576px</div>
+            </div>
+            <div class="bp-seg" style="flex:15" onclick="selectBp(this,'sm','≥ 576px','col-sm-','Móviles grandes. Prefijo sm. Ej: col-sm-6')">
+              <div class="bp-icon">📲</div>
+              <div class="bp-name">sm</div>
+              <div class="bp-size">≥576px</div>
+            </div>
+            <div class="bp-seg" style="flex:20" onclick="selectBp(this,'md','≥ 768px','col-md-','Tablets. Prefijo md. Ej: col-md-4. El más usado en la actividad.')">
+              <div class="bp-icon">📟</div>
+              <div class="bp-name">md</div>
+              <div class="bp-size">≥768px</div>
+            </div>
+            <div class="bp-seg" style="flex:22" onclick="selectBp(this,'lg','≥ 992px','col-lg-','Escritorios. Prefijo lg. Ej: col-lg-3 para 4 columnas.')">
+              <div class="bp-icon">💻</div>
+              <div class="bp-name">lg</div>
+              <div class="bp-size">≥992px</div>
+            </div>
+            <div class="bp-seg" style="flex:28" onclick="selectBp(this,'xl','≥ 1200px','col-xl-','Pantallas grandes. Prefijo xl. Raramente necesario.')">
+              <div class="bp-icon">🖥️</div>
+              <div class="bp-name">xl</div>
+              <div class="bp-size">≥1200px</div>
+            </div>
+          </div>
+        </div>
+        <div class="bp-info" id="bpInfo">
+          <div class="label">Selecciona un dispositivo arriba</div>
+          <div class="val">→ Haz clic en cualquier segmento de la barra</div>
+        </div>
+
+        <div class="mt12">
+          <p>Ejemplo combinado — Mobile First:</p>
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="cm">&lt;!-- Móvil: 100% | Tablet: 50% | Desktop: 33% --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-12 col-md-6 col-lg-4"</span><span class="tg">&gt;</span>
+<span class="tx">  Contenido</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utilidades -->
+    <div class="concept-card" data-id="utils">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title-wrap">
+          <div class="concept-icon ic-green">🔧</div>
+          <div>
+            <h3>2.3 Clases Utilitarias</h3>
+            <div class="concept-sub">Espaciado, colores, flexbox — sin escribir CSS propio</div>
+          </div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="concept-body">
+        <p>Bootstrap proporciona cientos de clases predefinidas para evitar escribir CSS repetitivo.</p>
+        <table>
+          <tr><th colspan="2">Espaciado — Escala 0-5</th></tr>
+          <tr><td><code>p-3</code></td><td>Padding 1rem (16px) en todos los lados</td></tr>
+          <tr><td><code>px-3</code></td><td>Padding horizontal</td></tr>
+          <tr><td><code>py-3</code></td><td>Padding vertical</td></tr>
+          <tr><td><code>m-3</code></td><td>Margin 1rem en todos los lados</td></tr>
+          <tr><td><code>mx-auto</code></td><td>Margin horizontal automático → centra el bloque</td></tr>
+          <tr><td><code>mb-3</code></td><td>Margin-bottom 1rem</td></tr>
+        </table>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+          <span class="tag-chip">p-0 = 0</span>
+          <span class="tag-chip">p-1 = 4px</span>
+          <span class="tag-chip">p-2 = 8px</span>
+          <span class="tag-chip">p-3 = 16px</span>
+          <span class="tag-chip">p-4 = 24px</span>
+          <span class="tag-chip">p-5 = 48px</span>
+        </div>
+        <table>
+          <tr><th colspan="2">Colores y Texto</th></tr>
+          <tr><td><code>bg-primary</code></td><td>Fondo azul Bootstrap (#007bff)</td></tr>
+          <tr><td><code>bg-secondary</code></td><td>Fondo gris (#6c757d)</td></tr>
+          <tr><td><code>bg-light</code></td><td>Fondo gris muy claro (#f8f9fa)</td></tr>
+          <tr><td><code>text-white</code></td><td>Texto blanco</td></tr>
+          <tr><td><code>text-center</code></td><td>Texto centrado</td></tr>
+        </table>
+        <table>
+          <tr><th colspan="2">Flexbox</th></tr>
+          <tr><td><code>d-flex</code></td><td>Activa display: flex</td></tr>
+          <tr><td><code>align-items-center</code></td><td>Centrar verticalmente</td></tr>
+          <tr><td><code>justify-content-center</code></td><td>Centrar horizontalmente</td></tr>
+          <tr><td><code>gap-3</code></td><td>Espacio entre elementos: 1rem</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Componentes -->
+    <div class="concept-card" data-id="comp">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-title-wrap">
+          <div class="concept-icon ic-amber">🧱</div>
+          <div>
+            <h3>2.4 Componentes Bootstrap</h3>
+            <div class="concept-sub">Navbar, Cards — listos para usar</div>
+          </div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="concept-body">
+        <p><strong>Navbar</strong> — Barra de navegación con menú hamburguesa automático:</p>
+        <div class="code-wrap mb12">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;nav</span> <span class="at">class=</span><span class="st">"navbar navbar-expand-lg navbar-light bg-light"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;a</span> <span class="at">class=</span><span class="st">"navbar-brand"</span> <span class="at">href=</span><span class="st">"#"</span><span class="tg">&gt;</span>Logo<span class="tg">&lt;/a&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">class=</span><span class="st">"navbar-toggler"</span> <span class="at">data-toggle=</span><span class="st">"collapse"</span>
+          <span class="at">data-target=</span><span class="st">"#menu"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;span</span> <span class="at">class=</span><span class="st">"navbar-toggler-icon"</span><span class="tg">&gt;&lt;/span&gt;</span>
+  <span class="tg">&lt;/button&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"collapse navbar-collapse"</span> <span class="at">id=</span><span class="st">"menu"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;ul</span> <span class="at">class=</span><span class="st">"navbar-nav"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;li</span> <span class="at">class=</span><span class="st">"nav-item"</span><span class="tg">&gt;&lt;a</span> <span class="at">class=</span><span class="st">"nav-link"</span> <span class="at">href=</span><span class="st">"#"</span><span class="tg">&gt;</span>Inicio<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tg">&lt;/ul&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/nav&gt;</span></pre>
+        </div>
+
+        <p><strong>Card</strong> — Estructura de tarjeta con cabecera, cuerpo y pie:</p>
+        <div class="card-anatomy">
+          <div class="card-demo" id="cardDemo">
+            <div class="cd-header" title="card-header">.card-header</div>
+            <div class="cd-img">.card-img-top</div>
+            <div class="cd-body">
+              <div class="cd-title">.card-title</div>
+              <div class="cd-sub">.card-subtitle</div>
+              <div class="cd-text">.card-text — Descripción del contenido de la tarjeta...</div>
+            </div>
+            <div class="cd-footer">.card-footer → Más información</div>
+          </div>
+          <div class="card-classes-list">
+            <div class="cc-row"><code>card</code><span class="cc-desc">Contenedor principal</span></div>
+            <div class="cc-row"><code>h-100</code><span class="cc-desc">Altura uniforme entre cards</span></div>
+            <div class="cc-row"><code>card-img-top</code><span class="cc-desc">Imagen superior</span></div>
+            <div class="cc-row"><code>card-header</code><span class="cc-desc">Cabecera</span></div>
+            <div class="cc-row"><code>card-body</code><span class="cc-desc">Cuerpo de la tarjeta</span></div>
+            <div class="cc-row"><code>card-title</code><span class="cc-desc">Título (≈ h3)</span></div>
+            <div class="cc-row"><code>card-subtitle</code><span class="cc-desc">Subtítulo (≈ h6)</span></div>
+            <div class="cc-row"><code>card-text</code><span class="cc-desc">Párrafo de texto</span></div>
+            <div class="cc-row"><code>card-footer</code><span class="cc-desc">Pie de la tarjeta</span></div>
+            <div class="cc-row"><code>card-link</code><span class="cc-desc">Enlace con estilo card</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN 3 ── -->
+  <div id="sec3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>Análisis Comparativo</h2>
+      <div class="section-line"></div>
+    </div>
+    <p>Examina cada cambio concreto entre la versión fija y la versión responsive.</p>
+
+    <!-- 3.1 Head -->
+    <div class="comparator">
+      <div style="padding:16px 20px 0;"><strong style="font-size:0.85rem;">3.1 — El &lt;head&gt;: Añadir Bootstrap</strong></div>
+      <div class="comp-tabs">
+        <div class="comp-tab before active" onclick="switchTab(this,'before','head')">❌ Antes — Sin Bootstrap</div>
+        <div class="comp-tab after" onclick="switchTab(this,'after','head')">✅ Ahora — Con Bootstrap</div>
+      </div>
+      <div class="comp-pane active" data-comp="head" data-side="before">
+        <div class="comp-badge badge-before">❌ No Responsive</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset=</span><span class="st">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">name=</span><span class="st">"viewport"</span> <span class="at">content=</span><span class="st">"width=device-width, initial-scale=1.0"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Mi Página<span class="tg">&lt;/title&gt;</span>
+  <span class="cm">&lt;!-- SIN Bootstrap → CSS propio solamente --&gt;</span>
+<span class="tg">&lt;/head&gt;</span></pre>
+        </div>
+        <div class="inline-note" style="margin-top:12px"><strong>Problema:</strong> El navegador móvil escala la página entera al 30% para que "quepa". Todo se ve diminuto e ilegible.</div>
+      </div>
+      <div class="comp-pane" data-comp="head" data-side="after">
+        <div class="comp-badge badge-after">✅ Responsive</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset=</span><span class="st">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="cm">&lt;!-- CRUCIAL: indica al móvil que use el ancho real --&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">name=</span><span class="st">"viewport"</span> <span class="at">content=</span><span class="st">"width=device-width, initial-scale=1.0"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Mi Página<span class="tg">&lt;/title&gt;</span>
+
+  <span class="cm">&lt;!-- 1. Bootstrap CSS --&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel=</span><span class="st">"stylesheet"</span> <span class="at">href=</span><span class="st">"css/bootstrap.min.css"</span><span class="tg">&gt;</span>
+  <span class="cm">&lt;!-- 2. Google Fonts --&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">href=</span><span class="st">"https://fonts.googleapis.com/..."</span> <span class="at">rel=</span><span class="st">"stylesheet"</span><span class="tg">&gt;</span>
+  <span class="cm">&lt;!-- 3. Font Awesome (iconos) --&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel=</span><span class="st">"stylesheet"</span> <span class="at">href=</span><span class="st">"https://use.fontawesome.com/..."</span><span class="tg">&gt;</span>
+  <span class="cm">&lt;!-- 4. Estilos propios al final --&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel=</span><span class="st">"stylesheet"</span> <span class="at">href=</span><span class="st">"css/styles.css"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;/head&gt;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2 Navbar -->
+    <div class="comparator" style="margin-top:20px">
+      <div style="padding:16px 20px 0;"><strong style="font-size:0.85rem;">3.2 — Navbar: Menú Hamburguesa</strong></div>
+      <div class="comp-tabs">
+        <div class="comp-tab before active" onclick="switchTab(this,'before','nav')">❌ Antes — HTML simple</div>
+        <div class="comp-tab after" onclick="switchTab(this,'after','nav')">✅ Ahora — Navbar Bootstrap</div>
+      </div>
+      <div class="comp-pane active" data-comp="nav" data-side="before">
+        <div class="comp-badge badge-before">❌ No Responsive</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;header&gt;</span>
+  <span class="tg">&lt;nav&gt;</span>
+    <span class="tg">&lt;a</span> <span class="at">href=</span><span class="st">"#!"</span><span class="tg">&gt;&lt;img</span> <span class="at">src=</span><span class="st">"img/logo.png"</span><span class="tg">&gt;&lt;/a&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">id=</span><span class="st">"barra-navegacion"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;ul&gt;</span>
+        <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href=</span><span class="st">"#!"</span><span class="tg">&gt;</span>INICIO<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tg">&lt;li&gt;&lt;a</span> <span class="at">href=</span><span class="st">"#!"</span><span class="tg">&gt;</span>LA LABORAL<span class="tg">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tg">&lt;/ul&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/nav&gt;</span>
+<span class="tg">&lt;/header&gt;</span></pre>
+        </div>
+      </div>
+      <div class="comp-pane" data-comp="nav" data-side="after">
+        <div class="comp-badge badge-after">✅ Responsive — con hamburguesa automática</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;header</span> <span class="at">class=</span><span class="st">"container"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;nav</span> <span class="at">class=</span><span class="st">"navbar navbar-expand-lg navbar-light bg-light"</span><span class="tg">&gt;</span>
+
+    <span class="cm">&lt;!-- Logo --&gt;</span>
+    <span class="tg">&lt;a</span> <span class="at">class=</span><span class="st">"navbar-brand"</span> <span class="at">href=</span><span class="st">"#!"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;img</span> <span class="at">src=</span><span class="st">"img/logo.png"</span> <span class="at">alt=</span><span class="st">"Logo"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;/a&gt;</span>
+
+    <span class="cm">&lt;!-- Botón hamburguesa (solo en móvil) --&gt;</span>
+    <span class="tg">&lt;button</span> <span class="at">class=</span><span class="st">"navbar-toggler"</span> <span class="at">type=</span><span class="st">"button"</span>
+            <span class="at">data-toggle=</span><span class="st">"collapse"</span>
+            <span class="at">data-target=</span><span class="st">"#barra-navegacion"</span>
+            <span class="at">aria-expanded=</span><span class="st">"false"</span>
+            <span class="at">aria-label=</span><span class="st">"Botón de navegación"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;span</span> <span class="at">class=</span><span class="st">"navbar-toggler-icon"</span><span class="tg">&gt;&lt;/span&gt;</span>
+    <span class="tg">&lt;/button&gt;</span>
+
+    <span class="cm">&lt;!-- Menú colapsable --&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"collapse navbar-collapse"</span> <span class="at">id=</span><span class="st">"barra-navegacion"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;ul</span> <span class="at">class=</span><span class="st">"navbar-nav mr-auto mt-2 mt-md-0 text-center"</span><span class="tg">&gt;</span>
+        <span class="tg">&lt;li</span> <span class="at">class=</span><span class="st">"nav-item active"</span><span class="tg">&gt;</span>
+          <span class="tg">&lt;a</span> <span class="at">class=</span><span class="st">"nav-link"</span> <span class="at">href=</span><span class="st">"#!"</span><span class="tg">&gt;</span>INICIO<span class="tg">&lt;/a&gt;</span>
+        <span class="tg">&lt;/li&gt;</span>
+      <span class="tg">&lt;/ul&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/nav&gt;</span>
+<span class="tg">&lt;/header&gt;</span></pre>
+        </div>
+        <table style="margin-top:12px">
+          <tr><th>Clase clave</th><th>Función</th></tr>
+          <tr><td><code>navbar-expand-lg</code></td><td>Menú horizontal en lg+, hamburguesa en &lt;lg</td></tr>
+          <tr><td><code>navbar-toggler</code></td><td>Botón que aparece solo en móvil</td></tr>
+          <tr><td><code>collapse navbar-collapse</code></td><td>Menú que se colapsa/expande</td></tr>
+          <tr><td><code>data-target="#id"</code></td><td>Vincula el botón con el menú</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3.3 Grid -->
+    <div class="comparator" style="margin-top:20px">
+      <div style="padding:16px 20px 0;"><strong style="font-size:0.85rem;">3.3 — Sección Imágenes: Grid de Columnas</strong></div>
+      <div class="comp-tabs">
+        <div class="comp-tab before active" onclick="switchTab(this,'before','grid3')">❌ Antes — Sin grid</div>
+        <div class="comp-tab after" onclick="switchTab(this,'after','grid3')">✅ Ahora — Bootstrap Grid</div>
+      </div>
+      <div class="comp-pane active" data-comp="grid3" data-side="before">
+        <div class="comp-badge badge-before">❌ Sin control de layout</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;div&gt;</span>
+  <span class="tg">&lt;div&gt;</span>
+    <span class="tg">&lt;div&gt;</span>Texto izquierda<span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;div&gt;</span>Imagen derecha<span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span>
+<span class="cm">&lt;!-- Sin clases = sin control responsive --&gt;</span></pre>
+        </div>
+      </div>
+      <div class="comp-pane" data-comp="grid3" data-side="after">
+        <div class="comp-badge badge-after">✅ Layout adaptable automáticamente</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"container-fluid"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"row"</span><span class="tg">&gt;</span>
+    <span class="cm">&lt;!-- Columna de texto: 100% en móvil, 50% en tablet+ --&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-md-6 bg-primary d-flex align-items-center"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"row justify-content-center"</span><span class="tg">&gt;</span>
+        <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-sm-8 text-center"</span><span class="tg">&gt;</span>
+          <span class="tg">&lt;h2&gt;</span>Título<span class="tg">&lt;/h2&gt;</span>
+          <span class="tg">&lt;p&gt;</span>Descripción...<span class="tg">&lt;/p&gt;</span>
+        <span class="tg">&lt;/div&gt;</span>
+      <span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+    <span class="cm">&lt;!-- Columna imagen: 100% en móvil, 50% en tablet+ --&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-md-6 bg-laboral1"</span><span class="tg">&gt;&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.4 Cards -->
+    <div class="comparator" style="margin-top:20px">
+      <div style="padding:16px 20px 0;"><strong style="font-size:0.85rem;">3.4 — Cards: Componente Bootstrap</strong></div>
+      <div class="comp-tabs">
+        <div class="comp-tab before active" onclick="switchTab(this,'before','cards3')">❌ Antes — Div plano</div>
+        <div class="comp-tab after" onclick="switchTab(this,'after','cards3')">✅ Ahora — Bootstrap Card</div>
+      </div>
+      <div class="comp-pane active" data-comp="cards3" data-side="before">
+        <div class="comp-badge badge-before">❌ Sin estructura semántica</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;div&gt;</span>
+  <span class="tg">&lt;img</span> <span class="at">src=</span><span class="st">"img/clase1.jpg"</span> <span class="at">alt=</span><span class="st">"..."</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;div&gt;</span>20 / Mayo / 2022<span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;div&gt;</span>
+    <span class="tg">&lt;h3&gt;</span>Título<span class="tg">&lt;/h3&gt;</span>
+    <span class="tg">&lt;p&gt;</span>Descripción...<span class="tg">&lt;/p&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;div&gt;&lt;a</span> <span class="at">href=</span><span class="st">"#"</span><span class="tg">&gt;</span>Más Información<span class="tg">&lt;/a&gt;&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+        </div>
+      </div>
+      <div class="comp-pane" data-comp="cards3" data-side="after">
+        <div class="comp-badge badge-after">✅ Card responsiva con altura uniforme</div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-md-6 col-lg-4 pb-2"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"card h-100"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;img</span> <span class="at">class=</span><span class="st">"card-img-top"</span> <span class="at">src=</span><span class="st">"img/clase1.jpg"</span> <span class="at">alt=</span><span class="st">"..."</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"card-header bg-primary"</span><span class="tg">&gt;</span>20 / Mayo / 2022<span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"card-body"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;h3</span> <span class="at">class=</span><span class="st">"card-title"</span><span class="tg">&gt;</span>Título<span class="tg">&lt;/h3&gt;</span>
+      <span class="tg">&lt;h6</span> <span class="at">class=</span><span class="st">"card-subtitle mb-2 text-muted"</span><span class="tg">&gt;</span>Subtítulo<span class="tg">&lt;/h6&gt;</span>
+      <span class="tg">&lt;p</span> <span class="at">class=</span><span class="st">"card-text"</span><span class="tg">&gt;</span>Descripción...<span class="tg">&lt;/p&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"card-footer"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;a</span> <span class="at">href=</span><span class="st">"#"</span> <span class="at">class=</span><span class="st">"card-link"</span><span class="tg">&gt;</span>Más Información<span class="tg">&lt;/a&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.5 Order -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-top:20px;">
+      <strong style="font-size:0.85rem; display:block; margin-bottom:12px;">3.5 — Orden de Columnas: <code>order-*</code></strong>
+      <p>Bootstrap permite invertir el orden visual de las columnas sin tocar el HTML. Útil para poner la imagen encima en móvil aunque en el HTML vaya después del texto.</p>
+
+      <div class="order-demo">
+        <div class="order-slider">
+          <label>Vista:</label>
+          <input type="range" id="vpRange" min="0" max="1" step="1" value="0" oninput="updateOrderDemo(this.value)">
+          <span id="vpLabel">📱 Móvil</span>
+        </div>
+        <div class="order-grid mobile" id="orderGrid">
+          <div class="order-block colA" id="obA">
+            Columna A (Texto)
+            <span class="order-tag">HTML: 1º | order-1 / order-md-2</span>
+          </div>
+          <div class="order-block colB" id="obB">
+            Columna B (Imagen)
+            <span class="order-tag">HTML: 2º | order-2 / order-md-1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap mt12">
+        <div class="code-header"><span class="code-lang">html</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+        <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"row"</span><span class="tg">&gt;</span>
+  <span class="cm">&lt;!-- En HTML va 1ª, pero en desktop aparece 2ª --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-12 col-md-6 order-1 order-md-2 bg-secondary"</span><span class="tg">&gt;</span>Texto<span class="tg">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- En HTML va 2ª, pero en desktop aparece 1ª --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-12 col-md-6 order-2 order-md-1 bg-laboral2"</span><span class="tg">&gt;</span>Imagen<span class="tg">&lt;/div&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN 4 ── -->
+  <div id="sec4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>Flujo de Responsive</h2>
+      <div class="section-line"></div>
+    </div>
+    <p>El diseño responsive sigue un proceso lógico de tres pasos que siempre se repite.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-node">
+        <div class="flow-node-icon">📐</div>
+        <div class="flow-node-title">1. Breakpoints</div>
+        <div class="flow-node-classes">
+          <div class="fnc">&lt;576px → xs</div>
+          <div class="fnc">≥576px → sm</div>
+          <div class="fnc">≥768px → md</div>
+          <div class="fnc">≥992px → lg</div>
+          <div class="fnc">≥1200px → xl</div>
+        </div>
+      </div>
+      <div class="flow-node" style="animation-delay:.08s">
+        <div class="flow-node-icon">📱</div>
+        <div class="flow-node-title">2. Mobile First</div>
+        <div class="flow-node-classes">
+          <div class="fnc">Diseña para móvil</div>
+          <div class="fnc">Añade breakpoints</div>
+          <div class="fnc">hacia pantallas</div>
+          <div class="fnc">más grandes</div>
+        </div>
+      </div>
+      <div class="flow-node" style="animation-delay:.16s">
+        <div class="flow-node-icon">⊞</div>
+        <div class="flow-node-title">3. Clases Responsive</div>
+        <div class="flow-node-classes">
+          <div class="fnc">col-12 → 100%</div>
+          <div class="fnc">col-sm-6 → 50%@sm+</div>
+          <div class="fnc">col-md-4 → 33%@md+</div>
+          <div class="fnc">col-lg-3 → 25%@lg+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inline-note" style="margin-top:16px">
+      <strong>Mobile First:</strong> Sin prefijo (<code>col-6</code>) aplica a todos los tamaños. Con prefijo (<code>col-md-6</code>) solo aplica desde ese breakpoint hacia arriba. Por eso se empieza por móvil.
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN 5 ── -->
+  <div id="sec5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>Ejercicios Propuestos</h2>
+      <div class="section-line"></div>
+    </div>
+    <p>Aplica lo aprendido sobre los archivos de la versión responsive. Despliega cada ejercicio y revela la solución solo cuando hayas intentado resolverlo.</p>
+
+    <!-- EX 1 -->
+    <div class="exercise-card open">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">01</div>
+        <div>
+          <div class="ex-title">Añadir un cuarto elemento de "Por qué estudiar"</div>
+          <div class="ex-file">📄 index.html</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>Localiza la sección <code>"¿Por qué estudiar con nosotros?"</code></span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Añade un nuevo <code>div class="col-md-4"</code> después del tercer card</span></div>
+          <div class="ex-step"><div class="step-dot">3</div><span>Usa una imagen existente o repite una. Inventa título y descripción</span></div>
+        </div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">html — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-md-4 text-center"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;img</span> <span class="at">src=</span><span class="st">"img/ciberseguridad.png"</span> <span class="at">class=</span><span class="st">"img-fluid mb-3"</span> <span class="at">alt=</span><span class="st">"nuevo"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;h3&gt;</span>Nuevo Título<span class="tg">&lt;/h3&gt;</span>
+  <span class="tg">&lt;p&gt;</span>Descripción del nuevo elemento.<span class="tg">&lt;/p&gt;</span>
+<span class="tg">&lt;/div&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 2 -->
+    <div class="exercise-card">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">02</div>
+        <div>
+          <div class="ex-title">Cambiar el breakpoint del navbar</div>
+          <div class="ex-file">📄 index.html</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>El navbar actual usa <code>navbar-expand-lg</code>: hamburguesa aparece en pantallas &lt; 992px</span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Modifícalo para que el hamburguesa aparezca también en tablets (≥768px)</span></div>
+        </div>
+        <div class="ex-hint">💡 <span>Cambia <code>navbar-expand-lg</code> por <code>navbar-expand-md</code></span></div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">html — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="tg">&lt;nav</span> <span class="at">class=</span><span class="st">"navbar navbar-expand-md navbar-light bg-light"</span><span class="tg">&gt;</span>
+<span class="cm">&lt;!-- Cambiado: navbar-expand-lg → navbar-expand-md
+     Ahora hamburguesa aparece en &lt;768px
+     En tablets ≥768px el menú ya es horizontal --&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 3 -->
+    <div class="exercise-card">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">03</div>
+        <div>
+          <div class="ex-title">Modificar el layout para 4 cards por fila en desktop</div>
+          <div class="ex-file">📄 index.html</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>Las cards de eventos usan actualmente <code>col-md-6 col-lg-4</code> → 3 por fila en desktop</span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Modifica para que en desktop aparezcan <strong>4 cards por fila</strong></span></div>
+        </div>
+        <div class="ex-hint">💡 <span>12 columnas ÷ 4 cards = 3 columnas cada una → <code>col-lg-3</code></span></div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">html — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"col-md-6 col-lg-3 pb-2"</span><span class="tg">&gt;</span>
+<span class="cm">&lt;!-- Clave: col-lg-3
+     12 ÷ 3 = 4 columnas por fila en desktop
+     En tablet (md) siguen siendo 2 por fila (col-md-6) --&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 4 -->
+    <div class="exercise-card">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">04</div>
+        <div>
+          <div class="ex-title">Centrar el footer con Flexbox</div>
+          <div class="ex-file">📄 index.html y/o css/styles.css</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>Localiza el <code>row</code> dentro del <code>&lt;footer&gt;</code></span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Añade las clases de alineación Flexbox al row</span></div>
+        </div>
+        <div class="ex-hint">💡 <span>Añade <code>align-items-center justify-content-center</code> al row del footer</span></div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">html — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="tg">&lt;div</span> <span class="at">class=</span><span class="st">"row align-items-center justify-content-center"</span><span class="tg">&gt;</span>
+<span class="cm">&lt;!-- align-items-center = centrado vertical
+     justify-content-center = centrado horizontal --&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 5 -->
+    <div class="exercise-card">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">05</div>
+        <div>
+          <div class="ex-title">Cambiar el color de la cabecera de las cards</div>
+          <div class="ex-file">📄 css/styles.css</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>Abre <code>css/styles.css</code></span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Añade una regla para <code>.card-header</code> y cambia el color de fondo</span></div>
+        </div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">css — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="cl">.card-header</span> <span class="tx">{</span>
+  <span class="at">background-color</span><span class="tx">:</span> <span class="cs">#28a745</span> <span class="kw">!important</span><span class="tx">;</span>
+  <span class="cm">/* Verde. !important sobreescribe bg-primary de Bootstrap */</span>
+<span class="tx">}</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EX 6 -->
+    <div class="exercise-card">
+      <div class="ex-header" onclick="toggleEx(this)">
+        <div class="ex-num">06</div>
+        <div>
+          <div class="ex-title">Invertir los colores del banner sin tocar el HTML</div>
+          <div class="ex-file">📄 css/styles.css</div>
+        </div>
+        <svg class="ex-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-steps">
+          <div class="ex-step"><div class="step-dot">1</div><span>En el banner principal hay dos secciones con fondos: <code>.imagen-superior</code> y <code>.imagen-inferior</code></span></div>
+          <div class="ex-step"><div class="step-dot">2</div><span>Intercambia sus colores/fondos <strong>solo en CSS</strong>, sin modificar el HTML</span></div>
+        </div>
+        <div class="ex-hint">💡 <span>Busca <code>.bg-laboral1</code> y <code>.bg-laboral2</code> o las clases de imagen en styles.css</span></div>
+        <div class="ex-sol-toggle">
+          <button class="sol-btn" onclick="toggleSol(this)">🔒 Ver solución</button>
+        </div>
+        <div class="sol-code">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">css — Solución</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+            <pre><span class="cl">.imagen-superior</span> <span class="tx">{</span>
+  <span class="at">background-color</span><span class="tx">:</span> <span class="cs">#FA5858</span><span class="tx">;</span> <span class="cm">/* Era #2E9AFE (azul) → ahora rojo */</span>
+<span class="tx">}</span>
+
+<span class="cl">.imagen-inferior</span> <span class="tx">{</span>
+  <span class="at">background-color</span><span class="tx">:</span> <span class="cs">#2E9AFE</span><span class="tx">;</span> <span class="cm">/* Era #FA5858 (rojo) → ahora azul */</span>
+<span class="tx">}</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── SECCIÓN 6 ── -->
+  <div id="sec6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>Recursos Adicionales</h2>
+      <div class="section-line"></div>
+    </div>
+    <p>Documentación oficial de Bootstrap para profundizar en cada tema.</p>
+    <div class="resources-grid">
+      <a class="res-link" href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" target="_blank">
+        <div class="res-icon">📚</div>Documentación oficial Bootstrap
+      </a>
+      <a class="res-link" href="https://getbootstrap.com/docs/5.3/layout/grid/" target="_blank">
+        <div class="res-icon">⊞</div>Sistema de Grid
+      </a>
+      <a class="res-link" href="https://getbootstrap.com/docs/5.3/components/navbar/" target="_blank">
+        <div class="res-icon">☰</div>Componente Navbar
+      </a>
+      <a class="res-link" href="https://getbootstrap.com/docs/5.3/components/card/" target="_blank">
+        <div class="res-icon">🃏</div>Componente Card
+      </a>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  Guía Didáctica · Bootstrap 4 · DAW · Responsive Design<br>
+  <span style="opacity:.4;margin-top:4px;display:block">¿Dudas? Consulta con tu profesor o revisa la documentación oficial.</span>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</div>
+
+<script>
+// ══════════════════════
+// ACCORDION CONCEPTS
+// ══════════════════════
+function toggleConcept(header) {
+  const card = header.closest('.concept-card');
+  card.classList.toggle('open');
+}
+
+// ══════════════════════
+// ACCORDION EXERCISES
+// ══════════════════════
+function toggleEx(header) {
+  const card = header.closest('.exercise-card');
+  card.classList.toggle('open');
+}
+
+// ══════════════════════
+// SOLUTION TOGGLE
+// ══════════════════════
+function toggleSol(btn) {
+  const solCode = btn.closest('.ex-body').querySelector('.sol-code');
+  const isVisible = solCode.classList.contains('visible');
+  if (isVisible) {
+    solCode.classList.remove('visible');
+    btn.textContent = '🔒 Ver solución';
+    btn.classList.remove('revealed');
+  } else {
+    solCode.classList.add('visible');
+    btn.textContent = '🔓 Ocultar solución';
+    btn.classList.add('revealed');
+  }
+}
+
+// ══════════════════════
+// BEFORE/AFTER TABS
+// ══════════════════════
+function switchTab(clickedTab, side, comp) {
+  const comparator = clickedTab.closest('.comparator');
+  // Update tabs
+  comparator.querySelectorAll('.comp-tab').forEach(t => t.classList.remove('active'));
+  clickedTab.classList.add('active');
+  // Update panes
+  comparator.querySelectorAll('.comp-pane').forEach(p => {
+    p.classList.toggle('active', p.dataset.side === side && p.dataset.comp === comp);
+  });
+}
+
+// ══════════════════════
+// BREAKPOINT INTERACTIVE
+// ══════════════════════
+function selectBp(el, name, size, cls, desc) {
+  document.querySelectorAll('.bp-seg').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const info = document.getElementById('bpInfo');
+  info.innerHTML = `
+    <div class="label">Breakpoint seleccionado</div>
+    <div style="margin-top:4px">
+      <span class="val">${name}</span>
+      <span style="color:var(--muted);margin:0 6px">·</span>
+      <span style="color:var(--text)">${size}</span>
+      <span style="color:var(--muted);margin:0 6px">·</span>
+      <span class="cls">Prefijo: ${cls}</span>
+    </div>
+    <div style="margin-top:6px;color:var(--muted);font-size:0.72rem;">${desc}</div>
+  `;
+}
+
+// ══════════════════════
+// ORDER DEMO
+// ══════════════════════
+function updateOrderDemo(val) {
+  const grid = document.getElementById('orderGrid');
+  const label = document.getElementById('vpLabel');
+  const obA = document.getElementById('obA');
+  const obB = document.getElementById('obB');
+
+  if (val == 0) {
+    // Mobile: A first (order-1), B second (order-2)
+    grid.className = 'order-grid mobile';
+    obA.style.order = '1';
+    obB.style.order = '2';
+    label.textContent = '📱 Móvil';
+    obA.querySelector('.order-tag').textContent = 'Móvil: aparece 1ª (order-1)';
+    obB.querySelector('.order-tag').textContent = 'Móvil: aparece 2ª (order-2)';
+  } else {
+    // Desktop: B first (order-md-1), A second (order-md-2)
+    grid.className = 'order-grid desktop';
+    obA.style.order = '2';
+    obB.style.order = '1';
+    label.textContent = '🖥️ Desktop';
+    obA.querySelector('.order-tag').textContent = 'Desktop: aparece 2ª (order-md-2)';
+    obB.querySelector('.order-tag').textContent = 'Desktop: aparece 1ª (order-md-1) ← INVERTIDA';
+  }
+}
+
+// ══════════════════════
+// COPY CODE
+// ══════════════════════
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Error';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+
+// ══════════════════════
+// SMOOTH SCROLL & NAV HIGHLIGHT
+// ══════════════════════
+document.querySelectorAll('.idx-link').forEach(link => {
+  link.addEventListener('click', e => {
+    document.querySelectorAll('.idx-link').forEach(l => l.style.color = '');
+    link.style.color = 'var(--accent)';
+    setTimeout(() => { link.style.color = ''; }, 1200);
+  });
+});
+</script>
+</body>
+</html>

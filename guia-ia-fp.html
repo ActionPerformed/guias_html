@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA para FP · Guía de Aprendizaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --ink: #1a1612;
+    --card: #ffffff;
+    --accent1: #e8441a;
+    --accent2: #2563d4;
+    --accent3: #16a34a;
+    --accent4: #d97706;
+    --muted: #6b6560;
+    --border: #e0dbd2;
+    --tag-bg: #1a1612;
+    --tag-fg: #f5f2eb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 150px;
+    z-index: 9999;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem 2rem;
+    gap: 1rem;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -.5px;
+    white-space: nowrap;
+  }
+
+  .nav-logo span { color: var(--accent1); }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a {
+    color: var(--bg);
+    text-decoration: none;
+    font-size: .8rem;
+    font-weight: 500;
+    opacity: .7;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover { opacity: 1; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 4rem 2rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: .3rem .75rem;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 1.25rem;
+    animation: fadeUp .6s .1s ease both;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent1);
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 580px;
+    opacity: .8;
+    animation: fadeUp .6s .2s ease both;
+  }
+
+  /* decorative circles */
+  .hero-deco {
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    border: 60px solid rgba(232,68,26,.12);
+    pointer-events: none;
+  }
+  .hero-deco2 {
+    position: absolute;
+    right: 60px;
+    bottom: -120px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 30px solid rgba(37,99,212,.15);
+    pointer-events: none;
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent1);
+    z-index: 200;
+    width: 0%;
+    transition: width .1s;
+  }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  section {
+    padding: 4rem 0 2rem;
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-num {
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .4rem;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .section-intro {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 620px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 0 0 3rem;
+  }
+
+  /* ─── INDEX ─── */
+  .index-section {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 3rem 2rem 4rem;
+  }
+
+  .index-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .index-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: 1.25rem;
+  }
+
+  .index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem;
+  }
+
+  .index-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    text-decoration: none;
+    color: var(--bg);
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+
+  .index-item:hover {
+    background: rgba(255,255,255,.1);
+    border-color: rgba(232,68,26,.5);
+    transform: translateY(-3px);
+  }
+
+  .index-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--accent1);
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+
+  .index-text strong {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    display: block;
+    margin-bottom: .2rem;
+  }
+
+  .index-text span {
+    font-size: .78rem;
+    opacity: .5;
+    font-weight: 300;
+  }
+
+  /* ─── CARDS ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform .25s, box-shadow .25s;
+    cursor: default;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.08);
+  }
+
+  .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: .75rem;
+  }
+
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+  }
+
+  .card p {
+    font-size: .88rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.55;
+  }
+
+  .card.accent1 { border-top: 4px solid var(--accent1); }
+  .card.accent2 { border-top: 4px solid var(--accent2); }
+  .card.accent3 { border-top: 4px solid var(--accent3); }
+  .card.accent4 { border-top: 4px solid var(--accent4); }
+
+  /* ─── PROMPTING SECTION ─── */
+  .prompt-builder {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .prompt-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #ffbd2e; }
+  .dot.g { background: #28c940; }
+
+  .prompt-body { padding: 1.5rem; }
+
+  .formula-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .formula-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .9rem;
+    border-radius: 99px;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: transform .15s;
+  }
+
+  .formula-pill:hover { transform: scale(1.05); }
+
+  .pill-role { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .pill-context { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  .pill-task { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .pill-format { background: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+  .pill-plus { background: transparent; color: var(--muted); font-size: 1.1rem; border: none; cursor: default; }
+
+  .example-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .example-compare { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  .ex-box {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: .85rem;
+    line-height: 1.55;
+  }
+
+  .ex-bad {
+    background: #fff1f2;
+    border: 1.5px solid #fecdd3;
+  }
+
+  .ex-good {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+  }
+
+  .ex-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+
+  .ex-bad .ex-label { color: #be123c; }
+  .ex-good .ex-label { color: #15803d; }
+
+  /* ─── TIPS INTERACTIVOS ─── */
+  .tip-accordion {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .tip-item {
+    border-bottom: 1.5px solid var(--border);
+  }
+
+  .tip-item:last-child { border-bottom: none; }
+
+  .tip-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: left;
+    transition: background .15s;
+  }
+
+  .tip-trigger:hover { background: #fafaf8; }
+
+  .tip-trigger-left { display: flex; align-items: center; gap: .75rem; }
+
+  .tip-icon-wrap {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .tip-arrow {
+    font-size: .75rem;
+    color: var(--muted);
+    transition: transform .25s;
+    flex-shrink: 0;
+  }
+
+  .tip-item.open .tip-arrow { transform: rotate(180deg); }
+
+  .tip-content {
+    display: none;
+    padding: 0 1.25rem 1.25rem 4rem;
+    font-size: .9rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .tip-item.open .tip-content { display: block; }
+
+  /* ─── PROYECTOS SECTION ─── */
+  .steps-list {
+    counter-reset: steps;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color .2s;
+  }
+
+  .steps-list li:hover { border-color: var(--accent2); }
+
+  .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+
+  .step-text strong {
+    font-weight: 600;
+    display: block;
+    margin-bottom: .25rem;
+    font-size: .95rem;
+  }
+
+  .step-text span {
+    font-size: .87rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ─── CASO PRÁCTICO ─── */
+  .caso-practico {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .caso-practico::before {
+    content: '"';
+    position: absolute;
+    top: -1.5rem;
+    right: 2rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 12rem;
+    font-weight: 800;
+    color: rgba(255,255,255,.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .caso-tag {
+    display: inline-block;
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: .25rem .6rem;
+    border-radius: 3px;
+    margin-bottom: 1.25rem;
+  }
+
+  .caso-practico h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: .75rem;
+    letter-spacing: -.5px;
+  }
+
+  .caso-practico p {
+    font-size: .9rem;
+    opacity: .75;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    max-width: 560px;
+  }
+
+  /* File tree */
+  .file-tree {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    font-size: .82rem;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+  }
+
+  .tree-folder { color: var(--accent4); font-weight: 600; }
+  .tree-file { color: rgba(245,242,235,.8); }
+  .tree-comment { color: rgba(245,242,235,.35); font-style: italic; }
+  .tree-indent { display: inline-block; width: 1.5rem; }
+
+  /* System prompt block */
+  .sysprompt-block {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(232,68,26,.3);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-size: .85rem;
+    line-height: 1.7;
+    color: rgba(245,242,235,.85);
+    font-weight: 300;
+  }
+
+  .sysprompt-block strong {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .sysprompt-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .6rem;
+  }
+
+  /* ─── CASOS DE USO POR CICLO ─── */
+  .ciclo-tabs {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .ciclo-tab {
+    padding: .45rem 1rem;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-family: 'Syne', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    color: var(--ink);
+  }
+
+  .ciclo-tab.active,
+  .ciclo-tab:hover {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .ciclo-panel { display: none; }
+  .ciclo-panel.active { display: block; animation: fadeUp .3s ease; }
+
+  .use-case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .use-case-item {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: .87rem;
+  }
+
+  .use-case-item .uc-module {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: .4rem;
+  }
+
+  .use-case-item p { color: var(--muted); font-weight: 300; font-size: .83rem; line-height: 1.5; }
+
+  /* ─── ETHICS ─── */
+  .ethics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .ethics-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+
+  .ethics-card .e-head {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    margin-bottom: .4rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .ethics-card p { font-weight: 300; color: var(--muted); }
+
+  .ec-do { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .ec-do .e-head { color: #15803d; }
+  .ec-dont { background: #fff1f2; border: 1.5px solid #fecdd3; }
+  .ec-dont .e-head { color: #be123c; }
+  .ec-note { background: #fffbeb; border: 1.5px solid #fde68a; }
+  .ec-note .e-head { color: #92400e; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    margin-top: 4rem;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+
+  footer p {
+    opacity: .5;
+    font-size: .82rem;
+    font-weight: 300;
+  }
+
+  footer strong { opacity: 1; font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── HIGHLIGHT CHIP ─── */
+  .chip {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-fg);
+    font-family: 'Syne', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: .2rem .55rem;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  /* inline code */
+  code {
+    font-family: 'DM Mono', 'Fira Mono', monospace;
+    background: #ede9e0;
+    padding: .1rem .35rem;
+    border-radius: 4px;
+    font-size: .83em;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IA<span>·</span>FP</div>
+  <ul class="nav-links">
+    <li><a href="#prompting">01 · Prompting</a></li>
+    <li><a href="#proyectos">02 · Proyectos Claude</a></li>
+    <li><a href="#ciclos">03 · Por ciclo</a></li>
+    <li><a href="#etica">04 · Uso responsable</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Guía para el alumnado · FP Informática</div>
+    <h1>La IA como tu<br><em>herramienta</em> de estudio</h1>
+    <p>Aprende a usar la inteligencia artificial para estudiar mejor, resolver dudas más rápido y entender los módulos de tu ciclo formativo.</p>
+  </div>
+</header>
+
+<!-- ÍNDICE -->
+<div class="index-section">
+  <div class="index-inner">
+    <div class="index-label">Contenidos de esta guía</div>
+    <div class="index-grid">
+      <a href="#prompting" class="index-item">
+        <div class="index-num">01</div>
+        <div class="index-text">
+          <strong>Prompting</strong>
+          <span>Cómo hacer buenas preguntas</span>
+        </div>
+      </a>
+      <a href="#proyectos" class="index-item">
+        <div class="index-num">02</div>
+        <div class="index-text">
+          <strong>Proyectos de Claude</strong>
+          <span>Tu asistente personalizado</span>
+        </div>
+      </a>
+      <a href="#ciclos" class="index-item">
+        <div class="index-num">03</div>
+        <div class="index-text">
+          <strong>Ideas por ciclo</strong>
+          <span>SMR · ASIR · DAM · DAW</span>
+        </div>
+      </a>
+      <a href="#etica" class="index-item">
+        <div class="index-num">04</div>
+        <div class="index-text">
+          <strong>Uso responsable</strong>
+          <span>La IA como herramienta real</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 1. PROMPTING -->
+<section id="prompting">
+  <div class="container">
+    <div class="section-num">01 — Prompting</div>
+    <h2>Cómo hacer buenas<br>preguntas</h2>
+    <p class="section-intro">Un buen prompt es como una buena pregunta en clase: cuanto más claro eres, mejor respuesta obtienes. Usa esta fórmula como punto de partida.</p>
+    <hr class="divider">
+
+    <div class="prompt-builder reveal">
+      <div class="prompt-header">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        La fórmula del prompt perfecto
+      </div>
+      <div class="prompt-body">
+        <div class="formula-row">
+          <span class="formula-pill pill-role">🎭 Rol</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-context">📚 Contexto</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-task">✅ Tarea concreta</span>
+          <span class="formula-pill pill-plus">+</span>
+          <span class="formula-pill pill-format">📝 Formato</span>
+        </div>
+        <p style="font-size:.85rem; color:var(--muted); margin-bottom:1rem;">Despliega cada elemento para ver qué significa y cómo usarlo:</p>
+
+        <div class="tip-accordion" id="formula-accordion">
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#fef3c7;">🎭</div>
+                <strong>Rol — ¿Quién eres?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Dile a la IA qué papel debe adoptar. Ejemplo: <em>"Actúa como un profesor de bases de datos que explica a estudiantes de FP..."</em> — esto cambia completamente el nivel y tono de la respuesta.
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#dbeafe;">📚</div>
+                <strong>Contexto — ¿Cuál es la situación?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Explica qué estás estudiando, qué ya sabes y qué no. Ejemplo: <em>"Estoy en el módulo de Bases de Datos de DAM, viendo el tema de normalización. Entiendo la 1FN pero no la 2FN."</em>
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#dcfce7;">✅</div>
+                <strong>Tarea — ¿Qué quieres exactamente?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Sé específico. Evita "explícame esto" y usa frases como: <em>"Ponme un ejemplo paso a paso con una tabla de ventas"</em>, <em>"Corrígeme este script SQL indicando qué línea falla y por qué"</em>, <em>"Genera 5 ejercicios de dificultad creciente sobre JOIN"</em>.
+            </div>
+          </div>
+          <div class="tip-item">
+            <button class="tip-trigger" onclick="toggleTip(this)">
+              <div class="tip-trigger-left">
+                <div class="tip-icon-wrap" style="background:#fce7f3;">📝</div>
+                <strong>Formato — ¿Cómo quieres la respuesta?</strong>
+              </div>
+              <span class="tip-arrow">▼</span>
+            </button>
+            <div class="tip-content">
+              Indica la forma: <em>"Respóndeme en menos de 150 palabras"</em>, <em>"Usa una tabla comparativa"</em>, <em>"Dame el código con comentarios en cada línea"</em>, <em>"Hazlo como si fuera un resumen para repasar antes del examen"</em>.
+            </div>
+          </div>
+        </div>
+
+        <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; margin: 1.5rem 0 .75rem;">Antes vs. después</p>
+        <div class="example-compare">
+          <div class="ex-box ex-bad">
+            <div class="ex-label">❌ Prompt vago</div>
+            "Explícame las bases de datos"
+            <br><br>
+            <span style="font-size:.8rem; opacity:.6;">→ Obtienes una respuesta genérica y larga que no te ayuda a estudiar.</span>
+          </div>
+          <div class="ex-box ex-good">
+            <div class="ex-label">✅ Prompt efectivo</div>
+            "Actúa como un profe de FP. Estoy en DAM, tema JOIN en SQL. No entiendo la diferencia entre INNER JOIN y LEFT JOIN. Explícamelo con un ejemplo sencillo de una tienda online, en menos de 200 palabras."
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips rápidos -->
+    <h3 style="font-family:'Syne',sans-serif; font-weight:700; margin-bottom:1rem; font-size:1.1rem;" class="reveal">Trucos rápidos de prompting</h3>
+    <div class="tip-accordion reveal">
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">💬</div>
+            Pide que te haga preguntas
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Escribe: <em>"Antes de responder, hazme 2-3 preguntas para entender mejor mi nivel."</em> Así la respuesta se adapta exactamente a ti.
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">🔄</div>
+            Pide que cambie el enfoque
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Si no entiendes la explicación, di: <em>"No lo he entendido, explícamelo como si tuviera 12 años usando una analogía de la vida real."</em>
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">🧪</div>
+            Pídele que te examine
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Escribe: <em>"Ahora ponme a prueba: hazme 5 preguntas tipo test sobre este tema y después dame las respuestas correctas."</em> Perfecto para repasar antes de un examen.
+        </div>
+      </div>
+      <div class="tip-item">
+        <button class="tip-trigger" onclick="toggleTip(this)">
+          <div class="tip-trigger-left">
+            <div class="tip-icon-wrap" style="background:#ede9e0;">🐛</div>
+            Debug de código
+          </div>
+          <span class="tip-arrow">▼</span>
+        </button>
+        <div class="tip-content">
+          Pega tu código y escribe: <em>"Este código da el error X. Identifica el problema, explícame por qué ocurre y muéstrame la corrección con comentarios."</em> No solo te da el fix: te enseña.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. PROYECTOS CLAUDE -->
+<section id="proyectos">
+  <div class="container">
+    <div class="section-num">02 — Proyectos de Claude</div>
+    <h2>Crea tu propio<br>asistente de módulo</h2>
+    <p class="section-intro">Los Proyectos de Claude te permiten crear un asistente personalizado para cada módulo. Piensa en ello como preparar el contexto una vez y que la IA lo recuerde siempre.</p>
+    <hr class="divider">
+
+    <ul class="steps-list reveal">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Entra en claude.ai y crea un proyecto nuevo</strong>
+          <span>En el panel lateral verás la opción "Proyectos". Dale un nombre descriptivo: por ejemplo, <code>Bases de Datos — DAM</code>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Escribe las instrucciones del proyecto</strong>
+          <span>Aquí le dices a Claude cómo debe comportarse siempre en ese proyecto: su rol, tu nivel, el módulo, cómo explicarte las cosas. Esto se aplica automáticamente en cada conversación.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Sube los archivos del módulo</strong>
+          <span>Puedes subir PDFs de apuntes, esquemas, ejercicios, los criterios de evaluación... Claude los leerá y los usará como referencia.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong>¡Empieza a chatear!</strong>
+          <span>Desde ese momento, cada conversación dentro del proyecto ya tendrá todo el contexto. No necesitas repetirle quién eres ni qué estás estudiando.</span>
+        </div>
+      </li>
+    </ul>
+
+    <!-- CASO PRÁCTICO -->
+    <div class="caso-practico reveal">
+      <div class="caso-tag">📖 Caso práctico real</div>
+      <h3>Ejemplo: Proyecto para el módulo de Bases de Datos (DAM/DAW)</h3>
+      <p>Así es como un alumno de DAM llamado Iker lo configuraría para sacarle el máximo partido a lo largo del curso.</p>
+
+      <p style="font-family:'Syne',sans-serif; font-weight:700; font-size:.8rem; letter-spacing:1px; text-transform:uppercase; color:rgba(245,242,235,.5); margin-bottom:.5rem;">📁 Archivos que subiría al proyecto</p>
+      <div class="file-tree">
+        <span class="tree-folder">📁 Proyecto: Bases de Datos — DAM</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 temario-completo.pdf</span> <span class="tree-comment">// Apuntes del profesor en PDF</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 criterios-evaluacion.pdf</span> <span class="tree-comment">// Lo que entra en los exámenes</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📄 ejercicios-resueltos.pdf</span> <span class="tree-comment">// Ejemplos de exámenes anteriores</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📝 esquema-normalizacion.md</span> <span class="tree-comment">// Resumen propio sobre normalización</span><br>
+        <span class="tree-indent">├─</span> <span class="tree-file">📝 dudas-frecuentes.txt</span> <span class="tree-comment">// Lista de conceptos que le cuestan</span><br>
+        <span class="tree-indent">└─</span> <span class="tree-file" style="color:#e8c76a;">📋 instrucciones-proyecto.txt</span> <span class="tree-comment">// ← las instrucciones, también como fichero</span>
+      </div>
+
+      <div style="background:rgba(232,68,26,.12); border:1px solid rgba(232,68,26,.3); border-radius:10px; padding:.85rem 1.1rem; margin-bottom:1.25rem; font-size:.82rem; color:rgba(245,242,235,.8); font-weight:300;">
+        💡 <strong style="color:#fff; font-weight:600;">Truco:</strong> guarda las instrucciones también como fichero <code style="background:rgba(255,255,255,.1); color:#fff;">instrucciones-proyecto.txt</code> y súbelo al proyecto. Así, si en algún momento Claude parece "olvidar" cómo debería comportarse, puedes escribir simplemente: <em>"Recuerda las instrucciones del fichero instrucciones-proyecto.txt"</em> sin tener que reescribirlas a mano.
+      </div>
+
+      <div class="sysprompt-label">✏️ Instrucciones que escribiría en el proyecto</div>
+      <div class="sysprompt-block">
+        <strong>Eres mi tutor personal del módulo de Bases de Datos</strong> del ciclo de DAM (Desarrollo de Aplicaciones Multiplataforma) de FP.<br><br>
+        Mi nombre es Iker y soy alumno de 1º. Tengo conocimientos básicos de SQL pero me cuesta la normalización y los procedimientos almacenados.<br><br>
+        <strong>Cómo quiero que me respondas:</strong><br>
+        — Explica siempre con ejemplos prácticos, preferiblemente de una tienda online o una app de música.<br>
+        — Si te pregunto sobre SQL, muéstrame el código con comentarios en cada línea.<br>
+        — Cuando no entienda algo, propón una analogía del mundo real.<br>
+        — Al final de cada explicación, hazme 2 preguntas rápidas para comprobar que lo he entendido.<br>
+        — Si cometo un error, no me des la solución directamente: guíame con pistas.<br><br>
+        <strong>Usa los documentos del proyecto</strong> como referencia cuando te pregunte sobre el temario o los ejercicios.
+      </div>
+    </div>
+
+    <div class="card reveal" style="border: 2px dashed var(--accent2); background: #eff6ff;">
+      <div class="card-icon">💡</div>
+      <h3 style="color:var(--accent2);">El truco está en las instrucciones</h3>
+      <p>Cuanto más detalladas sean las instrucciones del proyecto, más útil será el asistente. Puedes actualizarlas cuando avances en el temario o cuando detectes que hay algo que no te está explicando bien.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. CASOS DE USO POR CICLO -->
+<section id="ciclos">
+  <div class="container">
+    <div class="section-num">03 — Casos de uso</div>
+    <h2>Ideas según<br>tu ciclo</h2>
+    <p class="section-intro">Ejemplos concretos de cómo puedes usar la IA en los módulos de tu ciclo formativo.</p>
+    <hr class="divider">
+
+    <div class="ciclo-tabs reveal">
+      <button class="ciclo-tab active" onclick="showCiclo('smr', event)">SMR</button>
+      <button class="ciclo-tab" onclick="showCiclo('asir', event)">ASIR</button>
+      <button class="ciclo-tab" onclick="showCiclo('dam', event)">DAM</button>
+      <button class="ciclo-tab" onclick="showCiclo('daw', event)">DAW</button>
+    </div>
+
+    <div id="ciclo-smr" class="ciclo-panel active reveal">
+      <div class="use-case-grid">
+        <div class="use-case-item">
+          <div class="uc-module">Montaje y mantenimiento</div>
+          <p>Pídele que te explique paso a paso cómo diagnosticar un fallo de arranque o qué componente podría estar fallando según los síntomas.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Sistemas operativos</div>
+          <p>Genera ejercicios de comandos básicos de Windows/Linux o pídele que te explique diferencias entre sistemas de archivos.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Redes locales</div>
+          <p>Pídele que te explique qué es una subred y cómo calcular hosts disponibles. Que te ponga a prueba con cálculos de subnetting de dificultad creciente.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Seguridad informática</div>
+          <p>Pídele resúmenes de tipos de ataques, medidas preventivas o que simule ser un evaluador de una política de seguridad básica.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="ciclo-asir" class="ciclo-panel reveal">
+      <div class="use-case-grid">
+        <div class="use-case-item">
+          <div class="uc-module">Administración de sistemas</div>
+          <p>Pídele que genere scripts de Bash o PowerShell para tareas de mantenimiento y que te los explique línea por línea.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Servicios de red</div>
+          <p>Simula la configuración de un servidor DNS o DHCP con errores a propósito para que los detectes. Perfecto para practicar.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Seguridad y alta disponibilidad</div>
+          <p>Pídele que analice una política de backup o que proponga una arquitectura redundante para un servidor web, justificando cada decisión.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Cloud e implantación</div>
+          <p>Pregúntale diferencias entre modelos IaaS/PaaS/SaaS con ejemplos de AWS, Azure o Google Cloud que ya conozcas de clase.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="ciclo-dam" class="ciclo-panel reveal">
+      <div class="use-case-grid">
+        <div class="use-case-item">
+          <div class="uc-module">Programación</div>
+          <p>Pega tu código y pídele que lo revise, sugiera mejoras o explique por qué un método no funciona como esperas.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Bases de datos</div>
+          <p>Genera un modelo relacional de práctica, pídele ejercicios de normalización o que corrija tus queries SQL con explicación del error.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Entornos de desarrollo</div>
+          <p>Pídele que te explique patrones de diseño (MVC, DAO, Singleton) con ejemplos en el lenguaje que estés usando en clase.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Acceso a datos</div>
+          <p>Simula una conexión a base de datos y pídele ejercicios de CRUD con manejo de excepciones. Que corrija y explique cada error.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="ciclo-daw" class="ciclo-panel reveal">
+      <div class="use-case-grid">
+        <div class="use-case-item">
+          <div class="uc-module">Desarrollo web en entorno cliente</div>
+          <p>Pídele que revise tu JavaScript, te explique el DOM o genere ejercicios de eventos y asincronía (Promises, async/await).</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Desarrollo web en entorno servidor</div>
+          <p>Pídele que te ayude con rutas de API REST en PHP/Node, que revise tu lógica de sesiones o que genere casos de prueba.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Diseño de interfaces</div>
+          <p>Comparte tu código CSS y pídele que mejore la accesibilidad, adapte el diseño a móvil o explique reglas de Flexbox/Grid.</p>
+        </div>
+        <div class="use-case-item">
+          <div class="uc-module">Despliegue de aplicaciones web</div>
+          <p>Pídele que te explique CI/CD, qué hace cada línea de un Dockerfile o cómo configurar un servidor Nginx para tu proyecto.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. USO RESPONSABLE -->
+<section id="etica">
+  <div class="container">
+    <div class="section-num">04 — Uso responsable</div>
+    <h2>La IA es una herramienta,<br>no un atajo</h2>
+    <p class="section-intro">Como cualquier herramienta profesional, la IA hay que usarla con criterio. En el mundo laboral al que vas, saber usarla bien —y de forma ética— es una competencia real.</p>
+    <hr class="divider">
+
+    <div class="ethics-grid reveal">
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Úsala para aprender</div>
+        <p>Pídele explicaciones, ejemplos, correcciones. El objetivo es que <em>tú</em> entiendas, no que la IA haga el trabajo.</p>
+      </div>
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Verifica las respuestas</div>
+        <p>La IA puede equivocarse, sobre todo en detalles técnicos o versiones de software. Contrasta con los apuntes o el profe.</p>
+      </div>
+      <div class="ethics-card ec-do">
+        <div class="e-head">✅ Úsala para practicar</div>
+        <p>Generar ejercicios extra, simular exámenes, pedir feedback de tus soluciones: esto sí que potencia tu aprendizaje.</p>
+      </div>
+      <div class="ethics-card ec-dont">
+        <div class="e-head">❌ No copies sin entender</div>
+        <p>Si entregas un código o texto que la IA generó y no sabes explicarlo, no has aprendido nada. Y en el examen se notará.</p>
+      </div>
+      <div class="ethics-card ec-dont">
+        <div class="e-head">❌ No la uses en exámenes</div>
+        <p>Salvo que el profesor lo indique expresamente, usar IA en evaluaciones es trampa y puede tener consecuencias académicas.</p>
+      </div>
+      <div class="ethics-card ec-note">
+        <div class="e-head">⚠️ Datos personales</div>
+        <p>No pegues información sensible (contraseñas, datos reales de clientes, IPs de entornos de producción) en ninguna IA.</p>
+      </div>
+    </div>
+
+    <div class="card reveal" style="background: var(--ink); color: var(--bg); border-color: var(--ink);">
+      <div class="card-icon">🏆</div>
+      <h3 style="color:#fff;">La habilidad que te hará diferente</h3>
+      <p style="color:rgba(245,242,235,.7);">En unos años, saber usar bien la IA será tan esperado como saber buscar en Google. Los que destaquen serán quienes sepan <strong style="color:#fff;">combinar su propio criterio técnico con el uso inteligente de estas herramientas</strong>. Eso es lo que estás empezando a aprender ahora.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>IA · FP Informática · Asturias</strong></p>
+  <p style="margin-top:.5rem;">Guía para el alumnado · Curso 2025–26 · Elaborada con Claude</p>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</footer>
+
+<script>
+  // ─── PROGRESS BAR ───
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement;
+    const pct = (s.scrollTop / (s.scrollHeight - s.clientHeight)) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // ─── ACCORDION ───
+  function toggleTip(btn) {
+    const item = btn.closest('.tip-item');
+    item.classList.toggle('open');
+  }
+
+  // ─── CICLO TABS ───
+  function showCiclo(id, e) {
+    document.querySelectorAll('.ciclo-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ciclo-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('ciclo-' + id).classList.add('active');
+    e.currentTarget.classList.add('active');
+  }
+
+  // ─── SCROLL REVEAL ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

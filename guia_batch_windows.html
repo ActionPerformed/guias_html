@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scripts Batch · Guía Didáctica · 1º DAW</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════ */
+:root {
+  --bg:       #020804;
+  --bg2:      #060e07;
+  --surface:  #0a160b;
+  --surface2: #0f200f;
+  --border:   #1a3a1a;
+  --glow:     #00ff41;
+  --glow2:    #39ff14;
+  --dim:      #00b32c;
+  --muted:    #3a6b3a;
+  --amber:    #ffb800;
+  --red:      #ff3c3c;
+  --cyan:     #00e5ff;
+  --text:     #c8ffc8;
+  --text2:    #8fbc8f;
+  --r:        6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Share Tech Mono',monospace;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* CRT scanlines overlay */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,.12) 0px,
+    rgba(0,0,0,.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events:none;
+  z-index:999;
+}
+/* phosphor vignette */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 60%, rgba(0,0,0,.6) 100%);
+  pointer-events:none;
+  z-index:998;
+}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--dim);}
+
+/* ══════════════════════════════════════
+   BOOT SCREEN / HERO
+══════════════════════════════════════ */
+.hero{
+  position:relative;
+  padding:72px 24px 56px;
+  text-align:center;
+  overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,65,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,65,.04) 1px, transparent 1px);
+  background-size:40px 40px;
+  animation:gridfade 4s ease-in-out infinite alternate;
+}
+@keyframes gridfade{from{opacity:.4;}to{opacity:1;}}
+
+.hero-corner{
+  position:absolute;
+  width:60px;height:60px;
+  border-color:var(--dim);
+  border-style:solid;
+  opacity:.4;
+}
+.hero-corner.tl{top:16px;left:16px;border-width:2px 0 0 2px;}
+.hero-corner.tr{top:16px;right:16px;border-width:2px 2px 0 0;}
+.hero-corner.bl{bottom:16px;left:16px;border-width:0 0 2px 2px;}
+.hero-corner.br{bottom:16px;right:16px;border-width:0 2px 2px 0;}
+
+.boot-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:16px;
+  display:block;
+}
+.boot-tag::before{content:'> ';}
+
+.hero h1{
+  font-family:'VT323',monospace;
+  font-size:clamp(3rem,8vw,5.5rem);
+  color:var(--glow);
+  text-shadow:
+    0 0 10px var(--glow),
+    0 0 30px rgba(0,255,65,.4),
+    0 0 60px rgba(0,255,65,.15);
+  letter-spacing:.05em;
+  line-height:1;
+  margin-bottom:8px;
+  animation:flicker 8s ease-in-out infinite;
+}
+@keyframes flicker{
+  0%,95%,100%{opacity:1;}
+  96%{opacity:.8;}
+  97%{opacity:1;}
+  98%{opacity:.6;}
+  99%{opacity:1;}
+}
+
+.hero-sub{
+  font-family:'VT323',monospace;
+  font-size:1.5rem;
+  color:var(--dim);
+  letter-spacing:.08em;
+  margin-bottom:28px;
+}
+
+.hero-status{
+  display:inline-flex;flex-direction:column;gap:3px;
+  background:rgba(0,255,65,.04);
+  border:1px solid var(--border);
+  padding:14px 24px;
+  border-radius:var(--r);
+  text-align:left;
+  font-size:.7rem;
+  color:var(--muted);
+}
+.hs-line{display:flex;gap:8px;}
+.hs-line .ok{color:var(--glow);}
+.hs-line .label{color:var(--text2);}
+.cursor{
+  display:inline-block;width:8px;height:14px;
+  background:var(--glow);
+  animation:blink .8s step-end infinite;
+  vertical-align:middle;
+  margin-left:2px;
+  box-shadow:0 0 6px var(--glow);
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ══════════════════════════════════════
+   STICKY NAV — command bar style
+══════════════════════════════════════ */
+.cmdbar{
+  position:sticky;top:0;z-index:200;
+  background:rgba(2,8,4,.95);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+.cmdbar::-webkit-scrollbar{display:none;}
+.cmdbar-inner{
+  display:flex;max-width:500px;margin:0 auto;
+  align-items:center;
+  min-width:max-content;
+}
+.cmdbar-prompt{
+  padding:0 14px;
+  font-family:'VT323',monospace;font-size:1.1rem;
+  color:var(--dim);white-space:nowrap;
+  border-right:1px solid var(--border);
+}
+.cmdbar a{
+  display:flex;align-items:center;gap:5px;
+  padding:11px 14px;
+  font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.cmdbar a:hover{color:var(--glow);border-bottom-color:var(--glow);background:rgba(0,255,65,.04);}
+.cmdbar a .n{
+  font-family:'VT323',monospace;font-size:.9rem;
+  background:var(--surface2);color:var(--dim);
+  padding:0 5px;border-radius:3px;
+}
+
+/* ══════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════ */
+.wrap{max-width:1000px;margin:0 auto;padding:36px 20px 80px;}
+
+/* ══════════════════════════════════════
+   SECTION TITLES
+══════════════════════════════════════ */
+.stitle{
+  display:flex;align-items:center;gap:14px;
+  margin:60px 0 26px;
+}
+.stitle::before{
+  content:'//';
+  font-family:'VT323',monospace;font-size:1.4rem;
+  color:var(--dim);
+}
+.stitle h2{
+  font-family:'VT323',monospace;
+  font-size:1.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--glow);
+  text-shadow:0 0 8px rgba(0,255,65,.3);
+}
+.stitle-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+
+/* ══════════════════════════════════════
+   COMMANDS TABLE
+══════════════════════════════════════ */
+.cmd-table-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.cmd-table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+}
+.tbar-dots{display:flex;gap:6px;}
+.tbar-dot{width:10px;height:10px;border-radius:50%;}
+.tbar-title{
+  font-family:'VT323',monospace;font-size:.9rem;
+  color:var(--muted);letter-spacing:.1em;
+}
+.filter-row{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+.filter-row label{font-size:.68rem;color:var(--muted);white-space:nowrap;}
+#cmdFilter{
+  flex:1;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--glow);
+  font-family:'Share Tech Mono',monospace;font-size:.75rem;
+  padding:5px 10px;border-radius:4px;outline:none;
+}
+#cmdFilter:focus{border-color:var(--dim);box-shadow:0 0 8px rgba(0,255,65,.15);}
+#cmdFilter::placeholder{color:var(--muted);}
+
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--surface2);}
+th{
+  font-family:'Share Tech Mono',monospace;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);
+  padding:8px 14px;border-bottom:1px solid var(--border);text-align:left;
+}
+tbody tr{
+  cursor:pointer;transition:background .15s;
+  border-bottom:1px solid rgba(26,58,26,.4);
+}
+tbody tr:hover{background:rgba(0,255,65,.04);}
+tbody tr.highlighted{background:rgba(0,255,65,.07);border-left:3px solid var(--glow);}
+td{padding:9px 14px;font-size:.78rem;vertical-align:top;}
+td:first-child{
+  font-family:'Share Tech Mono',monospace;
+  color:var(--amber);font-weight:600;
+}
+td:nth-child(2){color:var(--dim);font-size:.73rem;}
+td:nth-child(3){color:var(--text2);font-size:.75rem;}
+
+code{
+  font-family:'Share Tech Mono',monospace;font-size:.8em;
+  background:rgba(0,255,65,.08);color:var(--glow);
+  padding:1px 5px;border-radius:3px;
+  border:1px solid rgba(0,255,65,.15);
+}
+
+/* ══════════════════════════════════════
+   TERMINAL WINDOW (reusable)
+══════════════════════════════════════ */
+.terminal{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin:14px 0;
+}
+.term-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+}
+.term-dot{width:9px;height:9px;border-radius:50%;}
+.term-title{
+  font-size:.65rem;color:var(--muted);
+  letter-spacing:.12em;text-transform:uppercase;
+  margin-left:4px;
+}
+pre{
+  padding:16px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:.76rem;line-height:1.65;
+  overflow-x:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+/* syntax tokens */
+pre .cm{color:#3a7a3a;}  /* comment */
+pre .kw{color:#ffb800;}  /* keyword/command */
+pre .st{color:#69e06f;}  /* string */
+pre .va{color:#00e5ff;}  /* variable */
+pre .op{color:#ff7c7c;}  /* operator/special */
+pre .tx{color:var(--text);}
+pre .pr{color:var(--dim);}  /* prompt */
+pre .er{color:var(--red);}  /* error */
+pre .ok{color:var(--glow);}  /* success */
+
+.term-output{
+  padding:14px 16px;
+  font-size:.74rem;color:var(--text2);
+  border-top:1px solid var(--border);
+  background:rgba(0,0,0,.3);
+}
+.term-output .prompt{color:var(--dim);}
+.term-output .out{color:var(--text);}
+.term-output .err{color:var(--red);}
+
+/* copy button */
+.term-copy{
+  margin-left:auto;
+  font-family:'Share Tech Mono',monospace;font-size:.6rem;
+  color:var(--muted);background:none;
+  border:1px solid var(--border);padding:2px 8px;border-radius:3px;
+  cursor:pointer;transition:all .2s;
+}
+.term-copy:hover{color:var(--glow);border-color:var(--dim);}
+.term-copy.ok{color:var(--glow);border-color:var(--glow);}
+
+/* ══════════════════════════════════════
+   ACTIVITY CARDS
+══════════════════════════════════════ */
+.act-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  margin-bottom:16px;
+  overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.act-card:hover{
+  border-color:var(--dim);
+  box-shadow:0 0 16px rgba(0,255,65,.06);
+}
+.act-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 18px;cursor:pointer;user-select:none;
+}
+.act-num{
+  font-family:'VT323',monospace;font-size:1.4rem;
+  color:var(--bg);
+  background:var(--dim);
+  width:36px;height:36px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 10px rgba(0,179,44,.4);
+}
+.act-info h3{
+  font-family:'Rajdhani',sans-serif;
+  font-size:.98rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+.act-info small{font-size:.68rem;color:var(--muted);}
+.act-status{
+  margin-left:auto;
+  font-size:.65rem;letter-spacing:.1em;
+  padding:3px 9px;border-radius:3px;flex-shrink:0;
+}
+.act-status.solved{
+  background:rgba(0,255,65,.08);color:var(--dim);
+  border:1px solid rgba(0,255,65,.2);
+}
+.act-status.proposed{
+  background:rgba(0,229,255,.06);color:var(--cyan);
+  border:1px solid rgba(0,229,255,.2);
+}
+.act-chev{color:var(--muted);transition:transform .3s;flex-shrink:0;}
+.act-card.open .act-chev{transform:rotate(180deg);}
+
+.act-body{
+  display:none;
+  border-top:1px solid var(--border);
+  padding:18px;
+}
+.act-card.open .act-body{display:block;}
+.act-body > * + *{margin-top:14px;}
+
+p,.act-body p{font-size:.82rem;color:var(--text2);}
+strong{color:var(--text);}
+
+/* ══════════════════════════════════════
+   CALLOUT / ENUNCIADO
+══════════════════════════════════════ */
+.enunciado{
+  background:rgba(0,229,255,.04);
+  border:1px solid rgba(0,229,255,.2);
+  border-left:3px solid var(--cyan);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:12px 16px;
+  font-size:.82rem;color:var(--text2);
+}
+.enunciado strong{color:var(--cyan);}
+.enunciado::before{
+  content:'ENUNCIADO  ';
+  font-size:.62rem;letter-spacing:.18em;
+  color:var(--cyan);opacity:.7;
+  display:block;margin-bottom:6px;
+}
+
+.hint-box{
+  background:rgba(255,184,0,.05);
+  border:1px solid rgba(255,184,0,.2);
+  border-left:3px solid var(--amber);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:10px 14px;
+  font-size:.78rem;color:rgba(255,184,0,.85);
+}
+.hint-box::before{content:'// PISTA: ';color:var(--amber);font-weight:600;}
+
+/* ══════════════════════════════════════
+   SOLUTION TOGGLE
+══════════════════════════════════════ */
+.sol-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Share Tech Mono',monospace;font-size:.72rem;
+  color:var(--muted);background:var(--surface2);
+  border:1px solid var(--border);
+  padding:7px 14px;border-radius:var(--r);
+  cursor:pointer;transition:all .2s;
+  letter-spacing:.08em;
+}
+.sol-btn:hover{color:var(--glow);border-color:var(--dim);box-shadow:0 0 8px rgba(0,255,65,.1);}
+.sol-btn.open{
+  color:var(--glow);border-color:var(--glow);
+  background:rgba(0,255,65,.05);
+  box-shadow:0 0 10px rgba(0,255,65,.12);
+}
+.sol-btn::before{content:'[';color:var(--dim);}
+.sol-btn::after{content:']';color:var(--dim);}
+.sol-block{display:none;margin-top:10px;}
+.sol-block.visible{display:block;}
+
+/* interactive sim btn */
+.sim-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;
+  color:var(--dim);background:transparent;
+  border:1px solid var(--border);
+  padding:6px 12px;border-radius:4px;
+  cursor:pointer;transition:all .2s;margin-right:8px;
+}
+.sim-btn:hover{color:var(--amber);border-color:var(--amber);}
+
+/* ══════════════════════════════════════
+   MINI TERMINAL SIMULATOR
+══════════════════════════════════════ */
+.sim-terminal{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin-top:10px;
+}
+.sim-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  font-size:.63rem;color:var(--muted);letter-spacing:.1em;
+}
+.sim-bar .live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--glow);
+  box-shadow:0 0 5px var(--glow);
+  animation:blink .8s step-end infinite;
+}
+.sim-output{
+  padding:12px 14px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:.74rem;line-height:1.8;
+  min-height:80px;
+}
+.sim-input-row{
+  display:flex;align-items:center;
+  padding:8px 14px;
+  border-top:1px solid var(--border);
+  background:rgba(0,0,0,.2);
+  gap:8px;
+}
+.sim-prompt-lbl{color:var(--dim);font-size:.72rem;white-space:nowrap;}
+.sim-input{
+  flex:1;background:none;border:none;outline:none;
+  font-family:'Share Tech Mono',monospace;font-size:.74rem;
+  color:var(--glow);caret-color:var(--glow);
+}
+.sim-run-btn{
+  font-family:'Share Tech Mono',monospace;font-size:.65rem;
+  color:var(--bg);background:var(--dim);
+  border:none;padding:4px 10px;border-radius:3px;
+  cursor:pointer;transition:background .15s;white-space:nowrap;
+}
+.sim-run-btn:hover{background:var(--glow);}
+
+/* output line types */
+.sline-prompt{color:var(--dim);}
+.sline-out{color:var(--text);}
+.sline-ok{color:var(--glow);}
+.sline-err{color:var(--red);}
+.sline-info{color:var(--amber);}
+
+/* ══════════════════════════════════════
+   STRUCTURE INFO BOX
+══════════════════════════════════════ */
+.struct-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin:14px 0;
+}
+.struct-header{
+  padding:8px 14px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+}
+
+/* ══════════════════════════════════════
+   EVALUATION BAR
+══════════════════════════════════════ */
+.eval-grid{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+.eval-row{
+  display:flex;align-items:center;gap:12px;
+}
+.eval-label{
+  font-size:.74rem;color:var(--text2);
+  flex:0 0 220px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.eval-bar-wrap{
+  flex:1;height:20px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:3px;overflow:hidden;position:relative;
+}
+.eval-bar{
+  height:100%;
+  background:linear-gradient(to right,var(--dim),var(--glow));
+  border-radius:3px;
+  position:relative;
+  transition:width 1.2s ease;
+  box-shadow:0 0 8px rgba(0,255,65,.3);
+}
+.eval-bar::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 50%,rgba(255,255,255,.08) 100%);
+}
+.eval-pts{
+  font-family:'VT323',monospace;font-size:1rem;
+  color:var(--glow);min-width:50px;text-align:right;
+  text-shadow:0 0 6px rgba(0,255,65,.4);
+}
+.eval-total{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid var(--border);
+  font-family:'VT323',monospace;font-size:1.3rem;
+  color:var(--glow);
+  text-shadow:0 0 10px rgba(0,255,65,.4);
+}
+
+/* ══════════════════════════════════════
+   RESOURCES
+══════════════════════════════════════ */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:480px){.res-grid{grid-template-columns:1fr;}}
+.res-link{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);text-decoration:none;
+  color:var(--text2);font-size:.78rem;
+  transition:all .2s;
+}
+.res-link:hover{border-color:var(--dim);color:var(--glow);box-shadow:0 0 10px rgba(0,255,65,.08);}
+.res-link::before{content:'> ';color:var(--dim);}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+.footer{
+  text-align:center;
+  padding:24px;border-top:1px solid var(--border);
+  font-size:.68rem;color:var(--muted);letter-spacing:.08em;
+}
+
+/* ══════════════════════════════════════
+   MISC
+══════════════════════════════════════ */
+.tag{
+  display:inline-block;
+  font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 8px;border-radius:3px;
+  background:rgba(0,255,65,.06);color:var(--dim);
+  border:1px solid rgba(0,255,65,.15);
+  margin:2px;
+}
+.tag.amber{background:rgba(255,184,0,.06);color:var(--amber);border-color:rgba(255,184,0,.2);}
+.tag.cyan{background:rgba(0,229,255,.06);color:var(--cyan);border-color:rgba(0,229,255,.2);}
+.tag.red{background:rgba(255,60,60,.06);color:var(--red);border-color:rgba(255,60,60,.2);}
+
+.inline-note{
+  font-size:.78rem;color:var(--muted);
+  padding:8px 12px;border-left:2px solid var(--border);
+  margin:10px 0;
+}
+.inline-note strong{color:var(--text2);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:580px){.two-col{grid-template-columns:1fr;}}
+
+/* entry animations */
+.act-card{animation:fadeup .4s ease both;}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.act-card:nth-child(1){animation-delay:.03s}
+.act-card:nth-child(2){animation-delay:.07s}
+.act-card:nth-child(3){animation-delay:.11s}
+.act-card:nth-child(4){animation-delay:.15s}
+.act-card:nth-child(5){animation-delay:.19s}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div><div class="hero-corner br"></div>
+
+  <span class="boot-tag">Sistemas Informáticos &nbsp;·&nbsp; 1º DAW &nbsp;·&nbsp; Windows CMD</span>
+  <h1>SCRIPTS<br>BATCH</h1>
+  <div class="hero-sub">Automatización · .BAT · CMD · Windows</div>
+  <div class="hero-status">
+    <div class="hs-line"><span class="ok">[OK]</span><span class="label">Sistema cargado &nbsp;·&nbsp; CMD disponible</span></div>
+    <div class="hs-line"><span class="ok">[OK]</span><span class="label">5 actividades &nbsp;·&nbsp; 5 propuestas &nbsp;·&nbsp; 14 comandos</span></div>
+    <div class="hs-line"><span class="ok">[  ]</span><span class="label">Listo para ejecutar<span class="cursor"></span></span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="cmdbar">
+  <div class="cmdbar-inner">
+    <div class="cmdbar-prompt">C:\DAW&gt;</div>
+    <a href="#s1"><span class="n">01</span> Comandos</a>
+    <a href="#s2"><span class="n">02</span> Estructura</a>
+    <a href="#s3"><span class="n">03</span> Actividades</a>
+    <a href="#s4"><span class="n">04</span> Propuestas</a>
+    <a href="#s6"><span class="n">05</span> Recursos</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ S1: TABLA DE COMANDOS ══ -->
+<div id="s1">
+  <div class="stitle"><h2>Referencia de Comandos</h2><div class="stitle-line"></div></div>
+  <p style="margin-bottom:14px">Haz clic en cualquier fila para destacar el comando. Filtra escribiendo en el buscador.</p>
+
+  <div class="cmd-table-wrap">
+    <div class="cmd-table-header">
+      <div class="tbar-dots">
+        <div class="tbar-dot" style="background:#ff5f57"></div>
+        <div class="tbar-dot" style="background:#febc2e;margin-left:5px"></div>
+        <div class="tbar-dot" style="background:#28c840;margin-left:5px"></div>
+      </div>
+      <span class="tbar-title">batch_commands.ref</span>
+    </div>
+    <div class="filter-row">
+      <label>FILTRAR &gt;</label>
+      <input type="text" id="cmdFilter" placeholder="escribe para buscar..." oninput="filterTable()">
+    </div>
+    <table id="cmdTable">
+      <thead>
+        <tr>
+          <th>Comando</th>
+          <th>Sintaxis básica</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="hlRow(this)"><td>echo</td><td><code>echo "texto"</code></td><td>Muestra texto por pantalla</td></tr>
+        <tr onclick="hlRow(this)"><td>@echo off</td><td><code>@echo off</code></td><td>Oculta los comandos mientras se ejecutan</td></tr>
+        <tr onclick="hlRow(this)"><td>set /p</td><td><code>set /p var="Mensaje: "</code></td><td>Captura entrada del usuario</td></tr>
+        <tr onclick="hlRow(this)"><td>set /a</td><td><code>set /a resultado=5+3</code></td><td>Realiza operaciones aritméticas</td></tr>
+        <tr onclick="hlRow(this)"><td>if</td><td><code>if condición comando</code></td><td>Ejecuta condicionalmente</td></tr>
+        <tr onclick="hlRow(this)"><td>if /i</td><td><code>if /i "%var%"=="S"</code></td><td>Comparación sin distinción mayúsc/min</td></tr>
+        <tr onclick="hlRow(this)"><td>if defined</td><td><code>if defined variable</code></td><td>Comprueba si existe una variable</td></tr>
+        <tr onclick="hlRow(this)"><td>if exist</td><td><code>if exist "archivo.txt"</code></td><td>Comprueba si existe un archivo en disco</td></tr>
+        <tr onclick="hlRow(this)"><td>goto + :etiqueta</td><td><code>goto :inicio</code></td><td>Salta a una etiqueta dentro del script</td></tr>
+        <tr onclick="hlRow(this)"><td>%1, %2, %3…</td><td><code>echo %1</code></td><td>Parámetros pasados al script al llamarlo</td></tr>
+        <tr onclick="hlRow(this)"><td>shutdown</td><td><code>shutdown /s /t 10</code></td><td>Apaga el equipo (10 segundos de espera)</td></tr>
+        <tr onclick="hlRow(this)"><td>del</td><td><code>del "archivo.txt"</code></td><td>Elimina un archivo del sistema</td></tr>
+        <tr onclick="hlRow(this)"><td>exit</td><td><code>exit</code> / <code>exit /b</code></td><td>Termina el script (o solo el bloque con /b)</td></tr>
+        <tr onclick="hlRow(this)"><td>pause</td><td><code>pause</code></td><td>Pausa la ejecución hasta que se pulsa una tecla</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ S2: ESTRUCTURA BÁSICA ══ -->
+<div id="s2">
+  <div class="stitle"><h2>Estructura de un Script</h2><div class="stitle-line"></div></div>
+  <p>Todo script .bat bien escrito sigue esta estructura mínima:</p>
+
+  <div class="terminal">
+    <div class="term-bar">
+      <div class="term-dot" style="background:#ff5f57"></div>
+      <div class="term-dot" style="background:#febc2e;margin-left:4px"></div>
+      <div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+      <span class="term-title">estructura_basica.bat</span>
+      <button class="term-copy" onclick="cp(this)">COPY</button>
+    </div>
+    <pre><span class="kw">@echo off</span>                 <span class="cm">:: Oculta los comandos al ejecutarse</span>
+<span class="cm">:: ────────────────────────────────</span>
+<span class="cm">:: Aquí va el código del script</span>
+<span class="cm">:: ────────────────────────────────</span>
+<span class="kw">pause</span>                     <span class="cm">:: Espera pulsación antes de cerrar</span>
+<span class="kw">exit /b</span>                   <span class="cm">:: Termina el script limpiamente</span></pre>
+  </div>
+
+  <div class="two-col" style="margin-top:14px">
+    <div class="struct-box">
+      <div class="struct-header">VARIABLES — sintaxis</div>
+      <div style="padding:12px">
+        <div class="terminal">
+          <pre><span class="cm">:: Declarar y leer</span>
+<span class="kw">set</span> <span class="va">nombre</span>=Juan
+<span class="kw">echo</span> Hola <span class="va">%nombre%</span>
+
+<span class="cm">:: Pedir al usuario</span>
+<span class="kw">set /p</span> <span class="va">respuesta</span>=<span class="st">"¿Continuar? "</span>
+
+<span class="cm">:: Aritmética</span>
+<span class="kw">set /a</span> <span class="va">total</span>=%1 + %2</pre>
+        </div>
+      </div>
+    </div>
+    <div class="struct-box">
+      <div class="struct-header">CONDICIONALES + BUCLES</div>
+      <div style="padding:12px">
+        <div class="terminal">
+          <pre><span class="cm">:: if básico</span>
+<span class="kw">if</span> <span class="st">"%var%"</span>==<span class="st">"S"</span> <span class="kw">echo</span> Sí
+
+<span class="cm">:: if/else</span>
+<span class="kw">if</span> <span class="kw">exist</span> <span class="st">"f.txt"</span> (
+  <span class="kw">echo</span> Existe
+) <span class="kw">else</span> (
+  <span class="kw">echo</span> No existe
+)
+
+<span class="cm">:: "Bucle" con goto</span>
+<span class="op">:inicio</span>
+<span class="kw">set /p</span> <span class="va">v</span>=<span class="st">"Valor: "</span>
+<span class="kw">if</span> <span class="st">"%v%"</span>==<span class="st">""</span> <span class="kw">goto</span> <span class="op">:inicio</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S3: ACTIVIDADES 6-10 ══ -->
+<div id="s3">
+  <div class="stitle"><h2>Actividades Resueltas</h2><div class="stitle-line"></div></div>
+
+  <!-- ACT 6 -->
+  <div class="act-card open">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">103</div>
+      <div class="act-info">
+        <h3>Apagado Voluntario</h3>
+        <small>shutdown · if /i · exit /b</small>
+      </div>
+      <span class="act-status solved">RESUELTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Pregunta al usuario si desea apagar el equipo (<strong>S/N</strong>). Si responde S → apaga a los 10 segundos. Si responde N → cierra sin hacer nada. Si otro valor → avisa del error.</div>
+
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div>
+          <div class="term-dot" style="background:#febc2e;margin-left:4px"></div>
+          <div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+          <span class="term-title">apagar.bat</span>
+          <button class="term-copy" onclick="cp(this)">COPY</button>
+        </div>
+        <pre><span class="kw">@echo off</span>
+<span class="kw">set /p</span> <span class="va">respuesta</span>=<span class="st">"¿Desea apagar el equipo? (S/N): "</span>
+<span class="kw">if /i</span> <span class="st">"%respuesta%"</span>==<span class="st">"S"</span> (
+    <span class="kw">echo</span> Apagando el equipo en 10 segundos...
+    <span class="kw">shutdown /s /t</span> 10
+) <span class="kw">else if /i</span> <span class="st">"%respuesta%"</span>==<span class="st">"N"</span> (
+    <span class="kw">echo</span> No se apagará el equipo.
+    <span class="kw">exit /b</span>
+) <span class="kw">else</span> (
+    <span class="kw">echo</span> Opción no válida. Ejecute de nuevo el programa.
+)</pre>
+      </div>
+
+      <p><strong>Simulador — prueba las tres respuestas:</strong></p>
+      <div class="sim-terminal" id="sim6">
+        <div class="sim-bar">
+          <div class="live-dot"></div>&nbsp;SIMULADOR INTERACTIVO &nbsp;·&nbsp; apagar.bat
+        </div>
+        <div class="sim-output" id="sim6out">
+          <span class="sline-prompt">C:\DAW&gt; apagar.bat</span><br>
+          <span class="sline-info">¿Desea apagar el equipo? (S/N):</span>
+        </div>
+        <div class="sim-input-row">
+          <span class="sim-prompt-lbl">ENTRADA &gt;</span>
+          <input class="sim-input" id="sim6inp" placeholder="escribe S, N u otra cosa..." onkeydown="if(event.key==='Enter')runSim6()">
+          <button class="sim-run-btn" onclick="runSim6()">EJECUTAR</button>
+        </div>
+      </div>
+
+      <div class="inline-note"><strong>// if /i</strong> hace la comparación insensible a mayúsculas: acepta tanto <code>s</code> como <code>S</code>. Sin <code>/i</code> sería necesario hacer dos comparaciones.</div>
+    </div>
+  </div>
+
+  <!-- ACT 7 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">218</div>
+      <div class="act-info">
+        <h3>Presentación Personal con Validación</h3>
+        <small>set /p · goto · if · robustez</small>
+      </div>
+      <span class="act-status solved">RESUELTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Pide nombre, apellidos y edad. Muestra: <em>"Hola [nombre] [apellidos], tienes [edad] años."</em> Si el usuario no introduce algún campo, el script debe <strong>repetir la pregunta</strong> informando del error.</div>
+
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+          <span class="term-title">presentacion.bat</span>
+          <button class="term-copy" onclick="cp(this)">COPY</button>
+        </div>
+        <pre><span class="kw">@echo off</span>
+
+<span class="op">:pedir_nombre</span>
+<span class="kw">set /p</span> <span class="va">nombre</span>=<span class="st">"Introduce tu nombre: "</span>
+<span class="kw">if</span> <span class="st">"%nombre%"</span>==<span class="st">""</span> (
+    <span class="kw">echo</span> No introdujiste ningun nombre. Intentalo de nuevo.
+    <span class="kw">goto</span> <span class="op">pedir_nombre</span>
+)
+
+<span class="op">:pedir_apellidos</span>
+<span class="kw">set /p</span> <span class="va">apellidos</span>=<span class="st">"Introduce tus apellidos: "</span>
+<span class="kw">if</span> <span class="st">"%apellidos%"</span>==<span class="st">""</span> (
+    <span class="kw">echo</span> No introdujiste ningun apellido. Intentalo de nuevo.
+    <span class="kw">goto</span> <span class="op">pedir_apellidos</span>
+)
+
+<span class="op">:pedir_edad</span>
+<span class="kw">set /p</span> <span class="va">edad</span>=<span class="st">"Introduce tu edad: "</span>
+<span class="kw">if</span> <span class="st">"%edad%"</span>==<span class="st">""</span> (
+    <span class="kw">echo</span> No introdujiste ninguna edad. Intentalo de nuevo.
+    <span class="kw">goto</span> <span class="op">pedir_edad</span>
+)
+
+<span class="kw">echo.</span>
+<span class="kw">echo</span> Hola <span class="va">%nombre%</span> <span class="va">%apellidos%</span>, tienes <span class="va">%edad%</span> años.
+<span class="kw">pause</span></pre>
+      </div>
+
+      <div class="inline-note"><strong>// El patrón goto</strong> funciona como un bucle: si la condición no se cumple, vuelve a la etiqueta (<code>:pedir_nombre</code>). No existe <code>while</code> nativo en Batch — este es el idiom equivalente.</div>
+    </div>
+  </div>
+
+  <!-- ACT 8 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">024</div>
+      <div class="act-info">
+        <h3>Borrado Seguro de Fichero</h3>
+        <small>%1 · if exist · del · validación</small>
+      </div>
+      <span class="act-status solved">RESUELTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Script <code>borrar.bat</code> que recibe un archivo como parámetro (<code>%1</code>). Debe comprobar: 1) que se pasó parámetro, 2) que el archivo existe. Si existe → lo borra. Si no → informa.</div>
+
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+          <span class="term-title">borrar.bat</span>
+          <button class="term-copy" onclick="cp(this)">COPY</button>
+        </div>
+        <pre><span class="kw">@echo off</span>
+
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: No se ha introducido ningun parametro.
+    <span class="kw">echo</span> Uso correcto: borrar.bat <span class="st">"nombre_del_archivo"</span>
+    <span class="kw">exit /b</span>
+)
+
+<span class="kw">if exist</span> <span class="st">"%1"</span> (
+    <span class="kw">echo</span> El archivo <span class="st">"%1"</span> existe. Procediendo a borrarlo...
+    <span class="kw">del</span> <span class="st">"%1"</span>
+    <span class="ok">echo</span> Archivo borrado correctamente.
+) <span class="kw">else</span> (
+    <span class="er">echo</span> ERROR: El archivo <span class="st">"%1"</span> no existe en el sistema.
+)
+<span class="kw">pause</span></pre>
+      </div>
+
+      <div class="term-output">
+        <div class="prompt">C:\&gt; borrar.bat prueba.txt</div>
+        <div class="out">El archivo "prueba.txt" existe. Procediendo a borrarlo...</div>
+        <div class="out" style="color:var(--glow)">Archivo borrado correctamente.</div>
+        <div class="out" style="color:var(--muted)">Presione una tecla para continuar . . .</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACT 9 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">A57</div>
+      <div class="act-info">
+        <h3>Calculadora de Suma por Parámetros</h3>
+        <small>%1 · %2 · set /a · validación doble</small>
+      </div>
+      <span class="act-status solved">RESUELTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Script <code>suma.bat</code> que recibe 2 números como parámetros y devuelve su suma. Ejemplo: <code>suma.bat 4 5</code> → <em>"El resultado de sumar 4 y 5 es: 9"</em></div>
+
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+          <span class="term-title">suma.bat</span>
+          <button class="term-copy" onclick="cp(this)">COPY</button>
+        </div>
+        <pre><span class="kw">@echo off</span>
+
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Debes introducir dos numeros.
+    <span class="kw">echo</span> Uso: suma.bat numero1 numero2
+    <span class="kw">exit /b</span>
+)
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Faltan parametros. Debes introducir dos numeros.
+    <span class="kw">exit /b</span>
+)
+
+<span class="kw">set /a</span> <span class="va">resultado</span>=%1 + %2
+<span class="kw">echo</span> El resultado de sumar %1 y %2 es: <span class="va">%resultado%</span>
+<span class="kw">pause</span></pre>
+      </div>
+
+      <p><strong>Simulador — introduce dos números:</strong></p>
+      <div class="sim-terminal">
+        <div class="sim-bar"><div class="live-dot"></div>&nbsp;SIMULADOR · suma.bat</div>
+        <div style="padding:10px 14px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:6px;font-size:.74rem">
+            <label style="color:var(--muted)">%1 &gt;</label>
+            <input id="s9n1" type="number" placeholder="4"
+              style="width:60px;background:var(--bg2);border:1px solid var(--border);color:var(--glow);font-family:'Share Tech Mono',monospace;font-size:.74rem;padding:4px 8px;border-radius:3px;outline:none;">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.74rem">
+            <label style="color:var(--muted)">%2 &gt;</label>
+            <input id="s9n2" type="number" placeholder="5"
+              style="width:60px;background:var(--bg2);border:1px solid var(--border);color:var(--glow);font-family:'Share Tech Mono',monospace;font-size:.74rem;padding:4px 8px;border-radius:3px;outline:none;">
+          </div>
+          <button class="sim-run-btn" onclick="runSim9()">EJECUTAR suma.bat</button>
+        </div>
+        <div class="sim-output" id="sim9out" style="min-height:50px">
+          <span class="sline-info">Introduce dos números y pulsa EJECUTAR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ S4: ACTIVIDADES PROPUESTAS ══ -->
+<div id="s4">
+  <div class="stitle"><h2>Actividades Propuestas</h2><div class="stitle-line"></div></div>
+  <p style="margin-bottom:16px">Intenta resolverlas por tu cuenta antes de ver la solución.</p>
+
+  <!-- PROP 1 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num" style="background:rgba(0,229,255,.2);color:var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.2)">P1</div>
+      <div class="act-info">
+        <h3>Comprobador de Paridad</h3>
+        <small>%1 · set /a · %% · equ</small>
+      </div>
+      <span class="act-status proposed">PROPUESTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Crea <code>paridad.bat</code> que reciba un número como parámetro y muestre si es <strong>par</strong> o <strong>impar</strong>. Comprueba que se introdujo parámetro.</div>
+      <div class="hint-box">Operador módulo en Batch: <code>set /a resto=%1 %% 2</code> — si resto equ 0 → PAR</div>
+
+      <button class="sol-btn" onclick="toggleSol(this)"> VER SOLUCIÓN </button>
+      <div class="sol-block">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+            <span class="term-title">paridad.bat — SOLUCIÓN</span>
+            <button class="term-copy" onclick="cp(this)">COPY</button>
+          </div>
+          <pre><span class="kw">@echo off</span>
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Debes introducir un numero.
+    <span class="kw">echo</span> Uso: paridad.bat numero
+    <span class="kw">exit /b</span>
+)
+
+<span class="kw">set /a</span> <span class="va">resto</span>=%1 %% 2
+<span class="kw">if</span> <span class="va">%resto%</span> equ 0 (
+    <span class="ok">echo</span> %1 es un numero PAR.
+) <span class="kw">else</span> (
+    <span class="kw">echo</span> %1 es un numero IMPAR.
+)
+<span class="kw">pause</span></pre>
+        </div>
+        <div class="inline-note"><strong>// %%</strong> — en un .bat hay que escapar el módulo como <code>%%</code>. En CMD directamente sería <code>%</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROP 2 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num" style="background:rgba(0,229,255,.2);color:var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.2)">P2</div>
+      <div class="act-info">
+        <h3>Copia de Seguridad</h3>
+        <small>%1 · %2 · if exist · copy</small>
+      </div>
+      <span class="act-status proposed">PROPUESTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Crea <code>copia.bat</code> con dos parámetros (origen y destino). Comprueba que existen ambos parámetros y que el archivo origen existe. Si todo OK → copia con <code>copy</code>.</div>
+      <div class="hint-box">Uso: <code>copia.bat origen.txt destino.txt</code> — informa de cada paso al usuario</div>
+
+      <button class="sol-btn" onclick="toggleSol(this)"> VER SOLUCIÓN </button>
+      <div class="sol-block">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+            <span class="term-title">copia.bat — SOLUCIÓN</span>
+            <button class="term-copy" onclick="cp(this)">COPY</button>
+          </div>
+          <pre><span class="kw">@echo off</span>
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Falta archivo origen.
+    <span class="kw">exit /b</span>
+)
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Falta archivo destino.
+    <span class="kw">exit /b</span>
+)
+<span class="kw">if not exist</span> <span class="st">"%1"</span> (
+    <span class="er">echo</span> ERROR: El archivo origen <span class="st">"%1"</span> no existe.
+    <span class="kw">exit /b</span>
+)
+
+<span class="kw">copy</span> <span class="st">"%1"</span> <span class="st">"%2"</span>
+<span class="ok">echo</span> Copia realizada de <span class="st">"%1"</span> a <span class="st">"%2"</span>.
+<span class="kw">pause</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROP 3 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num" style="background:rgba(0,229,255,.2);color:var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.2)">P3</div>
+      <div class="act-info">
+        <h3>Menú Interactivo</h3>
+        <small>goto · cls · date /t · time /t</small>
+      </div>
+      <span class="act-status proposed">PROPUESTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Crea <code>menu.bat</code> con un menú de 3 opciones: 1) Mostrar fecha, 2) Mostrar hora, 3) Salir. Si opción inválida → volver al menú.</div>
+      <div class="hint-box">Usa <code>:menu</code> como etiqueta + <code>goto menu</code> para volver. <code>cls</code> limpia la pantalla antes de mostrar el menú.</div>
+
+      <button class="sol-btn" onclick="toggleSol(this)"> VER SOLUCIÓN </button>
+      <div class="sol-block">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+            <span class="term-title">menu.bat — SOLUCIÓN</span>
+            <button class="term-copy" onclick="cp(this)">COPY</button>
+          </div>
+          <pre><span class="kw">@echo off</span>
+<span class="op">:menu</span>
+<span class="kw">cls</span>
+<span class="kw">echo</span> ====================
+<span class="kw">echo</span>        MENU
+<span class="kw">echo</span> ====================
+<span class="kw">echo</span> 1. Mostrar fecha
+<span class="kw">echo</span> 2. Mostrar hora
+<span class="kw">echo</span> 3. Salir
+<span class="kw">echo</span> ====================
+<span class="kw">set /p</span> <span class="va">opcion</span>=<span class="st">"Elige una opcion (1-3): "</span>
+
+<span class="kw">if</span> <span class="st">"%opcion%"</span>==<span class="st">"1"</span> (
+    <span class="kw">echo</span> Fecha actual:
+    <span class="kw">date /t</span>
+    <span class="kw">pause</span>
+    <span class="kw">goto</span> <span class="op">menu</span>
+)
+<span class="kw">if</span> <span class="st">"%opcion%"</span>==<span class="st">"2"</span> (
+    <span class="kw">echo</span> Hora actual:
+    <span class="kw">time /t</span>
+    <span class="kw">pause</span>
+    <span class="kw">goto</span> <span class="op">menu</span>
+)
+<span class="kw">if</span> <span class="st">"%opcion%"</span>==<span class="st">"3"</span> (
+    <span class="kw">echo</span> Saliendo del programa...
+    <span class="kw">exit /b</span>
+)
+<span class="er">echo</span> Opcion no valida. Intentalo de nuevo.
+<span class="kw">pause</span>
+<span class="kw">goto</span> <span class="op">menu</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROP 4 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num" style="background:rgba(0,229,255,.2);color:var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.2)">P4</div>
+      <div class="act-info">
+        <h3>Borrado Múltiple con Confirmación</h3>
+        <small>shift · goto · if exist · set /p</small>
+      </div>
+      <span class="act-status proposed">PROPUESTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Crea <code>borrarmulti.bat</code> que reciba varios archivos como parámetros y los borre uno a uno, preguntando antes de cada borrado: <em>"¿Borrar archivo X? (S/N)"</em></div>
+      <div class="hint-box">Clave: <code>shift</code> desplaza los parámetros (%2→%1, %3→%2…). Cuando <code>%1</code> queda vacío, se han procesado todos.</div>
+
+      <button class="sol-btn" onclick="toggleSol(this)"> VER SOLUCIÓN </button>
+      <div class="sol-block">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+            <span class="term-title">borrarmulti.bat — SOLUCIÓN</span>
+            <button class="term-copy" onclick="cp(this)">COPY</button>
+          </div>
+          <pre><span class="kw">@echo off</span>
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: No se introdujeron archivos para borrar.
+    <span class="kw">exit /b</span>
+)
+
+<span class="op">:borrar_siguiente</span>
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> <span class="kw">goto</span> <span class="op">fin</span>
+<span class="kw">if exist</span> <span class="st">"%1"</span> (
+    <span class="kw">set /p</span> <span class="va">resp</span>=<span class="st">"¿Borrar '%1'? (S/N): "</span>
+    <span class="kw">if /i</span> <span class="st">"!resp!"</span>==<span class="st">"S"</span> (
+        <span class="kw">del</span> <span class="st">"%1"</span>
+        <span class="ok">echo</span> <span class="st">"%1"</span> borrado.
+    ) <span class="kw">else</span> (
+        <span class="kw">echo</span> <span class="st">"%1"</span> no borrado.
+    )
+) <span class="kw">else</span> (
+    <span class="er">echo</span> <span class="st">"%1"</span> no existe.
+)
+<span class="kw">shift</span>
+<span class="kw">goto</span> <span class="op">borrar_siguiente</span>
+
+<span class="op">:fin</span>
+<span class="kw">pause</span></pre>
+        </div>
+        <div class="inline-note"><strong>// shift</strong> — mueve los parámetros: %2 pasa a ser %1, %3 pasa a ser %2, etc. Cuando no quedan más, %1 está vacío y el bucle termina.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROP 5 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num" style="background:rgba(0,229,255,.2);color:var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.2)">P5</div>
+      <div class="act-info">
+        <h3>Calculadora Básica (4 operaciones)</h3>
+        <small>%1 %2 %3 · set /a · operadores</small>
+      </div>
+      <span class="act-status proposed">PROPUESTA</span>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="enunciado">Crea <code>calculadora.bat</code> con tres parámetros: <code>calculadora.bat 5 + 3</code> → <em>"Resultado: 8"</em>. Soporta <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>. Error si operador inválido.</div>
+      <div class="hint-box">Usa cuatro <code>if</code> independientes, uno por operador. Si ninguno matchea → operador inválido.</div>
+
+      <button class="sol-btn" onclick="toggleSol(this)"> VER SOLUCIÓN </button>
+      <div class="sol-block">
+        <div class="terminal">
+          <div class="term-bar">
+            <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e;margin-left:4px"></div><div class="term-dot" style="background:#28c840;margin-left:4px"></div>
+            <span class="term-title">calculadora.bat — SOLUCIÓN</span>
+            <button class="term-copy" onclick="cp(this)">COPY</button>
+          </div>
+          <pre><span class="kw">@echo off</span>
+<span class="kw">if</span> <span class="st">"%1"</span>==<span class="st">""</span> (
+    <span class="kw">echo</span> Uso: calculadora.bat numero1 operador numero2
+    <span class="kw">echo</span> Operadores: +  -  *  /
+    <span class="kw">exit /b</span>
+)
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Falta el operador.
+    <span class="kw">exit /b</span>
+)
+<span class="kw">if</span> <span class="st">"%3"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> ERROR: Faltan parametros.
+    <span class="kw">exit /b</span>
+)
+
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">"+"</span> <span class="kw">set /a</span> <span class="va">res</span>=%1+%3
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">"-"</span> <span class="kw">set /a</span> <span class="va">res</span>=%1-%3
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">"*"</span> <span class="kw">set /a</span> <span class="va">res</span>=%1*%3
+<span class="kw">if</span> <span class="st">"%2"</span>==<span class="st">"/"</span> <span class="kw">set /a</span> <span class="va">res</span>=%1/%3
+
+<span class="kw">if</span> <span class="st">"%res%"</span>==<span class="st">""</span> (
+    <span class="er">echo</span> Operador no valido. Usa +, -, * o /
+) <span class="kw">else</span> (
+    <span class="ok">echo</span> Resultado: <span class="va">%res%</span>
+)
+<span class="kw">pause</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /s4 -->
+
+<!-- ══ S6: RECURSOS ══ -->
+<div id="s6">
+  <div class="stitle"><h2>Recursos Adicionales</h2><div class="stitle-line"></div></div>
+  <p style="margin-bottom:4px">Comandos de ayuda directa en CMD:</p>
+  <div class="terminal" style="margin-bottom:14px">
+    <pre><span class="pr">C:\&gt;</span> <span class="kw">help</span>              <span class="cm">-- Lista todos los comandos internos de CMD</span>
+<span class="pr">C:\&gt;</span> <span class="kw">shutdown /?</span>       <span class="cm">-- Ayuda específica del comando shutdown</span>
+<span class="pr">C:\&gt;</span> <span class="kw">del /?</span>            <span class="cm">-- Opciones del comando del</span>
+<span class="pr">C:\&gt;</span> <span class="kw">set /?</span>            <span class="cm">-- Toda la sintaxis del comando set</span></pre>
+  </div>
+
+  <div class="res-grid">
+    <a class="res-link" href="https://docs.microsoft.com/es-es/windows-server/administration/windows-commands/windows-commands" target="_blank">Microsoft Docs — Comandos Windows</a>
+    <a class="res-link" href="https://ss64.com/nt/" target="_blank">SS64.com — Referencia completa .BAT</a>
+    <a class="res-link" href="https://docs.microsoft.com/es-es/windows-server/administration/windows-commands/if" target="_blank">Referencia IF detallada</a>
+    <a class="res-link" href="https://docs.microsoft.com/es-es/windows-server/administration/windows-commands/set_1" target="_blank">Referencia SET y SET /A</a>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  SCRIPTS BATCH · SISTEMAS INFORMÁTICOS · 1º DAW<br>
+  <span style="opacity:.35;margin-top:3px;display:block">¿Dudas? Consulta con tu profesor o usa <code>comando /?</code> en CMD.</span>
+  <a style="margin-top:.4rem;" href="https://github.com/ActionPerformed/">https://github.com/ActionPerformed/</a>
+</div>
+
+<script>
+/* ══════════════════════
+   ACCORDION
+══════════════════════ */
+function toggleAct(head) {
+  head.closest('.act-card').classList.toggle('open');
+}
+
+/* ══════════════════════
+   SOLUTION TOGGLE
+══════════════════════ */
+function toggleSol(btn) {
+  const block = btn.nextElementSibling;
+  const open = block.classList.toggle('visible');
+  btn.classList.toggle('open', open);
+  btn.innerHTML = open ? ' OCULTAR ' : ' VER SOLUCIÓN ';
+}
+
+/* ══════════════════════
+   TABLE ROW HIGHLIGHT + FILTER
+══════════════════════ */
+function hlRow(row) {
+  document.querySelectorAll('#cmdTable tbody tr').forEach(r => r.classList.remove('highlighted'));
+  row.classList.add('highlighted');
+}
+function filterTable() {
+  const q = document.getElementById('cmdFilter').value.toLowerCase();
+  document.querySelectorAll('#cmdTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+/* ══════════════════════
+   COPY CODE
+══════════════════════ */
+function cp(btn) {
+  const pre = btn.closest('.terminal,.term-bar')?.closest('.terminal')?.querySelector('pre')
+           || btn.closest('.cw')?.querySelector('pre');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'OK!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* ══════════════════════
+   SIMULATOR 6 — apagar.bat
+══════════════════════ */
+function runSim6() {
+  const inp = document.getElementById('sim6inp').value.trim();
+  const out = document.getElementById('sim6out');
+  let result = '';
+  const v = inp.toLowerCase();
+  if (v === 's') {
+    result = `<span class="sline-prompt">C:\\DAW> apagar.bat</span><br>
+<span class="sline-info">¿Desea apagar el equipo? (S/N): ${inp}</span><br>
+<span class="sline-ok">Apagando el equipo en 10 segundos...</span><br>
+<span class="sline-info">[shutdown /s /t 10 — ejecutado]</span>`;
+  } else if (v === 'n') {
+    result = `<span class="sline-prompt">C:\\DAW> apagar.bat</span><br>
+<span class="sline-info">¿Desea apagar el equipo? (S/N): ${inp}</span><br>
+<span class="sline-out">No se apagará el equipo.</span>`;
+  } else if (inp === '') {
+    result = `<span class="sline-err">// Introduce S, N u otra cosa y pulsa EJECUTAR</span>`;
+  } else {
+    result = `<span class="sline-prompt">C:\\DAW> apagar.bat</span><br>
+<span class="sline-info">¿Desea apagar el equipo? (S/N): ${inp}</span><br>
+<span class="sline-err">Opción no válida. Ejecute de nuevo el programa.</span>`;
+  }
+  out.innerHTML = result;
+  document.getElementById('sim6inp').value = '';
+}
+
+/* ══════════════════════
+   SIMULATOR 9 — suma.bat
+══════════════════════ */
+function runSim9() {
+  const n1 = document.getElementById('s9n1').value;
+  const n2 = document.getElementById('s9n2').value;
+  const out = document.getElementById('sim9out');
+  if (n1 === '' && n2 === '') {
+    out.innerHTML = `<span class="sline-err">ERROR: Debes introducir dos numeros.</span><br><span class="sline-out">Uso: suma.bat numero1 numero2</span>`;
+    return;
+  }
+  if (n2 === '') {
+    out.innerHTML = `<span class="sline-err">ERROR: Faltan parametros. Debes introducir dos numeros.</span>`;
+    return;
+  }
+  const a = parseInt(n1), b = parseInt(n2);
+  out.innerHTML = `<span class="sline-prompt">C:\\DAW> suma.bat ${a} ${b}</span><br><span class="sline-ok">El resultado de sumar ${a} y ${b} es: ${a+b}</span>`;
+}
+
+</script>
+</body>
+</html>
