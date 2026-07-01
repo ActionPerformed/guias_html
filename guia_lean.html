@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lean · Guía de Introducción</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════
+   TOKENS — academic paper meets type theory
+════════════════════════════════════ */
+:root {
+  --paper:    #f7f3ea;
+  --paper2:   #efe8d8;
+  --paper3:   #e6ddc7;
+  --ink:      #241f3d;
+  --ink2:     #4a4366;
+  --line:     #d9cdab;
+  --line2:    #c9bb94;
+  --indigo:   #4b3f8f;
+  --indigo2:  #6c5ce7;
+  --violet:   #8257e5;
+  --gold:     #a9762f;
+  --green:    #1f7a4d;
+  --red:      #b6432e;
+  --code-bg:  #1e1a2e;
+  --code-text:#e8e3f5;
+  --r:        6px;
+  --rl:       12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+/* subtle paper texture */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(75,63,143,.025) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(168,118,47,.02) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+body > *{position:relative;z-index:1;}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--paper);}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--indigo);}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero{
+  padding:84px 24px 56px;
+  text-align:center;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.hero-symbol{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;color:var(--indigo2);
+  letter-spacing:.05em;
+  margin-bottom:22px;
+  opacity:.85;
+}
+.hero-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--indigo);
+  border:1px solid var(--indigo);
+  background:rgba(75,63,143,.06);
+  padding:5px 16px;border-radius:20px;
+  display:inline-block;margin-bottom:26px;
+}
+.hero h1{
+  font-family:'Source Serif 4',serif;
+  font-size:clamp(2.6rem,7vw,4.6rem);
+  font-weight:700;
+  letter-spacing:-.01em;
+  line-height:1.05;
+  margin-bottom:18px;
+  color:var(--ink);
+}
+.hero h1 em{
+  font-style:italic;
+  color:var(--indigo);
+}
+.hero-sub{
+  font-size:1rem;color:var(--ink2);
+  max-width:540px;margin:0 auto 30px;
+  font-weight:400;
+}
+.hero-badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.hbadge{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  padding:4px 12px;border-radius:5px;
+  background:var(--paper2);border:1px solid var(--line2);
+  color:var(--ink2);
+}
+
+/* ════════════════════════════════════
+   NAV
+════════════════════════════════════ */
+.snav{
+  position:sticky;top:0;z-index:300;
+  background:rgba(247,243,234,.93);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  overflow-x:auto;scrollbar-width:none;
+}
+.snav::-webkit-scrollbar{display:none;}
+.snav-inner{display:flex;max-width:980px;margin:0 auto;min-width:max-content;}
+.snav a{
+  display:flex;align-items:center;gap:6px;
+  padding:12px 16px;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.04em;
+  color:var(--ink2);text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.snav a:hover{color:var(--indigo);border-bottom-color:var(--indigo2);}
+.snav a .n{
+  background:var(--paper3);color:var(--indigo);
+  padding:1px 6px;border-radius:4px;font-size:.6rem;
+}
+
+/* ════════════════════════════════════
+   LAYOUT
+════════════════════════════════════ */
+.wrap{max-width:980px;margin:0 auto;padding:36px 22px 80px;}
+
+/* ════════════════════════════════════
+   SECTION TITLES
+════════════════════════════════════ */
+.stitle{
+  display:flex;align-items:baseline;gap:14px;
+  margin:62px 0 26px;
+}
+.stitle-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.95rem;color:var(--indigo2);
+  opacity:.6;
+}
+.stitle h2{
+  font-family:'Source Serif 4',serif;
+  font-size:1.7rem;font-weight:700;
+  color:var(--ink);
+}
+.stitle-bar{flex:1;height:1px;background:linear-gradient(to right,var(--line2),transparent);}
+
+p{font-size:.92rem;color:var(--ink2);margin-bottom:11px;}
+strong{color:var(--ink);font-weight:600;}
+em{font-style:italic;color:var(--indigo);}
+code{
+  font-family:'JetBrains Mono',monospace;font-size:.82em;
+  background:rgba(75,63,143,.08);color:var(--indigo);
+  padding:1px 6px;border-radius:4px;
+  border:1px solid rgba(75,63,143,.15);
+}
+
+/* ════════════════════════════════════
+   CONCEPT CARDS
+════════════════════════════════════ */
+.concept-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:14px 0;}
+@media(max-width:680px){.concept-row{grid-template-columns:1fr;}}
+.concept-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);padding:18px;
+  transition:all .2s;
+}
+.concept-card:hover{border-color:var(--indigo2);box-shadow:0 4px 16px rgba(75,63,143,.08);transform:translateY(-2px);}
+.cc-icon{font-size:1.5rem;margin-bottom:10px;}
+.cc-title{
+  font-family:'Source Serif 4',serif;
+  font-size:1.05rem;font-weight:600;margin-bottom:6px;
+}
+.cc-text{font-size:.82rem;color:var(--ink2);}
+
+/* ════════════════════════════════════
+   CODE BLOCKS — Lean syntax
+════════════════════════════════════ */
+.cw{
+  background:var(--code-bg);
+  border:1px solid #2d2748;
+  border-radius:var(--rl);overflow:hidden;
+  margin:14px 0;
+  box-shadow:0 4px 20px rgba(36,31,61,.12);
+}
+.cw-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid #2d2748;
+}
+.cw-dots{display:flex;gap:5px;}
+.cw-dot{width:9px;height:9px;border-radius:50%;}
+.cw-lang{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:#7c7299;margin-left:2px;
+}
+.cp-btn{
+  margin-left:auto;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  color:#7c7299;background:none;
+  border:1px solid #3a3458;padding:2px 8px;border-radius:3px;
+  cursor:pointer;transition:all .2s;
+}
+.cp-btn:hover{color:var(--indigo2);border-color:var(--indigo2);}
+.cp-btn.ok{color:#5ec98a;border-color:#5ec98a;}
+pre{
+  padding:15px;
+  font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.75;
+  overflow-x:auto;color:var(--code-text);
+  scrollbar-width:thin;scrollbar-color:#3a3458 transparent;
+}
+/* Lean syntax tokens */
+pre .kw  {color:#c792ea;}  /* keyword: def, example, theorem, by */
+pre .tac {color:#82aaff;}  /* tactic: rfl, intro, exact, rw, simp */
+pre .typ {color:#ffcb6b;}  /* type: Nat, Prop, Int */
+pre .cm  {color:#5a5478;}  /* comment */
+pre .str {color:#c3e88d;}  /* values/literals */
+pre .op  {color:#89ddff;}  /* operators */
+pre .id  {color:var(--code-text);}
+pre .gold{color:#ffcb6b;}
+
+/* ════════════════════════════════════
+   CHECK OUTPUT (terminal-style result)
+════════════════════════════════════ */
+.check-out{
+  background:#15121f;border-top:1px solid #2d2748;
+  padding:10px 15px;
+  font-family:'JetBrains Mono',monospace;font-size:.74rem;
+  color:#82aaff;
+}
+.check-out .arrow{color:#5a5478;}
+
+/* ════════════════════════════════════
+   ANALOGY / CALLOUT
+════════════════════════════════════ */
+.callout{
+  background:#fff;border:1px solid var(--line);
+  border-left:3px solid var(--indigo2);
+  border-radius:0 var(--rl) var(--rl) 0;
+  padding:14px 18px;margin:14px 0;
+  font-size:.86rem;color:var(--ink2);
+}
+.callout strong{color:var(--indigo);}
+.callout.gold{border-left-color:var(--gold);}
+.callout.gold strong{color:var(--gold);}
+.callout.green{border-left-color:var(--green);}
+.callout.green strong{color:var(--green);}
+
+/* ════════════════════════════════════
+   PROOF STATE STEPPER — signature element
+════════════════════════════════════ */
+.stepper{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);overflow:hidden;
+  margin:16px 0;
+  box-shadow:0 4px 24px rgba(75,63,143,.06);
+}
+.stepper-header{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;
+  background:linear-gradient(135deg, rgba(75,63,143,.06), rgba(130,87,229,.04));
+  border-bottom:1px solid var(--line);
+}
+.stepper-title{
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--indigo);
+}
+.stepper-pill{
+  margin-left:auto;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  color:var(--green);background:rgba(31,122,77,.08);
+  border:1px solid rgba(31,122,77,.25);padding:2px 8px;border-radius:3px;
+}
+.stepper-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:620px){.stepper-body{grid-template-columns:1fr;}}
+
+.stepper-code{
+  padding:16px;border-right:1px solid var(--line);
+  background:var(--code-bg);
+}
+.stepper-code-label{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  text-transform:uppercase;letter-spacing:.1em;color:#7c7299;
+  margin-bottom:8px;
+}
+.tactic-line{
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  padding:6px 10px;border-radius:5px;
+  color:#7c7299;cursor:pointer;
+  transition:all .15s;
+  border:1px solid transparent;
+  margin-bottom:2px;
+}
+.tactic-line:hover{background:rgba(255,255,255,.04);}
+.tactic-line.done{color:#5ec98a;}
+.tactic-line.current{
+  background:rgba(130,87,229,.15);
+  border-color:var(--indigo2);color:var(--code-text);
+}
+.tactic-line .ln{color:#4a4366;margin-right:10px;}
+
+.stepper-goal{
+  padding:16px;
+}
+.stepper-goal-label{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);
+  margin-bottom:10px;
+}
+.goal-box{
+  background:var(--paper2);border:1px solid var(--line2);
+  border-radius:var(--r);padding:12px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  min-height:90px;
+  transition:all .3s;
+}
+.goal-hyp{color:var(--ink2);margin-bottom:4px;}
+.goal-hyp .hname{color:var(--gold);}
+.goal-turnstile{
+  display:flex;align-items:center;gap:8px;
+  margin-top:8px;padding-top:8px;
+  border-top:1px solid var(--line2);
+  color:var(--indigo);font-weight:600;
+}
+.goal-done{
+  color:var(--green);font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.stepper-controls{
+  display:flex;gap:8px;padding:0 16px 16px;
+}
+.step-btn{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  color:var(--ink);background:var(--paper2);
+  border:1px solid var(--line2);
+  padding:7px 16px;border-radius:var(--r);
+  cursor:pointer;transition:all .2s;
+}
+.step-btn:hover{border-color:var(--indigo2);color:var(--indigo);}
+.step-btn.primary{
+  background:var(--indigo);color:#fff;border-color:var(--indigo);
+}
+.step-btn.primary:hover{background:var(--indigo2);}
+.step-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ════════════════════════════════════
+   TACTICS REFERENCE TABLE
+════════════════════════════════════ */
+.tbl-wrap{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);overflow:hidden;margin:14px 0;
+}
+table{width:100%;border-collapse:collapse;font-size:.82rem;}
+thead tr{background:var(--paper2);}
+th{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink2);padding:9px 14px;
+  border-bottom:1px solid var(--line);text-align:left;
+}
+tbody tr{border-bottom:1px solid var(--line);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(75,63,143,.03);}
+td{padding:9px 14px;color:var(--ink2);vertical-align:top;}
+td:first-child{color:var(--indigo);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+
+/* ════════════════════════════════════
+   TYPE EXPLORER (click to see #check result)
+════════════════════════════════════ */
+.type-explorer{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);overflow:hidden;margin:14px 0;
+}
+.te-header{
+  padding:10px 16px;background:var(--paper2);
+  border-bottom:1px solid var(--line);
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);
+}
+.te-body{padding:16px;}
+.te-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.te-chip{
+  font-family:'JetBrains Mono',monospace;font-size:.76rem;
+  padding:6px 14px;border-radius:6px;
+  background:var(--paper2);border:1px solid var(--line2);
+  color:var(--ink);cursor:pointer;transition:all .2s;
+}
+.te-chip:hover{border-color:var(--indigo2);}
+.te-chip.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+.te-result{
+  background:var(--code-bg);border-radius:var(--r);
+  padding:12px 16px;font-family:'JetBrains Mono',monospace;
+  font-size:.8rem;color:#82aaff;min-height:24px;
+}
+.te-result .res-type{color:#ffcb6b;}
+
+/* ════════════════════════════════════
+   CURRY-HOWARD VISUAL
+════════════════════════════════════ */
+.ch-table{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:0;
+  background:#fff;border:1px solid var(--line);border-radius:var(--rl);
+  overflow:hidden;margin:14px 0;
+}
+.ch-col{padding:18px;}
+.ch-col.logic{background:rgba(75,63,143,.04);}
+.ch-col.lean{background:rgba(168,118,47,.04);}
+.ch-col-title{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  margin-bottom:10px;
+}
+.ch-col.logic .ch-col-title{color:var(--indigo);}
+.ch-col.lean .ch-col-title{color:var(--gold);}
+.ch-row{font-size:.84rem;padding:7px 0;color:var(--ink2);}
+.ch-divider{
+  width:1px;background:var(--line);
+}
+
+/* ════════════════════════════════════
+   ACTIVITIES
+════════════════════════════════════ */
+.act-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);margin-bottom:12px;overflow:hidden;
+  transition:border-color .2s;
+}
+.act-card:hover{border-color:var(--indigo2);}
+.act-head{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;cursor:pointer;user-select:none;
+}
+.act-num{
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:600;
+  background:rgba(75,63,143,.08);border:1px solid rgba(75,63,143,.25);
+  color:var(--indigo);
+  width:34px;height:34px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.act-info h3{font-family:'Source Serif 4',serif;font-size:.95rem;font-weight:600;}
+.act-info small{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--ink2);}
+.act-chev{margin-left:auto;color:var(--ink2);transition:transform .3s;flex-shrink:0;}
+.act-card.open .act-chev{transform:rotate(180deg);}
+.act-body{display:none;border-top:1px solid var(--line);padding:16px 18px;}
+.act-card.open .act-body{display:block;}
+.act-body > * + *{margin-top:12px;}
+.goal-statement{
+  background:var(--paper2);border-left:3px solid var(--indigo2);
+  padding:10px 14px;border-radius:0 var(--r) var(--r) 0;
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--ink);
+}
+.sol-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  color:var(--ink2);background:var(--paper2);
+  border:1px solid var(--line2);
+  padding:7px 14px;border-radius:var(--r);
+  cursor:pointer;transition:all .2s;
+}
+.sol-btn:hover{color:var(--green);border-color:var(--green);}
+.sol-btn.open{color:var(--green);border-color:var(--green);background:rgba(31,122,77,.05);}
+.sol-block{display:none;}
+.sol-block.visible{display:block;}
+
+/* ════════════════════════════════════
+   FLOW / WORKFLOW
+════════════════════════════════════ */
+.flow{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);padding:22px;margin:14px 0;
+}
+.flow-steps{display:flex;flex-direction:column;}
+.flow-step{display:flex;gap:16px;}
+.flow-left{display:flex;flex-direction:column;align-items:center;width:34px;flex-shrink:0;}
+.flow-dot{
+  width:30px;height:30px;border-radius:50%;
+  border:2px solid var(--indigo2);background:rgba(130,87,229,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;
+  color:var(--indigo);flex-shrink:0;
+}
+.flow-connector{flex:1;width:2px;background:var(--line2);min-height:20px;}
+.flow-content{padding:3px 0 18px;font-size:.86rem;}
+.flow-content strong{color:var(--indigo);}
+.flow-content span{display:block;color:var(--ink2);font-size:.8rem;margin-top:2px;}
+
+/* ════════════════════════════════════
+   RESOURCES
+════════════════════════════════════ */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:520px){.res-grid{grid-template-columns:1fr;}}
+.res-link{
+  display:flex;flex-direction:column;gap:3px;
+  padding:14px 16px;
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--rl);text-decoration:none;
+  transition:all .2s;
+}
+.res-link:hover{border-color:var(--indigo2);box-shadow:0 4px 14px rgba(75,63,143,.08);}
+.res-link-title{font-family:'Source Serif 4',serif;font-weight:600;color:var(--ink);font-size:.92rem;}
+.res-link-desc{font-size:.76rem;color:var(--ink2);}
+
+/* ════════════════════════════════════
+   FOOTER
+════════════════════════════════════ */
+.footer{
+  text-align:center;padding:30px 24px 50px;
+  border-top:1px solid var(--line);
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--ink2);
+}
+
+/* entry animation */
+.act-card,.concept-card{animation:fu .4s ease both;}
+@keyframes fu{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.concept-card:nth-child(1){animation-delay:.04s}
+.concept-card:nth-child(2){animation-delay:.08s}
+.concept-card:nth-child(3){animation-delay:.12s}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-symbol">∀ n : Nat, n = n</div>
+  <div class="hero-eyebrow">Asistente de Pruebas · Lenguaje Funcional</div>
+  <h1>Introducción a<br><em>Lean</em></h1>
+  <p class="hero-sub">El lenguaje donde las demostraciones matemáticas se escriben, se verifican y nunca mienten.</p>
+  <div class="hero-badges">
+    <span class="hbadge">Teoría de Tipos</span>
+    <span class="hbadge">Curry-Howard</span>
+    <span class="hbadge">Tácticas</span>
+    <span class="hbadge">Mathlib</span>
+    <span class="hbadge">Lean 4</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="snav">
+  <div class="snav-inner">
+    <a href="#s1"><span class="n">01</span> Qué es Lean</a>
+    <a href="#s2"><span class="n">02</span> Instalación</a>
+    <a href="#s3"><span class="n">03</span> Tipos</a>
+    <a href="#s4"><span class="n">04</span> Curry-Howard</a>
+    <a href="#s5"><span class="n">05</span> Tácticas</a>
+    <a href="#s6"><span class="n">06</span> Stepper</a>
+    <a href="#s7"><span class="n">07</span> Mathlib</a>
+    <a href="#s8"><span class="n">08</span> Ejercicios</a>
+    <a href="#s9"><span class="n">09</span> Recursos</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ S1: QUÉ ES LEAN ══ -->
+<div id="s1">
+  <div class="stitle"><div class="stitle-num">§01</div><h2>¿Qué es Lean?</h2><div class="stitle-bar"></div></div>
+  <p>Lean es un software de código abierto que permite a matemáticos y programadores <strong>formalizar razonamientos</strong>. Nació en Microsoft Research y hoy cuenta con una comunidad activa detrás de <strong>Mathlib</strong>, una vasta biblioteca de matemáticas formalizadas.</p>
+
+  <div class="concept-row">
+    <div class="concept-card">
+      <div class="cc-icon">λ</div>
+      <div class="cc-title">Lenguaje de programación</div>
+      <div class="cc-text">Funcional de propósito general, similar a Haskell o ML, con un sistema de tipos mucho más potente.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">⊢</div>
+      <div class="cc-title">Asistente de pruebas</div>
+      <div class="cc-text">Escribes teoremas y demostraciones que el programa verifica automáticamente. Si hay un error, lo señala.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">⚙</div>
+      <div class="cc-title">Kernel de confianza</div>
+      <div class="cc-text">El núcleo es pequeño y simple — eso garantiza que la verificación de pruebas sea absolutamente fiable.</div>
+    </div>
+  </div>
+
+  <div class="callout"><strong>Idea central:</strong> en Lean, una demostración matemática no es un argumento persuasivo escrito en prosa — es un <em>programa</em> que el ordenador ejecuta y verifica byte a byte. No hay ambigüedad posible.</div>
+</div>
+
+<!-- ══ S2: INSTALACIÓN ══ -->
+<div id="s2">
+  <div class="stitle"><div class="stitle-num">§02</div><h2>Instalación y Entorno</h2><div class="stitle-bar"></div></div>
+  <p>Se recomienda instalar <strong>Lean 4</strong> junto con <strong>Visual Studio Code</strong> y la extensión oficial <code>Lean4</code>.</p>
+
+  <div class="flow">
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+        <div class="flow-content"><strong>Instala Lean 4</strong><span>Sigue la guía oficial en lean-lang.org/install/. El proceso es rápido y guiado.</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+        <div class="flow-content"><strong>Instala VS Code</strong><span>El editor recomendado oficialmente por el equipo de Lean.</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div><div class="flow-connector" style="background:transparent"></div></div>
+        <div class="flow-content"><strong>Añade la extensión "Lean4"</strong><span>Proporciona feedback en tiempo real: estado de la demostración, tipos de variables y errores de sintaxis mientras escribes.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout gold"><strong>Por qué importa el feedback en vivo:</strong> a diferencia de compilar y ejecutar, en Lean ves el "estado de la prueba" actualizarse línea a línea — es lo que hace que aprender tácticas sea mucho más intuitivo. La sección 06 de esta guía simula esa experiencia.</div>
+</div>
+
+<!-- ══ S3: TIPOS ══ -->
+<div id="s3">
+  <div class="stitle"><div class="stitle-num">§03</div><h2>Fundamentos: Tipos y Proposiciones</h2><div class="stitle-bar"></div></div>
+  <p>En Lean, <strong>todo tiene un tipo</strong> — tanto los datos numéricos como las proposiciones matemáticas.</p>
+
+  <p style="margin-top:16px"><strong>3.1 — Tipos básicos</strong></p>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="cm">-- Definimos una variable de tipo Nat</span>
+<span class="kw">def</span> <span class="id">mi_numero</span> : <span class="typ">Nat</span> := <span class="str">42</span>
+
+<span class="cm">-- Definimos una función que suma dos Naturales</span>
+<span class="kw">def</span> <span class="id">suma</span> (<span class="id">a b</span> : <span class="typ">Nat</span>) : <span class="typ">Nat</span> := <span class="id">a</span> <span class="op">+</span> <span class="id">b</span>
+
+<span class="cm">-- Lean puede inferir el tipo automáticamente</span>
+<span class="kw">def</span> <span class="id">otro_numero</span> := <span class="str">100</span></pre>
+  </div>
+
+  <p style="margin-top:16px"><strong>3.2 — Explorador de tipos</strong> — haz clic para ver el resultado de <code>#check</code>:</p>
+  <div class="type-explorer">
+    <div class="te-header">#check — comprueba el tipo de cualquier término</div>
+    <div class="te-body">
+      <div class="te-chips">
+        <div class="te-chip active" onclick="checkType(this,'Nat','Nat : Type')">Nat</div>
+        <div class="te-chip" onclick="checkType(this,'2 + 2 = 4','2 + 2 = 4 : Prop')">2 + 2 = 4</div>
+        <div class="te-chip" onclick="checkType(this,'True','True : Prop')">True</div>
+        <div class="te-chip" onclick="checkType(this,'42','42 : Nat')">42</div>
+        <div class="te-chip" onclick="checkType(this,'suma','suma : Nat → Nat → Nat')">suma</div>
+        <div class="te-chip" onclick="checkType(this,'Prop','Prop : Type')">Prop</div>
+      </div>
+      <div class="te-result" id="teResult"><span class="arrow">#check</span> Nat <span style="color:#5a5478">⟶</span> <span class="res-type">Nat : Type</span></div>
+    </div>
+  </div>
+  <div class="callout"><strong>Observación clave:</strong> <code>Nat</code> tiene tipo <code>Type</code>, pero <code>2 + 2 = 4</code> tiene tipo <code>Prop</code>. Las proposiciones matemáticas son, ellas mismas, tipos — esto es la semilla de todo lo que viene en la sección 04.</div>
+</div>
+
+<!-- ══ S4: CURRY-HOWARD ══ -->
+<div id="s4">
+  <div class="stitle"><div class="stitle-num">§04</div><h2>Proposiciones como Tipos</h2><div class="stitle-bar"></div></div>
+  <p>La idea central de Lean —basada en la <strong>Teoría de Tipos Dependientes</strong>— es la <strong>Correspondencia de Curry-Howard</strong>: las proposiciones matemáticas se tratan como tipos, y sus demostraciones son <em>programas</em> que construyen elementos de esos tipos.</p>
+
+  <div class="ch-table">
+    <div class="ch-col logic">
+      <div class="ch-col-title">Lógica / Matemáticas</div>
+      <div class="ch-row">Una proposición</div>
+      <div class="ch-row">Una demostración</div>
+      <div class="ch-row">"P implica Q"</div>
+      <div class="ch-row">"P y Q"</div>
+    </div>
+    <div class="ch-divider"></div>
+    <div class="ch-col lean">
+      <div class="ch-col-title">Lean / Teoría de Tipos</div>
+      <div class="ch-row" style="font-family:'JetBrains Mono',monospace">Un tipo</div>
+      <div class="ch-row" style="font-family:'JetBrains Mono',monospace">Un término que "habita" ese tipo</div>
+      <div class="ch-row" style="font-family:'JetBrains Mono',monospace">Una función P → Q</div>
+      <div class="ch-row" style="font-family:'JetBrains Mono',monospace">Un par (p : P, q : Q)</div>
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="tac">#check</span> <span class="typ">Nat</span>        <span class="cm">-- Nat : Type</span>
+<span class="tac">#check</span> <span class="id">2 + 2 = 4</span>  <span class="cm">-- 2 + 2 = 4 : Prop</span>
+<span class="tac">#check</span> <span class="typ">True</span>       <span class="cm">-- True : Prop</span></pre>
+  </div>
+
+  <div class="callout gold"><strong>En una frase:</strong> demostrar un teorema en Lean es literalmente <em>escribir un programa</em> cuyo tipo es el enunciado del teorema. Si el programa compila, la prueba es correcta.</div>
+</div>
+
+<!-- ══ S5: TÁCTICAS ══ -->
+<div id="s5">
+  <div class="stitle"><div class="stitle-num">§05</div><h2>Comenzando a Probar: Tácticas</h2><div class="stitle-bar"></div></div>
+  <p>En vez de escribir el programa de demostración directamente, Lean ofrece <strong>tácticas</strong> (<code>by ...</code>): comandos que indican cómo construir la prueba paso a paso. Al escribir <code>by</code>, Lean entra en "modo de construcción" — el objetivo es "rellenar el hueco" de la prueba.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Táctica</th><th>Qué hace</th><th>Cuándo se usa</th></tr></thead>
+      <tbody>
+        <tr><td>rfl</td><td>Demuestra que algo es igual a sí mismo (reflexividad)</td><td>El objetivo es literalmente <code>a = a</code></td></tr>
+        <tr><td>intro</td><td>Introduce una hipótesis para probar una implicación P → Q</td><td>El objetivo tiene forma <code>P → Q</code></td></tr>
+        <tr><td>exact</td><td>Aplica un término/hipótesis que coincide exactamente con el objetivo</td><td>Ya tienes la prueba exacta a mano</td></tr>
+        <tr><td>rw</td><td>Reescribe una parte de la expresión usando una igualdad</td><td>Quieres sustituir una subexpresión</td></tr>
+        <tr><td>simp</td><td>Aplica automáticamente reglas de simplificación comunes</td><td>La expresión se puede simplificar con lemas conocidos</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="margin-top:18px"><strong>5.1 — rfl (Reflexividad)</strong></p>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="cm">-- Teorema: para todo número natural n, n es igual a n</span>
+<span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) : <span class="id">n</span> = <span class="id">n</span> := <span class="kw">by</span>
+  <span class="tac">rfl</span>  <span class="cm">-- "reflectividad": algo es igual a sí mismo</span></pre>
+  </div>
+
+  <p style="margin-top:14px"><strong>5.2 — intro (Introducción de hipótesis)</strong></p>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) : <span class="id">n</span> = <span class="id">n</span> <span class="op">→</span> <span class="id">1</span> = <span class="id">1</span> := <span class="kw">by</span>
+  <span class="tac">intro</span> <span class="id">h</span>       <span class="cm">-- introducimos la hipótesis h : n = n</span>
+  <span class="tac">rfl</span>           <span class="cm">-- "1 = 1" se demuestra por reflexividad</span></pre>
+  </div>
+
+  <p style="margin-top:14px"><strong>5.3 — exact (Aplicación de hechos)</strong></p>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) (<span class="id">h</span> : <span class="id">n</span> = <span class="id">5</span>) : <span class="id">n</span> = <span class="id">5</span> := <span class="kw">by</span>
+  <span class="tac">exact</span> <span class="id">h</span></pre>
+  </div>
+
+  <p style="margin-top:14px"><strong>5.4 — rw y simp (Descomposición)</strong></p>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — rw (reescribir)</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) : <span class="id">n</span> <span class="op">+</span> <span class="id">0</span> = <span class="id">n</span> := <span class="kw">by</span>
+  <span class="tac">rw</span> [<span class="id">Nat.add_zero n</span>]  <span class="cm">-- reescribe n + 0 como n</span>
+  <span class="tac">rfl</span>                  <span class="cm">-- ahora tenemos n = n</span></pre>
+  </div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — simp (simplificar)</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="kw">example</span> (<span class="id">n m</span> : <span class="typ">Nat</span>) : <span class="id">n</span> <span class="op">+</span> <span class="id">0</span> <span class="op">+</span> <span class="id">m</span> = <span class="id">m</span> <span class="op">+</span> <span class="id">n</span> := <span class="kw">by</span>
+  <span class="tac">simp</span> [<span class="id">Nat.add_zero, Nat.add_comm</span>]
+  <span class="cm">-- Nat.add_comm es la regla conmutativa: n + m = m + n</span>
+  <span class="cm">-- Lean reordena y simplifica automáticamente</span></pre>
+  </div>
+</div>
+
+<!-- ══ S6: STEPPER — SIGNATURE ELEMENT ══ -->
+<div id="s6">
+  <div class="stitle"><div class="stitle-num">§06</div><h2>Simulador de Estado de Prueba</h2><div class="stitle-bar"></div></div>
+  <p>Así es como se ve trabajar con Lean en VS Code: cada táctica transforma el <strong>estado de la prueba</strong> (las hipótesis arriba del turnstile <code>⊢</code>, el objetivo debajo). Pulsa cada línea o usa los controles para avanzar.</p>
+
+  <div class="stepper">
+    <div class="stepper-header">
+      <span class="stepper-title">Goal State — n = n → 1 = 1</span>
+      <span class="stepper-pill" id="stepperStatus">en progreso</span>
+    </div>
+    <div class="stepper-body">
+      <div class="stepper-code">
+        <div class="stepper-code-label">Tácticas (haz clic para saltar)</div>
+        <div class="tactic-line current" data-step="0" onclick="goToStep(0)"><span class="ln">0</span>example (n : Nat) : n = n → 1 = 1 := by</div>
+        <div class="tactic-line" data-step="1" onclick="goToStep(1)"><span class="ln">1</span>&nbsp;&nbsp;intro h</div>
+        <div class="tactic-line" data-step="2" onclick="goToStep(2)"><span class="ln">2</span>&nbsp;&nbsp;rfl</div>
+      </div>
+      <div class="stepper-goal">
+        <div class="stepper-goal-label">Estado actual</div>
+        <div class="goal-box" id="goalBox">
+          <div class="goal-turnstile">⊢ n = n → 1 = 1</div>
+        </div>
+      </div>
+    </div>
+    <div class="stepper-controls">
+      <button class="step-btn" id="prevBtn" onclick="prevStep()" disabled>← anterior</button>
+      <button class="step-btn primary" id="nextBtn" onclick="nextStep()">siguiente táctica →</button>
+      <button class="step-btn" onclick="resetStepper()">↺ reiniciar</button>
+    </div>
+  </div>
+  <div class="callout green"><strong>Lo que acabas de ver</strong> es exactamente el flujo de trabajo en Lean: cada táctica reduce el objetivo hasta que coincide con algo ya demostrado o es trivialmente cierto (<code>rfl</code>). Cuando no queda objetivo, la prueba está completa.</div>
+</div>
+
+<!-- ══ S7: MATHLIB ══ -->
+<div id="s7">
+  <div class="stitle"><div class="stitle-num">§07</div><h2>Librería Matemática: Mathlib</h2><div class="stitle-bar"></div></div>
+  <p><strong>Mathlib</strong> es una biblioteca masiva y colaborativa de matemáticas formalizadas: álgebra, análisis, topología, probabilidad y mucho más. Es la razón principal por la que Lean es tan potente — la mayoría de los teoremas que necesitas ya están demostrados.</p>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — usando un teorema de Mathlib</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+    <pre><span class="kw">import</span> <span class="id">Mathlib.Data.Real.Basic</span>  <span class="cm">-- para trabajar con números reales</span>
+
+<span class="cm">-- Ejemplo: la suma de dos reales positivos es positiva</span>
+<span class="kw">example</span> (<span class="id">x y</span> : <span class="typ">ℝ</span>) (<span class="id">hx</span> : <span class="id">x</span> > <span class="id">0</span>) (<span class="id">hy</span> : <span class="id">y</span> > <span class="id">0</span>) : <span class="id">x</span> + <span class="id">y</span> > <span class="id">0</span> := <span class="kw">by</span>
+  <span class="tac">exact</span> <span class="id">add_pos hx hy</span>  <span class="cm">-- add_pos ya está demostrado en Mathlib</span></pre>
+  </div>
+  <div class="callout"><strong>add_pos</strong> no es magia — es un teorema que alguien de la comunidad ya demostró y aportó a Mathlib. Tu trabajo, muchas veces, es <em>encontrar</em> el lema correcto, no reinventarlo.</div>
+</div>
+
+<!-- ══ S8: EJERCICIOS ══ -->
+<div id="s8">
+  <div class="stitle"><div class="stitle-num">§08</div><h2>Ejercicios Propuestos</h2><div class="stitle-bar"></div></div>
+  <p>Intenta deducir la secuencia de tácticas antes de revelar la solución. Razona el estado de la prueba en cada paso como hiciste en el simulador.</p>
+
+  <!-- EX 1 -->
+  <div class="act-card open">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">01</div>
+      <div class="act-info"><h3>Reflexividad simple</h3><small>rfl</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="goal-statement">example (x : Nat) : x + 1 = x + 1 := by ___</div>
+      <p>¿Qué táctica única demuestra este objetivo?</p>
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <div class="sol-block">
+        <div class="cw"><div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+        <pre><span class="kw">example</span> (<span class="id">x</span> : <span class="typ">Nat</span>) : <span class="id">x</span> + <span class="id">1</span> = <span class="id">x</span> + <span class="id">1</span> := <span class="kw">by</span>
+  <span class="tac">rfl</span>  <span class="cm">-- ambos lados son sintácticamente idénticos</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 2 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">02</div>
+      <div class="act-info"><h3>Implicación con intro</h3><small>intro · rfl</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="goal-statement">example (p : Prop) : p → p := by ___</div>
+      <p>El objetivo es una implicación. Necesitas introducir la hipótesis y luego usarla directamente.</p>
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <div class="sol-block">
+        <div class="cw"><div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+        <pre><span class="kw">example</span> (<span class="id">p</span> : <span class="typ">Prop</span>) : <span class="id">p</span> <span class="op">→</span> <span class="id">p</span> := <span class="kw">by</span>
+  <span class="tac">intro</span> <span class="id">hp</span>   <span class="cm">-- hp : p</span>
+  <span class="tac">exact</span> <span class="id">hp</span>  <span class="cm">-- el objetivo ahora es exactamente "p", que es hp</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 3 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">03</div>
+      <div class="act-info"><h3>Usar una hipótesis exacta</h3><small>exact</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="goal-statement">example (n : Nat) (h : n = 10) : n = 10 := by ___</div>
+      <p>Ya tienes la hipótesis exacta. ¿Qué táctica la aplica directamente?</p>
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <div class="sol-block">
+        <div class="cw"><div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+        <pre><span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) (<span class="id">h</span> : <span class="id">n</span> = <span class="id">10</span>) : <span class="id">n</span> = <span class="id">10</span> := <span class="kw">by</span>
+  <span class="tac">exact</span> <span class="id">h</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 4 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">04</div>
+      <div class="act-info"><h3>Reescritura con rw</h3><small>rw · rfl</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="goal-statement">example (a b : Nat) (h : a = b) : a + 1 = b + 1 := by ___</div>
+      <p>Usa la hipótesis <code>h</code> para reescribir <code>a</code> como <code>b</code> en el objetivo.</p>
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <div class="sol-block">
+        <div class="cw"><div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+        <pre><span class="kw">example</span> (<span class="id">a b</span> : <span class="typ">Nat</span>) (<span class="id">h</span> : <span class="id">a</span> = <span class="id">b</span>) : <span class="id">a</span> + <span class="id">1</span> = <span class="id">b</span> + <span class="id">1</span> := <span class="kw">by</span>
+  <span class="tac">rw</span> [<span class="id">h</span>]  <span class="cm">-- sustituye a por b: objetivo pasa a "b + 1 = b + 1"</span>
+  <span class="cm">-- rw cierra automáticamente con rfl si el resultado es trivial</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX 5 -->
+  <div class="act-card">
+    <div class="act-head" onclick="toggleAct(this)">
+      <div class="act-num">05</div>
+      <div class="act-info"><h3>Cadena completa de tácticas</h3><small>intro · rw · rfl</small></div>
+      <svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="act-body">
+      <div class="goal-statement">example (n : Nat) : n = 0 → n + 5 = 5 := by ___</div>
+      <p>Combina varias tácticas: primero introduce la hipótesis, luego reescribe usándola.</p>
+      <button class="sol-btn" onclick="toggleSol(this)">Ver solución</button>
+      <div class="sol-block">
+        <div class="cw"><div class="cw-bar"><div class="cw-dots"><div class="cw-dot" style="background:#ff5f57"></div><div class="cw-dot" style="background:#febc2e"></div><div class="cw-dot" style="background:#28c840"></div></div><span class="cw-lang">lean — solución</span><button class="cp-btn" onclick="cp(this)">copiar</button></div>
+        <pre><span class="kw">example</span> (<span class="id">n</span> : <span class="typ">Nat</span>) : <span class="id">n</span> = <span class="id">0</span> <span class="op">→</span> <span class="id">n</span> + <span class="id">5</span> = <span class="id">5</span> := <span class="kw">by</span>
+  <span class="tac">intro</span> <span class="id">h</span>     <span class="cm">-- h : n = 0</span>
+  <span class="tac">rw</span> [<span class="id">h</span>]    <span class="cm">-- objetivo: 0 + 5 = 5</span>
+  <span class="cm">-- rw cierra automáticamente porque 0 + 5 se reduce a 5</span></pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S9: RECURSOS ══ -->
+<div id="s9">
+  <div class="stitle"><div class="stitle-num">§09</div><h2>Resumen y Recursos</h2><div class="stitle-bar"></div></div>
+
+  <div class="flow">
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+        <div class="flow-content"><strong>Declara el teorema</strong><span>Escribe el enunciado con su tipo (la proposición a demostrar)</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+        <div class="flow-content"><strong>Entra en modo táctica con `by`</strong><span>Lean muestra el estado de la prueba: hipótesis y objetivo</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot">3</div><div class="flow-connector" style="background:transparent"></div></div>
+        <div class="flow-content"><strong>Aplica tácticas hasta cerrar el objetivo</strong><span>intro, rw, simp, exact — hasta llegar a rfl o coincidir con una hipótesis</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="res-grid">
+    <a class="res-link" href="https://leanprover.github.io/theorem_proving_in_lean4/" target="_blank">
+      <span class="res-link-title">Theorem Proving in Lean</span>
+      <span class="res-link-desc">La guía oficial y más completa sobre teoría de tipos y tácticas</span>
+    </a>
+    <a class="res-link" href="https://leanprover.github.io/functional_programming_in_lean/" target="_blank">
+      <span class="res-link-title">Functional Programming in Lean</span>
+      <span class="res-link-desc">El lado "programación" del lenguaje — perfecto tras esta guía</span>
+    </a>
+    <a class="res-link" href="https://leanprover-community.github.io/" target="_blank">
+      <span class="res-link-title">Lean Community</span>
+      <span class="res-link-desc">Portal de la comunidad — Mathlib, tutoriales y más</span>
+    </a>
+    <a class="res-link" href="https://leanprover.zulipchat.com/" target="_blank">
+      <span class="res-link-title">Lean Zulip Chat</span>
+      <span class="res-link-desc">La comunidad principal — el mejor sitio para hacer preguntas</span>
+    </a>
+  </div>
+
+  <div class="callout" style="margin-top:18px"><strong>Este es solo el primer paso.</strong> La práctica constante es la clave para dominar Lean y descubrir cómo puede ser una herramienta revolucionaria para las matemáticas y la verificación de software.</div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  Introducción a Lean · Asistente de Pruebas y Lenguaje Funcional<br>
+  <span style="opacity:.5;margin-top:3px;display:block">∀ x, dudas x → consulta(profesor) ∨ consulta(Zulip)</span>
+</div>
+
+<script>
+/* ══════════════════════════════
+   COPY CODE
+══════════════════════════════ */
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copiar'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* ══════════════════════════════
+   ACCORDION
+══════════════════════════════ */
+function toggleAct(head) {
+  head.closest('.act-card').classList.toggle('open');
+}
+function toggleSol(btn) {
+  const block = btn.nextElementSibling;
+  const open = block.classList.toggle('visible');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? 'Ocultar' : 'Ver solución';
+}
+
+/* ══════════════════════════════
+   TYPE EXPLORER
+══════════════════════════════ */
+function checkType(chip, term, result) {
+  document.querySelectorAll('.te-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  document.getElementById('teResult').innerHTML =
+    `<span class="arrow">#check</span> ${term} <span style="color:#5a5478">⟶</span> <span class="res-type">${result}</span>`;
+}
+
+/* ══════════════════════════════
+   PROOF STATE STEPPER
+══════════════════════════════ */
+const steps = [
+  {
+    goal: `<div class="goal-turnstile">⊢ n = n → 1 = 1</div>`,
+    status: 'en progreso'
+  },
+  {
+    goal: `<div class="goal-hyp"><span class="hname">h</span> : n = n</div>
+           <div class="goal-turnstile">⊢ 1 = 1</div>`,
+    status: 'en progreso'
+  },
+  {
+    goal: `<div class="goal-done">✓ No goals — prueba completa</div>`,
+    status: 'completada'
+  }
+];
+
+let currentStep = 0;
+
+function renderStep() {
+  document.getElementById('goalBox').innerHTML = steps[currentStep].goal;
+  const statusEl = document.getElementById('stepperStatus');
+  statusEl.textContent = steps[currentStep].status;
+  statusEl.style.color = currentStep === steps.length - 1 ? 'var(--green)' : 'var(--indigo)';
+
+  document.querySelectorAll('.tactic-line').forEach((line, i) => {
+    line.classList.remove('current','done');
+    if (i < currentStep) line.classList.add('done');
+    if (i === currentStep) line.classList.add('current');
+  });
+
+  document.getElementById('prevBtn').disabled = currentStep === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  if (currentStep === steps.length - 1) {
+    nextBtn.textContent = '✓ prueba completa';
+    nextBtn.disabled = true;
+  } else {
+    nextBtn.textContent = 'siguiente táctica →';
+    nextBtn.disabled = false;
+  }
+}
+
+function nextStep() {
+  if (currentStep < steps.length - 1) { currentStep++; renderStep(); }
+}
+function prevStep() {
+  if (currentStep > 0) { currentStep--; renderStep(); }
+}
+function goToStep(n) {
+  currentStep = n;
+  renderStep();
+}
+function resetStepper() {
+  currentStep = 0;
+  renderStep();
+}
+
+renderStep();
+</script>
+</body>
+</html>

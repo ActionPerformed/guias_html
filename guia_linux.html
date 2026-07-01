@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux 101 - 1º DAW</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0e0a;
+    --bg2: #0f140f;
+    --bg3: #141a14;
+    --green: #39ff14;
+    --green2: #22c55e;
+    --green-dim: #1a7a0a;
+    --green-glow: rgba(57,255,20,0.15);
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #38bdf8;
+    --purple: #a78bfa;
+    --text: #d4e8d4;
+    --text-dim: #6b8f6b;
+    --border: #1f3a1f;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    background: var(--bg2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0.3 } }
+
+  .nav { display: flex; gap: 0.2rem; }
+
+  .nav-btn {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--green);
+    background: var(--green-glow);
+  }
+
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-label::before { content: ''; width: 24px; height: 1px; background: var(--green); }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  h1 span { color: var(--green); text-shadow: 0 0 20px var(--green); }
+
+  .hero-desc {
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid;
+    letter-spacing: 0.08em;
+  }
+
+  .badge-green { border-color: var(--green2); color: var(--green2); background: rgba(34,197,94,0.08); }
+  .badge-amber { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,0.08); }
+  .badge-blue  { border-color: var(--blue);  color: var(--blue);  background: rgba(56,189,248,0.08); }
+
+  .terminal {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(57,255,20,0.08), 0 20px 40px rgba(0,0,0,0.6);
+  }
+
+  .term-bar {
+    background: var(--bg3);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .td-red { background: #ff5f57; }
+  .td-yel { background: #febc2e; }
+  .td-grn { background: #28c840; }
+
+  .term-title {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .term-body {
+    padding: 1.2rem 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.8;
+    min-height: 200px;
+  }
+
+  .t-prompt { color: var(--green2); }
+  .t-cmd { color: #fff; }
+  .t-out { color: var(--text-dim); }
+  .t-cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--green);
+    animation: blink 1s infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  .section { margin-bottom: 3rem; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    background: var(--green-glow);
+    border: 1px solid var(--green-dim);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  h2 { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; color: #fff; }
+  h3 { font-family: var(--sans); font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.6rem; }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+
+  .tl-item { display: grid; grid-template-columns: 80px 1fr; gap: 1.2rem; align-items: stretch; }
+
+  .tl-time {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-align: right;
+    padding-top: 1rem;
+    line-height: 1.4;
+  }
+
+  .tl-right { display: flex; gap: 1rem; padding-bottom: 1rem; }
+  .tl-line { display: flex; flex-direction: column; align-items: center; }
+
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    flex-shrink: 0;
+    margin-top: 1rem;
+  }
+
+  .tl-connector { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .tl-item:last-child .tl-connector { display: none; }
+
+  .tl-card {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .tl-card:hover { border-color: var(--green-dim); box-shadow: 0 0 16px rgba(57,255,20,0.05); }
+
+  .tl-phase { font-family: var(--mono); font-size: 0.65rem; color: var(--green); margin-bottom: 0.3rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tl-title { font-weight: 600; font-size: 0.9rem; color: #fff; margin-bottom: 0.3rem; }
+  .tl-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+
+  .obj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+
+  .obj-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.2s;
+  }
+
+  .obj-card:hover { border-color: var(--green-dim); transform: translateY(-2px); }
+  .obj-icon { font-size: 1.4rem; margin-bottom: 0.6rem; display: block; }
+  .obj-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+  .obj-cmd { display: inline-block; font-family: var(--mono); font-size: 0.7rem; color: var(--green); background: rgba(57,255,20,0.08); padding: 0.1rem 0.4rem; border-radius: 3px; margin-top: 0.4rem; }
+
+  .modulo { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; transition: border-color 0.2s; }
+  .modulo.open { border-color: var(--green-dim); }
+
+  .modulo-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    background: var(--bg2);
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .modulo-header:hover { background: var(--bg3); }
+
+  .modulo-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    background: var(--green-glow);
+    border: 1px solid var(--green-dim);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .modulo-title { font-weight: 600; font-size: 0.95rem; flex: 1; }
+  .modulo-dur { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); }
+  .modulo-arrow { color: var(--text-dim); transition: transform 0.3s; font-size: 0.8rem; }
+  .modulo.open .modulo-arrow { transform: rotate(90deg); color: var(--green); }
+
+  .modulo-body { display: none; padding: 1.2rem; background: var(--bg); border-top: 1px solid var(--border); }
+  .modulo.open .modulo-body { display: block; }
+
+  .code-block { background: #000; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 0.8rem 0; }
+
+  .code-header {
+    background: var(--bg3);
+    padding: 0.4rem 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang { font-family: var(--mono); font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { color: var(--green); border-color: var(--green-dim); }
+
+  .code-content { padding: 1rem 1.2rem; font-family: var(--mono); font-size: 0.78rem; line-height: 2; overflow-x: auto; }
+  .code-content .c-comment { color: #4a7a4a; }
+  .code-content .c-cmd { color: var(--amber); }
+  .code-content .c-flag { color: var(--purple); }
+  .code-content .c-arg { color: var(--blue); }
+  .code-content .c-out { color: var(--text-dim); }
+
+  .perm-viz { background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem; font-family: var(--mono); margin: 1rem 0; }
+
+  .perm-row { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; margin-bottom: 0.8rem; }
+
+  .perm-bit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+
+  .pb-on  { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.12); }
+  .pb-off { color: #2a3a2a; border-color: #1a2a1a; background: rgba(0,0,0,0.3); }
+  .perm-sep { color: var(--border); margin: 0 0.3rem; }
+
+  .cheat-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.78rem; }
+
+  .cheat-table th {
+    background: var(--bg3);
+    color: var(--green);
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--green-dim);
+  }
+
+  .cheat-table td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .cheat-table tr:hover td { background: var(--bg2); }
+
+  .cmd-pill { display: inline-block; background: rgba(57,255,20,0.08); color: var(--green); border: 1px solid var(--green-dim); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+  .win-pill { display: inline-block; background: rgba(56,189,248,0.08); color: var(--blue); border: 1px solid rgba(56,189,248,0.2); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+
+  .ejercicio { background: var(--bg2); border: 1px solid var(--green-dim); border-radius: 8px; overflow: hidden; }
+
+  .ej-header { background: rgba(57,255,20,0.08); padding: 1rem 1.2rem; border-bottom: 1px solid var(--green-dim); display: flex; align-items: center; gap: 0.8rem; }
+  .ej-badge { font-family: var(--mono); font-size: 0.65rem; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; }
+  .ej-title { font-size: 1rem; font-weight: 700; color: #fff; }
+
+  .steps { padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .step { display: flex; gap: 1rem; align-items: flex-start; }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--green-glow);
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .step-content { flex: 1; }
+  .step-desc { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+
+  .errors-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  .err-card { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid; border-radius: 6px; padding: 0.9rem 1rem; }
+  .err-card.red { border-left-color: var(--red); }
+  .err-card.amber { border-left-color: var(--amber); }
+  .err-title { font-family: var(--mono); font-size: 0.75rem; color: #fff; margin-bottom: 0.4rem; }
+  .err-solution { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+
+  .q-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+  .q-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; }
+  .q-num { font-family: var(--mono); font-size: 0.65rem; color: var(--purple); margin-bottom: 0.5rem; }
+  .q-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+
+  .tab-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn:hover { color: var(--green); }
+  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  .tip { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-left: 3px solid var(--amber); border-radius: 6px; padding: 0.8rem 1rem; font-size: 0.82rem; color: var(--text); line-height: 1.6; margin: 0.8rem 0; }
+  .tip strong { color: var(--amber); font-family: var(--mono); }
+
+  .danger { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-left: 3px solid var(--red); border-radius: 6px; padding: 0.8rem 1rem; font-size: 0.82rem; color: var(--text); line-height: 1.6; margin: 0.8rem 0; }
+  .danger strong { color: var(--red); font-family: var(--mono); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .intro-text { font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 1.5rem; }
+
+  .dir-tree { background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.2rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; }
+  .dt-dir { color: var(--blue); }
+  .dt-comment { color: var(--text-dim); }
+  .dt-root { color: var(--green); font-weight: 700; }
+
+  .analogia-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; margin: 1rem 0; }
+
+  .ana-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 1rem; text-align: center; }
+  .ana-os { font-family: var(--mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .ana-cmd { font-family: var(--mono); font-size: 0.88rem; color: #fff; }
+  .ana-arrow { color: var(--green); font-size: 1.2rem; text-align: center; }
+
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; padding: 2rem 1rem 1rem; }
+    .obj-grid { grid-template-columns: 1fr 1fr; }
+    .errors-grid { grid-template-columns: 1fr; }
+    .q-grid { grid-template-columns: 1fr; }
+    .main { padding: 1rem; }
+    h1 { font-size: 1.8rem; }
+    .nav-btn span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <span>alumno@ubuntu:~$</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showPage('inicio', this)">inicio</button>
+      <button class="nav-btn" onclick="showPage('contenido', this)">contenido</button>
+      <button class="nav-btn" onclick="showPage('cheatsheet', this)">cheatsheet</button>
+      <button class="nav-btn" onclick="showPage('ejercicio', this)">ejercicio</button>
+      <button class="nav-btn" onclick="showPage('eval', this)">evaluación</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ======== INICIO ======== -->
+<div id="page-inicio" class="page active">
+  <div class="hero">
+    <div>
+      <div class="hero-label">Sesión 2h · Ubuntu 22.04/24.04</div>
+      <h1>Introducción<br>a <span>Linux</span></h1>
+      <p class="hero-desc">Aprende a moverte por el sistema de archivos, gestionar permisos, instalar software y usar el terminal como un profesional. Esto es exactamente lo que harás en servidores reales.</p>
+      <div class="badges">
+        <span class="badge badge-green">1º DAW · FP</span>
+        <span class="badge badge-amber">Nivel: Principiante</span>
+        <span class="badge badge-blue">7 módulos</span>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="term-bar">
+        <div class="term-dot td-red"></div>
+        <div class="term-dot td-yel"></div>
+        <div class="term-dot td-grn"></div>
+        <span class="term-title">bash — alumno@ubuntu</span>
+      </div>
+      <div class="term-body">
+        <div><span class="t-prompt">alumno@ubuntu:~$</span> <span class="t-cmd">pwd</span></div>
+        <div class="t-out">/home/alumno</div>
+        <div><span class="t-prompt">alumno@ubuntu:~$</span> <span class="t-cmd">ls -la</span></div>
+        <div class="t-out">total 32</div>
+        <div class="t-out">drwxr-xr-x  5 alumno alumno 4096 may 14 09:00 .</div>
+        <div class="t-out">drwxr-xr-x  3 root   root   4096 may 14 09:00 ..</div>
+        <div class="t-out">-rw-r--r--  1 alumno alumno  220 may 14 09:00 .bash_logout</div>
+        <div class="t-out">drwxr-xr-x  2 alumno alumno 4096 may 14 09:00 Descargas</div>
+        <div><span class="t-prompt">alumno@ubuntu:~$</span> <span class="t-cmd">echo "¡Hola, Linux!"</span></div>
+        <div class="t-out">¡Hola, Linux!</div>
+        <div><span class="t-prompt">alumno@ubuntu:~$</span> <span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">OBJ</span>
+        <h2>¿Qué aprenderás hoy?</h2>
+      </div>
+      <div class="obj-grid">
+        <div class="obj-card">
+          <span class="obj-icon">🧭</span>
+          <div class="obj-text">Navegar por el árbol de directorios</div>
+          <div><span class="obj-cmd">pwd · cd · ls</span></div>
+        </div>
+        <div class="obj-card">
+          <span class="obj-icon">📁</span>
+          <div class="obj-text">Crear, copiar, mover y borrar archivos</div>
+          <div><span class="obj-cmd">cp · mv · rm · mkdir</span></div>
+        </div>
+        <div class="obj-card">
+          <span class="obj-icon">🗺️</span>
+          <div class="obj-text">Entender la estructura del sistema de archivos</div>
+          <div><span class="obj-cmd">/etc · /home · /var · /bin</span></div>
+        </div>
+        <div class="obj-card">
+          <span class="obj-icon">🔐</span>
+          <div class="obj-text">Cambiar permisos de archivos y carpetas</div>
+          <div><span class="obj-cmd">chmod 755 · u+x</span></div>
+        </div>
+        <div class="obj-card">
+          <span class="obj-icon">📦</span>
+          <div class="obj-text">Instalar aplicaciones desde el terminal</div>
+          <div><span class="obj-cmd">apt install</span></div>
+        </div>
+        <div class="obj-card">
+          <span class="obj-icon">⚡</span>
+          <div class="obj-text">Usar redirecciones y tuberías</div>
+          <div><span class="obj-cmd">| · > · >> · man</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">🕐</span>
+        <h2>Timeline de la sesión (120 min)</h2>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">0:00<br>0:10</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Arranque</div>
+              <div class="tl-title">Contexto y motivación</div>
+              <div class="tl-desc">¿Por qué Linux en desarrollo? Servidores, entornos productivos. Arrancar la VM y abrir el terminal.</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">0:10<br>0:30</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Módulo 1</div>
+              <div class="tl-title">Navegación y estructura</div>
+              <div class="tl-desc"><code style="color:var(--green);font-family:var(--mono);font-size:0.75rem">pwd · ls · cd · tree</code> — Estructura de directorios: /, /home, /etc, /var/log, /bin</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">0:30<br>0:50</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Módulo 2</div>
+              <div class="tl-title">Gestión de archivos</div>
+              <div class="tl-desc"><code style="color:var(--green);font-family:var(--mono);font-size:0.75rem">touch · mkdir · cp · mv · rm -r</code> — Peligros del rm sin papelera</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">0:50<br>1:10</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Módulo 3</div>
+              <div class="tl-title">Permisos (chmod)</div>
+              <div class="tl-desc"><code style="color:var(--green);font-family:var(--mono);font-size:0.75rem">ls -l · chmod 755 · chmod u+x</code> — Entender rwx. Ejemplo con script bash</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">1:10<br>1:25</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Módulo 4</div>
+              <div class="tl-title">Instalación de apps</div>
+              <div class="tl-desc"><code style="color:var(--green);font-family:var(--mono);font-size:0.75rem">sudo apt update && apt install</code> — Diferencias con Windows .exe</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">1:25<br>1:40</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-card">
+              <div class="tl-phase">Módulo 5</div>
+              <div class="tl-title">Extras útiles</div>
+              <div class="tl-desc"><code style="color:var(--green);font-family:var(--mono);font-size:0.75rem">man · echo > f.txt · ls | grep · nano</code> — Redirecciones y tuberías</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">1:40<br>2:00</div>
+          <div class="tl-right">
+            <div class="tl-line"><div class="tl-dot" style="background:var(--amber);box-shadow:0 0 8px var(--amber)"></div><div class="tl-connector"></div></div>
+            <div class="tl-card" style="border-color:rgba(245,158,11,0.3)">
+              <div class="tl-phase" style="color:var(--amber)">Ejercicio Final</div>
+              <div class="tl-title">Analizador de Logs</div>
+              <div class="tl-desc">Proyecto integrador: estructura de carpetas, permisos, filtrado con grep, figlet para reporte</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== CONTENIDO ======== -->
+<div id="page-contenido" class="page">
+  <div class="main">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">📚</span>
+        <h2>Contenido detallado</h2>
+      </div>
+      <p class="intro-text">Haz clic en cada módulo para expandir el contenido. Sigue el orden de la sesión.</p>
+
+      <!-- MOD 1 -->
+      <div class="modulo" id="mod1">
+        <div class="modulo-header" onclick="toggleMod('mod1')">
+          <span class="modulo-num">01</span>
+          <span class="modulo-title">Navegación y estructura de directorios</span>
+          <span class="modulo-dur">20 min</span>
+          <span class="modulo-arrow">▶</span>
+        </div>
+        <div class="modulo-body">
+          <p class="intro-text">Linux tiene un árbol de directorios que parte de <code style="color:var(--green)">/&nbsp;(raíz)</code>. No hay letras de unidad como en Windows.</p>
+
+          <h3>Analogías Windows ↔ Linux</h3>
+          <div class="analogia-grid">
+            <div class="ana-box"><div class="ana-os">Windows</div><div class="ana-cmd">C:\</div></div>
+            <div class="ana-arrow">→</div>
+            <div class="ana-box"><div class="ana-os">Linux</div><div class="ana-cmd">/</div></div>
+          </div>
+          <div class="analogia-grid">
+            <div class="ana-box"><div class="ana-os">Windows</div><div class="ana-cmd">C:\Users</div></div>
+            <div class="ana-arrow">→</div>
+            <div class="ana-box"><div class="ana-os">Linux</div><div class="ana-cmd">/home</div></div>
+          </div>
+          <div class="analogia-grid">
+            <div class="ana-box"><div class="ana-os">Windows</div><div class="ana-cmd">dir</div></div>
+            <div class="ana-arrow">→</div>
+            <div class="ana-box"><div class="ana-os">Linux</div><div class="ana-cmd">ls</div></div>
+          </div>
+
+          <h3 style="margin-top:1.2rem">Comandos básicos</h3>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+            <div class="code-content">
+<span class="c-cmd">pwd</span>                   <span class="c-comment"># ¿Dónde estoy? (como cd sin args en Windows)</span><br>
+<span class="c-cmd">ls</span> <span class="c-flag">-la</span>                <span class="c-comment"># listado detallado con permisos y tamaño</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">/</span>                  <span class="c-comment"># ir a la raíz</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">/home</span>             <span class="c-comment"># ir a la carpeta de usuarios</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">~</span>                  <span class="c-comment"># atajo: tu carpeta personal</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">..</span>                 <span class="c-comment"># subir un nivel</span>
+            </div>
+          </div>
+
+          <h3>Estructura del sistema de archivos</h3>
+          <div class="dir-tree">
+<span class="dt-root">/</span>                    <span class="dt-comment">→ raíz (como C:\ pero sin letra de unidad)</span><br>
+├── <span class="dt-dir">home/</span>           <span class="dt-comment">→ carpetas de usuarios (como C:\Users)</span><br>
+│   └── <span class="dt-dir">alumno/</span>     <span class="dt-comment">→ tu espacio personal</span><br>
+├── <span class="dt-dir">etc/</span>            <span class="dt-comment">→ configuraciones del sistema (.ini + registro)</span><br>
+├── <span class="dt-dir">var/</span><br>
+│   └── <span class="dt-dir">log/</span>        <span class="dt-comment">→ logs del sistema (como Visor de Eventos)</span><br>
+├── <span class="dt-dir">bin/</span>            <span class="dt-comment">→ comandos básicos (ls, cp, mv...)</span><br>
+└── <span class="dt-dir">tmp/</span>            <span class="dt-comment">→ temporales (se borran al reiniciar)</span>
+          </div>
+
+          <div class="tip">
+            <strong>⚡ EJERCICIO RÁPIDO:</strong> Navega a /etc y ejecuta <code>ls | grep "passwd"</code> para ver los archivos relacionados con usuarios.
+          </div>
+        </div>
+      </div>
+
+      <!-- MOD 2 -->
+      <div class="modulo" id="mod2">
+        <div class="modulo-header" onclick="toggleMod('mod2')">
+          <span class="modulo-num">02</span>
+          <span class="modulo-title">Gestión de archivos</span>
+          <span class="modulo-dur">20 min</span>
+          <span class="modulo-arrow">▶</span>
+        </div>
+        <div class="modulo-body">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+            <div class="code-content">
+<span class="c-cmd">touch</span> <span class="c-arg">prueba.txt</span>         <span class="c-comment"># crear archivo vacío</span><br>
+<span class="c-cmd">mkdir</span> <span class="c-arg">proyecto</span>           <span class="c-comment"># crear carpeta</span><br>
+<span class="c-cmd">cp</span> <span class="c-arg">prueba.txt proyecto/</span>  <span class="c-comment"># copiar archivo</span><br>
+<span class="c-cmd">mv</span> <span class="c-arg">prueba.txt nuevo.txt</span>   <span class="c-comment"># mover o renombrar</span><br>
+<span class="c-cmd">rm</span> <span class="c-arg">prueba.txt</span>            <span class="c-comment"># eliminar archivo (¡sin papelera!)</span><br>
+<span class="c-cmd">rm</span> <span class="c-flag">-r</span> <span class="c-arg">proyecto/</span>         <span class="c-comment"># eliminar carpeta con todo su contenido</span>
+            </div>
+          </div>
+
+          <div class="danger">
+            <strong>⚠️ PELIGRO:</strong> <code>rm -rf</code> es irreversible. No hay papelera de reciclaje. <strong>NUNCA</strong> ejecutes <code>rm -rf /</code> ni <code>rm -rf /*</code> — borrarías todo el sistema sin confirmación.
+          </div>
+
+          <div class="tip">
+            <strong>💡 EJERCICIO:</strong> Crea la estructura <code>mis_notas/</code> con los archivos <code>tema1.txt</code> y <code>tema2.txt</code>. Luego copia todo a una carpeta <code>backup/</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- MOD 3 -->
+      <div class="modulo" id="mod3">
+        <div class="modulo-header" onclick="toggleMod('mod3')">
+          <span class="modulo-num">03</span><br>
+          <span class="modulo-title">Permisos (chmod)</span><br>
+          <span class="modulo-dur">20 min</span><br>
+          <span class="modulo-arrow">▶</span>
+        </div>
+        <div class="modulo-body">
+          <h3>Leer la salida de ls -l</h3>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+            <div class="code-content">
+<span class="c-out">-rw-r--r-- 1 alumno alumno 0 may 14 10:00 archivo.txt</span><br>
+<span class="c-comment"> ↑↑↑↑↑↑↑↑↑</span><br>
+<span class="c-comment"> │││└──── otros: r--  (solo leer)</span><br>
+<span class="c-comment"> │└────── grupo: r--  (solo leer)</span><br>
+<span class="c-comment"> └─────── usuario: rw- (leer + escribir)</span>
+            </div>
+          </div>
+
+          <h3 style="margin-top:1rem">Visualizador de permisos interactivo</h3>
+          <div style="margin-bottom:0.6rem;font-size:0.8rem;color:var(--text-dim)">Haz clic en los bits para cambiarlos:</div>
+          <div class="perm-viz">
+            <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:0.8rem">USUARIO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GRUPO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTROS</div>
+            <div class="perm-row" id="perm-row"></div>
+            <div style="margin-top:0.8rem;font-size:0.8rem">
+              Valor numérico: <span id="perm-num" style="color:var(--green);font-size:1.1rem;font-weight:700"></span>
+              &nbsp;&nbsp; Simbólico: <span id="perm-sym" style="color:var(--amber)"></span>
+            </div>
+          </div>
+
+          <h3 style="margin-top:1rem">Ejemplos clave</h3>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+            <div class="code-content">
+<span class="c-cmd">chmod</span> <span class="c-arg">755 script.sh</span>   <span class="c-comment"># rwxr-xr-x  → típico para scripts</span><br>
+<span class="c-cmd">chmod</span> <span class="c-arg">644 readme.txt</span>  <span class="c-comment"># rw-r--r--  → típico para archivos</span><br>
+<span class="c-cmd">chmod</span> <span class="c-arg">600 secreto.txt</span> <span class="c-comment"># rw-------  → solo tú</span><br>
+<span class="c-cmd">chmod</span> <span class="c-arg">u+x script.sh</span>   <span class="c-comment"># añade ejecución solo al propietario</span>
+            </div>
+          </div>
+
+          <div style="background:#000;border:1px solid var(--border);border-radius:6px;padding:0.8rem 1rem;margin:0.8rem 0">
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-dim);margin-bottom:0.5rem">REGLA MNEMOTÉCNICA</div>
+            <div style="display:flex;gap:1.5rem">
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1.4rem;color:var(--red);font-weight:700">4</div><div style="font-size:0.72rem;color:var(--text-dim)">r · leer</div></div>
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1.4rem;color:var(--amber);font-weight:700">2</div><div style="font-size:0.72rem;color:var(--text-dim)">w · escribir</div></div>
+              <div style="text-align:center"><div style="font-family:var(--mono);font-size:1.4rem;color:var(--green);font-weight:700">1</div><div style="font-size:0.72rem;color:var(--text-dim)">x · ejecutar</div></div>
+              <div style="text-align:center;border-left:1px solid var(--border);padding-left:1.5rem"><div style="font-family:var(--mono);font-size:1.4rem;color:#fff;font-weight:700">7</div><div style="font-size:0.72rem;color:var(--text-dim)">rwx (4+2+1)</div></div>
+            </div>
+          </div>
+
+          <div class="tip">
+            <strong>🔧 DEMO:</strong> Crea un script: <code>echo 'echo "Hola mundo"' > hola.sh</code>. Luego <code>chmod +x hola.sh</code> y ejecútalo con <code>./hola.sh</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOD 4 -->
+      <div class="modulo" id="mod4">
+        <div class="modulo-header" onclick="toggleMod('mod4')">
+          <span class="modulo-num">04</span>
+          <span class="modulo-title">Instalación de aplicaciones (apt)</span>
+          <span class="modulo-dur">15 min</span>
+          <span class="modulo-arrow">▶</span>
+        </div>
+        <div class="modulo-body">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+            <div class="code-content">
+<span class="c-cmd">sudo apt update</span>              <span class="c-comment"># actualiza lista de paquetes (no instala nada)</span><br>
+<span class="c-cmd">sudo apt upgrade</span>             <span class="c-comment"># actualiza todo el sistema</span><br>
+<span class="c-cmd">sudo apt install</span> <span class="c-arg">neofetch</span>    <span class="c-comment"># instalar una aplicación</span><br>
+<span class="c-cmd">neofetch</span>                     <span class="c-comment"># ejecutarla</span><br>
+<span class="c-cmd">sudo apt remove</span> <span class="c-arg">neofetch</span>     <span class="c-comment"># desinstalar</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin:1rem 0">
+            <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:0.9rem">
+              <div style="font-family:var(--mono);font-size:0.65rem;color:var(--red);margin-bottom:0.5rem;letter-spacing:0.1em">WINDOWS</div>
+              <div style="font-size:0.82rem;color:var(--text);line-height:1.6">Descargas .exe de webs aleatorias → riesgo de virus, sin control de versiones, desinstalación parcial</div>
+            </div>
+            <div style="background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.15);border-radius:6px;padding:0.9rem">
+              <div style="font-family:var(--mono);font-size:0.65rem;color:var(--green);margin-bottom:0.5rem;letter-spacing:0.1em">LINUX (APT)</div>
+              <div style="font-size:0.82rem;color:var(--text);line-height:1.6">Repositorios oficiales → software verificado, dependencias automáticas, desinstalación limpia</div>
+            </div>
+          </div>
+
+          <div class="tip">
+            <strong>💡 EJERCICIO:</strong> Instala <code>cowsay</code> y ejecuta <code>cowsay "Hola clase"</code>. Observa cómo apt gestiona las dependencias.
+          </div>
+        </div>
+      </div>
+
+      <!-- MOD 5 -->
+      <div class="modulo" id="mod5">
+        <div class="modulo-header" onclick="toggleMod('mod5')">
+          <span class="modulo-num">05</span>
+          <span class="modulo-title">Extras útiles: man, pipes y redirecciones</span>
+          <span class="modulo-dur">15 min</span>
+          <span class="modulo-arrow">▶</span>
+        </div>
+        <div class="modulo-body">
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab(this, 'tab-man', 'mod5')">man</button>
+            <button class="tab-btn" onclick="showTab(this, 'tab-redirect', 'mod5')">redirecciones</button>
+            <button class="tab-btn" onclick="showTab(this, 'tab-pipes', 'mod5')">pipes |</button>
+            <button class="tab-btn" onclick="showTab(this, 'tab-nano', 'mod5')">nano</button>
+          </div>
+
+          <div id="tab-man" class="tab-pane active">
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+              <div class="code-content">
+<span class="c-cmd">man</span> <span class="c-arg">ls</span>       <span class="c-comment"># manual del comando ls</span><br>
+<span class="c-cmd">man</span> <span class="c-arg">chmod</span>    <span class="c-comment"># manual de chmod</span>
+<span class="c-comment">              # Navegar: flechas ↑↓  |  Salir: q</span>
+              </div>
+            </div>
+            <div class="tip"><strong>💡</strong> El manual integrado funciona sin internet. Es tu mejor aliado cuando no recuerdas los flags.</div>
+          </div>
+
+          <div id="tab-redirect" class="tab-pane">
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+              <div class="code-content">
+<span class="c-cmd">echo</span> <span class="c-arg">"Primera línea"</span> <span class="c-flag">></span> <span class="c-arg">archivo.txt</span>   <span class="c-comment"># crea/sobrescribe</span><br>
+<span class="c-cmd">echo</span> <span class="c-arg">"Segunda línea"</span> <span class="c-flag">>></span> <span class="c-arg">archivo.txt</span>  <span class="c-comment"># añade al final</span><br>
+<span class="c-cmd">ls -la</span> <span class="c-flag">></span> <span class="c-arg">listado.txt</span>                  <span class="c-comment"># guarda salida de comando</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.8rem;margin-top:0.8rem">
+              <div style="flex:1;background:#000;border:1px solid var(--border);border-radius:6px;padding:0.8rem;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.5rem;color:var(--green);font-weight:700">></div>
+                <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.3rem">Crea o <strong style="color:var(--red)">sobrescribe</strong></div>
+              </div>
+              <div style="flex:1;background:#000;border:1px solid var(--border);border-radius:6px;padding:0.8rem;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.5rem;color:var(--amber);font-weight:700">>></div>
+                <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.3rem">Añade al <strong style="color:var(--green2)">final</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-pipes" class="tab-pane">
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+              <div class="code-content">
+<span class="c-cmd">ls -la</span> <span class="c-arg">/etc</span> <span class="c-flag">|</span> <span class="c-cmd">grep</span> <span class="c-arg">"conf"</span>   <span class="c-comment"># solo líneas con "conf"</span><br>
+<span class="c-cmd">ps aux</span> <span class="c-flag">|</span> <span class="c-cmd">grep</span> <span class="c-arg">"bash"</span>          <span class="c-comment"># buscar procesos bash</span><br>
+<span class="c-cmd">cat</span> <span class="c-arg">archivo.txt</span> <span class="c-flag">|</span> <span class="c-cmd">wc -l</span>     <span class="c-comment"># contar líneas</span>
+              </div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:0.8rem 1rem;margin-top:0.8rem;font-size:0.82rem;color:var(--text-dim)">
+              El pipe <code style="color:var(--green)">|</code> conecta la <strong style="color:#fff">salida</strong> de un comando con la <strong style="color:#fff">entrada</strong> del siguiente. Es como una cadena de montaje.
+            </div>
+          </div>
+
+          <div id="tab-nano" class="tab-pane">
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+              <div class="code-content">
+<span class="c-cmd">nano</span> <span class="c-arg">notas.txt</span>    <span class="c-comment"># abrir/crear archivo para editar</span>
+
+<span class="c-comment">  # Atajos dentro de nano:</span><br>
+<span class="c-comment">  # Ctrl + O  →  guardar</span><br>
+<span class="c-comment">  # Ctrl + X  →  salir</span><br>
+<span class="c-comment">  # Ctrl + K  →  cortar línea</span><br>
+<span class="c-comment">  # Ctrl + W  →  buscar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== CHEATSHEET ======== -->
+<div id="page-cheatsheet" class="page">
+  <div class="main">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">⚡</span>
+        <h2>Cheatsheet rápido</h2>
+      </div>
+
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:2rem">
+        <table class="cheat-table">
+          <thead>
+            <tr>
+              <th>Acción</th>
+              <th>Windows (cmd)</th>
+              <th>Linux (bash)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ver carpeta actual</td><td><span class="win-pill">cd</span></td><td><span class="cmd-pill">pwd</span></td></tr>
+            <tr><td>Listar archivos</td><td><span class="win-pill">dir</span></td><td><span class="cmd-pill">ls -la</span></td></tr>
+            <tr><td>Moverse de carpeta</td><td><span class="win-pill">cd carpeta</span></td><td><span class="cmd-pill">cd carpeta</span></td></tr>
+            <tr><td>Crear archivo vacío</td><td><span class="win-pill">type nul > f.txt</span></td><td><span class="cmd-pill">touch f.txt</span></td></tr>
+            <tr><td>Crear carpeta</td><td><span class="win-pill">mkdir carpeta</span></td><td><span class="cmd-pill">mkdir carpeta</span></td></tr>
+            <tr><td>Copiar archivo</td><td><span class="win-pill">copy f.txt dst\</span></td><td><span class="cmd-pill">cp f.txt dst/</span></td></tr>
+            <tr><td>Mover / renombrar</td><td><span class="win-pill">move f.txt dst\</span></td><td><span class="cmd-pill">mv f.txt dst/</span></td></tr>
+            <tr><td>Borrar archivo</td><td><span class="win-pill">del f.txt</span></td><td><span class="cmd-pill">rm f.txt</span></td></tr>
+            <tr><td>Borrar carpeta</td><td><span class="win-pill">rmdir /s carpeta</span></td><td><span class="cmd-pill">rm -r carpeta/</span></td></tr>
+            <tr><td>Ver contenido de archivo</td><td><span class="win-pill">type f.txt</span></td><td><span class="cmd-pill">cat f.txt</span></td></tr>
+            <tr><td>Limpiar pantalla</td><td><span class="win-pill">cls</span></td><td><span class="cmd-pill">clear</span></td></tr>
+            <tr><td>Ver ayuda</td><td><span class="win-pill">comando /?</span></td><td><span class="cmd-pill">man comando</span></td></tr>
+            <tr><td>Instalar app</td><td><span class="win-pill">winget install</span></td><td><span class="cmd-pill">sudo apt install</span></td></tr>
+            <tr><td>Ver procesos</td><td><span class="win-pill">tasklist</span></td><td><span class="cmd-pill">ps aux</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-header">
+        <span class="section-num">🔴</span>
+        <h2>Errores típicos y soluciones</h2>
+      </div>
+      <div class="errors-grid">
+        <div class="err-card red">
+          <div class="err-title">Permission denied</div>
+          <div class="err-solution">No tienes permisos. Usa <code style="color:var(--green)">sudo</code> o revisa con <code style="color:var(--green)">ls -l</code> y ajusta con <code style="color:var(--green)">chmod</code>.</div>
+        </div>
+        <div class="err-card red">
+          <div class="err-title">command not found</div>
+          <div class="err-solution">El comando no existe o hay un error tipográfico. Si debería existir, instálalo con <code style="color:var(--green)">apt install</code>.</div>
+        </div>
+        <div class="err-card amber">
+          <div class="err-title">rm: cannot remove</div>
+          <div class="err-solution">Sin permiso de escritura en el archivo, o el archivo no existe. Verifica la ruta con <code style="color:var(--green)">ls</code>.</div>
+        </div>
+        <div class="err-card amber">
+          <div class="err-title">No such file or directory</div>
+          <div class="err-solution">La ruta es incorrecta. Usa <code style="color:var(--green)">pwd</code> para saber dónde estás y <code style="color:var(--green)">ls</code> para ver qué hay.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== EJERCICIO ======== -->
+<div id="page-ejercicio" class="page">
+  <div class="main">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">🧪</span>
+        <h2>Ejercicio integrador: Analizador de Logs</h2>
+      </div>
+
+      <div class="ejercicio">
+        <div class="ej-header">
+          <div>
+            <div class="ej-badge">Ejercicio final · 20 min</div>
+            <div class="ej-title">Analizador de Logs del Sistema</div>
+          </div>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-desc">Crear la estructura de carpetas del proyecto</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">mkdir</span> <span class="c-arg">proyecto_logs</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">proyecto_logs</span><br>
+<span class="c-cmd">mkdir</span> <span class="c-arg">datos resultados</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-desc">Crear un archivo de log simulado con errores e información</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">echo</span> <span class="c-arg">"ERROR: conexión fallida"</span> <span class="c-flag">></span> <span class="c-arg">datos/sistema.log</span><br>
+<span class="c-cmd">echo</span> <span class="c-arg">"INFO: usuario login"</span> <span class="c-flag">>></span> <span class="c-arg">datos/sistema.log</span><br>
+<span class="c-cmd">echo</span> <span class="c-arg">"ERROR: disco lleno"</span> <span class="c-flag">>></span> <span class="c-arg">datos/sistema.log</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-desc">Copiar y filtrar solo los errores con grep</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">cp</span> <span class="c-arg">datos/sistema.log resultados/</span><br>
+<span class="c-cmd">cd</span> <span class="c-arg">resultados</span><br>
+<span class="c-cmd">grep</span> <span class="c-arg">"ERROR" sistema.log</span> <span class="c-flag">></span> <span class="c-arg">errores.txt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-desc">Asignar permisos correctos a archivos y carpetas</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">chmod</span> <span class="c-arg">644 errores.txt</span>    <span class="c-comment"># dueño: rw, resto: r</span><br>
+<span class="c-cmd">chmod</span> <span class="c-arg">755 ../datos</span>      <span class="c-comment"># carpeta con permisos de ejecución (acceso)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-desc">Instalar la herramienta figlet para generar texto decorativo</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">sudo apt update</span><br>
+<span class="c-cmd">sudo apt install</span> <span class="c-arg">figlet</span> <span class="c-flag">-y</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-content">
+              <div class="step-desc">Generar el reporte final combinando cabecera + errores</div>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+                <div class="code-content">
+<span class="c-cmd">figlet</span> <span class="c-arg">"MIS ERRORES"</span> <span class="c-flag">></span> <span class="c-arg">reporte.txt</span><br>
+<span class="c-cmd">cat</span> <span class="c-arg">errores.txt</span> <span class="c-flag">>></span> <span class="c-arg">reporte.txt</span><br>
+<span class="c-cmd">cat</span> <span class="c-arg">reporte.txt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <div class="section-header">
+          <span class="section-num">💭</span>
+          <h2>Preguntas de reflexión</h2>
+        </div>
+        <div class="q-grid">
+          <div class="q-card">
+            <div class="q-num">Q1</div>
+            <div class="q-text">¿Qué pasa si haces <code style="color:var(--green)">chmod 000 errores.txt</code>? ¿Cómo lo solucionas?</div>
+          </div>
+          <div class="q-card">
+            <div class="q-num">Q2</div>
+            <div class="q-text">¿Dónde se guardan los logs reales en Linux? <em style="color:var(--text-dim)">(Pista: /var/log)</em></div>
+          </div>
+          <div class="q-card">
+            <div class="q-num">Q3</div>
+            <div class="q-text">¿Qué diferencia hay entre <code style="color:var(--green)">&gt;</code> y <code style="color:var(--amber)">&gt;&gt;</code>? Da un ejemplo de cuándo usarías cada uno.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== EVALUACIÓN ======== -->
+<div id="page-eval" class="page">
+  <div class="main">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">✅</span>
+        <h2>Evaluación oral</h2>
+      </div>
+      <p class="intro-text">Preguntas para los últimos 5 minutos. Intenta responder antes de desplegar la respuesta.</p>
+
+      <div style="display:flex;flex-direction:column;gap:1rem" id="quiz-container"></div>
+
+      <div style="margin-top:2rem;background:rgba(57,255,20,0.06);border:1px solid var(--green-dim);border-radius:8px;padding:1.5rem;text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem">"La consola no muerde."</div>
+        <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.7">Lo que habéis hecho hoy es exactamente lo que haréis en servidores reales, en despliegues, en vuestro puesto de trabajo.<br>Con 10 comandos bien usados hacéis el 80% del trabajo diario.</div>
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <div class="section-header">
+          <span class="section-num">🏠</span>
+          <h2>Tarea para casa</h2>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-content">
+<span class="c-comment"># Explorar logs reales del sistema</span><br>
+<span class="c-cmd">ls -la</span> <span class="c-arg">/var/log</span>
+
+<span class="c-comment"># Buscar intentos de autenticación fallidos</span><br>
+<span class="c-cmd">grep</span> <span class="c-arg">"Failed"</span> <span class="c-arg">/var/log/auth.log</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleMod(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function showTab(btn, tabId, modId) {
+  const body = document.getElementById(modId).querySelector('.modulo-body');
+  body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  body.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function copyCode(btn) {
+  const text = btn.closest('.code-block').querySelector('.code-content').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ copiado';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+  });
+}
+
+// Permisos interactivos
+const bits = [
+  { label:'r', on:true }, { label:'w', on:true }, { label:'x', on:false },
+  { label:'r', on:true }, { label:'w', on:false }, { label:'x', on:true },
+  { label:'r', on:true }, { label:'w', on:false }, { label:'x', on:false }
+];
+
+function renderPerms() {
+  const row = document.getElementById('perm-row');
+  if (!row) return;
+  row.innerHTML = '';
+  bits.forEach((b, i) => {
+    if (i === 3 || i === 6) {
+      const sep = document.createElement('span');
+      sep.className = 'perm-sep'; sep.textContent = '·';
+      row.appendChild(sep);
+    }
+    const el = document.createElement('span');
+    el.className = 'perm-bit ' + (b.on ? 'pb-on' : 'pb-off');
+    el.textContent = b.on ? b.label : '-';
+    el.style.cursor = 'pointer';
+    el.title = 'Clic para cambiar';
+    el.onclick = () => { bits[i].on = !bits[i].on; renderPerms(); };
+    row.appendChild(el);
+  });
+  const groups = [[0,1,2],[3,4,5],[6,7,8]];
+  const nums = groups.map(g => g.reduce((s, i) => s + (bits[i].on ? [4,2,1][i%3] : 0), 0));
+  document.getElementById('perm-num').textContent = nums.join('');
+  document.getElementById('perm-sym').textContent = nums.join('') + ' → ' + bits.map(b => b.on ? b.label : '-').join('');
+}
+renderPerms();
+
+// Quiz
+const quiz = [
+  { q:'¿Qué significa rwxr-xr-- en permisos?', a:'Dueño: leer+escribir+ejecutar (7) | Grupo: leer+ejecutar (5) | Otros: solo leer (4)' },
+  { q:'Si quieres instalar git en Ubuntu, ¿qué escribes?', a:'sudo apt update && sudo apt install git' },
+  { q:'¿Cómo ves el contenido de /etc/passwd página por página?', a:'less /etc/passwd  (o también: more /etc/passwd)' },
+  { q:'¿Qué diferencia hay entre > y >> en redirecciones?', a:'> sobrescribe el archivo (¡cuidado!), >> añade al final sin borrar' },
+  { q:'¿Qué hace el pipe | ?', a:'Conecta la salida de un comando con la entrada del siguiente. Ej: ls -la | grep ".txt"' },
+];
+
+const qc = document.getElementById('quiz-container');
+quiz.forEach((item, i) => {
+  const div = document.createElement('div');
+  div.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;';
+  div.innerHTML = `
+    <div style="padding:1rem 1.2rem;cursor:pointer;display:flex;align-items:center;gap:1rem" onclick="var ans=this.nextElementSibling;ans.style.display=ans.style.display==='block'?'none':'block';this.querySelector('.qa-icon').textContent=ans.style.display==='block'?'▼':'▶'">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--purple);min-width:28px">Q${i+1}</span>
+      <span style="font-size:0.88rem;font-weight:600;flex:1">${item.q}</span>
+      <span class="qa-icon" style="color:var(--text-dim);font-size:0.75rem">▶</span>
+    </div>
+    <div style="display:none;padding:0.8rem 1.2rem;background:rgba(57,255,20,0.04);border-top:1px solid var(--border)">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--green);letter-spacing:0.1em">RESPUESTA:</span>
+      <div style="margin-top:0.4rem;font-family:var(--mono);font-size:0.82rem;color:var(--green2);line-height:1.6">${item.a}</div>
+    </div>
+  `;
+  qc.appendChild(div);
+});
+</script>
+</body>
+</html>

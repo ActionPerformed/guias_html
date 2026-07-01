@@ -40,6 +40,8 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [guia-ia-bachillerato.html](https://actionperformed.github.io/guias_html/guia-ia-bachillerato.html) | La IA como Herramienta de Estudio — EBAU y técnicas de estudio con IA |
 | [guia-ia-fp.html](https://actionperformed.github.io/guias_html/guia-ia-fp.html) | La IA como Herramienta de Estudio (FP) — IA para Formación Profesional |
 | [guia-que-ia-usar.html](https://actionperformed.github.io/guias_html/guia-que-ia-usar.html) | Qué IA Usar para Cada Tarea — comparativa visual de herramientas de IA |
+| [guia_linux.html](https://actionperformed.github.io/guias_html/guia_linux.html) | Introducción a Linux — sistema de archivos, permisos, terminal para 1º DAW |
+| [guia_lean.html](https://actionperformed.github.io/guias_html/guia_lean.html) | Introducción a Lean — lenguaje donde las demostraciones matemáticas se escriben, se verifican y nunca mienten |
 
 ---
 
