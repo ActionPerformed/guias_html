@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotlin desde Cero — Guía Interactiva DAM 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0C1E;
+  --bg-soft:#0F1228;
+  --surface:#161933;
+  --surface-2:#1D2044;
+  --border:#2B2E58;
+  --border-soft:#22254a;
+  --text:#E9E8F7;
+  --text-dim:#A6A4CC;
+  --text-faint:#716F9C;
+  --purple:#8657FF;
+  --purple-2:#B98EFF;
+  --orange:#FF9138;
+  --green:#4ADE80;
+  --red:#FF7A7A;
+  --blue:#5EC8FF;
+  --code-bg:#0B0C1E;
+  --grad: linear-gradient(120deg, var(--purple) 0%, #B15CFF 45%, var(--orange) 100%);
+  --radius: 14px;
+  --maxw: 880px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(134,87,255,0.18), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,145,56,0.10), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter', sans-serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; font-weight:600; line-height:1.25; margin:0 0 .5em;}
+p{margin:0 0 1em; color:var(--text-dim);}
+a{color:var(--purple-2);}
+code, pre, .mono{font-family:'JetBrains Mono', monospace;}
+::selection{background:rgba(134,87,255,0.35);}
+
+/* Skip link */
+.skip-link{position:absolute; left:-999px; top:0; background:var(--purple); color:#fff; padding:.6em 1em; border-radius:0 0 8px 0; z-index:999;}
+.skip-link:focus{left:0;}
+
+/* ===== NAVBAR ===== */
+header.nav{
+  position:sticky; top:0; z-index:100;
+  background:rgba(10,12,30,0.86);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border-soft);
+}
+.nav-inner{max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:1.2rem; padding:.7rem 1.2rem;}
+.brand{display:flex; align-items:center; gap:.6rem; flex-shrink:0; text-decoration:none; color:var(--text);}
+.brand-mark{width:30px; height:30px; flex-shrink:0;}
+.brand-text{font-family:'Space Grotesk'; font-weight:700; font-size:1.02rem; letter-spacing:.2px;}
+.brand-text .sub{display:block; font-family:'Inter'; font-weight:500; font-size:.62rem; color:var(--text-faint); letter-spacing:.4px; margin-top:1px;}
+.navlinks{display:flex; gap:.3rem; overflow-x:auto; scrollbar-width:none; flex:1;}
+.navlinks::-webkit-scrollbar{display:none;}
+.navlinks a{
+  white-space:nowrap; text-decoration:none; color:var(--text-dim); font-size:.83rem; font-weight:500;
+  padding:.45rem .8rem; border-radius:999px; transition:.15s; border:1px solid transparent;
+}
+.navlinks a:hover{color:var(--text); background:var(--surface);}
+.navlinks a.active{color:#fff; background:var(--surface-2); border-color:var(--border);}
+.navtoggle{display:none; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+
+@media (max-width:900px){
+  .navlinks{display:none; position:fixed; top:56px; left:0; right:0; bottom:0; flex-direction:column; overflow-y:auto; background:var(--bg-soft); padding:1rem; z-index:99; align-items:stretch;}
+  .navlinks.open{display:flex;}
+  .navlinks a{padding:.8rem 1rem; font-size:.95rem;}
+  .navtoggle{display:flex;}
+}
+
+/* ===== LAYOUT ===== */
+main{max-width:var(--maxw); margin:0 auto; padding:0 1.3rem 6rem;}
+section.block{padding:3.2rem 0; border-bottom:1px solid var(--border-soft);}
+section.block:last-of-type{border-bottom:none;}
+.eyebrow-row{display:flex; align-items:center; gap:.7rem; margin-bottom:.6rem;}
+.section-num{
+  font-family:'JetBrains Mono'; font-size:.78rem; color:var(--orange); background:rgba(255,145,56,.1);
+  border:1px solid rgba(255,145,56,.3); padding:.15rem .55rem; border-radius:6px;
+}
+.block h2{font-size:1.7rem; margin:0;}
+.block > .lede{font-size:1.02rem; margin-top:.6rem;}
+
+/* ===== HERO ===== */
+.hero{padding:3.6rem 0 2.2rem; text-align:left;}
+.hero-kicker{display:inline-flex; align-items:center; gap:.5rem; font-size:.78rem; color:var(--purple-2); background:rgba(134,87,255,.12); border:1px solid rgba(134,87,255,.35); padding:.35rem .8rem; border-radius:999px; margin-bottom:1.2rem;}
+.hero h1{font-size:clamp(2.2rem, 6vw, 3.4rem); margin-bottom:.5rem;}
+.hero h1 .grad{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p.lede{font-size:1.08rem; max-width:640px; color:var(--text-dim);}
+.hero-meta{display:flex; flex-wrap:wrap; gap:.8rem; margin-top:1.4rem;}
+.hero-meta span{font-size:.78rem; color:var(--text-faint); background:var(--surface); border:1px solid var(--border); padding:.35rem .7rem; border-radius:8px;}
+
+/* ===== TERMINAL (signature demo) ===== */
+.terminal{
+  margin-top:2rem; background:var(--code-bg); border:1px solid var(--border); border-radius:var(--radius);
+  overflow:hidden; box-shadow:0 30px 60px -25px rgba(134,87,255,.35);
+}
+.terminal-bar{display:flex; align-items:center; justify-content:space-between; padding:.6rem .9rem; background:var(--surface); border-bottom:1px solid var(--border);}
+.terminal-dots{display:flex; gap:.4rem;}
+.terminal-dots span{width:10px; height:10px; border-radius:50%; display:inline-block;}
+.terminal-dots span:nth-child(1){background:#FF6159;} .terminal-dots span:nth-child(2){background:#FFBD2E;} .terminal-dots span:nth-child(3){background:#28C840;}
+.terminal-title{font-size:.75rem; color:var(--text-faint);}
+.terminal-select{display:flex; gap:.5rem; padding:.7rem .9rem; flex-wrap:wrap; border-bottom:1px solid var(--border-soft); background:rgba(255,255,255,.015);}
+.snippet-btn{
+  font-family:'JetBrains Mono'; font-size:.72rem; background:var(--surface); border:1px solid var(--border); color:var(--text-dim);
+  padding:.4rem .7rem; border-radius:7px; cursor:pointer; transition:.15s;
+}
+.snippet-btn:hover{color:var(--text); border-color:var(--purple);}
+.snippet-btn.active{background:var(--purple); border-color:var(--purple); color:#fff;}
+.terminal-body{display:grid; grid-template-columns:1fr 1fr; min-height:230px;}
+@media (max-width:640px){.terminal-body{grid-template-columns:1fr;}}
+.term-code, .term-out{padding:1rem 1.1rem; font-size:.82rem; overflow:auto;}
+.term-code{border-right:1px solid var(--border-soft); white-space:pre; color:var(--text);}
+@media (max-width:640px){.term-code{border-right:none; border-bottom:1px solid var(--border-soft);}}
+.term-out{background:rgba(255,255,255,.015); white-space:pre-wrap; color:var(--green);}
+.term-out .prompt{color:var(--text-faint);}
+.term-footer{display:flex; justify-content:flex-end; padding:.7rem .9rem; border-top:1px solid var(--border-soft);}
+.run-btn{
+  font-family:'Space Grotesk'; font-weight:600; font-size:.82rem; background:var(--grad); color:#0A0C1E; border:none;
+  padding:.55rem 1.1rem; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:.4rem; transition:.15s;
+}
+.run-btn:hover{transform:translateY(-1px); filter:brightness(1.06);}
+.run-btn:active{transform:translateY(0);}
+.blink{animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ===== CODE BLOCKS ===== */
+.codewrap{position:relative; margin:1rem 0 1.3rem;}
+pre.code{
+  background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:1rem 1.1rem;
+  overflow-x:auto; font-size:.82rem; margin:0; line-height:1.6;
+}
+pre.code code{white-space:pre;}
+.copy-btn{
+  position:absolute; top:.55rem; right:.55rem; font-family:'Inter'; font-size:.68rem; font-weight:600;
+  background:var(--surface-2); color:var(--text-dim); border:1px solid var(--border); padding:.3rem .6rem;
+  border-radius:6px; cursor:pointer; opacity:.75; transition:.15s;
+}
+.copy-btn:hover{opacity:1; color:#fff; border-color:var(--purple);}
+.copy-btn.copied{background:rgba(74,222,128,.15); color:var(--green); border-color:var(--green);}
+.kw{color:var(--purple-2);} .str{color:var(--green);} .cmt{color:var(--text-faint); font-style:italic;} .num{color:var(--orange);} .fn{color:var(--blue);} .ann{color:var(--orange);} .tpl{color:#FFD166;}
+
+/* ===== TABLES ===== */
+.tblwrap{overflow-x:auto; margin:1.1rem 0;}
+table{border-collapse:collapse; width:100%; font-size:.86rem;}
+th,td{padding:.6rem .8rem; border:1px solid var(--border); text-align:left;}
+th{background:var(--surface-2); color:var(--purple-2); font-family:'Space Grotesk'; font-weight:600; font-size:.8rem;}
+td{color:var(--text-dim);}
+td code, th code{color:var(--text); background:rgba(134,87,255,.12); padding:.1rem .35rem; border-radius:4px; font-size:.8em;}
+tr:nth-child(even) td{background:rgba(255,255,255,.015);}
+
+/* ===== ACCORDION ===== */
+.accordion{border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:1.4rem;}
+.acc-item{border-bottom:1px solid var(--border-soft);}
+.acc-item:last-child{border-bottom:none;}
+.acc-head{
+  width:100%; text-align:left; background:var(--surface); color:var(--text); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between; padding:1rem 1.2rem; font-family:'Space Grotesk';
+  font-weight:600; font-size:.98rem; gap:1rem;
+}
+.acc-head:hover{background:var(--surface-2);}
+.acc-head .tag{font-family:'JetBrains Mono'; font-size:.7rem; color:var(--text-faint); font-weight:500;}
+.acc-chevron{transition:.25s; flex-shrink:0; color:var(--purple-2);}
+.acc-item.open .acc-chevron{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.acc-panel-inner{padding:0 1.2rem 1.4rem;}
+.acc-item.open .acc-panel{max-height:4000px;}
+
+/* ===== BADGES / CALLOUTS ===== */
+.callout{border-radius:10px; padding:.9rem 1.1rem; margin:1rem 0; font-size:.9rem; border:1px solid;}
+.callout.tip{background:rgba(94,200,255,.08); border-color:rgba(94,200,255,.3); color:#CDEBFF;}
+.callout.warn{background:rgba(255,122,122,.08); border-color:rgba(255,122,122,.3); color:#FFD9D9;}
+.callout.key{background:rgba(134,87,255,.1); border-color:rgba(134,87,255,.35); color:#E4D9FF;}
+.callout strong{color:#fff;}
+
+/* ===== TABS (scope functions) ===== */
+.tabs{display:flex; gap:.4rem; flex-wrap:wrap; margin-top:1.2rem;}
+.tab-btn{
+  font-family:'JetBrains Mono'; font-size:.78rem; background:var(--surface); border:1px solid var(--border);
+  color:var(--text-dim); padding:.5rem .9rem; border-radius:8px 8px 0 0; cursor:pointer; border-bottom:none; position:relative; top:1px;
+}
+.tab-btn.active{background:var(--surface-2); color:#fff; border-color:var(--purple); border-bottom:1px solid var(--surface-2);}
+.tab-panels{border:1px solid var(--border); border-radius:0 10px 10px 10px; background:var(--surface-2); padding:1.3rem;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.sf-meta{display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:1rem;}
+.sf-meta div{font-size:.82rem;}
+.sf-meta b{display:block; color:var(--text-faint); font-size:.68rem; text-transform:uppercase; letter-spacing:.5px; margin-bottom:.2rem;}
+
+/* ===== NULL SAFETY WIDGET ===== */
+.ns-widget{border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); padding:1.3rem; margin-top:1.2rem;}
+.ns-controls{display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1rem;}
+.ns-op{font-family:'JetBrains Mono'; font-weight:600; background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:.5rem 1rem; border-radius:8px; cursor:pointer;}
+.ns-op.active{background:var(--purple); border-color:var(--purple); color:#fff;}
+.ns-state{display:flex; align-items:center; gap:.6rem; margin-bottom:1rem; font-size:.85rem; color:var(--text-dim);}
+.ns-switch{position:relative; width:46px; height:24px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; cursor:pointer;}
+.ns-switch .knob{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--text-faint); transition:.2s;}
+.ns-switch.on{background:rgba(74,222,128,.25); border-color:var(--green);}
+.ns-switch.on .knob{transform:translateX(22px); background:var(--green);}
+.ns-result{font-family:'JetBrains Mono'; font-size:.88rem; background:var(--code-bg); border:1px solid var(--border-soft); border-radius:8px; padding:.9rem 1.1rem;}
+.ns-result .r-ok{color:var(--green);} .ns-result .r-err{color:var(--red);} .ns-result .r-warn{color:var(--orange);}
+
+/* ===== ACTIVITIES ===== */
+.activity{border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); padding:1.4rem; margin-top:1.2rem;}
+.activity-head{display:flex; align-items:center; gap:.7rem; margin-bottom:.7rem;}
+.activity-num{
+  font-family:'Space Grotesk'; font-weight:700; width:34px; height:34px; border-radius:9px; background:var(--grad);
+  color:#0A0C1E; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.95rem;
+}
+.activity h4{margin:0; font-size:1.02rem;}
+.reveal-row{display:flex; gap:.6rem; flex-wrap:wrap; margin:1rem 0 .3rem;}
+.reveal-btn{
+  font-family:'Inter'; font-weight:600; font-size:.78rem; background:var(--surface-2); border:1px solid var(--border);
+  color:var(--text-dim); padding:.5rem .9rem; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:.4rem;
+}
+.reveal-btn:hover{color:#fff; border-color:var(--purple-2);}
+.reveal-panel{display:none; margin-top:.8rem; padding:.9rem 1rem; border-radius:9px; border:1px solid var(--border-soft); background:rgba(255,255,255,.015); font-size:.88rem;}
+.reveal-panel.show{display:block;}
+.hint-panel{color:var(--text-dim);}
+
+/* ===== PROGRESS TRACKER ===== */
+.progress-wrap{position:fixed; top:0; left:0; height:3px; background:var(--grad); z-index:200; width:0%; transition:width .1s;}
+
+/* ===== MISC ===== */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
+@media (max-width:640px){.grid2{grid-template-columns:1fr;}}
+.pill{display:inline-block; font-family:'JetBrains Mono'; font-size:.72rem; background:var(--surface-2); border:1px solid var(--border); color:var(--purple-2); padding:.15rem .55rem; border-radius:6px; margin:0 .25rem .4rem 0;}
+footer{max-width:var(--maxw); margin:0 auto; padding:2.5rem 1.3rem 4rem; color:var(--text-faint); font-size:.85rem; text-align:center;}
+.back-top{position:fixed; bottom:1.4rem; right:1.4rem; width:44px; height:44px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:90; opacity:0; pointer-events:none; transition:.2s;}
+.back-top.show{opacity:1; pointer-events:auto;}
+ul.plain{padding-left:1.2rem; color:var(--text-dim);}
+ul.plain li{margin-bottom:.35rem;}
+</style>
+</head>
+<body>
+<a href="#inicio" class="skip-link">Saltar al contenido</a>
+<div class="progress-wrap" id="progressBar"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#inicio" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="kg" x1="0" y1="0" x2="40" y2="40"><stop offset="0" stop-color="#8657FF"/><stop offset="1" stop-color="#FF9138"/></linearGradient></defs>
+        <path d="M4 4H18L4 20L20 36H4V4Z" fill="url(#kg)"/>
+        <path d="M18 4H34L18 20L36 36H20L4 20L18 4Z" fill="url(#kg)" opacity="0.55"/>
+      </svg>
+      <span class="brand-text">Kotlin Explorer<span class="sub">DAM 2 · Prog. Móviles</span></span>
+    </a>
+    <button class="navtoggle" id="navToggle" aria-label="Abrir menú">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="navlinks" id="navLinks">
+      <a href="#inicio">Inicio</a>
+      <a href="#fundamentos">Fundamentos</a>
+      <a href="#poo">POO</a>
+      <a href="#funcional">Funcional</a>
+      <a href="#scope">Scope Functions</a>
+      <a href="#excepciones">Excepciones</a>
+      <a href="#corrutinas">Corrutinas</a>
+      <a href="#interop">Interop Java</a>
+      <a href="#android">Android</a>
+      <a href="#actividades">Actividades</a>
+      <a href="#proyecto">Proyecto</a>
+      <a href="#recursos">Recursos</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+  <span class="hero-kicker">📱 Programación de Móviles y Dispositivos Multimedia — 2º DAM</span>
+  <h1>Guía de iniciación a <span class="grad">Kotlin</span></h1>
+  <p class="lede">Una base sólida, práctica y contextualizada de Kotlin para el desarrollo Android: desde la sintaxis básica hasta corrutinas y scope functions, con ejemplos ejecutables en cada parada.</p>
+  <div class="hero-meta">
+    <span>12 secciones</span>
+    <span>10 actividades resueltas</span>
+    <span>1 proyecto integrador</span>
+  </div>
+
+  <div class="terminal" id="heroTerminal">
+    <div class="terminal-bar">
+      <div class="terminal-dots"><span></span><span></span><span></span></div>
+      <div class="terminal-title">main.kt — consola interactiva</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="terminal-select" id="snippetTabs">
+      <button class="snippet-btn active" data-snip="snip-1">01 · Hola DAM</button>
+      <button class="snippet-btn" data-snip="snip-2">02 · Templates</button>
+      <button class="snippet-btn" data-snip="snip-3">03 · Null Safety</button>
+      <button class="snippet-btn" data-snip="snip-4">04 · Scope fn</button>
+      <button class="snippet-btn" data-snip="snip-5">05 · Colecciones</button>
+      <button class="snippet-btn" data-snip="snip-6">06 · Corrutinas</button>
+    </div>
+    <div class="terminal-body">
+      <div class="term-code" id="termCode"></div>
+      <div class="term-out" id="termOut"><span class="prompt">// pulsa «Ejecutar» para ver la salida</span></div>
+    </div>
+    <div class="term-footer">
+      <button class="run-btn" id="runBtn">▶ Ejecutar</button>
+    </div>
+  </div>
+
+  <div style="display:none" id="snippetBank">
+    <div class="snippet-source" id="snip-1">
+      <div class="src"><span class="kw">fun</span> <span class="fn">main</span>() {
+    println(<span class="str">"¡Hola DAM 2!"</span>)
+}</div>
+      <div class="out"><div>¡Hola DAM 2!</div></div>
+    </div>
+
+    <div class="snippet-source" id="snip-2">
+      <div class="src"><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> nombre = <span class="str">"Ana"</span>
+    <span class="kw">val</span> edad = 25
+    println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span>)
+}</div>
+      <div class="out"><div>Mi nombre es Ana y tengo 26 años</div></div>
+    </div>
+
+    <div class="snippet-source" id="snip-3">
+      <div class="src"><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">var</span> ciudad: String? = <span class="kw">null</span>
+    <span class="kw">val</span> nombreSeguro = ciudad ?: <span class="str">"Desconocida"</span>
+    println(nombreSeguro)
+
+    ciudad = <span class="str">"Bilbao"</span>
+    ciudad?.let { println(<span class="str">"La ciudad es $it"</span>) }
+}</div>
+      <div class="out"><div>Desconocida</div><div>La ciudad es Bilbao</div></div>
+    </div>
+
+    <div class="snippet-source" id="snip-4">
+      <div class="src"><span class="kw">class</span> <span class="fn">Configuracion</span> {
+    <span class="kw">var</span> url: String = <span class="str">""</span>
+    <span class="kw">var</span> timeout: Int = 0
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> config = Configuracion().apply {
+        url = <span class="str">"api.ejemplo.com"</span>
+        timeout = 3000
+    }
+    config.let { println(<span class="str">"${it.url} (${it.timeout}ms)"</span>) }
+}</div>
+      <div class="out"><div>api.ejemplo.com (3000ms)</div></div>
+    </div>
+
+    <div class="snippet-source" id="snip-5">
+      <div class="src"><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> alumnos = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>, <span class="str">"David"</span>)
+    <span class="kw">val</span> resultado = alumnos
+        .filter { it.length > 3 }
+        .map { it.uppercase() }
+        .sortedBy { it }
+    println(resultado)
+}</div>
+      <div class="out"><div>[CARLOS, DAVID]</div></div>
+    </div>
+
+    <div class="snippet-source" id="snip-6">
+      <div class="src"><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="kw">suspend fun</span> <span class="fn">obtenerDatos</span>(): String {
+    delay(1000)
+    <span class="kw">return</span> <span class="str">"Datos cargados"</span>
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="kw">val</span> resultado = async { obtenerDatos() }.await()
+    println(resultado)
+}</div>
+      <div class="out"><div>Datos cargados</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 1: INTRODUCCIÓN ============ -->
+<section class="block" id="s1">
+  <div class="eyebrow-row"><span class="section-num">01</span></div>
+  <h2>Introducción y configuración</h2>
+  <p class="lede">Por qué Kotlin ha ganado terreno en Android y qué necesitas instalado antes de escribir la primera línea.</p>
+
+  <h3 style="margin-top:1.8rem;">¿Por qué Kotlin?</h3>
+  <ul class="plain">
+    <li><strong style="color:#fff">Lenguaje oficial</strong> para Android desde 2019.</li>
+    <li><strong style="color:#fff">100% interoperable</strong> con Java.</li>
+    <li><strong style="color:#fff">Null Safety</strong>: el compilador evita <code>NullPointerException</code>.</li>
+    <li><strong style="color:#fff">Conciso</strong>: reduce el código repetitivo (boilerplate) ~40% frente a Java.</li>
+    <li><strong style="color:#fff">Moderno</strong>: combina programación orientada a objetos y funcional.</li>
+  </ul>
+
+  <h3 style="margin-top:1.8rem;">Comparativa Java vs Kotlin</h3>
+  <div class="tabs" id="tabsJavaKotlin">
+    <button class="tab-btn active" data-tab="jk-java">Persona.java</button>
+    <button class="tab-btn" data-tab="jk-kotlin">Persona.kt</button>
+  </div>
+  <div class="tab-panels">
+    <div class="tab-panel active" id="jk-java">
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">public class</span> Persona {
+    <span class="kw">private</span> String nombre;
+    <span class="kw">public</span> Persona(String nombre) { <span class="kw">this</span>.nombre = nombre; }
+    <span class="kw">public</span> String getNombre() { <span class="kw">return</span> nombre; }
+}</code></pre></div>
+      <p style="margin-top:.5rem; font-size:.85rem;">5 líneas para una clase con un solo dato de lectura.</p>
+    </div>
+    <div class="tab-panel" id="jk-kotlin">
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String)</code></pre></div>
+      <p style="margin-top:.5rem; font-size:.85rem;">La misma clase, con constructor, propiedad y getter incluidos, en una línea.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.8rem;">Entorno de desarrollo</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Herramienta</th><th>Uso</th><th>Enlace</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:#fff">IntelliJ IDEA CE</strong></td><td>Práctica de consola y scripts</td><td><a href="https://www.jetbrains.com/idea/" target="_blank" rel="noopener">jetbrains.com</a></td></tr>
+      <tr><td><strong style="color:#fff">Android Studio</strong></td><td>Desarrollo de apps Android</td><td><a href="https://developer.android.com/studio" target="_blank" rel="noopener">developer.android.com</a></td></tr>
+      <tr><td><strong style="color:#fff">Kotlin Playground</strong></td><td>Ejecución rápida online</td><td><a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">play.kotlinlang.org/</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.8rem;">Primer programa</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() {
+    println(<span class="str">"Hello world!!!"</span>)
+}</code></pre></div>
+  <p><strong style="color:#fff">Ejecutable online:</strong> <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">play.kotlinlang.org/</a></p>
+</section>
+
+<!-- ============ SECTION 2: FUNDAMENTOS (accordion) ============ -->
+<section class="block" id="fundamentos">
+  <div class="eyebrow-row"><span class="section-num">02</span></div>
+  <h2>Fundamentos del lenguaje</h2>
+  <p class="lede">Variables, tipos, seguridad ante nulos, cadenas, rangos y estructuras de control: la caja de herramientas que usarás en cada línea de código.</p>
+  <div class="accordion" id="accFundamentos">
+
+    <div class="acc-item open">
+      <button class="acc-head"><span>2.1 · Variables y tipos de datos</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="tblwrap"><table>
+          <thead><tr><th>Modificador</th><th>Mutabilidad</th><th>Uso recomendado</th></tr></thead>
+          <tbody>
+            <tr><td><code>val</code></td><td>Inmutable (read-only)</td><td><strong style="color:#fff">Siempre por defecto</strong></td></tr>
+            <tr><td><code>var</code></td><td>Mutable</td><td>Solo cuando realmente necesite cambiar</td></tr>
+          </tbody>
+        </table></div>
+        <p style="margin-top:1rem;"><strong style="color:#fff">Inferencia de tipos:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> nombre = <span class="str">"Ana"</span>        <span class="cmt">// String (inferido)</span>
+<span class="kw">val</span> edad: Int = 25        <span class="cmt">// Explícito (opcional)</span>
+<span class="kw">var</span> salario = 1500.50     <span class="cmt">// Double (inferido)</span></code></pre></div>
+        <p><strong style="color:#fff">Tipos básicos:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> entero: Int = 42
+<span class="kw">val</span> enteroLargo: Long = 42L
+<span class="kw">val</span> decimal: Double = 3.14
+<span class="kw">val</span> decimalFloat: Float = 3.14f
+<span class="kw">val</span> booleano: Boolean = <span class="kw">true</span>
+<span class="kw">val</span> caracter: Char = <span class="str">'A'</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>2.2 · Null Safety (seguridad ante nulos)</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Concepto clave:</strong> por defecto, las variables NO pueden ser <code>null</code>.</p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">var</span> ciudad: String? = <span class="kw">null</span>   <span class="cmt">// ✅ Válido (nullable)</span>
+<span class="kw">var</span> pais: String = <span class="kw">null</span>      <span class="cmt">// ❌ ERROR de compilación</span></code></pre></div>
+
+        <div class="tblwrap"><table>
+          <thead><tr><th>Operador</th><th>Nombre</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td><code>?.</code></td><td>Safe Call</td><td>Ejecuta solo si no es nulo</td></tr>
+            <tr><td><code>?:</code></td><td>Elvis</td><td>Valor por defecto si es nulo</td></tr>
+            <tr><td><code>!!</code></td><td>Not-null assertion</td><td>Fuerza a tratar como no nulo (peligroso)</td></tr>
+            <tr><td><code>?.let {}</code></td><td>Safe Call + Lambda</td><td>Ejecuta bloque solo si no es nulo</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// Ejemplos prácticos</span>
+<span class="kw">val</span> longitud: Int? = ciudad?.length
+<span class="kw">val</span> nombreSeguro = ciudad ?: <span class="str">"Desconocida"</span>
+<span class="kw">val</span> forzado = ciudad!!.length  <span class="cmt">// Lanza NPE si es nulo</span>
+
+<span class="cmt">// Uso con let</span>
+ciudad?.let {
+    println(<span class="str">"La ciudad es $it"</span>)  <span class="cmt">// Solo ejecuta si no es nula</span>
+}</code></pre></div>
+
+        <div class="callout warn"><strong>Cuidado con <code>!!</code>:</strong> reintroduce el mismo riesgo de <code>NullPointerException</code> que Kotlin intenta evitar. Úsalo solo cuando estés absolutamente seguro de que el valor no será nulo.</div>
+
+        <p style="margin-top:1.4rem;"><strong style="color:#fff">Pruébalo tú mismo:</strong> elige un operador y decide si la variable es nula o no.</p>
+        <div class="ns-widget">
+          <div class="ns-controls">
+            <button class="ns-op active" data-op="safe">?.</button>
+            <button class="ns-op" data-op="elvis">?:</button>
+            <button class="ns-op" data-op="bang">!!</button>
+            <button class="ns-op" data-op="let">?.let {}</button>
+          </div>
+          <div class="ns-state">
+            <span>ciudad = null</span>
+            <div class="ns-switch" id="nsSwitch"><div class="knob"></div></div>
+            <span>ciudad = "Bilbao"</span>
+          </div>
+          <div class="ns-result" id="nsResult"></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>2.3 · Sistema de tipos <span class="tag">Any · Unit · Nothing</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="tblwrap"><table>
+          <thead><tr><th>Tipo</th><th>Descripción</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td><code>Any</code></td><td>Superclase de todos los tipos (como <code>Object</code> en Java)</td><td><code>val obj: Any = "Hola"</code></td></tr>
+            <tr><td><code>Unit</code></td><td>Representa «sin retorno» (como <code>void</code> en Java)</td><td><code>fun saludar(): Unit { ... }</code></td></tr>
+            <tr><td><code>Nothing</code></td><td>Representa «nunca retorna» (ej: lanzar excepción)</td><td><code>fun error(): Nothing = throw Exception()</code></td></tr>
+          </tbody>
+        </table></div>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// Unit es redundante (se puede omitir)</span>
+<span class="kw">fun</span> <span class="fn">saludar</span>(): Unit = println(<span class="str">"Hola"</span>)  <span class="cmt">// Equivale a:</span>
+<span class="kw">fun</span> <span class="fn">saludar</span>() = println(<span class="str">"Hola"</span>)        <span class="cmt">// Esto</span>
+
+<span class="cmt">// Nothing: función que siempre lanza excepción</span>
+<span class="kw">fun</span> <span class="fn">fail</span>(mensaje: String): Nothing {
+    <span class="kw">throw</span> IllegalArgumentException(mensaje)
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>2.4 · Strings y templates</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Interpolación de cadenas:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> nombre = <span class="str">"Ana"</span>
+<span class="kw">val</span> edad = 25
+println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span>)
+<span class="cmt">// Salida: Mi nombre es Ana y tengo 26 años</span></code></pre></div>
+        <p><strong style="color:#fff">String multilínea (raw string):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> json = <span class="str">"""
+    {
+        "nombre": "Ana",
+        "edad": 25
+    }
+"""</span>.trimIndent()</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>2.5 · Rangos (ranges)</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> rango1 = 1..10         <span class="cmt">// 1, 2, 3, ..., 10</span>
+<span class="kw">val</span> rango2 = 10 downTo 1   <span class="cmt">// 10, 9, 8, ..., 1</span>
+<span class="kw">val</span> rango3 = 1 until 10    <span class="cmt">// 1, 2, 3, ..., 9 (excluye 10)</span>
+<span class="kw">val</span> rango4 = 1..10 step 2  <span class="cmt">// 1, 3, 5, 7, 9</span>
+
+<span class="cmt">// Uso en bucles</span>
+<span class="kw">for</span> (i in 1..5) { println(i) }
+
+<span class="cmt">// Uso en when</span>
+<span class="kw">when</span> (nota) {
+    in 0..4 -> <span class="str">"Insuficiente"</span>
+    in 5..6 -> <span class="str">"Suficiente"</span>
+    in 7..8 -> <span class="str">"Notable"</span>
+    in 9..10 -> <span class="str">"Sobresaliente"</span>
+    <span class="kw">else</span> -> <span class="str">"Nota inválida"</span>
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>2.6 · Estructuras de control</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">if como expresión:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> max = <span class="kw">if</span> (a > b) a <span class="kw">else</span> b  <span class="cmt">// Devuelve valor</span></code></pre></div>
+        <p><strong style="color:#fff">when (vs switch de Java):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> resultado = <span class="kw">when</span> (dia) {
+    1 -> <span class="str">"Lunes"</span>
+    2 -> <span class="str">"Martes"</span>
+    in 3..5 -> <span class="str">"Miércoles a Viernes"</span>
+    <span class="str">"SÁBADO"</span>, <span class="str">"DOMINGO"</span> -> <span class="str">"Fin de semana"</span>
+    <span class="kw">else</span> -> <span class="str">"Día inválido"</span>
+}</code></pre></div>
+        <p><strong style="color:#fff">Bucles:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// for con rango</span>
+<span class="kw">for</span> (i in 1..5) { println(i) }
+
+<span class="cmt">// for con lista</span>
+<span class="kw">val</span> nombres = listOf(<span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="str">"Eva"</span>)
+<span class="kw">for</span> (nombre in nombres) { println(nombre) }
+
+<span class="cmt">// for con índice</span>
+<span class="kw">for</span> ((indice, valor) in nombres.withIndex()) {
+    println(<span class="str">"$indice: $valor"</span>)
+}
+
+<span class="cmt">// while</span>
+<span class="kw">var</span> i = 0
+<span class="kw">while</span> (i < 5) {
+    println(i)
+    i++
+}</code></pre></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SECTION 3: POO (accordion) ============ -->
+<section class="block" id="poo">
+  <div class="eyebrow-row"><span class="section-num">03</span></div>
+  <h2>Programación orientada a objetos</h2>
+  <p class="lede">Clases, herencia, interfaces, data classes y sealed classes: el vocabulario con el que Kotlin modela el mundo Android.</p>
+  <div class="accordion" id="accPoo">
+
+    <div class="acc-item open">
+      <button class="acc-head"><span>3.1 · Clases y propiedades</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Constructor primario:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String, <span class="kw">var</span> edad: Int) {
+    <span class="cmt">// val = solo lectura (getter)
+    // var = lectura/escritura (getter y setter)</span>
+}</code></pre></div>
+        <p><strong style="color:#fff">Bloque init (inicialización):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String, <span class="kw">val</span> anioNacimiento: Int) {
+    <span class="kw">val</span> edad: Int
+
+    init {
+        edad = 2026 - anioNacimiento
+        println(<span class="str">"Persona creada: $nombre ($edad años)"</span>)
+    }
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.2 · Herencia y clases abiertas</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li>Las clases son <code>final</code> por defecto (no se pueden heredar).</li>
+          <li>Usar <code>open</code> para permitir herencia.</li>
+        </ul>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">open class</span> <span class="fn">Animal</span>(<span class="kw">val</span> nombre: String) {
+    <span class="kw">open fun</span> <span class="fn">sonido</span>() = <span class="str">"Sonido genérico"</span>
+}
+
+<span class="kw">class</span> <span class="fn">Perro</span>(nombre: String, <span class="kw">val</span> raza: String) : Animal(nombre) {
+    <span class="kw">override fun</span> <span class="fn">sonido</span>() = <span class="str">"Guau!"</span>
+}
+
+<span class="cmt">// Uso</span>
+<span class="kw">val</span> perro = Perro(<span class="str">"Max"</span>, <span class="str">"Labrador"</span>)
+println(perro.sonido())  <span class="cmt">// Guau!</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.3 · Interfaces</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">interface</span> <span class="fn">Volador</span> {
+    <span class="kw">fun</span> <span class="fn">volar</span>()  <span class="cmt">// Método abstracto</span>
+    <span class="kw">fun</span> <span class="fn">aterrizar</span>() = println(<span class="str">"Aterrizando..."</span>)  <span class="cmt">// Método con implementación</span>
+}
+
+<span class="kw">class</span> <span class="fn">Pajaro</span> : Volador {
+    <span class="kw">override fun</span> <span class="fn">volar</span>() = println(<span class="str">"Volando con alas"</span>)
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.4 · Data classes <span class="tag">modelos de datos</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Ventajas:</strong> genera automáticamente <code>toString()</code>, <code>equals()</code>, <code>hashCode()</code>, <code>copy()</code>.</p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">data class</span> <span class="fn">Usuario</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> email: String)
+
+<span class="kw">val</span> usuario1 = Usuario(1, <span class="str">"Ana"</span>, <span class="str">"ana@email.com"</span>)
+<span class="kw">val</span> usuario2 = usuario1.copy(nombre = <span class="str">"Ana María"</span>)  <span class="cmt">// Copia con modificación</span>
+println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@email.com)</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.5 · Sealed classes <span class="tag">modelar estados</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="callout key"><strong>Importante para Android:</strong> modelar estados de UI.</div>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span> {
+    object Cargando : EstadoUI()
+    <span class="kw">data class</span> <span class="fn">Exito</span>(<span class="kw">val</span> datos: List&lt;String&gt;) : EstadoUI()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI()
+}
+
+<span class="cmt">// Uso con when (cubre todos los casos)</span>
+<span class="kw">fun</span> <span class="fn">manejarEstado</span>(estado: EstadoUI) {
+    <span class="kw">when</span> (estado) {
+        EstadoUI.Cargando -> println(<span class="str">"Mostrar loading..."</span>)
+        is EstadoUI.Exito -> println(<span class="str">"Datos: ${estado.datos}"</span>)
+        is EstadoUI.Error -> println(<span class="str">"Error: ${estado.mensaje}"</span>)
+    }
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.6 · Objetos y companion object</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff"><code>object</code> (Singleton):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>object Configuracion {
+    <span class="kw">const val</span> URL_API = <span class="str">"https://api.example.com"</span>
+    <span class="kw">val</span> version = <span class="str">"1.0"</span>
+
+    <span class="kw">fun</span> <span class="fn">obtenerConfig</span>() = <span class="str">"$URL_API (v$version)"</span>
+}
+
+<span class="cmt">// Uso directo (única instancia)</span>
+println(Configuracion.URL_API)</code></pre></div>
+        <p><strong style="color:#fff"><code>companion object</code> (miembros estáticos):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">MiActivity</span> {
+    companion object {
+        <span class="kw">const val</span> TAG = <span class="str">"MiActivity"</span>
+        <span class="kw">fun</span> <span class="fn">crearIntent</span>() = Intent(<span class="cmt">/* ... */</span>)
+    }
+}
+
+<span class="cmt">// Uso como "estático" en Java</span>
+MiActivity.TAG</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.7 · Getters/setters personalizados</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Rectangulo</span>(<span class="kw">val</span> ancho: Int, <span class="kw">val</span> alto: Int) {
+    <span class="kw">val</span> area: Int get() = ancho * alto  <span class="cmt">// Computado, no almacenado</span>
+
+    <span class="kw">var</span> longitud: Int = 0
+        set(value) {
+            field = <span class="kw">if</span> (value > 0) value <span class="kw">else</span> 0  <span class="cmt">// Validación</span>
+        }
+}</code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>3.8 · Delegación de propiedades <span class="tag">by lazy</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff"><code>by lazy</code> (inicialización perezosa):</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">MiClase</span> {
+    <span class="kw">val</span> datos: List&lt;String&gt; by lazy {
+        println(<span class="str">"Cargando datos..."</span>)
+        listOf(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>)  <span class="cmt">// Solo se ejecuta la primera vez</span>
+    }
+}</code></pre></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SECTION 4: FUNCIONAL (accordion) ============ -->
+<section class="block" id="funcional">
+  <div class="eyebrow-row"><span class="section-num">04</span></div>
+  <h2>Programación funcional y colecciones</h2>
+  <p class="lede">Lambdas, listas, mapas y los operadores que convierten cinco líneas de bucles en una sola cadena legible.</p>
+  <div class="accordion" id="accFuncional">
+
+    <div class="acc-item open">
+      <button class="acc-head"><span>4.1 · Lambdas y funciones de orden superior</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Sintaxis de lambda:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> suma: (Int, Int) -> Int = { a, b -> a + b }
+<span class="kw">val</span> cuadrado: (Int) -> Int = { it * it }  <span class="cmt">// "it" cuando hay un solo parámetro</span></code></pre></div>
+        <p><strong style="color:#fff">Función que recibe lambda:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">operar</span>(a: Int, b: Int, operacion: (Int, Int) -> Int): Int {
+    <span class="kw">return</span> operacion(a, b)
+}
+
+<span class="cmt">// Uso</span>
+<span class="kw">val</span> resultado = operar(5, 3) { x, y -> x * y }  <span class="cmt">// 15</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>4.2 · Colecciones: List, Map, Set</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// Listas</span>
+<span class="kw">val</span> listaInmutable = listOf(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>)
+<span class="kw">val</span> listaMutable = mutableListOf(1, 2, 3)
+listaMutable.add(4)
+
+<span class="cmt">// Mapas</span>
+<span class="kw">val</span> mapaInmutable = mapOf(<span class="str">"clave1"</span> to <span class="str">"valor1"</span>, <span class="str">"clave2"</span> to <span class="str">"valor2"</span>)
+<span class="kw">val</span> mapaMutable = mutableMapOf(<span class="str">"nombre"</span> to <span class="str">"Ana"</span>)
+mapaMutable[<span class="str">"edad"</span>] = <span class="str">"25"</span>
+
+<span class="cmt">// Sets (sin duplicados)</span>
+<span class="kw">val</span> setInmutable = setOf(1, 2, 3, 3)  <span class="cmt">// {1, 2, 3}</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>4.3 · Operadores esenciales</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> alumnos = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>, <span class="str">"Ana"</span>, <span class="str">"David"</span>)
+
+<span class="cmt">// filter: Filtra elementos</span>
+<span class="kw">val</span> conA = alumnos.filter { it.startsWith(<span class="str">"A"</span>) }  <span class="cmt">// ["Ana", "Ana"]</span>
+
+<span class="cmt">// map: Transforma elementos</span>
+<span class="kw">val</span> enMayusculas = alumnos.map { it.uppercase() }  <span class="cmt">// ["ANA", "BEA", ...]</span>
+
+<span class="cmt">// forEach: Itera sin retorno</span>
+alumnos.forEach { println(it) }
+
+<span class="cmt">// firstOrNull: Busca el primero que cumple</span>
+<span class="kw">val</span> primerConC = alumnos.firstOrNull { it.startsWith(<span class="str">"C"</span>) }  <span class="cmt">// "Carlos"</span>
+
+<span class="cmt">// sortedBy: Ordena por criterio</span>
+<span class="kw">val</span> ordenados = alumnos.sortedBy { it.length }
+
+<span class="cmt">// take / drop: Paginación</span>
+<span class="kw">val</span> primeros3 = alumnos.take(3)  <span class="cmt">// Primeros 3</span>
+<span class="kw">val</span> sinPrimeros2 = alumnos.drop(2)  <span class="cmt">// Quita los 2 primeros</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>4.4 · Operadores avanzados</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// flatMap: Aplana listas de listas</span>
+<span class="kw">val</span> listas = listOf(listOf(1, 2), listOf(3, 4))
+<span class="kw">val</span> aplanada = listas.flatMap { it }  <span class="cmt">// [1, 2, 3, 4]</span>
+
+<span class="cmt">// associate: Convierte lista a mapa</span>
+<span class="kw">val</span> alumnosMap = alumnos.associate { it to it.length }
+<span class="cmt">// {"Ana"=3, "Bea"=3, "Carlos"=6, "David"=5}</span>
+
+<span class="cmt">// groupBy: Agrupa elementos por clave</span>
+<span class="kw">val</span> porLongitud = alumnos.groupBy { it.length }
+<span class="cmt">// {3=["Ana", "Bea"], 6=["Carlos"], 5=["David"]}</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>4.5 · Predicados <span class="tag">any · all · none</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> numeros = listOf(2, 4, 6, 8)
+
+numeros.any { it > 5 }   <span class="cmt">// true (hay algún >5)</span>
+numeros.all { it % 2 == 0 }  <span class="cmt">// true (todos pares)</span>
+numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></pre></div>
+      </div></div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-head"><span>4.6 · Secuencias (Sequence)</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <p><strong style="color:#fff">Optimización para operaciones encadenadas:</strong></p>
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// Con listas (Eager): ejecuta todas las operaciones</span>
+<span class="kw">val</span> listaResultado = lista
+    .filter { it > 5 }   <span class="cmt">// Crea lista intermedia</span>
+    .map { it * 2 }      <span class="cmt">// Crea otra lista</span>
+    .take(3)
+
+<span class="cmt">// Con secuencias (Lazy): ejecuta solo cuando se necesita</span>
+<span class="kw">val</span> secuenciaResultado = lista.asSequence()
+    .filter { it > 5 }
+    .map { it * 2 }
+    .take(3)
+    .toList()  <span class="cmt">// Aquí se ejecuta todo</span></code></pre></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SECTION 5: SCOPE FUNCTIONS ============ -->
+<section class="block" id="scope">
+  <div class="eyebrow-row"><span class="section-num">05</span></div>
+  <h2>Scope functions <span style="color:var(--text-faint); font-weight:500; font-size:1rem;">— el secreto de Kotlin</span></h2>
+  <p class="lede">Cinco funciones que permiten trabajar «dentro» de un objeto: <code>let</code>, <code>run</code>, <code>apply</code>, <code>also</code> y <code>with</code>. Se diferencian en cómo se referencia al objeto y en qué devuelven.</p>
+
+  <div class="tblwrap"><table>
+    <thead><tr><th>Función</th><th>Contexto</th><th>Retorno</th><th>Uso típico</th></tr></thead>
+    <tbody>
+      <tr><td><code>let</code></td><td><code>it</code></td><td>Última expresión</td><td>Operar con nullable, transformar</td></tr>
+      <tr><td><code>run</code></td><td><code>this</code></td><td>Última expresión</td><td>Configurar objeto y retornar algo</td></tr>
+      <tr><td><code>apply</code></td><td><code>this</code></td><td>Mismo objeto</td><td>Configurar objeto (builder)</td></tr>
+      <tr><td><code>also</code></td><td><code>it</code></td><td>Mismo objeto</td><td>Logging, efectos secundarios</td></tr>
+      <tr><td><code>with</code></td><td><code>this</code></td><td>Última expresión</td><td>Agrupar operaciones en un objeto</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tabs" id="sfTabs">
+    <button class="tab-btn active" data-tab="sf-let">let</button>
+    <button class="tab-btn" data-tab="sf-run">run</button>
+    <button class="tab-btn" data-tab="sf-apply">apply</button>
+    <button class="tab-btn" data-tab="sf-also">also</button>
+    <button class="tab-btn" data-tab="sf-with">with</button>
+  </div>
+  <div class="tab-panels" id="sfPanels">
+    <div class="tab-panel active" id="sf-let">
+      <div class="sf-meta"><div><b>Contexto</b>it</div><div><b>Retorno</b>última expresión</div><div><b>Uso típico</b>operar con nullable, transformar</div></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// let: útil para nullables</span>
+<span class="kw">val</span> email: String? = getEmail()
+email?.let {
+    enviarEmail(it)  <span class="cmt">// 'it' es el email no nulo</span>
+}</code></pre></div>
+    </div>
+    <div class="tab-panel" id="sf-run">
+      <div class="sf-meta"><div><b>Contexto</b>this</div><div><b>Retorno</b>última expresión</div><div><b>Uso típico</b>configurar objeto y retornar algo</div></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// run: configura y calcula</span>
+<span class="kw">val</span> resultado = usuario.run {
+    <span class="cmt">// 'this' es usuario</span>
+    <span class="kw">val</span> nombreMayus = nombre.uppercase()
+    <span class="kw">val</span> edadDob = edad * 2
+    <span class="str">"$nombreMayus tiene ${edadDob} años"</span>
+}</code></pre></div>
+    </div>
+    <div class="tab-panel" id="sf-apply">
+      <div class="sf-meta"><div><b>Contexto</b>this</div><div><b>Retorno</b>mismo objeto</div><div><b>Uso típico</b>configuración fluida (builder)</div></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// apply: configuración fluida (builder)</span>
+<span class="kw">val</span> producto = Producto().apply {
+    nombre = <span class="str">"Laptop"</span>
+    precio = 1200.0
+    stock = 5
+}</code></pre></div>
+    </div>
+    <div class="tab-panel" id="sf-also">
+      <div class="sf-meta"><div><b>Contexto</b>it</div><div><b>Retorno</b>mismo objeto</div><div><b>Uso típico</b>logging, efectos secundarios</div></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// also: para efectos secundarios</span>
+<span class="kw">val</span> usuario = Usuario(<span class="str">"Ana"</span>).also {
+    println(<span class="str">"Usuario creado: ${it.nombre}"</span>)
+    logService.registrar(it)
+}</code></pre></div>
+    </div>
+    <div class="tab-panel" id="sf-with">
+      <div class="sf-meta"><div><b>Contexto</b>this</div><div><b>Retorno</b>última expresión</div><div><b>Uso típico</b>agrupar operaciones en un objeto</div></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// with: agrupa operaciones</span>
+with(persona) {
+    println(<span class="str">"Nombre: $nombre"</span>)
+    println(<span class="str">"Edad: $edad"</span>)
+}</code></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 6: EXCEPCIONES ============ -->
+<section class="block" id="excepciones">
+  <div class="eyebrow-row"><span class="section-num">06</span></div>
+  <h2>Manejo de excepciones</h2>
+  <p class="lede">En Kotlin, <code>try</code> también puede ser una expresión, y <code>runCatching</code> lleva ese estilo funcional hasta el manejo de errores.</p>
+
+  <h3 style="margin-top:1.6rem;">try-catch como expresión</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> resultado = <span class="kw">try</span> {
+    <span class="kw">val</span> numero = <span class="str">"123"</span>.toInt()
+    numero * 2
+} <span class="kw">catch</span> (e: NumberFormatException) {
+    -1  <span class="cmt">// Valor por defecto si falla</span>
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">runCatching (funcional)</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">val</span> resultado = runCatching {
+    <span class="str">"abc"</span>.toInt()  <span class="cmt">// Lanza excepción</span>
+}.getOrElse {
+    -1  <span class="cmt">// Valor por defecto</span>
+}
+
+<span class="cmt">// Otros métodos útiles</span>
+<span class="kw">val</span> exito = runCatching { 42 }
+    .getOrNull()  <span class="cmt">// null si falla</span>
+
+<span class="kw">val</span> mensaje = runCatching { <span class="str">"123"</span>.toInt() }
+    .fold(
+        onSuccess = { <span class="str">"Éxito: $it"</span> },
+        onFailure = { <span class="str">"Error: ${it.message}"</span> }
+    )</code></pre></div>
+  <div class="callout tip"><strong>Tip:</strong> <code>runCatching</code> devuelve un <code>Result&lt;T&gt;</code>, así que encaja bien en cadenas funcionales donde no quieres romper el flujo con un <code>try/catch</code> tradicional.</div>
+</section>
+
+<!-- ============ SECTION 7: CORRUTINAS ============ -->
+<section class="block" id="corrutinas">
+  <div class="eyebrow-row"><span class="section-num">07</span></div>
+  <h2>Corrutinas <span style="color:var(--text-faint); font-weight:500; font-size:1rem;">— asincronía moderna</span></h2>
+  <p class="lede">La forma en la que Kotlin resuelve las operaciones que tardan (red, disco, temporizadores) sin bloquear el hilo principal ni encadenar callbacks.</p>
+
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="cmt">// build.gradle.kts</span>
+dependencies {
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"</span>)
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"</span>)
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">Conceptos básicos</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Concepto</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr><td><code>suspend</code></td><td>Función que puede pausarse y reanudarse</td></tr>
+      <tr><td><code>CoroutineScope</code></td><td>Ámbito de vida de las corrutinas</td></tr>
+      <tr><td><code>Dispatchers</code></td><td>Hilo donde se ejecuta (Main, IO, Default)</td></tr>
+      <tr><td><code>Job</code></td><td>Representa una tarea cancelable</td></tr>
+      <tr><td><code>launch</code></td><td>Lanza corrutina sin retorno</td></tr>
+      <tr><td><code>async</code></td><td>Lanza corrutina con retorno (<code>Deferred</code>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">launch vs async</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="cmt">// Función suspendida</span>
+<span class="kw">suspend fun</span> <span class="fn">obtenerDatos</span>(): String {
+    delay(1000)  <span class="cmt">// Simula operación lenta</span>
+    <span class="kw">return</span> <span class="str">"Datos cargados"</span>
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="cmt">// launch: sin retorno</span>
+    <span class="kw">val</span> job = launch(Dispatchers.IO) {
+        <span class="kw">val</span> datos = obtenerDatos()
+        println(<span class="str">"Resultado: $datos"</span>)
+    }
+    job.join()  <span class="cmt">// Espera a que termine</span>
+
+    <span class="cmt">// async: con retorno</span>
+    <span class="kw">val</span> deferred = async(Dispatchers.IO) {
+        obtenerDatos()
+    }
+    <span class="kw">val</span> resultado = deferred.await()
+    println(resultado)
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">Manejo de errores</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="kw">val</span> handler = CoroutineExceptionHandler { _, exception ->
+        println(<span class="str">"Error capturado: ${exception.message}"</span>)
+    }
+    <span class="kw">val</span> job = launch(handler) {
+        <span class="kw">throw</span> RuntimeException(<span class="str">"Error en corrutina"</span>)
+    }
+    job.join()
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">En Android (viewModelScope)</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">MiViewModel</span> : ViewModel() {
+    <span class="kw">fun</span> <span class="fn">cargarDatos</span>() {
+        viewModelScope.launch(Dispatchers.IO) {
+            <span class="kw">try</span> {
+                <span class="kw">val</span> datos = apiService.obtenerDatos()
+                withContext(Dispatchers.Main) {
+                    _estado.value = EstadoUI.Exito(datos)
+                }
+            } <span class="kw">catch</span> (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _estado.value = EstadoUI.Error(e.message ?: <span class="str">"Error"</span>)
+                }
+            }
+        }
+    }
+}</code></pre></div>
+</section>
+
+<!-- ============ SECTION 8: INTEROP JAVA ============ -->
+<section class="block" id="interop">
+  <div class="eyebrow-row"><span class="section-num">08</span></div>
+  <h2>Interoperabilidad con Java</h2>
+  <p class="lede">La mayoría de proyectos Android conviven con código Java heredado. Estas anotaciones suavizan la frontera entre los dos lenguajes.</p>
+
+  <div class="tblwrap"><table>
+    <thead><tr><th>Anotación</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>@JvmStatic</code></td><td>Expone miembros de <code>companion object</code> como estáticos</td></tr>
+      <tr><td><code>@JvmOverloads</code></td><td>Genera sobrecargas para parámetros con valores por defecto</td></tr>
+      <tr><td><code>@JvmField</code></td><td>Expone propiedad como campo público de Java</td></tr>
+      <tr><td><code>@JvmName</code></td><td>Cambia el nombre de la función en Java</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Utilidades</span> {
+    companion object {
+        <span class="ann">@JvmStatic</span>
+        <span class="kw">fun</span> <span class="fn">saludar</span>() = <span class="str">"Hola desde Kotlin"</span>
+    }
+
+    <span class="ann">@JvmOverloads</span>
+    <span class="kw">fun</span> <span class="fn">saludarCon</span>(nombre: String, saludo: String = <span class="str">"Hola"</span>) = <span class="str">"$saludo $nombre"</span>
+}
+
+<span class="cmt">// En Java:
+// Utilidades.saludar();                 // Estático
+// new Utilidades().saludarCon("Ana");   // Hola Ana</span></code></pre></div>
+</section>
+
+<!-- ============ SECTION 9: ANDROID ============ -->
+<section class="block" id="android">
+  <div class="eyebrow-row"><span class="section-num">09</span></div>
+  <h2>Kotlin en Android <span style="color:var(--text-faint); font-weight:500; font-size:1rem;">— contexto DAM</span></h2>
+  <p class="lede">Cómo aterrizan todos estos conceptos en un proyecto real: Gradle, View Binding y un ViewModel con estado.</p>
+
+  <h3 style="margin-top:1.6rem;">Estructura básica de build.gradle.kts</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>plugins {
+    id(<span class="str">"com.android.application"</span>)
+    id(<span class="str">"org.jetbrains.kotlin.android"</span>)
+}
+
+android {
+    namespace = <span class="str">"com.example.app"</span>
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = <span class="str">"com.example.app"</span>
+        minSdk = 24
+        targetSdk = 34
+    }
+
+    buildFeatures {
+        viewBinding = <span class="kw">true</span>  <span class="cmt">// Para View Binding</span>
+    }
+}
+
+dependencies {
+    implementation(<span class="str">"androidx.core:core-ktx:1.12.0"</span>)
+    implementation(<span class="str">"androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"</span>)
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"</span>)
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">ViewBinding en Activity</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">MainActivity</span> : AppCompatActivity() {
+    <span class="kw">private lateinit var</span> binding: ActivityMainBinding
+
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="kw">super</span>.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.btnSaludar.setOnClickListener {
+            <span class="kw">val</span> nombre = binding.etNombre.text.toString()
+            binding.tvSaludo.text = <span class="str">"¡Hola $nombre!"</span>
+        }
+    }
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">ViewModel con StateFlow</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">ProductosViewModel</span> : ViewModel() {
+    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&gt;(EstadoUI.Cargando)
+    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&gt; = _uiState.asStateFlow()
+
+    <span class="kw">fun</span> <span class="fn">cargarProductos</span>() {
+        viewModelScope.launch {
+            _uiState.value = EstadoUI.Cargando
+            <span class="kw">try</span> {
+                <span class="kw">val</span> productos = repositorio.obtenerProductos()
+                _uiState.value = EstadoUI.Exito(productos)
+            } <span class="kw">catch</span> (e: Exception) {
+                _uiState.value = EstadoUI.Error(e.message ?: <span class="str">"Error"</span>)
+            }
+        }
+    }
+}</code></pre></div>
+  <div class="callout key"><strong>Conexión con la sección 3.5:</strong> este <code>EstadoUI</code> es la misma <code>sealed class</code> que vimos en Programación Orientada a Objetos — así se cierra el círculo entre teoría y práctica en Android.</div>
+</section>
+
+<!-- ============ SECTION 10: ACTIVIDADES ============ -->
+<section class="block" id="actividades">
+  <div class="eyebrow-row"><span class="section-num">10</span></div>
+  <h2>Actividades propuestas</h2>
+  <p class="lede">Diez ejercicios progresivos. Lee el enunciado, intenta resolverlo tú primero y usa la pista o la resolución solo si te atascas.</p>
+  <div id="activitiesRoot">
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">1</span><h4>Filtrado avanzado</h4></div>
+      <p>Dada una lista de nombres, filtra los que tienen más de 3 letras, conviértelos a mayúsculas y ordénalos alfabéticamente.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-1">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-1">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-1">Usa <code>filter { }</code>, <code>map { }</code>, <code>sortedBy { }</code> en cadena.</div>
+      <div class="reveal-panel" id="sol-1">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> nombres = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>, <span class="str">"Lu"</span>, <span class="str">"David"</span>, <span class="str">"Eva"</span>)
+    <span class="kw">val</span> resultado = nombres
+        .filter { it.length > 3 }
+        .map { it.uppercase() }
+        .sortedBy { it }
+    println(resultado)  <span class="cmt">// [CARLOS, DAVID]</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">2</span><h4>Mapa de estudiantes</h4></div>
+      <p>Crea un mapa <code>Map&lt;String, Double&gt;</code> con nombres y notas. Filtra los aprobados (&gt;=5) y devuelve una lista de nombres ordenados por nota descendente.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-2">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-2">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-2">Usa <code>.filter { }</code> sobre el mapa y <code>sortedByDescending { }</code>.</div>
+      <div class="reveal-panel" id="sol-2">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> notas = mapOf(<span class="str">"Ana"</span> to 8.5, <span class="str">"Luis"</span> to 4.5, <span class="str">"Eva"</span> to 7.0, <span class="str">"Juan"</span> to 5.5)
+    <span class="kw">val</span> aprobados = notas
+        .filter { it.value >= 5 }
+        .entries
+        .sortedByDescending { it.value }
+        .map { it.key }
+    println(aprobados)  <span class="cmt">// [Ana, Eva, Juan]</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">3</span><h4>Función de orden superior con repetición</h4></div>
+      <p>Crea una función <code>repetirCondicional</code> que reciba un número <code>n</code> y una lambda, y ejecute la lambda mientras <code>n</code> sea mayor que 0, decrementando <code>n</code> en cada iteración.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-3">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-3">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-3">Usa un bucle <code>while</code> o <code>do-while</code>.</div>
+      <div class="reveal-panel" id="sol-3">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">repetirCondicional</span>(n: Int, accion: (Int) -> Unit) {
+    <span class="kw">var</span> contador = n
+    <span class="kw">while</span> (contador > 0) {
+        accion(contador)
+        contador--
+    }
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    repetirCondicional(5) { println(<span class="str">"Iteración: $it"</span>) }
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">4</span><h4>Data class y null safety</h4></div>
+      <p>Define una <code>data class Producto(id: Int, nombre: String, precio: Double)</code>. Dada una lista nullable, calcula el precio total de los productos no nulos que empiezan por «P».</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-4">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-4">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-4">Usa <code>.filterNotNull()</code>, <code>.filter { }</code> y <code>.sumOf { }</code>.</div>
+      <div class="reveal-panel" id="sol-4">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double)
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> productos: List&lt;Producto?&gt; = listOf(
+        Producto(1, <span class="str">"Pan"</span>, 0.8), <span class="kw">null</span>, Producto(2, <span class="str">"Pasta"</span>, 1.2),
+        Producto(3, <span class="str">"Leche"</span>, 1.5), <span class="kw">null</span>, Producto(4, <span class="str">"Pizza"</span>, 3.0)
+    )
+    <span class="kw">val</span> total = productos
+        .filterNotNull()
+        .filter { it.nombre.startsWith(<span class="str">"P"</span>) }
+        .sumOf { it.precio }
+    println(<span class="str">"Total productos P: $total"</span>)  <span class="cmt">// Total productos P: 5.0</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">5</span><h4>Extensión de String avanzada</h4></div>
+      <p>Crea una función de extensión <code>toInitials()</code> para <code>String</code> que devuelva las iniciales de cada palabra en mayúscula (ej: «Ana María Pérez» → «A.M.P.»).</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-5">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-5">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-5">Usa <code>.split(" ")</code> y <code>.map { it.first() }</code>.</div>
+      <div class="reveal-panel" id="sol-5">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> String.<span class="fn">toInitials</span>(): String {
+    <span class="kw">return this</span>.split(<span class="str">" "</span>)
+        .filter { it.isNotEmpty() }
+        .map { it.first().uppercase() }
+        .joinToString(<span class="str">"."</span>) + <span class="str">"."</span>
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> nombre = <span class="str">"ana maría pérez"</span>
+    println(nombre.toInitials())  <span class="cmt">// A.M.P.</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">6</span><h4>Sealed class y when</h4></div>
+      <p>Modela el estado de una descarga con una sealed class que tenga estados: <code>Iniciada</code>, <code>Progreso(Int)</code> (porcentaje), <code>Completada(ByteArray)</code>, <code>Error(String)</code>. Crea una función que maneje cada estado.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-6">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-6">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-6">Usa <code>is</code> y <code>when</code> para manejar cada estado.</div>
+      <div class="reveal-panel" id="sol-6">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoDescarga</span> {
+    object Iniciada : EstadoDescarga()
+    <span class="kw">data class</span> <span class="fn">Progreso</span>(<span class="kw">val</span> porcentaje: Int) : EstadoDescarga()
+    <span class="kw">data class</span> <span class="fn">Completada</span>(<span class="kw">val</span> datos: ByteArray) : EstadoDescarga()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoDescarga()
+}
+
+<span class="kw">fun</span> <span class="fn">manejarDescarga</span>(estado: EstadoDescarga) {
+    <span class="kw">when</span> (estado) {
+        EstadoDescarga.Iniciada -> println(<span class="str">"Descarga iniciada"</span>)
+        is EstadoDescarga.Progreso -> println(<span class="str">"Progreso: ${estado.porcentaje}%"</span>)
+        is EstadoDescarga.Completada -> println(<span class="str">"Descarga completada: ${estado.datos.size} bytes"</span>)
+        is EstadoDescarga.Error -> println(<span class="str">"Error: ${estado.mensaje}"</span>)
+    }
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    manejarDescarga(EstadoDescarga.Iniciada)
+    manejarDescarga(EstadoDescarga.Progreso(50))
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">7</span><h4>Scope functions y configuración</h4></div>
+      <p>Crea una clase <code>Configuracion</code> con propiedades <code>url</code>, <code>tiempoEspera</code> y <code>maxReintentos</code>. Usa <code>apply</code> para crear una instancia configurada y <code>let</code> para mostrar su contenido.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-7">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-7">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-7">Usa <code>apply</code> para el builder y <code>let</code> para el logging.</div>
+      <div class="reveal-panel" id="sol-7">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">Configuracion</span> {
+    <span class="kw">var</span> url: String = <span class="str">""</span>
+    <span class="kw">var</span> tiempoEspera: Int = 0
+    <span class="kw">var</span> maxReintentos: Int = 0
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> config = Configuracion().apply {
+        url = <span class="str">"https://api.ejemplo.com"</span>
+        tiempoEspera = 5000
+        maxReintentos = 3
+    }
+
+    config.let {
+        println(<span class="str">"URL: ${it.url}"</span>)
+        println(<span class="str">"Timeout: ${it.tiempoEspera}ms"</span>)
+        println(<span class="str">"Reintentos: ${it.maxReintentos}"</span>)
+    }
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">8</span><h4>Corrutinas con async</h4></div>
+      <p>Usa <code>async</code> para ejecutar dos tareas en paralelo (simuladas con <code>delay</code>) y combina sus resultados.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-8">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-8">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-8">Usa <code>async { }</code> y <code>awaitAll()</code>.</div>
+      <div class="reveal-panel" id="sol-8">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="kw">suspend fun</span> <span class="fn">tarea1</span>(): String {
+    delay(1000)
+    <span class="kw">return</span> <span class="str">"Resultado 1"</span>
+}
+
+<span class="kw">suspend fun</span> <span class="fn">tarea2</span>(): String {
+    delay(1500)
+    <span class="kw">return</span> <span class="str">"Resultado 2"</span>
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="kw">val</span> resultados = listOf(
+        async { tarea1() },
+        async { tarea2() }
+    ).awaitAll()
+
+    println(<span class="str">"Combinado: ${resultados.joinToString(" + ")}"</span>)
+    <span class="cmt">// Combinado: Resultado 1 + Resultado 2</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">9</span><h4>Operadores de colecciones</h4></div>
+      <p>Dada una lista de enteros del 1 al 20, obtén una lista con los pares, multiplícalos por 2, y agrupa por decenas (0-9, 10-19, 20-29).</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-9">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-9">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-9">Usa <code>.filter { }</code>, <code>.map { }</code> y <code>.groupBy { }</code>.</div>
+      <div class="reveal-panel" id="sol-9">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() {
+    <span class="kw">val</span> numeros = (1..20).toList()
+    <span class="kw">val</span> resultado = numeros
+        .filter { it % 2 == 0 }
+        .map { it * 2 }
+        .groupBy {
+            <span class="kw">when</span> (it) {
+                in 0..9 -> <span class="str">"0-9"</span>
+                in 10..19 -> <span class="str">"10-19"</span>
+                in 20..29 -> <span class="str">"20-29"</span>
+                <span class="kw">else</span> -> <span class="str">"Otros"</span>
+            }
+        }
+    println(resultado)
+    <span class="cmt">// {0-9=[4, 8, 12, 16], 10-19=[20, 24, 28, 32, 36], 20-29=[40]}</span>
+}</code></pre></div>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-head"><span class="activity-num">10</span><h4>ViewModel simulado</h4></div>
+      <p>Simula un ViewModel con un <code>StateFlow</code> que maneje el estado de carga de datos. Crea una función <code>cargarDatos()</code> que emita estados de carga, éxito y error.</p>
+      <div class="reveal-row">
+        <button class="reveal-btn" data-target="hint-10">💡 Mostrar pista</button>
+        <button class="reveal-btn" data-target="sol-10">✅ Ver resolución</button>
+      </div>
+      <div class="reveal-panel hint-panel" id="hint-10">Usa un <code>sealed class</code> para estados y <code>MutableStateFlow</code>.</div>
+      <div class="reveal-panel" id="sol-10">
+        <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+<span class="kw">import</span> kotlinx.coroutines.flow.*
+
+<span class="kw">sealed class</span> <span class="fn">EstadoDatos</span> {
+    object Cargando : EstadoDatos()
+    <span class="kw">data class</span> <span class="fn">Exito</span>(<span class="kw">val</span> datos: List&lt;String&gt;) : EstadoDatos()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoDatos()
+}
+
+<span class="kw">class</span> <span class="fn">SimuladorViewModel</span> {
+    <span class="kw">private val</span> _estado = MutableStateFlow&lt;EstadoDatos&gt;(EstadoDatos.Cargando)
+    <span class="kw">val</span> estado: StateFlow&lt;EstadoDatos&gt; = _estado.asStateFlow()
+
+    <span class="kw">fun</span> <span class="fn">cargarDatos</span>() {
+        _estado.value = EstadoDatos.Cargando
+        <span class="kw">try</span> {
+            <span class="kw">val</span> datos = listOf(<span class="str">"Elemento 1"</span>, <span class="str">"Elemento 2"</span>, <span class="str">"Elemento 3"</span>)
+            _estado.value = EstadoDatos.Exito(datos)
+        } <span class="kw">catch</span> (e: Exception) {
+            _estado.value = EstadoDatos.Error(e.message ?: <span class="str">"Error desconocido"</span>)
+        }
+    }
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="kw">val</span> vm = SimuladorViewModel()
+    vm.cargarDatos()
+
+    vm.estado.collect { estado ->
+        <span class="kw">when</span> (estado) {
+            EstadoDatos.Cargando -> println(<span class="str">"Cargando..."</span>)
+            is EstadoDatos.Exito -> println(<span class="str">"Datos: ${estado.datos}"</span>)
+            is EstadoDatos.Error -> println(<span class="str">"Error: ${estado.mensaje}"</span>)
+        }
+    }
+}</code></pre></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SECTION 11: PROYECTO INTEGRADOR ============ -->
+<section class="block" id="proyecto">
+  <div class="eyebrow-row"><span class="section-num">11</span></div>
+  <h2>Proyecto integrador</h2>
+  <p class="lede"><strong style="color:#fff">Sistema de gestión de productos.</strong> Implementa un sistema que reúna todo lo visto en la guía.</p>
+
+  <ol class="plain" style="padding-left:1.4rem;">
+    <li><strong style="color:#fff">Modelo de datos:</strong> <code>data class Producto(id: Int, nombre: String, precio: Double, categoria: String)</code></li>
+    <li><strong style="color:#fff">Repositorio:</strong> clase que contiene una lista de productos (simula BD)</li>
+    <li><strong style="color:#fff">Funcionalidades:</strong> listar por categoría, buscar por nombre (case insensitive), calcular precio total por categoría, aplicar descuento a una categoría</li>
+    <li><strong style="color:#fff">Manejo de estados:</strong> usar <code>sealed class</code> para estados de operación</li>
+    <li><strong style="color:#fff">Corrutinas:</strong> simular operaciones asíncronas</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Esqueleto base</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double, <span class="kw">val</span> categoria: String)
+
+<span class="kw">class</span> <span class="fn">RepositorioProductos</span> {
+    <span class="kw">private val</span> productos = listOf(<span class="cmt">/* ... */</span>)
+
+    <span class="kw">suspend fun</span> <span class="fn">obtenerPorCategoria</span>(categoria: String): List&lt;Producto&gt; {
+        delay(500)
+        <span class="kw">return</span> productos.filter { it.categoria == categoria }
+    }
+
+    <span class="kw">suspend fun</span> <span class="fn">aplicarDescuento</span>(categoria: String, porcentaje: Double): List&lt;Producto&gt; {
+        delay(500)
+        <span class="kw">return</span> productos.map {
+            <span class="kw">if</span> (it.categoria == categoria)
+                it.copy(precio = it.precio * (1 - porcentaje/100))
+            <span class="kw">else</span> it
+        }
+    }
+}</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">Uso en un ViewModel simulado</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">class</span> <span class="fn">ProductosViewModel</span> {
+    <span class="kw">private val</span> repo = RepositorioProductos()
+    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&gt;(EstadoUI.Cargando)
+    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&gt; = _uiState.asStateFlow()
+
+    <span class="kw">fun</span> <span class="fn">cargarCategoria</span>(categoria: String) {
+        viewModelScope.launch {
+            _uiState.value = EstadoUI.Cargando
+            <span class="kw">try</span> {
+                <span class="kw">val</span> productos = repo.obtenerPorCategoria(categoria)
+                _uiState.value = EstadoUI.Exito(productos)
+            } <span class="kw">catch</span> (e: Exception) {
+                _uiState.value = EstadoUI.Error(e.message ?: <span class="str">"Error"</span>)
+            }
+        }
+    }
+}</code></pre></div>
+</section>
+
+<!-- ============ SECTION 12: RECURSOS ============ -->
+<section class="block" id="recursos">
+  <div class="eyebrow-row"><span class="section-num">12</span></div>
+  <h2>Recursos adicionales</h2>
+
+  <h3 style="margin-top:1rem;">Enlaces útiles</h3>
+  <p>
+    <span class="pill"><a href="https://kotlinlang.org/docs/home.html" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">Documentación oficial</a></span>
+    <span class="pill"><a href="https://play.kotlinlang.org/" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">Kotlin Playground</a></span>
+    <span class="pill"><a href="https://developer.android.com/kotlin" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">Android Developers · Kotlin</a></span>
+    <span class="pill"><a href="https://kotlinlang.org/docs/kotlin-koans.html" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">Kotlin Koans</a></span>
+  </p>
+
+  <h3 style="margin-top:1.6rem;">Librerías esenciales para Android</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Librería</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>androidx.core:core-ktx</code></td><td>Extensiones Kotlin para Android</td></tr>
+      <tr><td><code>androidx.lifecycle:lifecycle-viewmodel-ktx</code></td><td>ViewModel con corrutinas</td></tr>
+      <tr><td><code>kotlinx-coroutines-android</code></td><td>Corrutinas para Android</td></tr>
+      <tr><td><code>androidx.activity:activity-ktx</code></td><td>Extensiones para Activities</td></tr>
+      <tr><td><code>androidx.fragment:fragment-ktx</code></td><td>Extensiones para Fragments</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">Buenas prácticas</h3>
+  <ol class="plain" style="padding-left:1.4rem;">
+    <li>Preferir <code>val</code> sobre <code>var</code> siempre que sea posible</li>
+    <li>Usar <code>data class</code> para modelos de datos</li>
+    <li>Aprovechar scope functions para código más limpio</li>
+    <li>Usar sealed classes para modelar estados</li>
+    <li>Siempre manejar nullables con safe call (<code>?.</code>) y Elvis (<code>?:</code>)</li>
+    <li>Aprovechar la programación funcional en colecciones</li>
+  </ol>
+</section>
+
+</main>
+<footer>Guía interactiva de Kotlin para 2º DAM · Programación de Móviles y Dispositivos Multimedia</footer>
+<button class="back-top" id="backTop" aria-label="Volver arriba">↑</button>
+<script id="app-script">
+(function(){
+  "use strict";
+
+  /* ---------- Mobile nav toggle ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', function(){
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  /* ---------- Scroll progress bar ---------- */
+  var progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = (scrolled || 0) + '%';
+  }
+  document.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+
+  /* ---------- Back to top ---------- */
+  var backTop = document.getElementById('backTop');
+  document.addEventListener('scroll', function(){
+    backTop.classList.toggle('show', window.scrollY > 700);
+  }, {passive:true});
+  backTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  /* ---------- Scrollspy ---------- */
+  var navA = Array.from(navLinks.querySelectorAll('a'));
+  var idToLink = {};
+  navA.forEach(function(a){ idToLink[a.getAttribute('href').slice(1)] = a; });
+  var allSections = Array.from(document.querySelectorAll('section[id]'));
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        navA.forEach(function(a){ a.classList.remove('active'); });
+        var link = idToLink[entry.target.id];
+        if(link) link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  allSections.forEach(function(s){ spy.observe(s); });
+
+  /* ---------- Accordions ---------- */
+  document.querySelectorAll('.acc-head').forEach(function(head){
+    head.addEventListener('click', function(){
+      head.parentElement.classList.toggle('open');
+    });
+  });
+
+  /* ---------- Generic tabs (comparativa + scope functions) ---------- */
+  document.querySelectorAll('.tabs').forEach(function(tabGroup){
+    var panelsWrap = tabGroup.nextElementSibling;
+    var btns = tabGroup.querySelectorAll('.tab-btn');
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        btns.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        panelsWrap.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        var target = panelsWrap.querySelector('#' + btn.getAttribute('data-tab'));
+        if(target) target.classList.add('active');
+      });
+    });
+  });
+
+  /* ---------- Copy buttons ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.copy-btn');
+    if(!btn) return;
+    var wrap = btn.closest('.codewrap');
+    var codeEl = wrap.querySelector('pre.code code');
+    var text = codeEl.innerText;
+    var finish = function(){
+      var old = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('copied'); }, 1400);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(finish).catch(function(){
+        fallbackCopy(text); finish();
+      });
+    } else {
+      fallbackCopy(text); finish();
+    }
+  });
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- Activity reveal toggles ---------- */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var panel = document.getElementById(btn.getAttribute('data-target'));
+      if(!panel) return;
+      var showing = panel.classList.toggle('show');
+      if(btn.textContent.indexOf('pista') > -1 || btn.textContent.indexOf('Ocultar pista') > -1){
+        btn.textContent = showing ? '💡 Ocultar pista' : '💡 Mostrar pista';
+      } else {
+        btn.textContent = showing ? '✅ Ocultar resolución' : '✅ Ver resolución';
+      }
+    });
+  });
+
+  /* ---------- Null Safety interactive widget ---------- */
+  var nsOps = document.querySelectorAll('.ns-op');
+  var nsSwitch = document.getElementById('nsSwitch');
+  var nsResult = document.getElementById('nsResult');
+  var nsState = { op:'safe', isNull:true };
+
+  function renderNs(){
+    var city = nsState.isNull ? null : 'Bilbao';
+    var html = '';
+    if(nsState.op === 'safe'){
+      html = '<span class="mono">ciudad?.length</span> → ';
+      html += city === null ? '<span class="r-warn">null</span> <span style="color:var(--text-faint)">(tipo Int?, sin excepción)</span>'
+                             : '<span class="r-ok">' + city.length + '</span>';
+    } else if(nsState.op === 'elvis'){
+      html = '<span class="mono">ciudad ?: "Desconocida"</span> → ';
+      html += '<span class="r-ok">"' + (city === null ? 'Desconocida' : city) + '"</span>';
+    } else if(nsState.op === 'bang'){
+      html = '<span class="mono">ciudad!!.length</span> → ';
+      html += city === null ? '<span class="r-err">💥 NullPointerException</span>'
+                             : '<span class="r-ok">' + city.length + '</span>';
+    } else if(nsState.op === 'let'){
+      html = '<span class="mono">ciudad?.let { println("La ciudad es $it") }</span> → ';
+      html += city === null ? '<span style="color:var(--text-faint)">(el bloque no se ejecuta)</span>'
+                             : '<span class="r-ok">La ciudad es ' + city + '</span>';
+    }
+    nsResult.innerHTML = html;
+  }
+  nsOps.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      nsOps.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      nsState.op = btn.getAttribute('data-op');
+      renderNs();
+    });
+  });
+  nsSwitch.addEventListener('click', function(){
+    nsState.isNull = !nsState.isNull;
+    nsSwitch.classList.toggle('on', !nsState.isNull);
+    renderNs();
+  });
+  renderNs();
+
+  /* ---------- Terminal snippet demo ---------- */
+  var snippetBtns = document.querySelectorAll('.snippet-btn');
+  var termCode = document.getElementById('termCode');
+  var termOut = document.getElementById('termOut');
+  var runBtn = document.getElementById('runBtn');
+  var activeSnip = 'snip-1';
+
+  function loadSnippet(id){
+    activeSnip = id;
+    var src = document.querySelector('#' + id + ' .src');
+    termCode.innerHTML = src.innerHTML;
+    termOut.innerHTML = '<span class="prompt">// pulsa «Ejecutar» para ver la salida</span>';
+  }
+  snippetBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      snippetBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      loadSnippet(btn.getAttribute('data-snip'));
+    });
+  });
+  runBtn.addEventListener('click', function(){
+    var lines = document.querySelectorAll('#' + activeSnip + ' .out div');
+    termOut.innerHTML = '';
+    runBtn.disabled = true;
+    runBtn.style.opacity = '.6';
+    var i = 0;
+    function next(){
+      if(i >= lines.length){
+        runBtn.disabled = false;
+        runBtn.style.opacity = '1';
+        var done = document.createElement('span');
+        done.className = 'prompt';
+        done.textContent = '\n// proceso finalizado ✓';
+        termOut.appendChild(done);
+        return;
+      }
+      var line = document.createElement('div');
+      line.textContent = lines[i].textContent;
+      termOut.appendChild(line);
+      i++;
+      setTimeout(next, 420);
+    }
+    next();
+  });
+  loadSnippet('snip-1');
+
+})();
+</script>
+</body>
+</html>
