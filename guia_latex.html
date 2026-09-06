@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Iniciación a LaTeX — Taller de Composición</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDE6D6;
+  --paper-alt:#E4DBC6;
+  --paper-deep:#DCD1B7;
+  --ink:#211C15;
+  --ink-soft:#544A3B;
+  --ink-faint:#8A7F6C;
+  --accent:#7A1F2B;
+  --accent-soft:#9C3542;
+  --accent-pale:#EFD9D4;
+  --gold:#9C7A28;
+  --gold-pale:#EFE1BC;
+  --code-bg:#241F19;
+  --code-bg-alt:#2E2820;
+  --code-text:#F0EBE0;
+  --code-accent:#E3B34A;
+  --border:rgba(33,28,21,0.16);
+  --border-strong:rgba(33,28,21,0.30);
+  --success:#3F6B4A;
+  --shadow:0 2px 0 rgba(33,28,21,0.08);
+  --radius:2px;
+  --maxw:920px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Source Serif 4', Georgia, serif;
+  font-size:17px;
+  line-height:1.65;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(33,28,21,0.045) 1px, transparent 0);
+  background-size:22px 22px;
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+}
+::selection{background:var(--accent); color:var(--paper);}
+h1,h2,h3,h4{
+  font-family:'Fraunces', Georgia, serif;
+  color:var(--ink);
+  font-weight:600;
+  line-height:1.15;
+  margin:0 0 .5em 0;
+}
+a{color:var(--accent);}
+p{max-width:72ch;}
+.container{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+code{font-family:'JetBrains Mono', monospace; font-size:0.88em;}
+
+/* ---------- Topbar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:100;
+  background:rgba(237,230,214,0.94);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border-strong);
+}
+.topbar-inner{
+  max-width:1180px; margin:0 auto; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  height:58px;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem;
+  color:var(--ink); text-decoration:none; white-space:nowrap;
+}
+.brand .mark{
+  width:26px; height:26px; border:1.5px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fraunces', serif; font-weight:700; font-size:0.85rem;
+  color:var(--accent); transform:rotate(-4deg);
+}
+.navlinks{
+  display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;
+  font-size:0.86rem;
+}
+.navlinks::-webkit-scrollbar{display:none;}
+.navlinks a{
+  color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+  padding:8px 10px; border-radius:var(--radius);
+  font-family:'Source Serif 4', serif;
+  border-bottom:2px solid transparent;
+  transition:color .15s, border-color .15s;
+}
+.navlinks a:hover{color:var(--accent); border-color:var(--gold);}
+.nav-toggle{display:none;}
+
+@media (max-width:920px){
+  .navlinks{display:none; position:absolute; top:58px; left:0; right:0; background:var(--paper); flex-direction:column; border-bottom:1px solid var(--border-strong); padding:8px 12px 16px;}
+  .navlinks.open{display:flex;}
+  .nav-toggle{display:block; background:none; border:1.5px solid var(--ink); color:var(--ink); width:34px; height:34px; font-size:1rem; cursor:pointer; font-family:'JetBrains Mono',monospace;}
+}
+
+/* ---------- Progress bar ---------- */
+.progress{position:fixed; top:0; left:0; height:3px; background:var(--accent); width:0%; z-index:200; transition:width .1s linear;}
+
+/* ---------- Hero ---------- */
+.hero{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--border-strong);
+}
+.hero-grid{
+  display:grid; grid-template-columns:1fr;
+  gap:20px;
+}
+.hero-kicker{
+  font-family:'JetBrains Mono', monospace;
+  font-size:0.78rem; letter-spacing:0.02em;
+  color:var(--accent);
+  margin-bottom:14px;
+}
+.hero h1{
+  font-size:clamp(2.1rem, 5vw, 3.4rem);
+  max-width:14ch;
+  margin-bottom:0.3em;
+}
+.hero h1 em{font-style:italic; color:var(--accent); font-weight:500;}
+.hero p.lead{
+  font-size:1.12rem; color:var(--ink-soft); max-width:56ch;
+}
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:22px;
+  font-family:'JetBrains Mono', monospace; font-size:0.78rem; color:var(--ink-faint);
+}
+.hero-meta strong{color:var(--ink-soft); font-weight:600;}
+
+.compile-demo{
+  margin-top:36px;
+  border:1px solid var(--border-strong);
+  background:var(--paper-alt);
+  display:grid; grid-template-columns:1fr 44px 1fr;
+  align-items:stretch;
+  min-height:190px;
+}
+@media (max-width:760px){
+  .compile-demo{grid-template-columns:1fr; }
+  .compile-arrow{transform:rotate(90deg); margin:0 auto;}
+}
+.compile-pane{padding:18px 20px; overflow:hidden;}
+.compile-pane.code{background:var(--code-bg); color:var(--code-text); font-family:'JetBrains Mono',monospace; font-size:0.82rem; white-space:pre-wrap;}
+.compile-pane.out{background:var(--paper); font-family:'Source Serif 4', serif;}
+.compile-label{
+  font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:.04em;
+  color:var(--ink-faint); margin-bottom:10px; display:block;
+}
+.compile-pane.code .compile-label{color:#8f8471;}
+.compile-arrow{display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.3rem;}
+#heroTyped::after{content:'▌'; animation:blink 1s step-start infinite; color:var(--code-accent);}
+@keyframes blink{50%{opacity:0;}}
+#heroOut{opacity:0; transition:opacity .5s ease;}
+#heroOut.show{opacity:1;}
+#heroOut h4{font-size:1.15rem; margin-bottom:6px;}
+#heroOut .rubric{color:var(--accent); font-weight:700; font-family:'Fraunces',serif;}
+
+/* ---------- Sections ---------- */
+main{padding-bottom:40px;}
+section.chapter{
+  padding:56px 0; border-bottom:1px solid var(--border);
+}
+section.chapter:nth-of-type(even){background:var(--paper-alt);}
+.chapter-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+.chapter-num{
+  font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+  color:var(--accent); font-size:1.5rem; line-height:1;
+}
+.chapter-head h2{font-size:1.9rem; margin-bottom:0;}
+.chapter-intro{color:var(--ink-soft); max-width:64ch; margin-bottom:28px;}
+h3.sub{font-size:1.25rem; margin-top:36px; padding-top:2px; border-top:1px solid var(--border); padding-top:14px;}
+h3.sub:first-of-type{border-top:none; margin-top:0;}
+
+/* ---------- Code blocks ---------- */
+.codewrap{position:relative; margin:16px 0;}
+pre{
+  background:var(--code-bg); color:var(--code-text);
+  font-family:'JetBrains Mono', monospace; font-size:0.85rem; line-height:1.6;
+  padding:18px 20px; margin:0; overflow-x:auto;
+  border-left:3px solid var(--gold);
+}
+pre .cm{color:#8f8471; font-style:italic;}
+pre .kw{color:var(--code-accent);}
+pre .str{color:#B7C99A;}
+.copy-btn{
+  position:absolute; top:8px; right:8px;
+  background:var(--code-bg-alt); color:var(--paper);
+  border:1px solid rgba(240,235,224,0.25);
+  font-family:'JetBrains Mono', monospace; font-size:0.68rem;
+  padding:5px 9px; cursor:pointer; letter-spacing:.02em;
+  transition:background .15s, border-color .15s;
+}
+.copy-btn:hover{border-color:var(--gold); color:var(--code-accent);}
+.copy-btn.copied{color:#B7C99A; border-color:#B7C99A;}
+
+/* ---------- Tables ---------- */
+table{border-collapse:collapse; width:100%; margin:18px 0; font-size:0.94rem;}
+th,td{border:1px solid var(--border-strong); padding:9px 12px; text-align:left; vertical-align:top;}
+th{background:var(--ink); color:var(--paper); font-family:'Fraunces',serif; font-weight:600; font-size:0.86rem;}
+tr:nth-child(even) td{background:rgba(33,28,21,0.035);}
+.table-scroll{overflow-x:auto;}
+
+/* ---------- Lists ---------- */
+ul.styled, ol.styled{padding-left:1.3em;}
+ul.styled li, ol.styled li{margin-bottom:6px;}
+ul.check{list-style:none; padding-left:0;}
+ul.check li{padding-left:1.7em; position:relative; margin-bottom:8px;}
+ul.check li::before{content:'✓'; position:absolute; left:0; color:var(--success); font-weight:700;}
+
+/* ---------- Callouts ---------- */
+.callout{
+  border-left:3px solid var(--accent); background:var(--accent-pale);
+  padding:14px 18px; margin:20px 0; font-size:0.95rem;
+}
+.callout.gold{border-color:var(--gold); background:var(--gold-pale);}
+.callout strong{color:var(--accent);}
+.callout.gold strong{color:var(--gold);}
+
+/* ---------- Anatomy diagram (section 2) ---------- */
+.anatomy{
+  background:var(--code-bg); padding:36px 24px 26px; margin:24px 0 40px;
+  overflow-x:auto;
+}
+.anatomy-line{
+  font-family:'JetBrains Mono', monospace; font-size:1.3rem;
+  color:var(--code-text); white-space:nowrap; display:flex; justify-content:center; margin-bottom:10px;
+}
+.anatomy-line span{cursor:pointer; padding:2px 3px; border-radius:2px; transition:background .15s;}
+.anatomy-line span.cmd{color:var(--code-accent);}
+.anatomy-line span.opt{color:#8CC1D8;}
+.anatomy-line span.arg{color:#B7C99A;}
+.anatomy-line span:hover, .anatomy-line span.active{background:rgba(240,235,224,0.14);}
+.anatomy-desc{
+  min-height:64px; text-align:center; color:var(--code-text);
+  font-family:'Source Serif 4', serif; font-size:0.98rem; padding:0 12px;
+}
+.anatomy-desc b{color:var(--code-accent); font-family:'JetBrains Mono',monospace;}
+.anatomy-hint{text-align:center; color:#8f8471; font-family:'JetBrains Mono',monospace; font-size:0.7rem; margin-top:18px;}
+
+/* ---------- Accordion ---------- */
+.accordion-item{border:1px solid var(--border-strong); margin-bottom:10px; background:var(--paper);}
+.accordion-head{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px 18px; cursor:pointer; user-select:none;
+}
+.accordion-head h4{margin:0; font-size:1.02rem;}
+.accordion-head .plus{font-family:'JetBrains Mono',monospace; color:var(--accent); font-size:1.1rem; flex:0 0 auto;}
+.accordion-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.accordion-body-inner{padding:0 18px 18px;}
+.accordion-item.open .accordion-body{max-height:4000px;}
+.accordion-item.open .accordion-head .plus{transform:rotate(45deg);}
+
+/* ---------- Reveal buttons (activities) ---------- */
+.reveal-btn{
+  display:inline-flex; align-items:center; gap:6px;
+  background:none; border:1.5px solid var(--ink); color:var(--ink);
+  font-family:'JetBrains Mono', monospace; font-size:0.76rem;
+  padding:8px 14px; cursor:pointer; margin:6px 8px 6px 0;
+  transition:background .15s, color .15s;
+}
+.reveal-btn:hover{background:var(--ink); color:var(--paper);}
+.reveal-panel{display:none; margin-top:14px; border-top:1px dashed var(--border-strong); padding-top:14px;}
+.reveal-panel.show{display:block;}
+
+/* ---------- Symbol palette (math) ---------- */
+.symbol-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
+  gap:8px; margin:18px 0;
+}
+.symbol-chip{
+  background:var(--code-bg); color:var(--code-text); border:1px solid rgba(240,235,224,0.15);
+  padding:10px 6px; text-align:center; cursor:pointer;
+  transition:border-color .15s, transform .1s;
+}
+.symbol-chip:hover{border-color:var(--gold); transform:translateY(-1px);}
+.symbol-chip .glyph{font-size:1.35rem; display:block; margin-bottom:4px;}
+.symbol-chip .cmdname{font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:#8f8471;}
+.symbol-chip.copied{border-color:#B7C99A;}
+.symbol-toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:var(--paper); font-family:'JetBrains Mono',monospace;
+  font-size:0.78rem; padding:10px 18px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+  z-index:300;
+}
+.symbol-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* ---------- Playground (signature demo) ---------- */
+.playground{
+  border:1px solid var(--border-strong); background:var(--ink);
+  margin:26px 0;
+}
+.pg-header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 18px; border-bottom:1px solid rgba(240,235,224,0.15);
+  font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--paper);
+}
+.pg-header .dots{display:flex; gap:6px;}
+.pg-header .dots span{width:9px; height:9px; border-radius:50%; display:inline-block;}
+.pg-body{display:grid; grid-template-columns:1fr 1fr; min-height:340px;}
+@media (max-width:760px){.pg-body{grid-template-columns:1fr;}}
+.pg-pane{display:flex; flex-direction:column;}
+.pg-pane + .pg-pane{border-left:1px solid rgba(240,235,224,0.15);}
+@media (max-width:760px){.pg-pane + .pg-pane{border-left:none; border-top:1px solid rgba(240,235,224,0.15);}}
+.pg-label{
+  font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:#9a8f78;
+  padding:10px 16px; letter-spacing:.03em;
+}
+#pgInput{
+  flex:1; background:var(--code-bg); color:var(--code-text); border:none;
+  font-family:'JetBrains Mono',monospace; font-size:0.86rem; line-height:1.6;
+  padding:0 16px 16px; resize:none; outline:none;
+}
+#pgOutput{
+  flex:1; background:var(--paper); color:var(--ink); padding:16px 20px 20px;
+  font-family:'Source Serif 4',serif; overflow-y:auto;
+}
+#pgOutput h2,#pgOutput h3{font-family:'Fraunces',serif;}
+#pgOutput .pg-err{color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:0.8rem;}
+.pg-presets{display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px solid rgba(240,235,224,0.15);}
+.pg-preset-btn{
+  background:none; border:1px solid rgba(240,235,224,0.3); color:#c9c0ab;
+  font-family:'JetBrains Mono',monospace; font-size:0.68rem; padding:6px 10px; cursor:pointer;
+}
+.pg-preset-btn:hover{border-color:var(--gold); color:var(--code-accent);}
+
+/* ---------- Error diagnostics tool ---------- */
+.diag-tool{border:1px solid var(--border-strong); background:var(--paper); padding:22px 24px; margin:24px 0;}
+.diag-tool select{
+  width:100%; font-family:'JetBrains Mono',monospace; font-size:0.86rem;
+  padding:10px 12px; background:var(--code-bg); color:var(--code-text); border:1px solid var(--border-strong);
+  margin-bottom:16px;
+}
+.diag-result{border-left:3px solid var(--gold); background:var(--gold-pale); padding:14px 18px; display:none;}
+.diag-result.show{display:block;}
+.diag-result .drow{margin-bottom:8px;}
+.diag-result .drow:last-child{margin-bottom:0;}
+.diag-result b{font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent); display:block; margin-bottom:2px;}
+
+/* ---------- Table generator tool ---------- */
+.tablegen{border:1px solid var(--border-strong); background:var(--paper); padding:22px 24px; margin:24px 0;}
+.tg-controls{display:flex; gap:22px; flex-wrap:wrap; margin-bottom:16px;}
+.tg-field{display:flex; flex-direction:column; gap:6px;}
+.tg-field label{font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--ink-soft);}
+.tg-field input[type=number]{width:70px; padding:6px 8px; font-family:'JetBrains Mono',monospace; border:1px solid var(--border-strong);}
+.tg-aligns{display:flex; gap:6px;}
+.tg-align-btn{
+  width:34px; height:34px; border:1px solid var(--border-strong); background:var(--paper);
+  font-family:'JetBrains Mono',monospace; cursor:pointer;
+}
+.tg-align-btn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.tg-check{display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.76rem;}
+
+/* ---------- Glossary flip cards ---------- */
+.glossary-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; margin-top:20px;}
+.gcard{
+  border:1px solid var(--border-strong); background:var(--paper); padding:16px 18px;
+  min-height:110px; cursor:pointer; position:relative; overflow:hidden;
+}
+.gcard .gterm{font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem; color:var(--accent); margin-bottom:8px; display:flex; justify-content:space-between;}
+.gcard .gterm .flip-hint{font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--ink-faint); font-weight:400;}
+.gcard .gdef{font-size:0.88rem; color:var(--ink-soft); display:none;}
+.gcard.open .gdef{display:block;}
+.gcard.open .gterm{margin-bottom:8px;}
+
+/* ---------- Resource cards ---------- */
+.res-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:20px;}
+.res-card{border:1px solid var(--border-strong); background:var(--paper); padding:16px 18px; text-decoration:none; display:block; color:var(--ink);}
+.res-card:hover{border-color:var(--accent);}
+.res-card .rtag{font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--gold); text-transform:uppercase; letter-spacing:.04em;}
+.res-card h4{font-size:1rem; margin:6px 0 4px;}
+.res-card p{font-size:0.85rem; color:var(--ink-soft); margin:0;}
+
+/* ---------- Footer ---------- */
+footer{padding:40px 0 60px; text-align:center; color:var(--ink-faint); font-family:'JetBrains Mono',monospace; font-size:0.78rem;}
+footer .fmark{font-family:'Fraunces',serif; font-style:italic; color:var(--ink-soft); font-size:0.95rem; margin-bottom:10px;}
+
+/* ---------- Focus ---------- */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible, textarea:focus-visible, select:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px;
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progressBar"></div>
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="#top" class="brand"><span class="mark">§</span> Iniciación a LaTeX</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">≡</button>
+    <div class="navlinks" id="navLinks">
+      <a href="#fundamentos">Fundamentos</a>
+      <a href="#sintaxis">Sintaxis</a>
+      <a href="#taller">Taller en vivo</a>
+      <a href="#texto">Texto</a>
+      <a href="#matematicas">Matemáticas</a>
+      <a href="#listas-tablas">Listas y tablas</a>
+      <a href="#imagenes">Imágenes</a>
+      <a href="#referencias">Referencias</a>
+      <a href="#personalizacion">Personalización</a>
+      <a href="#errores">Errores</a>
+      <a href="#actividades">Actividades</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#glosario">Glosario</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-kicker">// GUÍA INTERACTIVA · NIVEL INICIACIÓN</div>
+        <h1>El código que <em>se convierte</em> en documento</h1>
+        <p class="lead">LaTeX no es un procesador de texto: es un lenguaje de composición. Escribes, compilas, y el resultado es un documento con la calidad de una imprenta profesional. Esta guía te lleva de cero a tu primer informe académico completo.</p>
+        <div class="hero-meta">
+          <span><strong>Público:</strong> sin experiencia previa</span>
+          <span><strong>Duración:</strong> 4–6 horas autodirigidas</span>
+          <span><strong>Incluye:</strong> taller en vivo + 6 actividades guiadas</span>
+        </div>
+      </div>
+      <div class="compile-demo">
+        <div class="compile-pane code">
+          <span class="compile-label">entrada.tex</span>
+          <div id="heroTyped"></div>
+        </div>
+        <div class="compile-arrow">→</div>
+        <div class="compile-pane out">
+          <span class="compile-label">SALIDA COMPILADA</span>
+          <div id="heroOut">
+            <h4>1&nbsp;&nbsp;Introducción</h4>
+            <p>Este es un documento escrito en <strong>LaTeX</strong>, compuesto con <span class="rubric">tipografía profesional</span> a partir de texto plano.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="chapter" id="fundamentos">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§1</span><h2>Fundamentos de LaTeX</h2></div>
+    <p class="chapter-intro">Antes de escribir una sola línea, conviene entender qué es LaTeX y en qué se diferencia radicalmente de Word o LibreOffice.</p>
+
+    <h3 class="sub">¿Qué es LaTeX?</h3>
+    <p>LaTeX (pronunciado <em>«lá-tech»</em> o <em>«léi-tech»</em>) es un sistema de composición de documentos de alta calidad, ampliamente utilizado en el ámbito académico y científico.</p>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Aspecto</th><th>LaTeX</th><th>Word / LibreOffice</th></tr></thead>
+      <tbody>
+        <tr><td>Paradigma</td><td>Programación (código → compilar → PDF)</td><td>WYSIWYG</td></tr>
+        <tr><td>Enfoque</td><td>Contenido y estructura</td><td>Formato y apariencia</td></tr>
+        <tr><td>Control</td><td>Total sobre el diseño</td><td>Limitado por la interfaz</td></tr>
+        <tr><td>Matemáticas</td><td>Excelente (nativo)</td><td>Deficiente (requiere complementos)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="sub">El flujo de trabajo</h3>
+    <p>Todo documento LaTeX sigue el mismo ciclo, tantas veces como haga falta:</p>
+    <div class="codewrap">
+      <pre>[ESCRIBIR]  →  .tex (código fuente)
+      ↓
+[COMPILAR]  →  pdflatex, xelatex, lualatex
+      ↓
+ ¿ERRORES?  →  Sí → corregir y volver a compilar
+      ↓
+[VISUALIZAR] → PDF (documento final)
+      ↓
+[DEPURAR]   →  ajustar y repetir si es necesario</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Objetivos de aprendizaje</h3>
+    <p>Al completar esta guía, serás capaz de:</p>
+    <ul class="check">
+      <li>Crear documentos LaTeX desde cero</li>
+      <li>Estructurar contenido con secciones y estilos</li>
+      <li>Escribir fórmulas matemáticas complejas</li>
+      <li>Insertar tablas, imágenes y listas</li>
+      <li>Gestionar referencias y bibliografía</li>
+      <li>Compilar documentos y resolver errores básicos</li>
+      <li>Personalizar el formato de tus documentos</li>
+    </ul>
+
+    <h3 class="sub">Instalación y herramientas</h3>
+    <div class="callout gold"><strong>Para empezar sin instalar (recomendado):</strong> Overleaf (overleaf.com) — editor online colaborativo, no requiere instalación.</div>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Sistema</th><th>Instalación local recomendada</th></tr></thead>
+      <tbody>
+        <tr><td>Windows</td><td>MiKTeX + TeXstudio</td></tr>
+        <tr><td>Mac</td><td>MacTeX + TeXstudio</td></tr>
+        <tr><td>Linux</td><td>TeX Live + cualquier editor</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>Herramientas complementarias:</strong> JabRef (gestor de bibliografía) y Detexify (identifica símbolos matemáticos dibujados a mano).</p>
+  </div>
+</section>
+<section class="chapter" id="sintaxis">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§2</span><h2>Estructura y sintaxis</h2></div>
+    <p class="chapter-intro">Todo documento LaTeX comparte un esqueleto mínimo y una gramática de comandos que se repite en toda la guía. Domina esto y el resto es vocabulario.</p>
+
+    <h3 class="sub">Estructura mínima</h3>
+    <div class="codewrap">
+      <pre>\documentclass{article}    % Tipo de documento (PREÁMBULO)
+\usepackage[utf8]{inputenc} % Configuración
+
+\begin{document}           % INICIO DEL CUERPO
+% Aquí va el contenido visible
+\end{document}             % FIN DEL CUERPO</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Anatomía de un comando</h3>
+    <p>Todos los comandos de LaTeX comparten esta forma. Toca cada parte para ver qué hace:</p>
+    <div class="anatomy">
+      <div class="anatomy-line">
+        <span class="cmd" data-desc="El <b>nombre del comando</b>, siempre precedido de una barra invertida <b>\</b>. Le dice a LaTeX qué acción ejecutar.">\comando</span><span>[</span><span class="opt" data-desc="Argumento <b>opcional</b>, entre corchetes. Modifica el comportamiento por defecto — si se omite, LaTeX usa un valor predeterminado.">opciones</span><span>]</span><span>{</span><span class="arg" data-desc="Primer argumento <b>obligatorio</b>, entre llaves. El comando no funciona sin él.">argumento1</span><span>}</span><span>{</span><span class="arg" data-desc="Puede haber <b>varios argumentos obligatorios</b> encadenados, cada uno en sus propias llaves.">argumento2</span><span>}</span>
+      </div>
+      <div class="anatomy-desc" id="anatomyDesc">Toca cualquier parte del comando de arriba para ver su función.</div>
+      <div class="anatomy-hint">EJEMPLO: \includegraphics[width=5cm]{imagen.png}</div>
+    </div>
+
+    <h3 class="sub">Comentarios</h3>
+    <div class="codewrap">
+      <pre>% Esto es un comentario (no aparece en el PDF)
+\documentclass{article} % Comentario al final de línea
+% \usepackage{algo}     % Línea desactivada</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Tipos de documento (clases)</h3>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Clase</th><th>Uso</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>article</code></td><td>Artículos cortos, ensayos</td><td>Trabajos universitarios</td></tr>
+        <tr><td><code>report</code></td><td>Informes, tesis</td><td>Proyectos largos</td></tr>
+        <tr><td><code>book</code></td><td>Libros</td><td>Publicaciones extensas</td></tr>
+        <tr><td><code>beamer</code></td><td>Presentaciones</td><td>Diapositivas</td></tr>
+        <tr><td><code>letter</code></td><td>Cartas</td><td>Correspondencia formal</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="sub">Paquetes esenciales</h3>
+    <div class="codewrap">
+      <pre>\usepackage[utf8]{inputenc}   % Acentos y caracteres especiales
+\usepackage[spanish]{babel}   % Idioma: traducciones automáticas
+\usepackage{amsmath}          % Matemáticas avanzadas
+\usepackage{amssymb}          % Símbolos matemáticos adicionales
+\usepackage{graphicx}         % Insertar imágenes
+\usepackage{geometry}         % Control de márgenes
+\usepackage{hyperref}         % Enlaces y referencias
+\usepackage{xcolor}           % Colores en el texto
+\usepackage{fancyhdr}         % Encabezados y pies de página</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="taller">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">✎</span><h2>Taller de composición en vivo</h2></div>
+    <p class="chapter-intro">Escribe código con la sintaxis que acabas de ver y observa el resultado compuesto al instante. Es una versión simplificada de un compilador real — pensada para que veas el efecto de cada comando, no para sustituir a pdflatex.</p>
+
+    <div class="playground">
+      <div class="pg-header">
+        <span>mesa-de-composicion.tex</span>
+        <div class="dots"><span style="background:#9C3542"></span><span style="background:#9C7A28"></span><span style="background:#3F6B4A"></span></div>
+      </div>
+      <div class="pg-body">
+        <div class="pg-pane">
+          <div class="pg-label">CÓDIGO FUENTE</div>
+          <textarea id="pgInput" spellcheck="false"></textarea>
+        </div>
+        <div class="pg-pane">
+          <div class="pg-label">VISTA COMPUESTA</div>
+          <div id="pgOutput"></div>
+        </div>
+      </div>
+      <div class="pg-presets">
+        <button class="pg-preset-btn" data-preset="basico" type="button">Texto básico</button>
+        <button class="pg-preset-btn" data-preset="secciones" type="button">Secciones</button>
+        <button class="pg-preset-btn" data-preset="listas" type="button">Listas</button>
+        <button class="pg-preset-btn" data-preset="matematicas" type="button">Matemáticas</button>
+      </div>
+    </div>
+    <p style="font-size:0.85rem; color:var(--ink-faint);">Comandos soportados en este taller: <code>\textbf \textit \underline \emph \section \subsection \begin/\end{itemize|enumerate|center} \item</code>, modo matemático con <code>^ _ \frac \sqrt</code> y letras griegas, y <code>%</code> para comentarios.</p>
+  </div>
+</section>
+<section class="chapter" id="texto">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§3</span><h2>Texto básico</h2></div>
+    <p class="chapter-intro">El formato de texto en LaTeX se marca con comandos explícitos, no con botones. Esto obliga a pensar en estructura semántica antes que en apariencia.</p>
+
+    <h3 class="sub">Formato de texto</h3>
+    <div class="codewrap">
+      <pre>\textbf{Negrita}      % NEGRITA
+\textit{Cursiva}      % Cursiva
+\underline{Subrayado} % Subrayado
+\textsc{Versalitas}   % VERSALITAS
+\emph{Énfasis}         % Énfasis (generalmente cursiva)</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Tamaños de fuente</h3>
+    <div class="codewrap">
+      <pre>{\tiny Texto minúsculo}
+{\scriptsize Texto muy pequeño}
+{\footnotesize Texto pie de página}
+{\small Texto pequeño}
+{\normalsize Texto normal}
+{\large Texto grande}
+{\Large Texto más grande}
+{\LARGE Texto muy grande}
+{\huge Texto enorme}
+{\Huge Texto gigante}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Espaciado</h3>
+    <div class="codewrap">
+      <pre>\\                    % Salto de línea
+\newline              % Salto de línea (similar)
+\par                  % Nuevo párrafo
+
+\newpage              % Nueva página
+\clearpage            % Nueva página (fuerza salida de flotantes)
+
+\hspace{1cm}          % Espacio horizontal
+\vspace{1cm}          % Espacio vertical
+
+\quad                 % Espacio de 1em
+\qquad                % Espacio de 2em
+
+~                     % Espacio no separable (evita salto de línea)</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Estructura del documento</h3>
+    <div class="codewrap">
+      <pre>\section{Sección Principal}
+\subsection{Subsección}
+\subsubsection{Sub-subsección}
+\paragraph{Párrafo con título}
+\subparagraph{Subpárrafo}
+
+% Sin numeración (versión con *)
+\section*{Sección sin numerar}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Entornos especiales</h3>
+    <div class="codewrap">
+      <pre>\begin{center}
+  Texto centrado
+\end{center}
+
+\begin{flushleft}
+  Texto alineado a la izquierda
+\end{flushleft}
+
+\begin{flushright}
+  Texto alineado a la derecha
+\end{flushright}
+
+\begin{quote}
+  Cita textual (con sangría)
+\end{quote}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="matematicas">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§4</span><h2>Matemáticas</h2></div>
+    <p class="chapter-intro">Aquí es donde LaTeX brilla frente a cualquier procesador de texto: escribir ecuaciones se vuelve tan natural como escribir texto.</p>
+
+    <h3 class="sub">Modos matemáticos</h3>
+    <div class="codewrap">
+      <pre>% En línea (dentro del párrafo)
+La fórmula $E = mc^2$ es famosa.
+
+% En display (ecuación en su propia línea)
+\[ E = mc^2 \]
+
+% Ecuación numerada
+\begin{equation}
+  E = mc^2
+\end{equation}
+
+% Múltiples ecuaciones alineadas
+\begin{align}
+  a + b &= c \\
+  d + e &= f
+\end{align}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Superíndices y subíndices</h3>
+    <div class="codewrap">
+      <pre>$x^2$      % x al cuadrado
+$x^{10}$   % x a la 10 (agrupar con {})
+$x_i$      % x sub i
+$x_{ij}$   % x sub ij
+$x^2_i$    % x sub i al cuadrado (orden: subíndice después del superíndice)</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Fracciones y raíces</h3>
+    <div class="codewrap">
+      <pre>\frac{numerador}{denominador}           % Fracción
+\frac{1}{2}                             % 1/2
+
+\sqrt{radicando}                        % Raíz cuadrada
+\sqrt[3]{radicando}                     % Raíz cúbica
+\sqrt[4]{16} = 2                        % Raíz cuarta</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Delimitadores</h3>
+    <div class="codewrap">
+      <pre>( )        % Paréntesis normales
+[ ]        % Corchetes
+\{ \}      % Llaves (escapadas con \)
+|          % Barra vertical
+\|         % Doble barra (norma)
+
+\left( \frac{a}{b} \right)  % Tamaño automático
+\left[ \frac{a}{b} \right]
+\left\{ \frac{a}{b} \right\}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Símbolos comunes — toca para copiar el comando</h3>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Una versión en miniatura de lo que hace Detexify: en vez de dibujar el símbolo, lo reconoces y copias su comando.</p>
+    <div class="symbol-grid" id="symbolGrid">
+      <!-- Letras griegas minúsculas -->
+      <div class="symbol-chip" data-code="\alpha"><span class="glyph">α</span><span class="cmdname">\alpha</span></div>
+      <div class="symbol-chip" data-code="\beta"><span class="glyph">β</span><span class="cmdname">\beta</span></div>
+      <div class="symbol-chip" data-code="\gamma"><span class="glyph">γ</span><span class="cmdname">\gamma</span></div>
+      <div class="symbol-chip" data-code="\delta"><span class="glyph">δ</span><span class="cmdname">\delta</span></div>
+      <div class="symbol-chip" data-code="\epsilon"><span class="glyph">ε</span><span class="cmdname">\epsilon</span></div>
+      <div class="symbol-chip" data-code="\theta"><span class="glyph">θ</span><span class="cmdname">\theta</span></div>
+      <div class="symbol-chip" data-code="\lambda"><span class="glyph">λ</span><span class="cmdname">\lambda</span></div>
+      <div class="symbol-chip" data-code="\mu"><span class="glyph">μ</span><span class="cmdname">\mu</span></div>
+      <div class="symbol-chip" data-code="\pi"><span class="glyph">π</span><span class="cmdname">\pi</span></div>
+      <div class="symbol-chip" data-code="\sigma"><span class="glyph">σ</span><span class="cmdname">\sigma</span></div>
+      <div class="symbol-chip" data-code="\phi"><span class="glyph">φ</span><span class="cmdname">\phi</span></div>
+      <div class="symbol-chip" data-code="\omega"><span class="glyph">ω</span><span class="cmdname">\omega</span></div>
+      <!-- Mayúsculas -->
+      <div class="symbol-chip" data-code="\Gamma"><span class="glyph">Γ</span><span class="cmdname">\Gamma</span></div>
+      <div class="symbol-chip" data-code="\Delta"><span class="glyph">Δ</span><span class="cmdname">\Delta</span></div>
+      <div class="symbol-chip" data-code="\Sigma"><span class="glyph">Σ</span><span class="cmdname">\Sigma</span></div>
+      <div class="symbol-chip" data-code="\Omega"><span class="glyph">Ω</span><span class="cmdname">\Omega</span></div>
+      <!-- Operadores -->
+      <div class="symbol-chip" data-code="\cdot"><span class="glyph">·</span><span class="cmdname">\cdot</span></div>
+      <div class="symbol-chip" data-code="\times"><span class="glyph">×</span><span class="cmdname">\times</span></div>
+      <div class="symbol-chip" data-code="\div"><span class="glyph">÷</span><span class="cmdname">\div</span></div>
+      <div class="symbol-chip" data-code="\pm"><span class="glyph">±</span><span class="cmdname">\pm</span></div>
+      <div class="symbol-chip" data-code="\neq"><span class="glyph">≠</span><span class="cmdname">\neq</span></div>
+      <div class="symbol-chip" data-code="\approx"><span class="glyph">≈</span><span class="cmdname">\approx</span></div>
+      <div class="symbol-chip" data-code="\leq"><span class="glyph">≤</span><span class="cmdname">\leq</span></div>
+      <div class="symbol-chip" data-code="\geq"><span class="glyph">≥</span><span class="cmdname">\geq</span></div>
+      <div class="symbol-chip" data-code="\in"><span class="glyph">∈</span><span class="cmdname">\in</span></div>
+      <div class="symbol-chip" data-code="\subset"><span class="glyph">⊂</span><span class="cmdname">\subset</span></div>
+      <div class="symbol-chip" data-code="\cup"><span class="glyph">∪</span><span class="cmdname">\cup</span></div>
+      <div class="symbol-chip" data-code="\cap"><span class="glyph">∩</span><span class="cmdname">\cap</span></div>
+      <div class="symbol-chip" data-code="\sum_{i=1}^{n}"><span class="glyph">Σ</span><span class="cmdname">\sum</span></div>
+      <div class="symbol-chip" data-code="\int_{a}^{b}"><span class="glyph">∫</span><span class="cmdname">\int</span></div>
+      <div class="symbol-chip" data-code="\lim_{x \to 0}"><span class="glyph">lim</span><span class="cmdname">\lim</span></div>
+      <div class="symbol-chip" data-code="\infty"><span class="glyph">∞</span><span class="cmdname">\infty</span></div>
+    </div>
+
+    <h3 class="sub">Funciones predefinidas (se escriben sin cursiva)</h3>
+    <div class="codewrap">
+      <pre>\sin x, \cos x, \tan x, \cot x
+\sec x, \csc x
+\log x, \ln x
+\lim_{x \to 0} f(x)
+\sum_{i=1}^{n} i^2
+\prod_{j=1}^{m} j
+\int_{a}^{b} f(x) dx</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Entornos matemáticos avanzados</h3>
+    <div class="codewrap">
+      <pre>% Sistema de ecuaciones
+\begin{cases}
+  x + y = 5 \\
+  2x - y = 1
+\end{cases}
+
+% Matriz
+\begin{matrix}
+  1 & 2 \\
+  3 & 4
+\end{matrix}
+
+% Matriz con delimitadores
+\begin{pmatrix}  % (matriz)
+  1 & 2 \\
+  3 & 4
+\end{pmatrix}
+
+\begin{bmatrix}  % [matriz]
+  1 & 2 \\
+  3 & 4
+\end{bmatrix}
+
+\begin{vmatrix}  % |matriz|
+  1 & 2 \\
+  3 & 4
+\end{vmatrix}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+  </div>
+</section>
+<div class="symbol-toast" id="symbolToast">Copiado al portapapeles</div>
+<section class="chapter" id="listas-tablas">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§5</span><h2>Listas y tablas</h2></div>
+    <p class="chapter-intro">Estructurar información en listas y tablas es una de las tareas más frecuentes al redactar cualquier documento técnico.</p>
+
+    <h3 class="sub">Listas</h3>
+    <div class="codewrap">
+      <pre>% No numerada (viñetas)
+\begin{itemize}
+  \item Primer elemento
+  \item Segundo elemento
+  \begin{itemize}  % Sublista
+    \item Subelemento 1
+    \item Subelemento 2
+  \end{itemize}
+  \item Tercer elemento
+\end{itemize}
+
+% Numerada automáticamente
+\begin{enumerate}
+  \item Primer elemento
+  \item Segundo elemento
+  \begin{enumerate}  % Sublista
+    \item Subelemento 1
+    \item Subelemento 2
+  \end{enumerate}
+  \item Tercer elemento
+\end{enumerate}
+
+% Lista de descripción
+\begin{description}
+  \item[Término 1] Definición del término
+  \item[Término 2] Definición del término
+\end{description}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Tablas básicas</h3>
+    <div class="codewrap">
+      <pre>\begin{tabular}{|l|c|r|}  % Columnas: izquierda, centro, derecha
+  \hline                   % Línea horizontal
+  Columna 1 & Columna 2 & Columna 3 \\
+  \hline
+  Izquierda & Centro & Derecha \\
+  \hline
+\end{tabular}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Símbolo</th><th>Alineación</th></tr></thead>
+      <tbody>
+        <tr><td><code>l</code></td><td>Izquierda</td></tr>
+        <tr><td><code>c</code></td><td>Centrado</td></tr>
+        <tr><td><code>r</code></td><td>Derecha</td></tr>
+        <tr><td><code>p{3cm}</code></td><td>Ancho fijo (justificado)</td></tr>
+        <tr><td><code>|</code></td><td>Línea vertical</td></tr>
+        <tr><td><code>\hline</code></td><td>Línea horizontal</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="sub">Tablas avanzadas</h3>
+    <div class="codewrap">
+      <pre>% Combinar columnas (2 columnas → 1)
+\begin{tabular}{|l|l|}
+  \hline
+  \multicolumn{2}{|c|}{Productos} \\
+  \hline
+  Manzanas & 2.50 € \\
+  Naranjas & 3.00 € \\
+  \hline
+\end{tabular}
+
+% Combinar filas (requiere paquete multirow)
+% \usepackage{multirow}
+\begin{tabular}{|l|c|}
+  \hline
+  \multirow{2}{*}{Frutas} & Manzanas \\
+                           & Naranjas \\
+  \hline
+\end{tabular}
+
+% Ancho fijo automático (requiere tabularx)
+% \usepackage{tabularx}
+\begin{tabularx}{\textwidth}{|X|X|}
+  \hline
+  Columna flexible & Columna flexible \\
+  \hline
+  Texto largo que se ajusta automáticamente & Más texto \\
+  \hline
+\end{tabularx}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Generador de tablas</h3>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Define columnas y alineación para generar el esqueleto <code>tabular</code> correspondiente.</p>
+    <div class="tablegen">
+      <div class="tg-controls">
+        <div class="tg-field">
+          <label for="tgCols">COLUMNAS</label>
+          <input type="number" id="tgCols" min="1" max="8" value="3">
+        </div>
+        <div class="tg-field">
+          <label for="tgRows">FILAS DE DATOS</label>
+          <input type="number" id="tgRows" min="1" max="10" value="3">
+        </div>
+        <div class="tg-field">
+          <label>ALINEACIÓN</label>
+          <div class="tg-aligns" id="tgAligns">
+            <button type="button" class="tg-align-btn active" data-align="l">l</button>
+            <button type="button" class="tg-align-btn" data-align="c">c</button>
+            <button type="button" class="tg-align-btn" data-align="r">r</button>
+          </div>
+        </div>
+        <div class="tg-field">
+          <label>&nbsp;</label>
+          <span class="tg-check"><input type="checkbox" id="tgLines" checked> líneas verticales</span>
+        </div>
+      </div>
+      <div class="codewrap">
+        <pre id="tgOutput"></pre>
+        <button class="copy-btn" type="button">Copiar</button>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="imagenes">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§6</span><h2>Imágenes y flotantes</h2></div>
+    <p class="chapter-intro">Las imágenes en LaTeX no se «pegan» donde escribes: viajan como elementos flotantes que el sistema recoloca según el espacio disponible.</p>
+
+    <h3 class="sub">Insertar imágenes</h3>
+    <div class="codewrap">
+      <pre>% Paquete necesario
+\usepackage{graphicx}
+
+% Comandos
+\includegraphics{imagen.png}
+\includegraphics[width=5cm]{imagen.png}
+\includegraphics[width=0.5\textwidth]{imagen.png}
+\includegraphics[height=3cm]{imagen.png}
+\includegraphics[scale=0.5]{imagen.png}
+
+% Opciones de ancho
+0.3\textwidth    % 30% del ancho del texto
+0.5\linewidth    % 50% del ancho de línea actual
+0.7\columnwidth  % 70% del ancho de columna</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Formato</th><th>PDFLaTeX</th><th>XeLaTeX / LuaLaTeX</th></tr></thead>
+      <tbody>
+        <tr><td>PNG</td><td>✅</td><td>✅</td></tr>
+        <tr><td>JPG</td><td>✅</td><td>✅</td></tr>
+        <tr><td>PDF</td><td>✅</td><td>✅</td></tr>
+        <tr><td>EPS</td><td>✅</td><td>✅ (con conversión)</td></tr>
+        <tr><td>SVG</td><td>❌</td><td>⚠️ (mediante inkscape)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="sub">Entorno figure (flotante)</h3>
+    <div class="codewrap">
+      <pre>\begin{figure}[h]  % Opciones de posición
+  \centering
+  \includegraphics[width=0.6\textwidth]{grafico.pdf}
+  \caption{Pie de foto descriptivo}
+  \label{fig:ejemplo}
+\end{figure}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Opción</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>h</code></td><td>Here (aquí, aproximadamente)</td></tr>
+        <tr><td><code>t</code></td><td>Top (parte superior de la página)</td></tr>
+        <tr><td><code>b</code></td><td>Bottom (parte inferior de la página)</td></tr>
+        <tr><td><code>p</code></td><td>Page (página solo de flotantes)</td></tr>
+        <tr><td><code>H</code></td><td>Here exacto (requiere paquete float)</td></tr>
+        <tr><td><code>!</code></td><td>Forzar posición (ignora restricciones)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">Las opciones son combinables, p. ej. <code>[htbp]</code> le da a LaTeX varias alternativas por orden de preferencia.</div>
+
+    <h3 class="sub">Figuras de múltiples imágenes (subfigures)</h3>
+    <div class="codewrap">
+      <pre>% \usepackage{subcaption}
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{grafico1.pdf}
+    \caption{Gráfico A}
+    \label{fig:a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{grafico2.pdf}
+    \caption{Gráfico B}
+    \label{fig:b}
+  \end{subfigure}
+  \caption{Comparativa de gráficos}
+  \label{fig:comparativa}
+\end{figure}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="referencias">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§7</span><h2>Referencias y bibliografía</h2></div>
+    <p class="chapter-intro">Etiquetar y referenciar es lo que convierte un documento largo en algo navegable — y lo que hace que «Figura 3» siga siendo correcto aunque reordenes el contenido.</p>
+
+    <h3 class="sub">Referencias cruzadas</h3>
+    <div class="codewrap">
+      <pre>% 1. Etiquetar el elemento
+\begin{figure}[h]
+  \centering
+  \includegraphics{imagen.pdf}
+  \caption{Descripción}
+  \label{fig:diagrama}  % ¡Clave!
+\end{figure}
+
+% 2. Referenciar en el texto
+Como se muestra en la Figura \ref{fig:diagrama}...
+
+% Con hyperref (crea enlace clickable)
+\usepackage{hyperref}
+... en la Figura \ref{fig:diagrama} en la página \pageref{fig:diagrama}.</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Prefijo</th><th>Para</th></tr></thead>
+      <tbody>
+        <tr><td><code>sec:</code></td><td>Secciones</td></tr>
+        <tr><td><code>fig:</code></td><td>Figuras</td></tr>
+        <tr><td><code>tab:</code></td><td>Tablas</td></tr>
+        <tr><td><code>eq:</code></td><td>Ecuaciones</td></tr>
+        <tr><td><code>chap:</code></td><td>Capítulos</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="sub">Bibliografía con thebibliography</h3>
+    <div class="codewrap">
+      <pre>\begin{thebibliography}{9}  % {9} = ancho máximo de etiqueta
+  \bibitem{knuth84} 
+  Knuth, Donald E. (1984). 
+  \textit{The TeXbook}. 
+  Addison-Wesley.
+
+  \bibitem{lamport94}
+  Lamport, Leslie (1994). 
+  \textit{LaTeX: A Document Preparation System}. 
+  Addison-Wesley, 2nd edition.
+\end{thebibliography}
+
+% Cita en el texto
+\cite{knuth84} mostró que...</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Bibliografía con BibTeX (recomendado)</h3>
+    <div class="codewrap">
+      <pre>% 1. Crear archivo .bib (ej: referencias.bib)
+@book{knuth84,
+  author    = {Donald E. Knuth},
+  title     = {The TeXbook},
+  publisher = {Addison-Wesley},
+  year      = {1984}
+}
+
+@article{lamport94,
+  author  = {Leslie Lamport},
+  title   = {LaTeX: A Document Preparation System},
+  journal = {Communications of the ACM},
+  volume  = {37},
+  number  = {2},
+  pages   = {80-87},
+  year    = {1994}
+}
+
+% 2. En el documento:
+\bibliographystyle{plain}  % Estilo de citación
+\bibliography{referencias}  % Archivo .bib
+
+% 3. Citar en el texto
+\cite{knuth84} y \cite{lamport94}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Estilo</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>plain</code></td><td>Numérico (estilo por defecto)</td></tr>
+        <tr><td><code>alpha</code></td><td>Alfabético (Knuth84)</td></tr>
+        <tr><td><code>ieeetr</code></td><td>Estilo IEEE (numérico)</td></tr>
+        <tr><td><code>apalike</code></td><td>Estilo APA (autor-fecha)</td></tr>
+        <tr><td><code>abbrv</code></td><td>Abreviado (nombres abreviados)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="personalizacion">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§8</span><h2>Personalización avanzada</h2></div>
+    <p class="chapter-intro">Una vez dominas la estructura, estos paquetes te dan control total sobre el aspecto final del documento.</p>
+
+    <h3 class="sub">Márgenes y página (paquete geometry)</h3>
+    <div class="codewrap">
+      <pre>\usepackage[a4paper]{geometry}
+\geometry{
+  margin=2.5cm,
+  top=2.5cm,
+  bottom=2.5cm,
+  left=3cm,
+  right=2cm
+}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Encabezados y pies de página (fancyhdr)</h3>
+    <div class="codewrap">
+      <pre>\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{\leftmark}   % Sección actual a la izquierda
+\fancyhead[R]{\thepage}    % Número de página a la derecha
+\fancyfoot[C]{}            % Sin pie de página
+\renewcommand{\headrulewidth}{0.4pt}  % Línea bajo encabezado</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Colores (xcolor)</h3>
+    <div class="codewrap">
+      <pre>\usepackage{xcolor}
+
+% Colores predefinidos
+\textcolor{red}{Texto rojo}
+\textcolor{blue}{Texto azul}
+
+% Definir colores propios
+\definecolor{miColor}{RGB}{255,0,128}
+\textcolor{miColor}{Texto personalizado}
+
+% Colores en ecuaciones
+\color{blue}
+\[ E = mc^2 \]
+\color{black}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Enlaces e hipervínculos (hyperref)</h3>
+    <div class="codewrap">
+      <pre>\usepackage[colorlinks=true, linkcolor=blue, urlcolor=red]{hyperref}
+
+\url{https://www.overleaf.com}
+\href{https://www.overleaf.com}{Overleaf}
+
+% Colores de enlaces:
+linkcolor=blue     % Referencias cruzadas
+citecolor=green    % Citas bibliográficas
+urlcolor=red       % URLs</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Tabla de contenidos</h3>
+    <div class="codewrap">
+      <pre>\tableofcontents          % Genera tabla de contenidos
+\listoffigures            % Lista de figuras
+\listoftables             % Lista de tablas
+
+% Para que aparezcan en la TOC:
+\addcontentsline{toc}{section}{Apéndice}</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="errores">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§9</span><h2>Manejo de errores</h2></div>
+    <p class="chapter-intro">Compilar en LaTeX significa, al principio, ver el terminal lleno de mensajes crípticos. Aprender a leerlos es una habilidad tan importante como escribir el código.</p>
+
+    <h3 class="sub">Diagnóstico interactivo de errores</h3>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Selecciona el mensaje de error que ha lanzado tu compilador para ver la causa probable y cómo resolverlo.</p>
+    <div class="diag-tool">
+      <select id="diagSelect">
+        <option value="">— Selecciona un mensaje de error —</option>
+        <option value="missing">! Missing $ inserted</option>
+        <option value="undef">! Undefined control sequence</option>
+        <option value="filenf">! File not found</option>
+        <option value="inputenc">! Package inputenc Error</option>
+        <option value="floatlost">! LaTeX Error: Float(s) lost</option>
+        <option value="toomany">! LaTeX Error: Too many unprocessed floats</option>
+      </select>
+      <div class="diag-result" id="diagResult">
+        <div class="drow"><b>CAUSA PROBABLE</b><span id="diagCause"></span></div>
+        <div class="drow"><b>SOLUCIÓN</b><span id="diagFix"></span></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Lectura de logs</h3>
+    <div class="codewrap">
+      <pre>% El archivo .log muestra toda la compilación
+% Buscar:
+!                   % Error
+Warning:            % Advertencia
+Overfull \hbox      % Texto que excede el margen
+Underfull \hbox     % Poco texto en línea</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Técnicas de depuración</h3>
+    <div class="codewrap">
+      <pre>% 1. Comentar secciones para aislar errores
+% \begin{figure}
+%   \includegraphics{imagen.pdf}
+% \end{figure}
+
+% 2. Usar \show para depurar comandos
+\show\section  % Muestra definición en el log
+
+% 3. Compilar paso a paso
+% pdflatex documento.tex  (primera pasada)
+% pdflatex documento.tex  (segunda pasada para referencias)
+% bibtex documento         (para bibliografía)
+% pdflatex documento.tex  (tercera pasada final)</pre>
+      <button class="copy-btn" type="button">Copiar</button>
+    </div>
+
+    <h3 class="sub">Apéndice: tabla de errores rápida</h3>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Símbolo de error</th><th>Significado</th><th>Acción</th></tr></thead>
+      <tbody>
+        <tr><td><code>!</code></td><td>Error crítico</td><td>Detiene compilación, corregir obligatorio</td></tr>
+        <tr><td><code>*</code></td><td>Error menor</td><td>Continúa compilación, verificar</td></tr>
+        <tr><td><code>Warning:</code></td><td>Advertencia</td><td>Puede ignorarse, afecta formato</td></tr>
+        <tr><td><code>Overfull \hbox</code></td><td>Texto fuera de margen</td><td>Ajustar texto o usar <code>\sloppy</code></td></tr>
+        <tr><td><code>Underfull \hbox</code></td><td>Poco texto en línea</td><td>Revisar espaciado o agregar <code>\hfill</code></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="actividades">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§10</span><h2>Actividades prácticas</h2></div>
+    <p class="chapter-intro">Seis actividades progresivas, de un documento simple a un informe académico completo. Intenta resolver cada una antes de mirar las pistas.</p>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 1 — Mi primer documento completo</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Crear un artículo con estructura completa y formato básico.</p>
+        <p><strong>Enunciado:</strong> Crea un documento que:</p>
+        <ul class="styled">
+          <li>Sea de clase <code>article</code></li>
+          <li>Use codificación UTF-8 e idioma español</li>
+          <li>Tenga título, autor y fecha</li>
+          <li>Incluya al menos 3 secciones y 2 subsecciones</li>
+          <li>Contenga texto con formato: negrita, cursiva y subrayado</li>
+          <li>Incluya un comentario en el código</li>
+        </ul>
+        <button class="reveal-btn" type="button" data-target="hint-1">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-1">Ver solución</button>
+        <div class="reveal-panel" id="hint-1">
+          <ol class="styled">
+            <li>Escribe la estructura mínima: <code>\documentclass</code>, preámbulo, <code>\begin{document}</code></li>
+            <li>Añade <code>\title{}</code>, <code>\author{}</code>, <code>\date{}</code></li>
+            <li>Usa <code>\maketitle</code> en el cuerpo</li>
+            <li>Crea secciones con <code>\section{}</code> y <code>\subsection{}</code></li>
+            <li>Agrega formato con <code>\textbf{}</code>, <code>\textit{}</code>, <code>\underline{}</code></li>
+            <li>Añade comentarios con <code>%</code></li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-1">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+
+% Título y autor
+\title{Introducción a LaTeX}
+\author{Carlos Martínez}
+\date{1 de septiembre de 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Primeros pasos}
+Esta es la \textbf{introducción} al documento.
+\subsection{Formato básico}
+Podemos usar \textit{cursiva} y \underline{subrayado}.
+
+\section{Sección principal}
+Este es el contenido principal del artículo.
+\subsection{Subsección detallada}
+Aquí se detalla la información de la sección anterior.
+
+\section{Conclusiones}
+Finalizamos el documento con las conclusiones.
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 2 — Fórmulas matemáticas</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Practicar ecuaciones complejas en modo matemático.</p>
+        <p><strong>Enunciado:</strong> Escribe las siguientes expresiones en LaTeX:</p>
+        <ol class="styled">
+          <li>La fórmula del área del círculo: πr² (en línea)</li>
+          <li>La fórmula cuadrática en display: x = (−b ± √(b²−4ac)) / (2a)</li>
+          <li>Un sistema de ecuaciones alineado: 2x + 3y = 7, 4x − y = 5</li>
+          <li>La serie infinita: ∑(n=1 hasta ∞) 1/n² = π²/6</li>
+          <li>Una matriz 2×2 con paréntesis</li>
+        </ol>
+        <button class="reveal-btn" type="button" data-target="hint-2">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-2">Ver solución</button>
+        <div class="reveal-panel" id="hint-2">
+          <ol class="styled">
+            <li>Usa <code>\pi</code> para π y <code>^2</code> para cuadrado</li>
+            <li>Para la fórmula cuadrática, usa <code>\frac{}</code> y <code>\sqrt{}</code></li>
+            <li>El sistema necesita <code>\begin{align}</code> y <code>&amp;</code> para alinear</li>
+            <li>La serie usa <code>\sum</code> con límites superior e inferior</li>
+            <li>La matriz usa <code>\begin{pmatrix}</code> y <code>&amp;</code> para columnas</li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-2">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+
+\begin{document}
+
+\section{Área del círculo}
+El área de un círculo es $A = \pi r^2$.
+
+\section{Fórmula cuadrática}
+La ecuación cuadrática se resuelve con:
+\[
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+\]
+
+\section{Sistema de ecuaciones}
+\begin{align}
+2x + 3y &= 7 \\
+4x - y &= 5
+\end{align}
+
+\section{Serie infinita}
+La serie de Basel es:
+\[
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+\]
+
+\section{Matriz}
+Una matriz 2x2:
+\[
+\begin{pmatrix}
+2 & 3 \\
+4 & -1
+\end{pmatrix}
+\]
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 3 — Listas y tablas</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Crear listas anidadas y tablas con formatos diversos.</p>
+        <p><strong>Enunciado:</strong> Crea un documento que contenga:</p>
+        <ol class="styled">
+          <li>Una lista numerada de 3 tareas, donde la segunda contenga una sublista no numerada de 2 pasos</li>
+          <li>Una tabla con 3 columnas (Producto, Cantidad, Precio) y 4 filas de datos</li>
+          <li>La tabla debe tener líneas horizontales y verticales, una fila de título combinando las 3 columnas, y una fila final con el total</li>
+        </ol>
+        <button class="reveal-btn" type="button" data-target="hint-3">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-3">Ver solución</button>
+        <div class="reveal-panel" id="hint-3">
+          <ol class="styled">
+            <li>Usa <code>\begin{enumerate}</code> para la lista numerada y <code>\begin{itemize}</code> para la sublista</li>
+            <li>Para la tabla, usa <code>\begin{tabular}{|l|c|r|}</code></li>
+            <li>Para combinar columnas, usa <code>\multicolumn{3}{|c|}{...}</code></li>
+            <li>Añade <code>\hline</code> entre filas para líneas horizontales</li>
+            <li>El total puedes calcularlo manualmente</li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-3">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+\section{Lista de tareas}
+\begin{enumerate}
+  \item Preparar materiales
+  \item Desarrollar contenido
+    \begin{itemize}
+      \item Escribir el texto
+      \item Revisar ortografía
+    \end{itemize}
+  \item Publicar documento
+\end{enumerate}
+
+\section{Tabla de precios}
+\begin{tabular}{|l|c|r|}
+  \hline
+  \multicolumn{3}{|c|}{Lista de la Compra} \\
+  \hline
+  Producto & Cantidad & Precio (€) \\
+  \hline
+  Manzanas & 3 & 2.50 \\
+  Plátanos & 2 & 1.80 \\
+  Naranjas & 4 & 3.00 \\
+  \hline
+  \multicolumn{2}{|r|}{Total} & 7.30 \\
+  \hline
+\end{tabular}
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 4 — Imágenes y flotantes</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Insertar imágenes con diferentes configuraciones.</p>
+        <p><strong>Enunciado:</strong> Crea un documento que use <code>graphicx</code>, inserte "diagrama.pdf" centrado en un entorno <code>figure</code>, al 60% del ancho del texto, con pie de foto "Diagrama de ejemplo", una etiqueta, y una referencia en el texto (ej. "como se muestra en la Figura 1").</p>
+        <button class="reveal-btn" type="button" data-target="hint-4">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-4">Ver solución</button>
+        <div class="reveal-panel" id="hint-4">
+          <ol class="styled">
+            <li>Carga <code>\usepackage{graphicx}</code> en el preámbulo</li>
+            <li>Usa <code>\begin{figure}[h]</code> para el flotante</li>
+            <li>Centra con <code>\centering</code></li>
+            <li>Escala con <code>\includegraphics[width=0.6\textwidth]{diagrama.pdf}</code></li>
+            <li>Añade <code>\caption{}</code> y <code>\label{}</code></li>
+            <li>Referencia en el texto con <code>\ref{}</code></li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-4">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\begin{document}
+
+\section{Resultados del experimento}
+Como se puede observar en la Figura \ref{fig:diagrama}, los resultados obtenidos...
+\newpage
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{diagrama.pdf}
+  \caption{Diagrama de ejemplo del experimento}
+  \label{fig:diagrama}
+\end{figure}
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 5 — Referencias y bibliografía</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Gestionar citas y referencias bibliográficas.</p>
+        <p><strong>Enunciado:</strong> Crea un documento con 3 referencias en estilo IEEE usando <code>thebibliography</code>, citas con <code>\cite{}</code>, una sección con ecuación numerada y su referencia, y enlaces clickables con <code>hyperref</code>.</p>
+        <button class="reveal-btn" type="button" data-target="hint-5">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-5">Ver solución</button>
+        <div class="reveal-panel" id="hint-5">
+          <ol class="styled">
+            <li>Define <code>\begin{thebibliography}{9}</code> al final del documento</li>
+            <li>Cada referencia usa <code>\bibitem{clave}</code></li>
+            <li>En el texto, cita con <code>\cite{clave}</code></li>
+            <li>Para la ecuación, usa <code>\begin{equation}</code> y <code>\label{}</code></li>
+            <li>Referencia la ecuación con <code>\ref{}</code></li>
+            <li>Carga <code>\usepackage{hyperref}</code> para enlaces</li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-5">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+
+\begin{document}
+
+\section{Introducción}
+La teoría cuántica fue desarrollada por \cite{Planck1900} y posteriormente expandida por \cite{Einstein1905}. 
+
+\section{Ecuación clave}
+La ecuación fundamental es:
+\begin{equation}
+E = h \cdot \nu
+\label{eq:planck}
+\end{equation}
+
+Como se muestra en la Ecuación \ref{eq:planck}, la energía es proporcional a la frecuencia.
+
+\begin{thebibliography}{9}
+  \bibitem{Planck1900} 
+  Planck, M. (1900). 
+  \emph{Zur Theorie des Gesetzes der Energieverteilung im Normalspektrum}. 
+  Deutsche Physikalische Gesellschaft, 2, 237-245.
+
+  \bibitem{Einstein1905}
+  Einstein, A. (1905). 
+  \emph{Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt}. 
+  Annalen der Physik, 322(6), 132-148.
+
+  \bibitem{Schrodinger1926}
+  Schrödinger, E. (1926). 
+  \emph{An Undulatory Theory of the Mechanics of Atoms and Molecules}. 
+  Physical Review, 28(6), 1049-1070.
+\end{thebibliography}
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-head"><h4>Actividad 6 — Proyecto final (documento académico)</h4><span class="plus">+</span></div>
+      <div class="accordion-body"><div class="accordion-body-inner">
+        <p><strong>Objetivo:</strong> Integrar todos los conceptos en un documento realista.</p>
+        <p><strong>Enunciado:</strong> Crea un informe académico corto con título, autor, fecha, resumen, 3 secciones y conclusión; texto con formato y lista; fórmula matemática y tabla de datos; figura con pie de foto y referencia; tabla de contenidos; referencias cruzadas; al menos 2 citas bibliográficas; márgenes de 2.5 cm; encabezado con el título del documento.</p>
+        <button class="reveal-btn" type="button" data-target="hint-6">Ver pistas</button>
+        <button class="reveal-btn" type="button" data-target="sol-6">Ver solución</button>
+        <div class="reveal-panel" id="hint-6">
+          <ol class="styled">
+            <li>Usa <code>\documentclass{article}</code> con los paquetes necesarios</li>
+            <li>Configura márgenes con <code>\usepackage{geometry}</code></li>
+            <li>Usa <code>\tableofcontents</code> para la TOC</li>
+            <li>Para las referencias, usa <code>\label{}</code> y <code>\ref{}</code></li>
+            <li>La bibliografía puede ser simple con <code>thebibliography</code></li>
+            <li>Usa <code>\pagestyle{fancy}</code> para personalizar encabezados</li>
+          </ol>
+        </div>
+        <div class="reveal-panel" id="sol-6">
+          <div class="codewrap"><pre>\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+
+% Configuración de página
+\geometry{margin=2.5cm}
+\pagestyle{fancy}
+\fancyhead[L]{Informe de Investigación}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Metadatos
+\title{Análisis de Datos Experimentales}
+\author{María González}
+\date{Octubre 2024}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introducción}
+Este informe presenta los resultados del \textbf{experimento} realizado. 
+Se utilizó la técnica de \textit{espectrometría} para medir la absorbancia de muestras.
+
+\subsection{Objetivos específicos}
+\begin{itemize}
+  \item Medir la absorbancia en función de la concentración
+  \item Determinar la relación lineal entre variables
+  \item Calcular la ecuación de la recta de calibrado
+\end{itemize}
+
+\section{Metodología}
+Se prepararon 5 soluciones con concentraciones crecientes.
+
+\subsection{Ecuación de calibrado}
+La relación entre absorbancia y concentración es:
+\[
+A = \epsilon \cdot b \cdot C
+\]
+donde $\epsilon$ es el coeficiente de extinción molar.
+
+\subsection{Datos experimentales}
+Los datos obtenidos se muestran en la Tabla \ref{tab:datos}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    Concentración (M) & Absorbancia \\
+    \hline
+    0.00 & 0.000 \\
+    0.01 & 0.125 \\
+    0.02 & 0.251 \\
+    0.03 & 0.378 \\
+    0.04 & 0.502 \\
+    \hline
+  \end{tabular}
+  \caption{Datos de absorbancia experimental}
+  \label{tab:datos}
+\end{table}
+
+\section{Resultados y Discusión}
+Los datos muestran una tendencia lineal como se observa en la Figura \ref{fig:calibrado}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{calibrado.pdf}
+  \caption{Curva de calibrado de absorbancia vs concentración}
+  \label{fig:calibrado}
+\end{figure}
+
+La ecuación de la recta obtenida es $y = 12.55x + 0.0005$, con un $R^2 = 0.9998$.
+
+\section{Conclusión}
+Los resultados confirman la relación lineal esperada según la ley de Beer-Lambert \cite{beer1852}. El método presenta excelente precisión y sensibilidad.
+
+\begin{thebibliography}{9}
+  \bibitem{beer1852}
+  Beer, A. (1852). 
+  \emph{Bestimmung der Absorption des rothen Lichts in farbigen Flüssigkeiten}. 
+  Annalen der Physik, 162(5), 78-88.
+
+  \bibitem{harris2010}
+  Harris, D. C. (2010). 
+  \emph{Quantitative Chemical Analysis}. 
+  Freeman, 8th edition.
+\end{thebibliography}
+
+\end{document}</pre><button class="copy-btn" type="button">Copiar</button></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+<section class="chapter" id="recursos">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§11</span><h2>Recursos y siguientes pasos</h2></div>
+    <p class="chapter-intro">Con lo cubierto en esta guía puedes escribir el 90% de los documentos académicos habituales. Para ir más allá, estos son los puntos de partida recomendados.</p>
+
+    <h3 class="sub">Documentación oficial</h3>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.latex-project.org/" target="_blank" rel="noopener">
+        <span class="rtag">Sitio oficial</span><h4>LaTeX Project</h4><p>La fuente primaria sobre el propio lenguaje y sus versiones.</p>
+      </a>
+      <a class="res-card" href="https://www.ctan.org/" target="_blank" rel="noopener">
+        <span class="rtag">Repositorio</span><h4>CTAN</h4><p>Comprehensive TeX Archive Network — todos los paquetes existentes.</p>
+      </a>
+      <a class="res-card" href="https://www.overleaf.com/learn" target="_blank" rel="noopener">
+        <span class="rtag">Tutoriales</span><h4>Overleaf Documentation</h4><p>Tutoriales interactivos, ideales para consultar mientras escribes.</p>
+      </a>
+      <a class="res-card" href="https://en.wikibooks.org/wiki/LaTeX" target="_blank" rel="noopener">
+        <span class="rtag">Manual libre</span><h4>LaTeX Wikibook</h4><p>Guía completa y gratuita, muy detallada por temas.</p>
+      </a>
+    </div>
+
+    <h3 class="sub">Herramientas útiles</h3>
+    <div class="res-grid">
+      <a class="res-card" href="http://detexify.kirelabs.org/classify.html" target="_blank" rel="noopener">
+        <span class="rtag">Símbolos</span><h4>Detexify</h4><p>Dibuja un símbolo a mano y encuentra su comando.</p>
+      </a>
+      <a class="res-card" href="https://www.tablesgenerator.com/" target="_blank" rel="noopener">
+        <span class="rtag">Tablas</span><h4>Tables Generator</h4><p>Genera código de tabla LaTeX desde una interfaz visual.</p>
+      </a>
+      <a class="res-card" href="https://latexcolor.com/" target="_blank" rel="noopener">
+        <span class="rtag">Color</span><h4>LaTeX Color</h4><p>Paleta de colores lista para usar con xcolor.</p>
+      </a>
+      <a class="res-card" href="https://mathpix.com/" target="_blank" rel="noopener">
+        <span class="rtag">OCR matemático</span><h4>Mathpix Snip</h4><p>Convierte ecuaciones escritas a mano en código LaTeX.</p>
+      </a>
+    </div>
+
+    <h3 class="sub">Paquetes adicionales (para futuras exploraciones)</h3>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Paquete</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>tikz</code></td><td>Dibujo vectorial y gráficos</td></tr>
+        <tr><td><code>pgfplots</code></td><td>Gráficos de funciones y datos</td></tr>
+        <tr><td><code>chemfig</code></td><td>Fórmulas químicas</td></tr>
+        <tr><td><code>minted</code></td><td>Código fuente con resaltado de sintaxis</td></tr>
+        <tr><td><code>siunitx</code></td><td>Unidades del Sistema Internacional</td></tr>
+        <tr><td><code>booktabs</code></td><td>Tablas profesionales</td></tr>
+        <tr><td><code>caption</code></td><td>Personalización de pies de figura</td></tr>
+        <tr><td><code>algorithm2e</code></td><td>Algoritmos y pseudocódigo</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="glosario">
+  <div class="container">
+    <div class="chapter-head"><span class="chapter-num">§12</span><h2>Glosario de términos</h2></div>
+    <p class="chapter-intro">Toca cada tarjeta para ver la definición.</p>
+    <div class="glossary-grid" id="glossaryGrid">
+      <div class="gcard"><div class="gterm">Compilar <span class="flip-hint">tocar</span></div><div class="gdef">Proceso de convertir código LaTeX en PDF.</div></div>
+      <div class="gcard"><div class="gterm">Entorno <span class="flip-hint">tocar</span></div><div class="gdef">Bloque de código delimitado por <code>\begin{}</code> y <code>\end{}</code>.</div></div>
+      <div class="gcard"><div class="gterm">Flotante <span class="flip-hint">tocar</span></div><div class="gdef">Elemento (figura, tabla) que puede moverse en la página.</div></div>
+      <div class="gcard"><div class="gterm">Log <span class="flip-hint">tocar</span></div><div class="gdef">Archivo de registro de la compilación (.log).</div></div>
+      <div class="gcard"><div class="gterm">Paquete <span class="flip-hint">tocar</span></div><div class="gdef">Conjunto de comandos que añaden funcionalidad.</div></div>
+      <div class="gcard"><div class="gterm">Preámbulo <span class="flip-hint">tocar</span></div><div class="gdef">Parte del documento entre <code>\documentclass</code> y <code>\begin{document}</code>.</div></div>
+      <div class="gcard"><div class="gterm">WYSIWYG <span class="flip-hint">tocar</span></div><div class="gdef">«What You See Is What You Get» — lo que ves es lo que obtienes.</div></div>
+      <div class="gcard"><div class="gterm">Clase <span class="flip-hint">tocar</span></div><div class="gdef">Define el tipo de documento y su estructura global.</div></div>
+      <div class="gcard"><div class="gterm">Etiqueta <span class="flip-hint">tocar</span></div><div class="gdef"><code>\label{}</code> permite referenciar elementos numéricamente.</div></div>
+      <div class="gcard"><div class="gterm">Cita <span class="flip-hint">tocar</span></div><div class="gdef"><code>\cite{}</code> referencia una entrada bibliográfica.</div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="fmark">§ Fin de la guía</div>
+  <div>Guía interactiva de iniciación a LaTeX — material didáctico</div>
+</footer>
+<script>
+(function(){
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Nav toggle ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  if(navToggle){
+    navToggle.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
+    navLinks.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+    });
+  }
+
+  /* ---------- Scroll progress ---------- */
+  var progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    var d = document.documentElement;
+    var max = d.scrollHeight - d.clientHeight;
+    var pct = max > 0 ? (d.scrollTop / max) * 100 : 0;
+    progressBar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress);
+  updateProgress();
+
+  /* ---------- Copy to clipboard ---------- */
+  function fallbackCopy(text){
+    return new Promise(function(resolve){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); }catch(e){}
+      document.body.removeChild(ta);
+      resolve();
+    });
+  }
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).catch(function(){ return fallbackCopy(text); });
+    }
+    return fallbackCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pre = btn.previousElementSibling;
+      if(!pre) return;
+      copyText(pre.textContent).then(function(){
+        var original = btn.textContent;
+        btn.textContent = 'Copiado';
+        btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = original; btn.classList.remove('copied'); }, 1300);
+      });
+    });
+  });
+
+  /* ---------- Toast ---------- */
+  var toastTimer = null;
+  function showToast(msg){
+    var t = document.getElementById('symbolToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1500);
+  }
+
+  /* ---------- Hero typing animation ---------- */
+  var heroCode = "\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\n\\begin{document}\n\n\\section{Introducción}\nEste es un documento escrito en \\textbf{LaTeX}, compuesto con \\textit{tipografía profesional}\na partir de texto plano.\n\n\\end{document}";
+  function typeHero(){
+    var el = document.getElementById('heroTyped');
+    var out = document.getElementById('heroOut');
+    if(!el) return;
+    if(reduceMotion){ el.textContent = heroCode; out.classList.add('show'); return; }
+    var i = 0;
+    function step(){
+      if(i <= heroCode.length){
+        el.textContent = heroCode.slice(0, i);
+        i += 2;
+        setTimeout(step, 16);
+      } else {
+        out.classList.add('show');
+      }
+    }
+    step();
+  }
+  typeHero();
+
+  /* ---------- Anatomy diagram ---------- */
+  var anatomySpans = document.querySelectorAll('.anatomy-line span[data-desc]');
+  var anatomyDesc = document.getElementById('anatomyDesc');
+  anatomySpans.forEach(function(span){
+    span.addEventListener('click', function(){
+      anatomySpans.forEach(function(s){ s.classList.remove('active'); });
+      span.classList.add('active');
+      anatomyDesc.innerHTML = span.getAttribute('data-desc');
+    });
+  });
+
+  /* ---------- Symbol palette ---------- */
+  document.querySelectorAll('.symbol-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var code = chip.getAttribute('data-code');
+      copyText(code);
+      chip.classList.add('copied');
+      setTimeout(function(){ chip.classList.remove('copied'); }, 900);
+      showToast('Copiado: ' + code);
+    });
+  });
+
+  /* ---------- Accordion (activities) ---------- */
+  document.querySelectorAll('.accordion-head').forEach(function(head){
+    head.addEventListener('click', function(){
+      head.parentElement.classList.toggle('open');
+    });
+  });
+
+  /* ---------- Reveal buttons (hints / solutions) ---------- */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = document.getElementById(btn.getAttribute('data-target'));
+      var shown = target.classList.toggle('show');
+      var isHint = btn.getAttribute('data-target').indexOf('hint') === 0;
+      btn.textContent = shown ? (isHint ? 'Ocultar pistas' : 'Ocultar solución') : (isHint ? 'Ver pistas' : 'Ver solución');
+    });
+  });
+
+  /* ---------- Glossary cards ---------- */
+  document.querySelectorAll('.gcard').forEach(function(card){
+    card.addEventListener('click', function(){ card.classList.toggle('open'); });
+  });
+
+  /* ================================================================
+     MINI-COMPILADOR LATEX -> HTML (taller en vivo)
+     ================================================================ */
+  var SYMBOLS = {
+    alpha:'α', beta:'β', gamma:'γ', delta:'δ', epsilon:'ε', zeta:'ζ', eta:'η',
+    theta:'θ', iota:'ι', kappa:'κ', lambda:'λ', mu:'μ', nu:'ν', xi:'ξ', pi:'π',
+    rho:'ρ', sigma:'σ', tau:'τ', upsilon:'υ', phi:'φ', chi:'χ', psi:'ψ', omega:'ω',
+    Gamma:'Γ', Delta:'Δ', Theta:'Θ', Lambda:'Λ', Pi:'Π', Sigma:'Σ', Upsilon:'Υ',
+    Phi:'Φ', Psi:'Ψ', Omega:'Ω',
+    cdot:'·', times:'×', div:'÷', pm:'±', mp:'∓', neq:'≠', approx:'≈', equiv:'≡',
+    leq:'≤', geq:'≥', in:'∈', subset:'⊂', cup:'∪', cap:'∩', infty:'∞', to:'→',
+    sum:'∑', int:'∫', prod:'∏', lim:'lim', sin:'sin', cos:'cos', tan:'tan',
+    ln:'ln', log:'log'
+  };
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function mathBody(s){
+    // s ya viene con entidades HTML escapadas
+    // \sqrt se procesa antes que \frac para que un \sqrt anidado dentro
+    // de un numerador/denominador no rompa la captura de \frac{}{}
+    s = s.replace(/\\sqrt(\[([^\]]*)\])?\{([^{}]*)\}/g, function(m, br, idx, content){
+      var pre = idx ? '<sup style="font-size:.65em;">'+idx+'</sup>' : '';
+      return pre+'√<span style="text-decoration:overline;">'+content+'</span>';
+    });
+    s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, function(m, a, b){
+      return '<span style="display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 .15em;line-height:1.15;font-size:0.92em;"><span style="border-bottom:1px solid currentColor;padding:0 .25em;">'+a+'</span><span style="padding:0 .25em;">'+b+'</span></span>';
+    });
+    s = s.replace(/\\[a-zA-Z]+/g, function(m){
+      var name = m.slice(1);
+      return Object.prototype.hasOwnProperty.call(SYMBOLS, name) ? SYMBOLS[name] : m;
+    });
+    s = s.replace(/\^\{([^{}]*)\}/g, '<sup>$1</sup>');
+    s = s.replace(/\^([^\s{}\\])/g, '<sup>$1</sup>');
+    s = s.replace(/_\{([^{}]*)\}/g, '<sub>$1</sub>');
+    s = s.replace(/_([^\s{}\\])/g, '<sub>$1</sub>');
+    return s;
+  }
+
+  function inlineFormat(line){
+    var s = escapeHtml(line);
+    s = s.replace(/\$([^$]+)\$/g, function(m, inner){
+      return '<span style="font-style:italic;">'+mathBody(inner)+'</span>';
+    });
+    s = s.replace(/\\textbf\{([^{}]*)\}/g, '<strong>$1</strong>');
+    s = s.replace(/\\textit\{([^{}]*)\}/g, '<em>$1</em>');
+    s = s.replace(/\\emph\{([^{}]*)\}/g, '<em>$1</em>');
+    s = s.replace(/\\underline\{([^{}]*)\}/g, '<u>$1</u>');
+    s = s.replace(/\\\\/g, '<br>');
+    return s;
+  }
+
+  function stripComment(line){
+    for(var i=0;i<line.length;i++){
+      if(line[i]==='%' && (i===0 || line[i-1] !== '\\')){
+        return line.slice(0,i);
+      }
+    }
+    return line;
+  }
+
+  function renderBlock(type, content){
+    if(type === 'align'){
+      var rows = content.split('\\\\').map(function(r){return r.trim();}).filter(function(r){return r.length;});
+      var rowsHtml = rows.map(function(r){
+        var idx = r.indexOf('&');
+        var left = idx >= 0 ? r.slice(0, idx) : r;
+        var right = idx >= 0 ? r.slice(idx+1) : '';
+        return '<div style="display:flex;justify-content:center;gap:.4em;font-style:italic;margin:2px 0;">'
+          + '<span style="min-width:38%;text-align:right;">'+mathBody(escapeHtml(left))+'</span>'
+          + '<span style="min-width:38%;text-align:left;">'+mathBody(escapeHtml(right))+'</span></div>';
+      }).join('');
+      return '<div style="margin:14px 0;font-size:1.05rem;">'+rowsHtml+'</div>';
+    }
+    return '<div style="text-align:center;font-style:italic;margin:16px 0;font-size:1.08rem;">'+mathBody(escapeHtml(content.trim()))+'</div>';
+  }
+
+  function compile(source){
+    var lines = source.split('\n');
+    var out = [];
+    var listStack = [];
+    var paragraph = [];
+    var mathBlock = null;
+
+    function flush(){
+      if(paragraph.length){
+        out.push('<p style="margin:0 0 12px;">'+paragraph.join(' ')+'</p>');
+        paragraph = [];
+      }
+    }
+
+    for(var li=0; li<lines.length; li++){
+      var raw = stripComment(lines[li]);
+      var trimmed = raw.trim();
+
+      if(mathBlock){
+        if((mathBlock.type === 'display' && trimmed.indexOf('\\]') !== -1) ||
+           (mathBlock.type === 'equation' && trimmed === '\\end{equation}') ||
+           (mathBlock.type === 'align' && trimmed === '\\end{align}')){
+          out.push(renderBlock(mathBlock.type, mathBlock.content));
+          mathBlock = null;
+        } else {
+          mathBlock.content += raw + '\n';
+        }
+        continue;
+      }
+
+      if(trimmed === '\\['){ flush(); mathBlock = {type:'display', content:''}; continue; }
+      if(trimmed.indexOf('\\[') === 0 && trimmed.slice(-2) === '\\]'){
+        flush();
+        out.push(renderBlock('display', trimmed.slice(2, -2)));
+        continue;
+      }
+      if(trimmed === '\\begin{equation}'){ flush(); mathBlock = {type:'equation', content:''}; continue; }
+      if(trimmed === '\\begin{align}'){ flush(); mathBlock = {type:'align', content:''}; continue; }
+
+      if(trimmed === '\\begin{itemize}'){ flush(); listStack.push('ul'); out.push('<ul class="styled">'); continue; }
+      if(trimmed === '\\end{itemize}'){ listStack.pop(); out.push('</ul>'); continue; }
+      if(trimmed === '\\begin{enumerate}'){ flush(); listStack.push('ol'); out.push('<ol class="styled">'); continue; }
+      if(trimmed === '\\end{enumerate}'){ listStack.pop(); out.push('</ol>'); continue; }
+      if(trimmed === '\\begin{center}'){ flush(); out.push('<div style="text-align:center;">'); continue; }
+      if(trimmed === '\\end{center}'){ out.push('</div>'); continue; }
+
+      var mSec = trimmed.match(/^\\section\{([^{}]*)\}/);
+      if(mSec){ flush(); out.push('<h3 style="font-size:1.2rem;margin:18px 0 8px;">'+escapeHtml(mSec[1])+'</h3>'); continue; }
+      var mSub = trimmed.match(/^\\subsection\{([^{}]*)\}/);
+      if(mSub){ flush(); out.push('<h4 style="font-size:1.02rem;margin:14px 0 6px;">'+escapeHtml(mSub[1])+'</h4>'); continue; }
+
+      var mItem = trimmed.match(/^\\item\s*(.*)$/);
+      if(mItem){ out.push('<li>'+inlineFormat(mItem[1])+'</li>'); continue; }
+
+      if(trimmed === ''){ flush(); continue; }
+
+      paragraph.push(inlineFormat(raw));
+    }
+    flush();
+    while(listStack.length){ out.push('</'+listStack.pop()+'>'); }
+    return out.join('\n');
+  }
+
+  var pgInput = document.getElementById('pgInput');
+  var pgOutput = document.getElementById('pgOutput');
+  function updatePlayground(){
+    if(!pgInput) return;
+    try{
+      pgOutput.innerHTML = compile(pgInput.value);
+    }catch(e){
+      pgOutput.innerHTML = '<p class="pg-err">⚠ No se ha podido interpretar ese código. Revisa que las llaves { } y los entornos \\begin/\\end estén bien cerrados.</p>';
+    }
+  }
+  if(pgInput){ pgInput.addEventListener('input', updatePlayground); }
+
+  var presets = {
+    basico: "Este texto usa \\textbf{negrita}, \\textit{cursiva} y \\underline{subrayado}.\n\nTambién puedes usar \\emph{énfasis} para dar importancia a una palabra.\n\nUn salto de línea manual: primera línea \\\\\nsegunda línea.",
+    secciones: "\\section{Introducción}\nEste es el primer párrafo de la sección.\n\n\\subsection{Motivación}\nAquí explicamos por qué es importante este trabajo.\n\n\\section{Conclusión}\nY así cerramos el documento.",
+    listas: "\\section{Tareas pendientes}\n\\begin{itemize}\n\\item Escribir la introducción\n\\item Revisar la bibliografía\n\\begin{itemize}\n\\item Comprobar el formato IEEE\n\\item Verificar las URLs\n\\end{itemize}\n\\item Enviar el documento final\n\\end{itemize}",
+    matematicas: "La fórmula cuadrática es:\n\\[\nx = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}\n\\]\n\nY la serie de Basel:\n\\[\n\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}\n\\]\n\nUn sistema alineado:\n\\begin{align}\na + b &= c \\\\\nd - e &= f\n\\end{align}"
+  };
+  document.querySelectorAll('.pg-preset-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      pgInput.value = presets[btn.getAttribute('data-preset')];
+      updatePlayground();
+    });
+  });
+  if(pgInput){ pgInput.value = presets.basico; updatePlayground(); }
+
+  /* ---------- Diagnóstico de errores ---------- */
+  var diagData = {
+    missing: {
+      cause: 'Has usado un símbolo o comando matemático (^, _, \\frac, una letra griega...) fuera de modo matemático, es decir, sin rodearlo de $...$ o \\[...\\].',
+      fix: 'Rodea la expresión con signos de dólar, por ejemplo $x^2$, o usa \\[ ... \\] para una ecuación en su propia línea.'
+    },
+    undef: {
+      cause: 'Has escrito mal el nombre de un comando, o el paquete que lo define no está cargado con \\usepackage{}.',
+      fix: 'Revisa la ortografía exacta del comando (mayúsculas y minúsculas incluidas) y comprueba que el paquete correspondiente está en el preámbulo.'
+    },
+    filenf: {
+      cause: 'LaTeX no encuentra un paquete o un archivo de imagen con el nombre indicado.',
+      fix: 'Comprueba que el nombre y la extensión del archivo son correctos y que está en la misma carpeta que el .tex, o en la ruta indicada.'
+    },
+    inputenc: {
+      cause: 'El archivo contiene un carácter que la codificación declarada no reconoce, normalmente un acento o símbolo especial.',
+      fix: 'Guarda el archivo en UTF-8 y carga \\usepackage[utf8]{inputenc} en el preámbulo.'
+    },
+    floatlost: {
+      cause: 'Una figura o tabla no tiene ninguna posición válida donde LaTeX pueda colocarla.',
+      fix: 'Añade opciones de posición como [h], [t] o [htbp] al entorno figure o table.'
+    },
+    toomany: {
+      cause: 'Hay demasiadas figuras o tablas esperando a ser colocadas, y LaTeX se queda sin páginas antes de la siguiente.',
+      fix: 'Añade \\clearpage tras un bloque de flotantes, o usa el paquete float con la opción [H] para fijar su posición.'
+    }
+  };
+  var diagSelect = document.getElementById('diagSelect');
+  if(diagSelect){
+    diagSelect.addEventListener('change', function(){
+      var box = document.getElementById('diagResult');
+      var val = this.value;
+      if(!val){ box.classList.remove('show'); return; }
+      var d = diagData[val];
+      document.getElementById('diagCause').textContent = d.cause;
+      document.getElementById('diagFix').textContent = d.fix;
+      box.classList.add('show');
+    });
+  }
+
+  /* ---------- Generador de tablas ---------- */
+  var tgCols = document.getElementById('tgCols');
+  var tgRows = document.getElementById('tgRows');
+  var tgLines = document.getElementById('tgLines');
+  var tgOutput = document.getElementById('tgOutput');
+  var tgAlignBtns = document.querySelectorAll('.tg-align-btn');
+
+  function updateTableGen(){
+    var cols = Math.max(1, Math.min(8, parseInt(tgCols.value, 10) || 1));
+    var rows = Math.max(1, Math.min(10, parseInt(tgRows.value, 10) || 1));
+    var alignBtn = document.querySelector('.tg-align-btn.active');
+    var align = alignBtn ? alignBtn.getAttribute('data-align') : 'l';
+    var lines = tgLines.checked;
+    var cells = [];
+    for(var i=0;i<cols;i++){ cells.push(align); }
+    var colSpec = lines ? '|' + cells.join('|') + '|' : cells.join('');
+
+    var out = '\\begin{tabular}{' + colSpec + '}\n';
+    if(lines) out += '  \\hline\n';
+    var header = [];
+    for(var h=1; h<=cols; h++){ header.push('Columna ' + h); }
+    out += '  ' + header.join(' & ') + ' \\\\\n';
+    if(lines) out += '  \\hline\n';
+    for(var r=1; r<=rows; r++){
+      var rowCells = [];
+      for(var c=1; c<=cols; c++){ rowCells.push('Dato'); }
+      out += '  ' + rowCells.join(' & ') + ' \\\\\n';
+    }
+    if(lines) out += '  \\hline\n';
+    out += '\\end{tabular}';
+    tgOutput.textContent = out;
+  }
+  tgAlignBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tgAlignBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      updateTableGen();
+    });
+  });
+  if(tgCols){
+    tgCols.addEventListener('input', updateTableGen);
+    tgRows.addEventListener('input', updateTableGen);
+    tgLines.addEventListener('change', updateTableGen);
+    updateTableGen();
+  }
+})();
+</script>
+</body>
+</html>

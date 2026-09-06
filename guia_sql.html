@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL desde los Cimientos — Guía interactiva ASIR · DAM · DAW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SQL DESDE LOS CIMIENTOS — hoja de estilos
+   Estética: "plano de ingeniería de base de datos" (blueprint)
+   ============================================================ */
+:root{
+  --bg:#0A1826;
+  --bg-2:#0D1F32;
+  --panel:#0F2338;
+  --panel-2:#13293F;
+  --panel-3:#0B1C2E;
+  --code-bg:#081420;
+  --grid-line: rgba(148,180,209,0.07);
+  --border: #21455F;
+  --border-soft: #1A3650;
+  --text: #E7EEF5;
+  --text-dim: #8FA8C2;
+  --text-faint:#5D7996;
+  --amber:#E8A33D;
+  --amber-dim: #B9812C;
+  --cyan:#4FD1C5;
+  --cyan-dim:#379E95;
+  --rose:#E8748C;
+  --violet:#9C8CE0;
+  --font-head: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --maxw: 900px;
+  --radius: 3px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+    var(--bg);
+  color:var(--text);
+  font-family: var(--font-head);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background: var(--amber); color:#151515; }
+
+a{ color:var(--cyan); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+
+h1,h2,h3,h4{ font-family:var(--font-head); font-weight:600; line-height:1.25; margin:0 0 .5em; letter-spacing:-0.01em; }
+p{ margin:0 0 1em; color:var(--text); max-width:74ch; }
+code, pre, .mono{ font-family:var(--font-mono); }
+
+/* ---------- layout shell ---------- */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
+  padding:12px 20px;
+  background:rgba(10,24,38,0.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border-soft);
+}
+.topbar .brand{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--text);
+  white-space:nowrap;
+}
+.topbar .brand .dot{ width:9px; height:9px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber); flex:none;}
+.topbar .brand small{ color:var(--text-faint); font-weight:400; display:block; font-size:11px; }
+.topbar-actions{ display:flex; align-items:center; gap:10px; }
+.progress-wrap{
+  flex:1; max-width:280px; height:6px; background:var(--panel-2); border:1px solid var(--border-soft);
+  position:relative; display:none;
+}
+#progressBar{ position:absolute; inset:0; width:0%; background:linear-gradient(90deg,var(--cyan),var(--amber)); }
+.menu-btn{
+  display:none; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+  padding:8px 10px; font-family:var(--font-mono); cursor:pointer; border-radius:var(--radius);
+}
+.btn-console{
+  background:var(--panel-2); border:1px solid var(--cyan-dim); color:var(--cyan);
+  font-family:var(--font-mono); font-size:12.5px; padding:8px 12px; cursor:pointer; border-radius:var(--radius);
+  white-space:nowrap;
+}
+.btn-console:hover{ background:rgba(79,209,197,0.12); }
+
+.layout{ display:flex; align-items:flex-start; max-width:1400px; margin:0 auto; }
+
+.sidebar{
+  position:sticky; top:53px;
+  height:calc(100vh - 53px);
+  width:270px; flex:none;
+  overflow-y:auto;
+  padding:18px 10px 60px 20px;
+  border-right:1px solid var(--border-soft);
+}
+.sidebar::-webkit-scrollbar{ width:6px; }
+.sidebar::-webkit-scrollbar-thumb{ background:var(--border); }
+
+.schema-label{
+  font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint);
+  margin:18px 0 6px; padding-left:4px;
+}
+.schema-label:first-child{ margin-top:0; }
+.navtree{ list-style:none; margin:0; padding:0; }
+.navtree li{ margin:0; }
+.navtree a{
+  display:block; color:var(--text-dim); font-size:13.5px; padding:6px 8px 6px 10px;
+  border-left:2px solid transparent; text-decoration:none;
+  font-family:var(--font-mono);
+}
+.navtree a .n{ color:var(--amber-dim); margin-right:6px; }
+.navtree a:hover{ color:var(--text); border-left-color:var(--border); background:var(--grid-line); }
+.navtree a.active{ color:var(--cyan); border-left-color:var(--cyan); background:rgba(79,209,197,0.06); }
+
+.content{ flex:1; min-width:0; padding:0 0 100px; }
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+
+/* ---------- hero ---------- */
+.hero{
+  padding:64px 32px 40px;
+  border-bottom:1px solid var(--border-soft);
+  position:relative;
+  overflow:hidden;
+}
+.hero .kicker{
+  font-family:var(--font-mono); font-size:12.5px; color:var(--cyan);
+  margin-bottom:14px; display:flex; align-items:center; gap:8px;
+}
+.hero .kicker::before{ content:'--'; color:var(--text-faint); }
+.hero h1{
+  font-size:clamp(32px,5vw,52px); max-width:16ch; color:var(--text);
+}
+.hero h1 .hl{ color:var(--amber); }
+.hero p.lead{ font-size:17px; color:var(--text-dim); max-width:56ch; margin-top:14px; }
+.hero-meta{ display:flex; gap:22px; flex-wrap:wrap; margin-top:28px; font-family:var(--font-mono); font-size:12.5px; color:var(--text-faint); }
+.hero-meta b{ color:var(--text); font-weight:600; }
+.hero-er{ margin-top:44px; }
+
+/* ---------- section blocks ---------- */
+.section{ padding:52px 32px 8px; border-bottom:1px solid var(--border-soft); scroll-margin-top:64px; }
+.section-head{
+  display:flex; align-items:baseline; gap:14px; margin-bottom:22px;
+}
+.section-num{
+  font-family:var(--font-mono); color:var(--amber); font-size:14px; border:1px solid var(--amber-dim);
+  padding:2px 8px; border-radius:var(--radius); flex:none;
+}
+.section-head h2{ font-size:26px; margin:0; }
+.section-sub{ color:var(--text-faint); font-size:13.5px; margin:-14px 0 26px; font-family:var(--font-mono); }
+
+h3.sub{ font-size:18px; color:var(--text); margin-top:32px; display:flex; align-items:center; gap:8px;}
+h3.sub .tag{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); font-weight:400; }
+h4.mini{ font-size:14.5px; color:var(--cyan); margin-top:22px; font-family:var(--font-mono); font-weight:600; }
+
+ul.plain, ol.plain{ padding-left:1.3em; margin:0 0 1em; color:var(--text); }
+ul.plain li, ol.plain li{ margin-bottom:6px; }
+ul.plain code, p code, li code{
+  background:var(--panel-2); border:1px solid var(--border-soft); color:var(--amber);
+  padding:1px 6px; border-radius:3px; font-size:.88em;
+}
+
+/* ---------- tables ---------- */
+.tbl-wrap{ overflow-x:auto; margin:16px 0 26px; border:1px solid var(--border); border-radius:var(--radius); }
+table.data{ border-collapse:collapse; width:100%; font-size:14px; }
+table.data th{
+  background:var(--panel-2); color:var(--amber); text-align:left; font-family:var(--font-mono);
+  font-weight:600; font-size:12px; padding:9px 12px; border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+table.data td{ padding:8px 12px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top; }
+table.data td code{ color:var(--cyan); background:none; border:none; padding:0; }
+table.data tr:last-child td{ border-bottom:none; }
+table.data tr:hover td{ background:rgba(255,255,255,0.02); color:var(--text); }
+
+/* ---------- code blocks ---------- */
+.code-block{
+  position:relative; background:var(--code-bg); border:1px solid var(--border);
+  border-radius:var(--radius); margin:16px 0 24px; overflow:hidden;
+}
+.code-block .code-bar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 12px; background:var(--panel-3); border-bottom:1px solid var(--border-soft);
+  font-family:var(--font-mono); font-size:11px; color:var(--text-faint);
+}
+.code-block .code-bar .dots{ display:flex; gap:5px; }
+.code-block .code-bar .dots span{ width:7px; height:7px; border-radius:50%; background:var(--border); }
+.code-block pre{ margin:0; padding:14px 16px; overflow-x:auto; font-size:13.3px; line-height:1.65; }
+.code-block code{ color:var(--text); white-space:pre; }
+.copy-btn{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim);
+  font-family:var(--font-mono); font-size:11px; padding:3px 9px; border-radius:3px; cursor:pointer;
+}
+.copy-btn:hover{ color:var(--cyan); border-color:var(--cyan-dim); }
+.copy-btn.copied{ color:var(--amber); border-color:var(--amber-dim); }
+.run-btn{
+  background:rgba(79,209,197,0.1); border:1px solid var(--cyan-dim); color:var(--cyan);
+  font-family:var(--font-mono); font-size:11px; padding:3px 10px; border-radius:3px; cursor:pointer; margin-right:8px;
+}
+.run-btn:hover{ background:rgba(79,209,197,0.22); }
+
+/* sql syntax highlight */
+.kw{ color:var(--amber); font-weight:600; }
+.fn{ color:var(--violet); }
+.str{ color:var(--cyan); }
+.num{ color:#8FE39A; }
+.cmt{ color:var(--text-faint); font-style:italic; }
+.tblname{ color:#E7EEF5; }
+
+/* ---------- accordions ---------- */
+.accordion{ border:1px solid var(--border); border-radius:var(--radius); margin:18px 0; overflow:hidden; background:var(--panel); }
+.acc-item + .acc-item{ border-top:1px solid var(--border-soft); }
+.acc-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; cursor:pointer; user-select:none;
+}
+.acc-head:hover{ background:var(--grid-line); }
+.acc-head .title{ display:flex; align-items:center; gap:10px; font-weight:600; font-size:14.5px; }
+.acc-head .pk-dot{ width:7px; height:7px; border-radius:50%; background:var(--amber); flex:none; }
+.acc-head .chev{ color:var(--text-faint); font-family:var(--font-mono); transition:transform .2s ease; }
+.acc-item.open .chev{ transform:rotate(90deg); color:var(--cyan); }
+.acc-body{ max-height:0; overflow:hidden; transition:max-height .28s ease; }
+.acc-item.open .acc-body{ max-height:4000px; }
+.acc-body-inner{ padding:0 16px 18px; }
+
+/* ---------- activity cards ---------- */
+.activity{ border:1px solid var(--border); border-radius:var(--radius); margin:20px 0; background:var(--panel); }
+.activity-head{
+  display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border-soft);
+  background:var(--panel-2);
+}
+.activity-head .anum{
+  font-family:var(--font-mono); color:var(--bg); background:var(--amber); font-weight:700;
+  font-size:12.5px; padding:3px 9px; border-radius:3px; flex:none;
+}
+.activity-head h4{ margin:0; font-size:15.5px; color:var(--text); }
+.activity-body{ padding:16px 18px; }
+.hint-toggle{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-faint);
+  font-family:var(--font-mono); font-size:12px; margin:6px 0; border:1px dashed var(--border); padding:5px 10px; border-radius:3px;
+}
+.hint-toggle:hover{ color:var(--cyan); border-color:var(--cyan-dim); }
+.hint-body, .sol-body{ display:none; margin-top:10px; }
+.hint-body.show, .sol-body.show{ display:block; }
+.hint-box{ background:var(--panel-3); border-left:3px solid var(--cyan-dim); padding:10px 14px; font-size:13.5px; color:var(--text-dim); border-radius:0 3px 3px 0; }
+.sol-toggle{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer; color:var(--bg); background:var(--amber);
+  font-family:var(--font-mono); font-weight:700; font-size:12px; padding:6px 12px; border-radius:3px; border:none; margin-top:8px;
+}
+.sol-toggle:hover{ background:#f3b559; }
+
+/* ---------- callouts ---------- */
+.callout{ display:flex; gap:12px; padding:14px 16px; border-radius:var(--radius); margin:18px 0; border:1px solid; font-size:14px; }
+.callout .ic{ font-family:var(--font-mono); font-weight:700; flex:none; }
+.callout.tip{ background:rgba(79,209,197,0.06); border-color:var(--cyan-dim); }
+.callout.tip .ic{ color:var(--cyan); }
+.callout.warn{ background:rgba(232,116,140,0.07); border-color:var(--rose); }
+.callout.warn .ic{ color:var(--rose); }
+.callout.note{ background:rgba(232,163,61,0.06); border-color:var(--amber-dim); }
+.callout.note .ic{ color:var(--amber); }
+.callout p{ margin:0; color:var(--text-dim); }
+
+/* ---------- er diagram ---------- */
+.er-box rect.hd{ fill:var(--panel-2); stroke:var(--border); }
+.er-box rect.bd{ fill:var(--panel-3); stroke:var(--border); }
+.er-box text.tname{ font-family:var(--font-mono); font-weight:700; font-size:12px; fill:var(--amber); }
+.er-box text.col{ font-family:var(--font-mono); font-size:10.5px; fill:var(--text-dim); }
+.er-box text.pk{ fill:var(--amber); font-weight:600; }
+.er-box text.fk{ fill:var(--cyan); }
+.er-line{ stroke:var(--border); stroke-width:1.4; fill:none; }
+.er-lbl{ font-family:var(--font-mono); font-size:9.5px; fill:var(--text-faint); }
+
+/* ---------- playground ---------- */
+.console{
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); overflow:hidden; margin-top:20px;
+}
+.console-top{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  padding:10px 14px; background:var(--panel-2); border-bottom:1px solid var(--border-soft);
+}
+.console-top select, .console-top button{
+  font-family:var(--font-mono); font-size:12px; background:var(--panel-3); color:var(--text);
+  border:1px solid var(--border); padding:6px 10px; border-radius:3px; cursor:pointer;
+}
+.console-top select{ max-width:260px; }
+.console-grid{ display:grid; grid-template-columns: 200px 1fr; min-height:340px; }
+.console-schema{ border-right:1px solid var(--border-soft); padding:12px; overflow-y:auto; max-height:520px; }
+.console-schema .tbl-item{ margin-bottom:10px; }
+.console-schema .tbl-item summary{
+  cursor:pointer; font-family:var(--font-mono); font-size:12.5px; color:var(--text); list-style:none; padding:4px 0;
+  display:flex; align-items:center; gap:6px;
+}
+.console-schema .tbl-item summary::-webkit-details-marker{ display:none; }
+.console-schema .tbl-item summary::before{ content:'▸'; color:var(--text-faint); font-size:10px; }
+.console-schema .tbl-item[open] summary::before{ content:'▾'; color:var(--cyan); }
+.console-schema .col-row{ font-family:var(--font-mono); font-size:11px; padding:2px 0 2px 16px; color:var(--text-faint); }
+.console-schema .col-row.pk{ color:var(--amber); }
+.console-schema .col-row.fk{ color:var(--cyan); }
+.console-main{ display:flex; flex-direction:column; }
+#sqlInput{
+  flex:1; min-height:150px; background:var(--code-bg); color:var(--text); border:none; outline:none;
+  font-family:var(--font-mono); font-size:13.5px; padding:16px; resize:vertical; line-height:1.6;
+}
+.console-results{ border-top:1px solid var(--border-soft); padding:14px 16px; max-height:340px; overflow:auto; background:var(--panel-3); }
+.console-results .meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); margin-bottom:8px; }
+.console-results .err{ color:var(--rose); font-family:var(--font-mono); font-size:13px; white-space:pre-wrap; }
+.console-results table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+.console-results th{ text-align:left; color:var(--amber); font-family:var(--font-mono); font-size:11px; padding:6px 10px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--panel-3); }
+.console-results td{ padding:6px 10px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); font-family:var(--font-mono); }
+.console-results tr:hover td{ color:var(--text); background:rgba(255,255,255,0.02); }
+
+/* ---------- footer ---------- */
+.footer{ padding:50px 32px 80px; text-align:center; }
+.footer p{ margin:0 auto; color:var(--text-faint); font-family:var(--font-mono); font-size:12.5px; }
+.footer .glyph{ color:var(--amber); font-size:22px; margin-bottom:10px; }
+
+/* ---------- misc ---------- */
+.pill{ display:inline-block; font-family:var(--font-mono); font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--border); color:var(--text-faint); margin:2px 4px 2px 0; }
+.diff-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:18px 0; }
+.diff-card{ border:1px solid var(--border); border-radius:var(--radius); padding:14px; background:var(--panel); }
+.diff-card h5{ margin:0 0 8px; font-family:var(--font-mono); font-size:12px; color:var(--cyan); }
+.diff-card p{ font-size:13px; color:var(--text-dim); margin:0; }
+
+.back-top{
+  position:fixed; right:20px; bottom:20px; width:40px; height:40px; border-radius:50%;
+  background:var(--panel-2); border:1px solid var(--border); color:var(--cyan); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0; pointer-events:none; transition:opacity .2s ease; font-family:var(--font-mono); z-index:30;
+}
+.back-top.show{ opacity:1; pointer-events:auto; }
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .sidebar{ position:fixed; left:0; top:53px; z-index:35; background:var(--bg-2); width:260px; transform:translateX(-100%); transition:transform .25s ease; box-shadow:8px 0 24px rgba(0,0,0,0.4); }
+  .sidebar.open{ transform:translateX(0); }
+  .menu-btn{ display:inline-flex; }
+  .console-grid{ grid-template-columns:1fr; }
+  .console-schema{ border-right:none; border-bottom:1px solid var(--border-soft); max-height:180px; }
+  .hero, .section{ padding-left:20px; padding-right:20px; }
+  .wrap{ padding:0 20px; }
+}
+@media (max-width:600px){
+  .hero-meta{ gap:12px; }
+  table.data{ font-size:12.5px; }
+}
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *{ transition:none !important; }
+}
+</style>
+</head>
+<body>
+<div class="back-top" id="backTop" title="Volver arriba">↑</div>
+
+<header class="topbar">
+  <div class="brand">
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir índice">☰</button>
+    <span class="dot"></span>
+    <span>sql_desde_cimientos<small>ASIR · DAM · DAW — 1º curso</small></span>
+  </div>
+  <div class="topbar-actions">
+    <div class="progress-wrap"><div id="progressBar"></div></div>
+    <button class="btn-console" onclick="document.getElementById('playground').scrollIntoView({behavior:'smooth'})">▶ consola SQL</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="schema-label">-- fundamentos</div>
+    <ul class="navtree">
+      <li><a href="#s1"><span class="n">01</span>Introducción</a></li>
+      <li><a href="#s2"><span class="n">02</span>Tipos y modelado</a></li>
+      <li><a href="#s3"><span class="n">03</span>DDL</a></li>
+      <li><a href="#s4"><span class="n">04</span>DML</a></li>
+    </ul>
+    <div class="schema-label">-- consultas</div>
+    <ul class="navtree">
+      <li><a href="#s5"><span class="n">05</span>SELECT</a></li>
+      <li><a href="#s6"><span class="n">06</span>Agregación / GROUP BY</a></li>
+      <li><a href="#s7"><span class="n">07</span>Cadena, fecha, NULL</a></li>
+      <li><a href="#s8"><span class="n">08</span>JOINs</a></li>
+      <li><a href="#playground"><span class="n">▶</span>Consola SQL</a></li>
+      <li><a href="#s9"><span class="n">09</span>Subconsultas</a></li>
+      <li><a href="#s10"><span class="n">10</span>UNION / INTERSECT</a></li>
+      <li><a href="#s11"><span class="n">11</span>Window functions</a></li>
+    </ul>
+    <div class="schema-label">-- objetos y producción</div>
+    <ul class="navtree">
+      <li><a href="#s12"><span class="n">12</span>Vistas</a></li>
+      <li><a href="#s13"><span class="n">13</span>Índices</a></li>
+      <li><a href="#s14"><span class="n">14</span>Transacciones</a></li>
+      <li><a href="#s15"><span class="n">15</span>Seguridad</a></li>
+    </ul>
+    <div class="schema-label">-- práctica</div>
+    <ul class="navtree">
+      <li><a href="#s16"><span class="n">16</span>8 actividades</a></li>
+      <li><a href="#s17"><span class="n">17</span>Buenas prácticas</a></li>
+      <li><a href="#s18"><span class="n">18</span>Siguientes pasos</a></li>
+      <li><a href="#s19"><span class="n">19</span>Glosario</a></li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <section class="hero">
+      <div class="kicker">guía interactiva de sql</div>
+      <h1>SQL desde los <span class="hl">cimientos</span>, tabla a tabla.</h1>
+      <p class="lead">Un recorrido práctico y progresivo por SQL para 1º de ASIR, DAM y DAW: desde el modelo relacional hasta funciones de ventana, con una consola SQL real integrada donde ejecutar cada ejemplo contra el esquema de una tienda online.</p>
+      <div class="hero-meta">
+        <span><b>19</b> secciones</span>
+        <span><b>8</b> actividades resueltas</span>
+        <span><b>7</b> tablas de ejemplo</span>
+        <span><b>1</b> consola SQL en vivo</span>
+      </div>
+      <div class="hero-er">
+        <svg viewBox="0 0 1200 650" class="er-box" style="width:100%;height:auto;max-width:900px" xmlns="http://www.w3.org/2000/svg">
+ <style>.er-box {
+      background: #071a2b;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
+                   Consolas, &quot;Liberation Mono&quot;, monospace;
+    }
+
+    .grid {
+      fill: url(#grid);
+    }
+
+    .hd {
+      fill: #102c45;
+      stroke: #1d5278;
+      stroke-width: 1;
+    }
+
+    .bd {
+      fill: #0b2237;
+      stroke: #1d5278;
+      stroke-width: 1;
+    }
+
+    .tname {
+      fill: #ffb52e;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .col {
+      fill: #d5e0e8;
+      font-size: 13px;
+    }
+
+    .pk {
+      fill: #ffb52e;
+      font-weight: 700;
+    }
+
+    .fk {
+      fill: #55c7d9;
+      font-weight: 700;
+    }
+
+    .er-line {
+      fill: none;
+      stroke: #d6e1e8;
+      stroke-width: 1.5;
+    }
+
+    .er-lbl {
+      fill: #d6e1e8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .crow {
+      fill: none;
+      stroke: #d6e1e8;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }</style>
+ <!-- ========================================================= -->
+ <!-- FONDO -->
+ <!-- ========================================================= -->
+ <defs>
+  <pattern height="32" id="grid" patternUnits="userSpaceOnUse" width="32">
+   <path d="m32,0l-32,0l0,32" fill="none" id="svg_1" stroke="#12304a"/>
+  </pattern>
+ </defs>
+ <!-- ========================================================= -->
+ <!-- RELACIONES -->
+ <!-- ========================================================= -->
+ <!-- clientes 1:N pedidos
+       Borde derecho clientes: x=210
+       Borde izquierdo pedidos: x=350
+  -->
+ <!-- pedidos 1:N lineas_pedido
+       Borde inferior pedidos: y=235
+       Borde superior lineas: y=300
+  -->
+ <!-- lineas_pedido N:1 productos
+       Ambos extremos terminan exactamente en los bordes
+  -->
+ <!-- categorias 1:N productos
+       La línea llega al borde superior de productos
+  -->
+ <!-- productos 1:N productos_proveedores
+       Borde inferior productos: y=445
+       Borde superior puente: y=500
+  -->
+ <!-- proveedores 1:N productos_proveedores
+       Borde inferior proveedores: y=200
+       Borde superior puente: y=500
+  -->
+ <!-- ========================================================= -->
+ <!-- CARDINALIDADES -->
+ <!-- ========================================================= -->
+ <!-- clientes 1:N pedidos -->
+ <!-- pedidos 1:N lineas -->
+ <!-- lineas N:1 productos -->
+ <!-- categorias 1:N productos -->
+ <!-- productos 1:N puente -->
+ <!-- proveedores 1:N puente -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: CLIENTES -> PEDIDOS -->
+ <!-- El extremo toca exactamente x=350 -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: PEDIDOS -> LINEAS -->
+ <!-- El extremo toca exactamente y=300 -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: LINEAS -> PRODUCTOS -->
+ <!-- El extremo toca exactamente x=550 -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: CATEGORIAS -> PRODUCTOS -->
+ <!-- El extremo toca exactamente el borde superior -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: PRODUCTOS -> PUENTE -->
+ <!-- El extremo toca exactamente y=500 -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CROW'S FOOT: PROVEEDORES -> PUENTE -->
+ <!-- El extremo toca exactamente y=500 -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CLIENTES -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- PEDIDOS -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- LINEAS_PEDIDO -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- CATEGORIAS -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- PRODUCTOS -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- PROVEEDORES -->
+ <!-- ========================================================= -->
+ <!-- ========================================================= -->
+ <!-- PRODUCTOS_PROVEEDORES -->
+ <!-- ========================================================= -->
+ <g class="layer">
+  <title>Layer 1</title>
+  <rect fill="#071a2b" height="650" id="svg_2" width="1200" x="0" y="0"/>
+  <rect class="grid" height="650" id="svg_3" width="1200" x="26.27" y="-0.85"/>
+  <path class="er-line" d="m210,145l140,0" id="svg_4"/>
+  <path class="er-line" d="m450,213.81l0,86.19" id="svg_5" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+  <path class="er-line" d="m550,385l300,0" id="svg_6"/>
+  <path class="er-line" d="m750,143.98l0,127.46l191.53,0" id="svg_7"/>
+  <path class="er-line" d="m950,445l0,55" id="svg_8"/>
+  <path class="er-line" d="m1085,200l0,300" id="svg_9"/>
+  <text class="er-lbl" id="svg_10" x="225" y="137">1</text>
+  <text class="er-lbl" id="svg_11" x="325" y="137">N</text>
+  <text class="er-lbl" id="svg_12" x="460" y="252">1</text>
+  <text class="er-lbl" id="svg_13" x="460" y="292">N</text>
+  <text class="er-lbl" id="svg_14" x="565" y="377">N</text>
+  <text class="er-lbl" id="svg_15" x="825" y="377">1</text>
+  <text class="er-lbl" id="svg_16" x="760" y="177">1</text>
+  <text class="er-lbl" font-size="12" id="svg_17" x="923.31" y="265.14">N</text>
+  <text class="er-lbl" id="svg_18" x="960" y="465">1</text>
+  <text class="er-lbl" id="svg_19" x="960" y="492">N</text>
+  <text class="er-lbl" id="svg_20" x="1095" y="220">1</text>
+  <text class="er-lbl" id="svg_21" x="1095" y="492">N</text>
+  <path class="crow" d="m350,145l-12,-8" id="svg_22"/>
+  <path class="crow" d="m350,145l-12,0" id="svg_23"/>
+  <path class="crow" d="m350,145l-12,8" id="svg_24"/>
+  <path class="crow" d="m450,300l-8,-12" id="svg_25"/>
+  <path class="crow" d="m450,300l0,-12" id="svg_26"/>
+  <path class="crow" d="m450,300l8,-12" id="svg_27"/>
+  <path class="crow" d="m550,385l12,-8" id="svg_28"/>
+  <path class="crow" d="m550,385l12,0" id="svg_29"/>
+  <path class="crow" d="m550,385l12,8" id="svg_30"/>
+  <path class="crow" d="m942.37,284.15l-8,-12" id="svg_31"/>
+  <path class="crow" d="m942.37,283.31l0,-12" id="svg_32" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+  <path class="crow" d="m942.37,284.15l8,-12" id="svg_33" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+  <path class="crow" d="m950,500l-8,-12" id="svg_34"/>
+  <path class="crow" d="m950,500l0,-12" id="svg_35"/>
+  <path class="crow" d="m950,500l8,-12" id="svg_36"/>
+  <path class="crow" d="m1085,500l-8,-12" id="svg_37"/>
+  <path class="crow" d="m1085,500l0,-12" id="svg_38"/>
+  <path class="crow" d="m1085,500l8,-12" id="svg_39"/>
+  <g id="svg_40" transform="translate(30,80)">
+   <rect class="hd" height="30" id="svg_41" rx="3" width="180" x="0" y="0"/>
+   <text class="tname" id="svg_42" x="12" y="20">clientes</text>
+   <rect class="bd" height="155" id="svg_43" rx="3" width="180" x="0" y="30"/>
+   <text class="col pk" id="svg_44" x="12" y="53">id_cliente</text>
+   <text class="col" id="svg_45" x="12" y="76">nombre</text>
+   <text class="col" id="svg_46" x="12" y="99">email</text>
+   <text class="col" id="svg_47" x="12" y="122">ciudad</text>
+   <text class="col" id="svg_48" x="12" y="145">telefono</text>
+   <text class="col" id="svg_49" x="12" y="168">fecha_alta</text>
+  </g>
+  <g id="svg_50" transform="translate(350,80)">
+   <rect class="hd" height="30" id="svg_51" rx="3" width="200" x="0" y="0"/>
+   <text class="tname" id="svg_52" x="12" y="20">pedidos</text>
+   <rect class="bd" height="105" id="svg_53" rx="3" width="200" x="0" y="30"/>
+   <text class="col pk" id="svg_54" x="12" y="53">id_pedido</text>
+   <text class="col fk" id="svg_55" x="12" y="76">id_cliente</text>
+   <text class="col" id="svg_56" x="12" y="99">fecha_pedido</text>
+   <text class="col" id="svg_57" x="12" y="122">total</text>
+  </g>
+  <g id="svg_58" transform="translate(350,300)">
+   <rect class="hd" height="30" id="svg_59" rx="3" width="200" x="0" y="0"/>
+   <text class="tname" id="svg_60" x="12" y="20">lineas_pedido</text>
+   <rect class="bd" height="130" id="svg_61" rx="3" width="200" x="0" y="30"/>
+   <text class="col pk" id="svg_62" x="12" y="53">id_linea</text>
+   <text class="col fk" id="svg_63" x="12" y="76">id_pedido</text>
+   <text class="col fk" id="svg_64" x="12" y="99">id_producto</text>
+   <text class="col" id="svg_65" x="12" y="122">cantidad</text>
+   <text class="col" id="svg_66" x="12" y="145">precio_unitario</text>
+  </g>
+  <g id="svg_67" transform="translate(650,50)">
+   <rect class="hd" height="30" id="svg_68" rx="3" width="200" x="0" y="0"/>
+   <text class="tname" id="svg_69" x="12" y="20">categorias</text>
+   <rect class="bd" height="65" id="svg_70" rx="3" width="200" x="0" y="30"/>
+   <text class="col pk" id="svg_71" x="12" y="53">id_categoria</text>
+   <text class="col" id="svg_72" x="12" y="79">nombre</text>
+  </g>
+  <g id="svg_73" transform="translate(850,285)">
+   <rect class="hd" height="30" id="svg_74" rx="3" width="200" x="0" y="0"/>
+   <text class="tname" id="svg_75" x="12" y="20">productos</text>
+   <rect class="bd" height="130" id="svg_76" rx="3" width="200" x="0" y="30"/>
+   <text class="col pk" id="svg_77" x="12" y="53">id_producto</text>
+   <text class="col" id="svg_78" x="12" y="76">nombre</text>
+   <text class="col" id="svg_79" x="12" y="99">precio</text>
+   <text class="col" id="svg_80" x="12" y="122">stock</text>
+   <text class="col fk" id="svg_81" x="12" y="145">id_categoria</text>
+  </g>
+  <g id="svg_82" transform="translate(1000,80)">
+   <rect class="hd" height="30" id="svg_83" rx="3" width="170" x="0" y="0"/>
+   <text class="tname" id="svg_84" x="12" y="20">proveedores</text>
+   <rect class="bd" height="90" id="svg_85" rx="3" width="170" x="0" y="30"/>
+   <text class="col pk" id="svg_86" x="12" y="53">id_proveedor</text>
+   <text class="col" id="svg_87" x="12" y="79">nombre</text>
+   <text class="col" id="svg_88" x="12" y="105">email</text>
+  </g>
+  <g id="svg_89" transform="translate(800, 500)">
+   <rect class="hd" height="30" id="svg_90" rx="3" width="300" x="0" y="0"/>
+   <text class="tname" id="svg_91" x="12" y="20">productos_proveedores</text>
+   <rect class="bd" height="75" id="svg_92" rx="3" width="300" x="0" y="30"/>
+   <text class="col pk" id="svg_93" x="12" y="56">id_producto</text>
+   <text class="col pk" id="svg_95" x="12" y="84">id_proveedor</text>
+  </g>
+ </g>
+</svg>
+      </div>
+    </section>
+    <!-- ============ SECCIÓN 1 ============ -->
+    <section class="section" id="s1">
+      <div class="section-head"><span class="section-num">01</span><h2>Introducción y conceptos fundamentales</h2></div>
+      <div class="section-sub">-- de qué hablamos cuando hablamos de SQL</div>
+
+      <h3 class="sub">1.1 &middot; ¿Qué es SQL?</h3>
+      <p><strong>SQL</strong> (Structured Query Language) es el lenguaje estándar para trabajar con bases de datos relacionales. No es un lenguaje de programación general: es un lenguaje declarativo — le dices <em>qué</em> quieres, no <em>cómo</em> conseguirlo. Se divide en tres grandes familias de sentencias:</p>
+      <div class="diff-grid">
+        <div class="diff-card"><h5>DDL</h5><p>Data Definition Language. Define la estructura: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>.</p></div>
+        <div class="diff-card"><h5>DML</h5><p>Data Manipulation Language. Manipula los datos: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>.</p></div>
+        <div class="diff-card"><h5>DCL</h5><p>Data Control Language. Gestiona permisos: <code>GRANT</code>, <code>REVOKE</code>.</p></div>
+      </div>
+
+      <h3 class="sub">1.2 &middot; Modelo relacional básico</h3>
+      <ul class="plain">
+        <li><strong>Tabla</strong> = entidad (ej. <code>clientes</code>)</li>
+        <li><strong>Fila</strong> = registro o tupla (ej. un cliente concreto)</li>
+        <li><strong>Columna</strong> = atributo (ej. <code>nombre</code>)</li>
+        <li><strong>Clave primaria (PK)</strong> = identifica cada fila de forma única</li>
+        <li><strong>Clave foránea (FK)</strong> = relaciona una tabla con otra</li>
+      </ul>
+
+      <h3 class="sub">1.3 &middot; Relaciones entre tablas</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Tipo</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>1:N</code></td><td>Un registro de A se relaciona con muchos de B</td><td>Un cliente → muchos pedidos</td></tr>
+        <tr><td><code>N:1</code></td><td>Muchos de A se relacionan con uno de B</td><td>Muchos pedidos → un cliente</td></tr>
+        <tr><td><code>N:N</code></td><td>Muchos de A con muchos de B</td><td>Productos ↔ Proveedores (tabla intermedia)</td></tr>
+      </table></div>
+
+      <h3 class="sub">1.4 &middot; El modelo de datos de esta guía</h3>
+      <p>A lo largo de toda la guía usaremos el mismo escenario — una <strong>tienda online</strong> — para que cada ejemplo encaje con el anterior. Puedes ver el diagrama completo arriba, en la cabecera. Las siete tablas son:</p>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Tabla</th><th>Columnas</th></tr>
+        <tr><td><code>clientes</code></td><td>id_cliente, nombre, email, ciudad, fecha_alta, telefono</td></tr>
+        <tr><td><code>categorias</code></td><td>id_categoria, nombre, descripcion</td></tr>
+        <tr><td><code>productos</code></td><td>id_producto, nombre, precio, stock, id_categoria</td></tr>
+        <tr><td><code>pedidos</code></td><td>id_pedido, id_cliente, fecha_pedido, total</td></tr>
+        <tr><td><code>lineas_pedido</code></td><td>id_linea, id_pedido, id_producto, cantidad, precio_unitario</td></tr>
+        <tr><td><code>proveedores</code></td><td>id_proveedor, nombre, email, telefono</td></tr>
+        <tr><td><code>productos_proveedores</code></td><td>id_producto, id_proveedor &nbsp;(tabla puente N:N)</td></tr>
+      </table></div>
+      <div class="callout tip"><span class="ic">i</span><p>Este mismo esquema está cargado en la <a href="#playground">consola SQL</a> más abajo, con datos reales. Cada vez que veas un botón <strong>▶ probar</strong> junto a una consulta, te llevará directamente allí.</p></div>
+    </section>
+    <!-- ============ SECCIÓN 2 ============ -->
+    <section class="section" id="s2">
+      <div class="section-head"><span class="section-num">02</span><h2>Tipos de datos y modelado</h2></div>
+      <div class="section-sub">-- elegir el molde correcto para cada dato</div>
+
+      <h3 class="sub">2.1 &middot; Tipos de datos más comunes</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Tipo</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>INT</code></td><td>Números enteros</td><td><code>id_cliente INT</code></td></tr>
+        <tr><td><code>BIGINT</code></td><td>Enteros grandes</td><td>para IDs con muchos registros</td></tr>
+        <tr><td><code>DECIMAL(p,s)</code></td><td>Números exactos (p=dígitos totales, s=decimales)</td><td><code>precio DECIMAL(10,2)</code></td></tr>
+        <tr><td><code>FLOAT</code></td><td>Números aproximados (menos precisos)</td><td><code>coordenadas FLOAT</code></td></tr>
+        <tr><td><code>VARCHAR(n)</code></td><td>Texto variable (hasta n caracteres)</td><td><code>nombre VARCHAR(100)</code></td></tr>
+        <tr><td><code>TEXT</code></td><td>Texto largo (hasta 65KB)</td><td><code>descripcion TEXT</code></td></tr>
+        <tr><td><code>CHAR(n)</code></td><td>Texto fijo (siempre n caracteres)</td><td><code>codigo CHAR(10)</code></td></tr>
+        <tr><td><code>BOOLEAN</code></td><td>Verdadero/Falso (en MySQL es TINYINT(1))</td><td><code>activo BOOLEAN</code></td></tr>
+        <tr><td><code>ENUM</code></td><td>Lista de valores permitidos</td><td><code>estado ENUM('activo','inactivo')</code></td></tr>
+        <tr><td><code>DATE</code></td><td>Fecha (YYYY-MM-DD)</td><td><code>fecha_alta DATE</code></td></tr>
+        <tr><td><code>DATETIME</code></td><td>Fecha y hora</td><td><code>fecha_pedido DATETIME</code></td></tr>
+        <tr><td><code>TIMESTAMP</code></td><td>Fecha y hora con zona horaria</td><td><code>ultima_modificacion TIMESTAMP</code></td></tr>
+        <tr><td><code>TIME</code></td><td>Solo hora</td><td><code>hora_entrega TIME</code></td></tr>
+      </table></div>
+
+      <h3 class="sub">2.2 &middot; Restricciones (constraints)</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Restricción</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>PRIMARY KEY</code></td><td>Clave primaria (única y no nula)</td><td><code>id INT PRIMARY KEY</code></td></tr>
+        <tr><td><code>FOREIGN KEY</code></td><td>Clave foránea (referencia a otra tabla)</td><td><code>FOREIGN KEY (id_cliente) REFERENCES clientes(id)</code></td></tr>
+        <tr><td><code>UNIQUE</code></td><td>Valor único en toda la tabla</td><td><code>email VARCHAR(100) UNIQUE</code></td></tr>
+        <tr><td><code>NOT NULL</code></td><td>No puede ser nulo</td><td><code>nombre VARCHAR(50) NOT NULL</code></td></tr>
+        <tr><td><code>CHECK</code></td><td>Validación de una condición</td><td><code>CHECK (precio &gt; 0)</code></td></tr>
+        <tr><td><code>DEFAULT</code></td><td>Valor por defecto</td><td><code>fecha_alta DATE DEFAULT CURRENT_DATE</code></td></tr>
+      </table></div>
+
+      <h3 class="sub">2.3 &middot; Claves primarias compuestas</h3>
+      <p>Cuando una tabla existe solo para resolver una relación N:N — como <code>productos_proveedores</code> — su clave primaria suele ser la combinación de las dos claves foráneas:</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Tabla intermedia para N:N (productos y proveedores)
+CREATE TABLE productos_proveedores (
+    id_producto INT,
+    id_proveedor INT,
+    fecha_asignacion DATE DEFAULT CURRENT_DATE,
+    PRIMARY KEY (id_producto, id_proveedor),  -- PK compuesta
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
+    FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+);</code></pre></div>
+    </section>
+
+    <!-- ============ SECCIÓN 3 ============ -->
+    <section class="section" id="s3">
+      <div class="section-head"><span class="section-num">03</span><h2>DDL &mdash; Definición de estructuras</h2></div>
+      <div class="section-sub">-- construir el esqueleto de la base de datos</div>
+
+      <h3 class="sub">3.1 &middot; CREATE TABLE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE TABLE clientes (
+    id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    telefono VARCHAR(15),
+    ciudad VARCHAR(50) DEFAULT 'Madrid',
+    fecha_alta DATE DEFAULT CURRENT_DATE,
+    activo BOOLEAN DEFAULT TRUE,
+    CHECK (LENGTH(telefono) &gt;= 9 OR telefono IS NULL)  -- CHECK constraint
+);
+
+CREATE TABLE categorias (
+    id_categoria INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    descripcion TEXT
+);
+
+CREATE TABLE productos (
+    id_producto INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL CHECK (precio &gt; 0),
+    stock INT NOT NULL DEFAULT 0 CHECK (stock &gt;= 0),
+    id_categoria INT,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+);
+
+CREATE TABLE pedidos (
+    id_pedido INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT NOT NULL,
+    fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2) DEFAULT 0,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente) ON DELETE CASCADE
+);
+-- ON DELETE CASCADE: si se borra el cliente, se borran sus pedidos</code></pre></div>
+
+      <h3 class="sub">3.2 &middot; ALTER TABLE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Añadir columna
+ALTER TABLE productos ADD descripcion TEXT;
+
+-- Modificar tipo de columna
+ALTER TABLE productos MODIFY precio DECIMAL(12,2);
+
+-- Añadir restricción
+ALTER TABLE productos ADD CHECK (stock &gt;= 0);
+
+-- Eliminar columna
+ALTER TABLE productos DROP COLUMN descripcion;
+
+-- Renombrar tabla
+ALTER TABLE clientes RENAME TO usuarios;</code></pre></div>
+
+      <h3 class="sub">3.3 &middot; DROP TABLE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">DROP TABLE productos_proveedores;  -- primero las que tienen FK
+DROP TABLE proveedores;</code></pre></div>
+
+      <h3 class="sub">3.4 &middot; TRUNCATE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">TRUNCATE TABLE lineas_pedido;  -- elimina todas las filas (más rápido que DELETE)</code></pre></div>
+
+      <div class="callout warn"><span class="ic">!</span><p><code>DROP</code> y <code>TRUNCATE</code> no tienen deshacer en la mayoría de motores. Antes de ejecutarlos fuera de un entorno de pruebas, haz una copia de seguridad.</p></div>
+    </section>
+
+    <!-- ============ SECCIÓN 4 ============ -->
+    <section class="section" id="s4">
+      <div class="section-head"><span class="section-num">04</span><h2>DML &mdash; Manipulación de datos</h2></div>
+      <div class="section-sub">-- insertar, actualizar y borrar filas</div>
+
+      <h3 class="sub">4.1 &middot; INSERT</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Insertar un registro
+INSERT INTO clientes (nombre, email, telefono, ciudad)
+VALUES ('Ana Pérez', 'ana@email.com', '666111222', 'Madrid');
+
+-- Insertar múltiples registros
+INSERT INTO categorias (nombre, descripcion) VALUES
+    ('Electrónica', 'Dispositivos electrónicos'),
+    ('Ropa', 'Prendas de vestir'),
+    ('Hogar', 'Productos para el hogar');
+
+-- Insertar con AUTO_INCREMENT y DEFAULT
+INSERT INTO productos (nombre, precio, id_categoria)
+VALUES ('Portátil', 800.00, 1);  -- stock toma el valor DEFAULT (0)</code></pre></div>
+
+      <h3 class="sub">4.2 &middot; UPDATE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Actualizar un registro específico (SIEMPRE CON WHERE)
+UPDATE clientes SET telefono = '677888999', ciudad = 'Barcelona'
+WHERE id_cliente = 1;
+
+-- Actualizar múltiples registros
+UPDATE productos SET precio = precio * 1.10  -- sube un 10%
+WHERE id_categoria = 1;
+
+-- Actualizar con JOIN (MySQL)
+UPDATE productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+SET p.stock = p.stock + 50
+WHERE c.nombre = 'Electrónica';</code></pre></div>
+
+      <h3 class="sub">4.3 &middot; DELETE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Borrar un registro específico (SIEMPRE CON WHERE)
+DELETE FROM clientes WHERE id_cliente = 1;
+
+-- Borrar con JOIN (MySQL)
+DELETE p FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+WHERE c.nombre = 'Ropa' AND p.stock = 0;
+
+-- Borrar todos los registros (cuidado)
+DELETE FROM productos;  -- sin WHERE, borra todo
+-- Mejor usar TRUNCATE para vaciar rápido</code></pre></div>
+
+      <div class="callout note"><span class="ic">*</span><p>La regla de oro de esta sección: en <code>UPDATE</code> y <code>DELETE</code>, escribe primero el <code>WHERE</code> mentalmente. Un <code>UPDATE</code> sin <code>WHERE</code> afecta a la tabla entera.</p></div>
+    </section>
+    <!-- ============ SECCIÓN 5 ============ -->
+    <section class="section" id="s5">
+      <div class="section-head"><span class="section-num">05</span><h2>Consultas básicas (SELECT)</h2></div>
+      <div class="section-sub">-- el verbo que más vas a escribir en tu vida</div>
+
+      <h3 class="sub">5.1 &middot; SELECT básico y filtros</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">-- Columnas específicas
+SELECT nombre, email, ciudad FROM clientes;
+
+-- Alias (AS)
+SELECT nombre AS cliente, email AS correo FROM clientes;
+
+-- Filtrar con WHERE
+SELECT * FROM productos WHERE precio &gt; 100;
+SELECT * FROM clientes WHERE ciudad = 'Madrid' OR ciudad = 'Barcelona';
+
+-- BETWEEN (rango)
+SELECT * FROM productos WHERE precio BETWEEN 50 AND 200;
+
+-- IN (lista)
+SELECT * FROM clientes WHERE ciudad IN ('Madrid', 'Barcelona', 'Valencia');
+
+-- LIKE (patrón)
+SELECT * FROM clientes WHERE email LIKE '%@gmail.com';
+SELECT * FROM clientes WHERE nombre LIKE 'A%';
+
+-- IS NULL / IS NOT NULL
+SELECT * FROM clientes WHERE telefono IS NULL;</code></pre></div>
+      <p>Operadores de comparación disponibles: <span class="pill">=</span><span class="pill">!=</span><span class="pill">&gt;</span><span class="pill">&lt;</span><span class="pill">&gt;=</span><span class="pill">&lt;=</span><span class="pill">BETWEEN</span><span class="pill">IN</span><span class="pill">LIKE</span><span class="pill">IS NULL</span></p>
+
+      <h3 class="sub">5.2 &middot; DISTINCT</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT DISTINCT ciudad FROM clientes;</code></pre></div>
+
+      <h3 class="sub">5.3 &middot; ORDER BY</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT * FROM productos ORDER BY precio DESC;
+SELECT * FROM pedidos ORDER BY fecha_pedido DESC, total DESC;</code></pre></div>
+
+      <h3 class="sub">5.4 &middot; LIMIT (paginación)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT * FROM productos LIMIT 10;
+SELECT * FROM productos LIMIT 10 OFFSET 10;  -- página 2 (registros 11-20)</code></pre></div>
+
+      <h3 class="sub">5.5 &middot; CASE (lógica condicional)</h3>
+      <p>El equivalente SQL a un <code>if/elif/else</code>: evalúa condiciones en orden y devuelve el primer resultado que encaje.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT nombre, precio,
+    CASE
+        WHEN precio &lt; 50 THEN 'Económico'
+        WHEN precio &lt; 200 THEN 'Normal'
+        ELSE 'Caro'
+    END AS categoria_precio
+FROM productos;</code></pre></div>
+      <div class="callout tip"><span class="ic">i</span><p>Prueba estas consultas tú mismo — cada bloque con el botón <strong>▶ probar</strong> te lleva a la consola con el ejemplo ya cargado, listo para ejecutar o modificar.</p></div>
+    </section>
+
+    <!-- ============ SECCIÓN 6 ============ -->
+    <section class="section" id="s6">
+      <div class="section-head"><span class="section-num">06</span><h2>Funciones de agregación y GROUP BY</h2></div>
+      <div class="section-sub">-- de muchas filas a un resumen</div>
+
+      <h3 class="sub">6.1 &middot; Funciones agregadas básicas</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Función</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>COUNT(*)</code></td><td>Número total de filas</td><td><code>SELECT COUNT(*) FROM clientes</code></td></tr>
+        <tr><td><code>COUNT(col)</code></td><td>Número de valores no nulos</td><td><code>SELECT COUNT(telefono) FROM clientes</code></td></tr>
+        <tr><td><code>COUNT(DISTINCT col)</code></td><td>Número de valores distintos</td><td><code>SELECT COUNT(DISTINCT ciudad) FROM clientes</code></td></tr>
+        <tr><td><code>SUM(col)</code></td><td>Suma de valores</td><td><code>SELECT SUM(total) FROM pedidos</code></td></tr>
+        <tr><td><code>AVG(col)</code></td><td>Media de valores</td><td><code>SELECT AVG(precio) FROM productos</code></td></tr>
+        <tr><td><code>MAX(col)</code></td><td>Valor máximo</td><td><code>SELECT MAX(precio) FROM productos</code></td></tr>
+        <tr><td><code>MIN(col)</code></td><td>Valor mínimo</td><td><code>SELECT MIN(precio) FROM productos</code></td></tr>
+      </table></div>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT
+    COUNT(*) AS total_productos,
+    AVG(precio) AS precio_medio,
+    MAX(precio) AS precio_maximo,
+    MIN(precio) AS precio_minimo
+FROM productos;</code></pre></div>
+
+      <h3 class="sub">6.2 &middot; GROUP BY</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT
+    c.nombre AS categoria,
+    COUNT(p.id_producto) AS cantidad,
+    AVG(p.precio) AS precio_medio
+FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+GROUP BY c.id_categoria, c.nombre;</code></pre></div>
+
+      <h3 class="sub">6.3 &middot; HAVING</h3>
+      <p>Igual que <code>WHERE</code> filtra filas, <code>HAVING</code> filtra <em>grupos</em> — por eso puede usar funciones agregadas y siempre va después de <code>GROUP BY</code>.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">-- Clientes que han gastado más de 300€
+SELECT
+    c.nombre,
+    SUM(p.total) AS gasto_total
+FROM clientes c
+JOIN pedidos p ON c.id_cliente = p.id_cliente
+GROUP BY c.id_cliente, c.nombre
+HAVING SUM(p.total) &gt; 300;</code></pre></div>
+
+      <h3 class="sub">6.4 &middot; Agregación condicional con CASE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    SUM(CASE WHEN precio &lt; 50 THEN 1 ELSE 0 END) AS economicos,
+    SUM(CASE WHEN precio BETWEEN 50 AND 200 THEN 1 ELSE 0 END) AS normales,
+    SUM(CASE WHEN precio &gt; 200 THEN 1 ELSE 0 END) AS caros
+FROM productos;</code></pre></div>
+    </section>
+    <!-- ============ SECCIÓN 7 ============ -->
+    <section class="section" id="s7">
+      <div class="section-head"><span class="section-num">07</span><h2>Funciones de cadena, fecha y NULL</h2></div>
+      <div class="section-sub">-- transformar datos dentro de la propia consulta</div>
+
+      <h3 class="sub">7.1 &middot; Funciones de cadena (texto)</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Función</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>CONCAT(a, b)</code></td><td>Concatenar cadenas</td><td><code>CONCAT(nombre, ' ', apellido)</code></td></tr>
+        <tr><td><code>UPPER(s)</code></td><td>Mayúsculas</td><td><code>UPPER(nombre)</code></td></tr>
+        <tr><td><code>LOWER(s)</code></td><td>Minúsculas</td><td><code>LOWER(email)</code></td></tr>
+        <tr><td><code>LENGTH(s)</code></td><td>Longitud</td><td><code>LENGTH(nombre)</code></td></tr>
+        <tr><td><code>SUBSTRING(s, pos, len)</code></td><td>Subcadena</td><td><code>SUBSTRING(nombre, 1, 3)</code></td></tr>
+        <tr><td><code>REPLACE(s, old, new)</code></td><td>Reemplazar</td><td><code>REPLACE(email, '@gmail.com', '@yahoo.com')</code></td></tr>
+        <tr><td><code>TRIM(s)</code></td><td>Quitar espacios</td><td><code>TRIM(nombre)</code></td></tr>
+        <tr><td><code>LOCATE(sub, s)</code></td><td>Posición de subcadena</td><td><code>LOCATE('@', email)</code></td></tr>
+      </table></div>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    CONCAT(nombre, ' (', email, ')') AS contacto,
+    UPPER(ciudad) AS ciudad_mayus,
+    LENGTH(nombre) AS longitud_nombre,
+    SUBSTRING(email, 1, LOCATE('@', email)-1) AS usuario_email
+FROM clientes;</code></pre></div>
+
+      <h3 class="sub">7.2 &middot; Funciones de fecha y hora</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Función</th><th>Descripción</th><th>Ejemplo</th></tr>
+        <tr><td><code>NOW()</code></td><td>Fecha y hora actual</td><td><code>NOW()</code></td></tr>
+        <tr><td><code>CURDATE()</code></td><td>Fecha actual</td><td><code>CURDATE()</code></td></tr>
+        <tr><td><code>DATE(f)</code></td><td>Extraer fecha</td><td><code>DATE(fecha_pedido)</code></td></tr>
+        <tr><td><code>YEAR(f)</code></td><td>Año</td><td><code>YEAR(fecha_pedido)</code></td></tr>
+        <tr><td><code>MONTH(f)</code></td><td>Mes</td><td><code>MONTH(fecha_pedido)</code></td></tr>
+        <tr><td><code>DATEDIFF(f1, f2)</code></td><td>Días entre fechas</td><td><code>DATEDIFF(CURDATE(), fecha_alta)</code></td></tr>
+        <tr><td><code>DATE_ADD(f, INTERVAL n UNIT)</code></td><td>Sumar tiempo</td><td><code>DATE_ADD(fecha_alta, INTERVAL 1 YEAR)</code></td></tr>
+        <tr><td><code>DATE_SUB(f, INTERVAL n UNIT)</code></td><td>Restar tiempo</td><td><code>DATE_SUB(CURDATE(), INTERVAL 30 DAY)</code></td></tr>
+      </table></div>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    nombre,
+    fecha_alta,
+    DATEDIFF(CURDATE(), fecha_alta) AS dias_cliente,
+    YEAR(fecha_alta) AS año_alta
+FROM clientes;
+
+-- Pedidos del último mes
+SELECT * FROM pedidos
+WHERE fecha_pedido &gt; DATE_SUB(NOW(), INTERVAL 30 DAY);</code></pre></div>
+
+      <h3 class="sub">7.3 &middot; Manejo de NULL</h3>
+      <p><code>NULL</code> no es cero ni cadena vacía: es <em>ausencia de valor</em>. Por eso no se compara con <code>=</code>, sino con <code>IS NULL</code>, y por eso existen funciones específicas para sustituirlo por un valor por defecto.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- COALESCE: devuelve el primer valor no nulo (estándar, funciona en todos los motores)
+SELECT
+    nombre,
+    COALESCE(telefono, 'Sin teléfono') AS telefono,
+    COALESCE(ciudad, 'Sin ciudad') AS ciudad
+FROM clientes;
+
+-- IFNULL (MySQL) / NVL (Oracle) / ISNULL (SQL Server): equivalentes específicos
+SELECT nombre, IFNULL(telefono, 'No disponible') AS telefono FROM clientes;</code></pre></div>
+    </section>
+
+    <!-- ============ SECCIÓN 8 ============ -->
+    <section class="section" id="s8">
+      <div class="section-head"><span class="section-num">08</span><h2>JOINs &mdash; combinar tablas</h2></div>
+      <div class="section-sub">-- reconstruir el mundo real a partir de tablas separadas</div>
+      <p>Los datos normalizados viven repartidos en varias tablas para evitar duplicación. Un <code>JOIN</code> las vuelve a juntar en el momento de la consulta, según una condición de relación (normalmente PK = FK).</p>
+
+      <h3 class="sub">8.1 &middot; INNER JOIN (solo coincidencias)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT p.id_pedido, c.nombre, p.fecha_pedido, p.total
+FROM pedidos p
+INNER JOIN clientes c ON p.id_cliente = c.id_cliente;</code></pre></div>
+
+      <h3 class="sub">8.2 &middot; LEFT JOIN (todos los de la izquierda)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">-- Clientes con o sin pedidos
+SELECT c.nombre, COUNT(p.id_pedido) AS num_pedidos
+FROM clientes c
+LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente
+GROUP BY c.id_cliente, c.nombre;
+
+-- Productos que nunca se han vendido
+SELECT p.nombre
+FROM productos p
+LEFT JOIN lineas_pedido lp ON p.id_producto = lp.id_producto
+WHERE lp.id_producto IS NULL;</code></pre></div>
+
+      <h3 class="sub">8.3 &middot; RIGHT JOIN</h3>
+      <p>Menos común en la práctica — casi cualquier <code>RIGHT JOIN</code> puede reescribirse como un <code>LEFT JOIN</code> intercambiando el orden de las tablas.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT p.id_pedido, c.nombre
+FROM clientes c
+RIGHT JOIN pedidos p ON c.id_cliente = p.id_cliente;
+-- equivalente a: FROM pedidos p LEFT JOIN clientes c ON ...</code></pre></div>
+
+      <h3 class="sub">8.4 &middot; JOIN múltiple (4 tablas o más)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT
+    c.nombre AS cliente,
+    p.fecha_pedido,
+    pr.nombre AS producto,
+    lp.cantidad,
+    lp.precio_unitario,
+    (lp.cantidad * lp.precio_unitario) AS subtotal
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+JOIN lineas_pedido lp ON p.id_pedido = lp.id_pedido
+JOIN productos pr ON lp.id_producto = pr.id_producto
+WHERE p.id_pedido = 1;</code></pre></div>
+
+      <h3 class="sub">8.5 &middot; Self-Join</h3>
+      <p>Una tabla puede unirse consigo misma cuando hay una relación jerárquica interna, como una categoría que tiene una categoría padre.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Relaciones jerárquicas en categorías (categorías padre-hijo)
+ALTER TABLE categorias ADD id_categoria_padre INT;
+ALTER TABLE categorias ADD FOREIGN KEY (id_categoria_padre) REFERENCES categorias(id_categoria);
+
+SELECT
+    c1.nombre AS subcategoria,
+    c2.nombre AS categoria_padre
+FROM categorias c1
+LEFT JOIN categorias c2 ON c1.id_categoria_padre = c2.id_categoria;</code></pre></div>
+
+      <h3 class="sub">8.6 &middot; NATURAL JOIN</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Une automáticamente por TODAS las columnas con el mismo nombre
+SELECT * FROM pedidos NATURAL JOIN clientes;  -- une por id_cliente</code></pre></div>
+      <div class="callout warn"><span class="ic">!</span><p><code>NATURAL JOIN</code> es cómodo pero frágil: si añades una columna nueva a cualquiera de las dos tablas con un nombre que coincide por casualidad, la condición de unión cambia sin avisar. En producción, casi siempre es mejor un <code>JOIN ... ON</code> explícito.</p></div>
+    </section>
+    <!-- ============ PLAYGROUND ============ -->
+    <section class="section" id="playground">
+      <div class="section-head"><span class="section-num">&#9654;</span><h2>Consola SQL en vivo</h2></div>
+      <div class="section-sub">-- el mismo esquema de la tienda, ejecutable de verdad</div>
+      <p>Esta consola ejecuta un subconjunto real de SQL &mdash; <code>SELECT</code>, <code>JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>ORDER BY</code>, <code>LIMIT</code> &mdash; directamente en tu navegador, contra los datos de ejemplo de la tienda. No sustituye a un SGBD real, pero te deja equivocarte y volver a intentarlo sin instalar nada.</p>
+
+      <div class="console">
+        <div class="console-top">
+          <select id="exampleSelect" onchange="loadExample(this.value)">
+            <option value="">-- cargar consulta de ejemplo --</option>
+            <option value="ex1">Clientes de Madrid</option>
+            <option value="ex2">Productos ordenados por precio</option>
+            <option value="ex3">Productos por categoría (JOIN + GROUP BY)</option>
+            <option value="ex4">Clientes sin pedidos (LEFT JOIN)</option>
+            <option value="ex5">Gasto total por cliente (HAVING)</option>
+            <option value="ex6">Detalle completo de un pedido (4 tablas)</option>
+            <option value="ex7">Productos entre 50€ y 200€ (BETWEEN)</option>
+            <option value="ex8">Top 5 productos más caros (LIMIT)</option>
+          </select>
+          <div>
+            <button onclick="runQuery()">▶ Ejecutar</button>
+            <button onclick="clearConsole()">Limpiar</button>
+          </div>
+        </div>
+        <div class="console-grid">
+          <div class="console-schema" id="schemaBrowser"></div>
+          <div class="console-main">
+            <textarea id="sqlInput" spellcheck="false">SELECT nombre, email, ciudad FROM clientes WHERE ciudad = 'Madrid';</textarea>
+            <div class="console-results" id="results"><div class="meta">Pulsa "Ejecutar" para ver el resultado aquí.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="callout note"><span class="ic">*</span><p><strong>Alcance de la consola:</strong> soporta <code>SELECT</code> sencillos y con varios <code>JOIN</code>/<code>WHERE</code>/<code>GROUP BY</code>/<code>HAVING</code>/<code>ORDER BY</code>/<code>LIMIT</code>. No interpreta subconsultas anidadas, funciones de ventana ni sentencias DDL/DML &mdash; para esas, revisa las resoluciones de las <a href="#s16">actividades</a>, están explicadas paso a paso.</p></div>
+    </section>
+    <!-- ============ SECCIÓN 9 ============ -->
+    <section class="section" id="s9">
+      <div class="section-head"><span class="section-num">09</span><h2>Subconsultas (básicas y avanzadas)</h2></div>
+      <div class="section-sub">-- una consulta dentro de otra consulta</div>
+
+      <h3 class="sub">9.1 &middot; Subconsulta en WHERE (escalar)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Productos más caros que la media
+SELECT nombre, precio
+FROM productos
+WHERE precio &gt; (SELECT AVG(precio) FROM productos);
+
+-- Productos con precio &gt; precio medio de SU categoría (correlacionada)
+SELECT p.nombre, p.precio, p.id_categoria
+FROM productos p
+WHERE p.precio &gt; (
+    SELECT AVG(p2.precio)
+    FROM productos p2
+    WHERE p2.id_categoria = p.id_categoria
+);</code></pre></div>
+
+      <h3 class="sub">9.2 &middot; Subconsulta con IN / NOT IN</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT nombre FROM clientes
+WHERE id_cliente IN (SELECT DISTINCT id_cliente FROM pedidos);
+
+SELECT nombre FROM productos
+WHERE id_producto NOT IN (SELECT DISTINCT id_producto FROM lineas_pedido);</code></pre></div>
+
+      <h3 class="sub">9.3 &middot; Subconsulta con EXISTS / NOT EXISTS</h3>
+      <p><code>EXISTS</code> solo comprueba si la subconsulta devuelve filas &mdash; no le importa cuántas ni cuáles &mdash; así que suele ser más eficiente que <code>IN</code> sobre tablas grandes.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Clientes que han hecho pedidos
+SELECT c.nombre
+FROM clientes c
+WHERE EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.id_cliente = c.id_cliente
+);
+
+-- Clientes que NO han hecho pedidos
+SELECT c.nombre
+FROM clientes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.id_cliente = c.id_cliente
+);</code></pre></div>
+
+      <h3 class="sub">9.4 &middot; Subconsulta en FROM (tabla derivada)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT nombre, gasto_total
+FROM (
+    SELECT
+        c.nombre,
+        SUM(p.total) AS gasto_total
+    FROM clientes c
+    JOIN pedidos p ON c.id_cliente = p.id_cliente
+    GROUP BY c.id_cliente, c.nombre
+) AS resumen_clientes
+WHERE gasto_total &gt; 1000;</code></pre></div>
+
+      <h3 class="sub">9.5 &middot; Subconsulta en SELECT (escalar)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    c.nombre,
+    (SELECT COUNT(*) FROM pedidos p WHERE p.id_cliente = c.id_cliente) AS num_pedidos,
+    (SELECT COALESCE(SUM(total), 0) FROM pedidos p WHERE p.id_cliente = c.id_cliente) AS total_gastado
+FROM clientes c;</code></pre></div>
+
+      <h3 class="sub">9.6 &middot; Comparación con ANY / ALL</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Más caros que TODOS los de electrónica
+SELECT nombre, precio FROM productos
+WHERE precio &gt; ALL (
+    SELECT precio FROM productos
+    WHERE id_categoria = (SELECT id_categoria FROM categorias WHERE nombre = 'Electrónica')
+);
+
+-- Más caros que ALGUNO de electrónica
+SELECT nombre, precio FROM productos
+WHERE precio &gt; ANY (
+    SELECT precio FROM productos
+    WHERE id_categoria = (SELECT id_categoria FROM categorias WHERE nombre = 'Electrónica')
+);</code></pre></div>
+    </section>
+
+    <!-- ============ SECCIÓN 10 ============ -->
+    <section class="section" id="s10">
+      <div class="section-head"><span class="section-num">10</span><h2>Operadores de conjunto</h2></div>
+      <div class="section-sub">-- UNION &middot; INTERSECT &middot; EXCEPT</div>
+
+      <h3 class="sub">10.1 &middot; UNION</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Clientes y proveedores en un solo listado
+SELECT nombre, email, 'Cliente' AS tipo FROM clientes
+UNION
+SELECT nombre, email, 'Proveedor' AS tipo FROM proveedores;
+
+-- UNION ALL (incluye duplicados, más rápido)
+SELECT nombre, ciudad FROM clientes WHERE ciudad = 'Madrid'
+UNION ALL
+SELECT nombre, ciudad FROM clientes WHERE ciudad = 'Barcelona';</code></pre></div>
+
+      <h3 class="sub">10.2 &middot; INTERSECT</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- PostgreSQL / SQL Server
+SELECT id_producto FROM lineas_pedido
+INTERSECT
+SELECT id_producto FROM productos WHERE stock &gt; 0;
+
+-- MySQL no tiene INTERSECT: se simula con JOIN
+SELECT DISTINCT p.id_producto, p.nombre
+FROM productos p
+JOIN lineas_pedido lp ON p.id_producto = lp.id_producto
+WHERE p.stock &gt; 0;</code></pre></div>
+
+      <h3 class="sub">10.3 &middot; EXCEPT / MINUS</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- PostgreSQL: EXCEPT
+SELECT id_producto FROM productos
+EXCEPT
+SELECT DISTINCT id_producto FROM lineas_pedido;
+
+-- MySQL: se simula con NOT EXISTS
+SELECT p.id_producto, p.nombre
+FROM productos p
+WHERE NOT EXISTS (
+    SELECT 1 FROM lineas_pedido lp WHERE lp.id_producto = p.id_producto
+);</code></pre></div>
+      <div class="callout tip"><span class="ic">i</span><p>Regla práctica de compatibilidad: MySQL no implementa <code>INTERSECT</code> ni <code>EXCEPT</code> de forma nativa (hasta versiones recientes). PostgreSQL y SQL Server sí. Cuando dudes, la alternativa con <code>JOIN</code>/<code>EXISTS</code> funciona en todos los motores.</p></div>
+    </section>
+
+    <!-- ============ SECCIÓN 11 ============ -->
+    <section class="section" id="s11">
+      <div class="section-head"><span class="section-num">11</span><h2>Funciones de ventana (window functions)</h2></div>
+      <div class="section-sub">-- calcular sobre un grupo de filas sin colapsarlas en una sola</div>
+      <p>A diferencia de <code>GROUP BY</code>, una función de ventana no reduce el número de filas: cada fila conserva su identidad, pero gana una columna calculada "mirando" a las filas vecinas definidas por <code>OVER (...)</code>.</p>
+
+      <h3 class="sub">11.1 &middot; ROW_NUMBER()</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    nombre, precio,
+    ROW_NUMBER() OVER (ORDER BY precio DESC) AS ranking
+FROM productos;
+
+-- Con PARTITION BY: reinicia el contador por cada categoría
+SELECT
+    c.nombre AS categoria,
+    p.nombre AS producto,
+    p.precio,
+    ROW_NUMBER() OVER (PARTITION BY p.id_categoria ORDER BY p.precio DESC) AS posicion_en_categoria
+FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria;</code></pre></div>
+
+      <h3 class="sub">11.2 &middot; RANK() y DENSE_RANK()</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- RANK(): si hay empate, salta números. DENSE_RANK(): no los salta.
+SELECT
+    nombre, precio,
+    RANK() OVER (ORDER BY precio DESC) AS rank_normal,
+    DENSE_RANK() OVER (ORDER BY precio DESC) AS rank_denso
+FROM productos;</code></pre></div>
+
+      <h3 class="sub">11.3 &middot; LAG() y LEAD()</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Comparar con el producto anterior (más barato) en el orden
+SELECT
+    nombre, precio,
+    LAG(precio, 1) OVER (ORDER BY precio) AS precio_anterior,
+    precio - LAG(precio, 1) OVER (ORDER BY precio) AS diferencia
+FROM productos;</code></pre></div>
+
+      <h3 class="sub">11.4 &middot; SUM() OVER() &mdash; acumulados</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    c.nombre,
+    p.fecha_pedido,
+    p.total,
+    SUM(p.total) OVER (PARTITION BY c.id_cliente ORDER BY p.fecha_pedido) AS acumulado_cliente
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+ORDER BY c.nombre, p.fecha_pedido;</code></pre></div>
+
+      <h3 class="sub">11.5 &middot; NTILE() &mdash; cuartiles y percentiles</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    nombre, precio,
+    NTILE(4) OVER (ORDER BY precio) AS cuartil
+FROM productos;</code></pre></div>
+      <div class="callout note"><span class="ic">*</span><p>La consola SQL de esta guía no interpreta <code>OVER (...)</code>; es un buen momento para copiar estos ejemplos y probarlos en un SGBD real (MySQL 8+, PostgreSQL o SQL Server) contra tu propia versión de la tabla <code>productos</code>.</p></div>
+    </section>
+    <!-- ============ SECCIÓN 12 ============ -->
+    <section class="section" id="s12">
+      <div class="section-head"><span class="section-num">12</span><h2>Vistas (VIEWS)</h2></div>
+      <div class="section-sub">-- una consulta guardada que se comporta como una tabla</div>
+
+      <h3 class="sub">12.1 &middot; Crear vistas</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE VIEW resumen_clientes AS
+SELECT
+    c.id_cliente, c.nombre, c.email,
+    COUNT(p.id_pedido) AS total_pedidos,
+    COALESCE(SUM(p.total), 0) AS total_gastado,
+    COALESCE(AVG(p.total), 0) AS media_pedido
+FROM clientes c
+LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente
+GROUP BY c.id_cliente, c.nombre, c.email;
+
+CREATE VIEW productos_completos AS
+SELECT
+    p.id_producto, p.nombre AS producto, p.precio, p.stock,
+    c.nombre AS categoria,
+    GROUP_CONCAT(pr.nombre SEPARATOR ', ') AS proveedores
+FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+LEFT JOIN productos_proveedores pp ON p.id_producto = pp.id_producto
+LEFT JOIN proveedores pr ON pp.id_proveedor = pr.id_proveedor
+GROUP BY p.id_producto;</code></pre></div>
+
+      <h3 class="sub">12.2 &middot; Usar vistas (como tablas)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT * FROM resumen_clientes WHERE total_gastado &gt; 1000;
+SELECT * FROM productos_completos WHERE categoria = 'Electrónica';</code></pre></div>
+
+      <h3 class="sub">12.3 &middot; Actualizar a través de una vista</h3>
+      <p>Solo funciona si la vista es "actualizable": sin <code>JOIN</code>s complejos ni agregación, y basada en una única tabla base.</p>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE VIEW clientes_activos AS
+SELECT * FROM clientes WHERE activo = TRUE;
+
+UPDATE clientes_activos SET ciudad = 'Sevilla' WHERE id_cliente = 1;</code></pre></div>
+
+      <h3 class="sub">12.4 &middot; Eliminar vista</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">DROP VIEW resumen_clientes;</code></pre></div>
+    </section>
+
+    <!-- ============ SECCIÓN 13 ============ -->
+    <section class="section" id="s13">
+      <div class="section-head"><span class="section-num">13</span><h2>Índices y rendimiento</h2></div>
+      <div class="section-sub">-- el índice de un libro, aplicado a una tabla</div>
+
+      <h3 class="sub">13.1 &middot; Tipos de índices</h3>
+      <ul class="plain">
+        <li><strong>INDEX</strong> (B-tree): búsqueda rápida por valor</li>
+        <li><strong>UNIQUE INDEX</strong>: índice que además obliga a valores únicos</li>
+        <li><strong>FULLTEXT</strong>: búsqueda de texto completo</li>
+        <li><strong>SPATIAL</strong>: datos geoespaciales</li>
+      </ul>
+
+      <h3 class="sub">13.2 &middot; Crear índices</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE INDEX idx_nombre ON clientes(nombre);
+CREATE INDEX idx_ciudad_nombre ON clientes(ciudad, nombre);   -- compuesto
+CREATE UNIQUE INDEX idx_email ON clientes(email);
+CREATE FULLTEXT INDEX idx_descripcion ON productos(descripcion);</code></pre></div>
+
+      <h3 class="sub">13.3 &middot; EXPLAIN &mdash; analizar consultas</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">EXPLAIN SELECT * FROM clientes WHERE nombre = 'Ana Pérez';
+-- Muestra: tipo de búsqueda, uso de índice, coste estimado
+
+EXPLAIN SELECT c.nombre, SUM(p.total)
+FROM clientes c
+JOIN pedidos p ON c.id_cliente = p.id_cliente
+WHERE c.ciudad = 'Madrid'
+GROUP BY c.id_cliente;</code></pre></div>
+
+      <h3 class="sub">13.4 &middot; Cuándo usar índices</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Usar índices en&hellip;</th><th>No usar índices en&hellip;</th></tr>
+        <tr><td>Columnas en WHERE</td><td>Columnas con pocos valores distintos (ej. sexo)</td></tr>
+        <tr><td>Columnas en JOIN</td><td>Tablas muy pequeñas</td></tr>
+        <tr><td>Columnas en ORDER BY</td><td>Columnas que cambian mucho (ej. stock)</td></tr>
+        <tr><td>Columnas con UNIQUE</td><td>Columnas con muchos NULL</td></tr>
+      </table></div>
+      <div class="callout note"><span class="ic">*</span><p>Un índice acelera la lectura pero ralentiza <code>INSERT</code>/<code>UPDATE</code>/<code>DELETE</code>, porque el índice también hay que mantenerlo. No indexes "por si acaso".</p></div>
+    </section>
+
+    <!-- ============ SECCIÓN 14 ============ -->
+    <section class="section" id="s14">
+      <div class="section-head"><span class="section-num">14</span><h2>Transacciones y control de errores</h2></div>
+      <div class="section-sub">-- todo o nada</div>
+
+      <h3 class="sub">14.1 &middot; Conceptos ACID</h3>
+      <div class="diff-grid">
+        <div class="diff-card"><h5>Atomicity</h5><p>Todo o nada: si una parte falla, se deshace la transacción completa.</p></div>
+        <div class="diff-card"><h5>Consistency</h5><p>La base pasa de un estado válido a otro estado válido.</p></div>
+        <div class="diff-card"><h5>Isolation</h5><p>Las transacciones concurrentes no se pisan entre sí.</p></div>
+        <div class="diff-card"><h5>Durability</h5><p>Una vez confirmados, los cambios sobreviven a un fallo del sistema.</p></div>
+      </div>
+
+      <h3 class="sub">14.2 &middot; Comandos básicos</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">START TRANSACTION;              -- iniciar
+COMMIT;                         -- confirmar cambios
+ROLLBACK;                       -- deshacer todo
+SAVEPOINT nombre;               -- punto de guardado parcial
+ROLLBACK TO SAVEPOINT nombre;   -- volver a ese punto</code></pre></div>
+
+      <h3 class="sub">14.3 &middot; Ejemplo práctico (pedido con líneas)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">START TRANSACTION;
+
+INSERT INTO pedidos (id_cliente, fecha_pedido) VALUES (1, NOW());
+SET @id_pedido = LAST_INSERT_ID();
+
+INSERT INTO lineas_pedido (id_pedido, id_producto, cantidad, precio_unitario)
+VALUES
+    (@id_pedido, 1, 2, 50.00),
+    (@id_pedido, 2, 1, 120.00);
+
+UPDATE productos SET stock = stock - 2 WHERE id_producto = 1;
+UPDATE productos SET stock = stock - 1 WHERE id_producto = 2;
+
+COMMIT;</code></pre></div>
+
+      <h3 class="sub">14.4 &middot; SAVEPOINT (recuperación parcial)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">START TRANSACTION;
+
+INSERT INTO pedidos (id_cliente) VALUES (1);
+SAVEPOINT pedido_creado;
+
+UPDATE productos SET stock = stock - 100 WHERE id_producto = 1;  -- puede fallar
+
+ROLLBACK TO SAVEPOINT pedido_creado;  -- deshace solo la última operación
+
+INSERT INTO lineas_pedido (id_pedido, id_producto, cantidad)
+VALUES (LAST_INSERT_ID(), 2, 1);
+
+COMMIT;  -- solo se guardan la operación 1 y la 3</code></pre></div>
+
+      <h3 class="sub">14.5 &middot; Manejo de errores (MySQL, procedimiento)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">DELIMITER //
+CREATE PROCEDURE hacer_pedido(IN p_id_cliente INT, IN p_id_producto INT, IN p_cantidad INT)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error en la transacción' AS mensaje;
+    END;
+
+    START TRANSACTION;
+    INSERT INTO pedidos (id_cliente) VALUES (p_id_cliente);
+    SET @id_pedido = LAST_INSERT_ID();
+    INSERT INTO lineas_pedido (id_pedido, id_producto, cantidad, precio_unitario)
+    SELECT @id_pedido, p_id_producto, p_cantidad, precio FROM productos WHERE id_producto = p_id_producto;
+    UPDATE productos SET stock = stock - p_cantidad WHERE id_producto = p_id_producto;
+    COMMIT;
+    SELECT 'Pedido completado' AS mensaje;
+END //
+DELIMITER ;</code></pre></div>
+    </section>
+
+    <!-- ============ SECCIÓN 15 ============ -->
+    <section class="section" id="s15">
+      <div class="section-head"><span class="section-num">15</span><h2>Seguridad y permisos</h2></div>
+      <div class="section-sub">-- DCL: quién puede hacer qué</div>
+
+      <h3 class="sub">15.1 &middot; Usuarios (MySQL)</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE USER 'usuario_app'@'localhost' IDENTIFIED BY 'password123';
+CREATE USER 'usuario_informe'@'%' IDENTIFIED BY 'informe456';
+ALTER USER 'usuario_app'@'localhost' IDENTIFIED BY 'nuevo_password';</code></pre></div>
+
+      <h3 class="sub">15.2 &middot; GRANT</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">GRANT SELECT ON tienda.* TO 'usuario_informe'@'%';
+GRANT SELECT, INSERT, UPDATE ON tienda.clientes TO 'usuario_app'@'localhost';
+GRANT ALL PRIVILEGES ON tienda.* TO 'admin'@'localhost' WITH GRANT OPTION;
+
+-- permisos por columna
+GRANT SELECT (nombre, email) ON tienda.clientes TO 'usuario_soporte'@'%';</code></pre></div>
+
+      <h3 class="sub">15.3 &middot; REVOKE</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">REVOKE INSERT ON tienda.clientes FROM 'usuario_app'@'localhost';
+REVOKE ALL PRIVILEGES ON tienda.* FROM 'usuario_app'@'localhost';</code></pre></div>
+
+      <h3 class="sub">15.4 &middot; Ver permisos y eliminar usuario</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SHOW GRANTS FOR 'usuario_app'@'localhost';
+DROP USER 'usuario_app'@'localhost';</code></pre></div>
+      <div class="callout warn"><span class="ic">!</span><p>Principio de mínimo privilegio: concede solo lo que cada usuario necesita para su tarea, no <code>ALL PRIVILEGES</code> por comodidad.</p></div>
+    </section>
+    <!-- ============ SECCIÓN 16 ============ -->
+    <section class="section" id="s16">
+      <div class="section-head"><span class="section-num">16</span><h2>Actividades propuestas</h2></div>
+      <div class="section-sub">-- 8 ejercicios, de DDL a índices</div>
+      <p>Intenta resolver cada actividad antes de mirar la pista o la solución. Guardar el hábito de escribir la consulta primero &mdash; aunque falle &mdash; es lo que realmente fija el aprendizaje.</p>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">1</span><h4>DDL y modelado completo</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Diseña y crea la tabla <code>proveedores</code> y la tabla intermedia <code>productos_proveedores</code> (relación N:N). Incluye: PK compuesta, FK, un <code>CHECK</code> para que el email contenga '@', y <code>DEFAULT</code> para la fecha de alta.</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>PRIMARY KEY (id_producto, id_proveedor)</code>. Para el CHECK de email: <code>CHECK (email LIKE '%@%')</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE TABLE proveedores (
+    id_proveedor INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL CHECK (email LIKE '%@%'),
+    telefono VARCHAR(15),
+    fecha_alta DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE productos_proveedores (
+    id_producto INT,
+    id_proveedor INT,
+    fecha_asignacion DATE DEFAULT CURRENT_DATE,
+    PRIMARY KEY (id_producto, id_proveedor),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
+    FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+);</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">2</span><h4>Consultas con funciones</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Muestra el nombre de los clientes, su email en minúsculas, los años que llevan como clientes, y su ciudad en mayúsculas. Ordena por antigüedad (más antiguos primero).</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>DATEDIFF</code>, <code>UPPER</code>, <code>LOWER</code> y <code>ORDER BY</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    nombre,
+    LOWER(email) AS email_minusculas,
+    UPPER(ciudad) AS ciudad_mayus,
+    DATEDIFF(CURDATE(), fecha_alta) AS dias_cliente,
+    ROUND(DATEDIFF(CURDATE(), fecha_alta) / 365, 1) AS años_cliente
+FROM clientes
+ORDER BY fecha_alta ASC;</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">3</span><h4>GROUP BY y HAVING avanzado</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Obtén por categoría: número de productos, precio mínimo, máximo, medio, y el número de productos con stock &gt; 0. Muestra solo categorías con más de 3 productos.</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>COUNT</code>, <code>MIN</code>, <code>MAX</code>, <code>AVG</code>, <code>SUM(CASE WHEN...)</code>, <code>GROUP BY</code>, <code>HAVING</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><div><button class="run-btn" onclick="loadConsole(this)">▶ probar</button><button class="copy-btn" onclick="copyCode(this)">copiar</button></div></div><pre><code class="language-sql">SELECT
+    c.nombre AS categoria,
+    COUNT(p.id_producto) AS total_productos,
+    MIN(p.precio) AS precio_minimo,
+    MAX(p.precio) AS precio_maximo,
+    AVG(p.precio) AS precio_medio,
+    SUM(CASE WHEN p.stock &gt; 0 THEN 1 ELSE 0 END) AS productos_con_stock
+FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+GROUP BY c.id_categoria, c.nombre
+HAVING COUNT(p.id_producto) &gt; 3
+ORDER BY total_productos DESC;</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">4</span><h4>JOIN múltiple y self-join</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Crea una jerarquía de categorías (añade <code>id_categoria_padre</code>). Inserta categorías padre e hijas. Muestra cada subcategoría con su categoría padre y el número de productos que tiene.</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Self-join para obtener padre-hijo, luego <code>JOIN</code> con productos y <code>GROUP BY</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Paso 1: modificar tabla
+ALTER TABLE categorias ADD id_categoria_padre INT;
+ALTER TABLE categorias ADD FOREIGN KEY (id_categoria_padre) REFERENCES categorias(id_categoria);
+
+-- Paso 2: datos de ejemplo
+INSERT INTO categorias (nombre, descripcion) VALUES
+    ('Electrónica', 'Productos electrónicos'), ('Ropa', 'Prendas de vestir');
+INSERT INTO categorias (nombre, descripcion, id_categoria_padre) VALUES
+    ('Ordenadores', 'PCs y portátiles', 1), ('Smartphones', 'Teléfonos móviles', 1);
+
+-- Paso 3: consulta final
+SELECT
+    h.nombre AS subcategoria,
+    p.nombre AS categoria_padre,
+    COUNT(pr.id_producto) AS num_productos
+FROM categorias h
+LEFT JOIN categorias p ON h.id_categoria_padre = p.id_categoria
+LEFT JOIN productos pr ON pr.id_categoria = h.id_categoria
+WHERE h.id_categoria_padre IS NOT NULL
+GROUP BY h.id_categoria, h.nombre, p.nombre;</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">5</span><h4>Subconsultas con EXISTS y NOT EXISTS</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Encuentra los clientes que han hecho pedidos en el último mes (con <code>EXISTS</code>) y los que NO han hecho ningún pedido en el último año (con <code>NOT EXISTS</code>).</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>DATE_SUB(NOW(), INTERVAL 1 MONTH)</code> y <code>DATE_SUB(NOW(), INTERVAL 1 YEAR)</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">-- Clientes con pedidos en el último mes
+SELECT c.nombre, c.email FROM clientes c
+WHERE EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.id_cliente = c.id_cliente
+    AND p.fecha_pedido &gt;= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+);
+
+-- Clientes sin pedidos en el último año
+SELECT c.nombre, c.email FROM clientes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.id_cliente = c.id_cliente
+    AND p.fecha_pedido &gt;= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+);</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">6</span><h4>Funciones de ventana</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Para cada producto, muestra su categoría, precio, el ranking de precio dentro de su categoría (<code>RANK()</code>), y la diferencia con el producto inmediatamente más barato de la misma categoría (<code>LAG()</code>).</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>RANK() OVER (PARTITION BY ... ORDER BY ...)</code> y <code>LAG(precio) OVER (PARTITION BY ... ORDER BY ...)</code>.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SELECT
+    c.nombre AS categoria,
+    p.nombre AS producto,
+    p.precio,
+    RANK() OVER (PARTITION BY p.id_categoria ORDER BY p.precio DESC) AS ranking_categoria,
+    LAG(p.precio, 1) OVER (PARTITION BY p.id_categoria ORDER BY p.precio DESC) AS precio_anterior_mas_caro,
+    (LAG(p.precio, 1) OVER (PARTITION BY p.id_categoria ORDER BY p.precio DESC) - p.precio) AS diferencia_con_anterior
+FROM productos p
+JOIN categorias c ON p.id_categoria = c.id_categoria
+ORDER BY c.nombre, p.precio DESC;</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">7</span><h4>Transacciones con SAVEPOINT</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Escribe una transacción que inserte un pedido para el cliente 1, inserte 2 líneas de pedido, actualice el stock, y si el stock de algún producto queda negativo, haga <code>ROLLBACK</code> al <code>SAVEPOINT</code> anterior a la actualización.</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Crea un <code>SAVEPOINT</code> después de insertar las líneas y antes de actualizar el stock. Si stock &lt; 0, <code>ROLLBACK TO</code> ese savepoint.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">START TRANSACTION;
+
+INSERT INTO pedidos (id_cliente, fecha_pedido) VALUES (1, NOW());
+SET @id_pedido = LAST_INSERT_ID();
+
+INSERT INTO lineas_pedido (id_pedido, id_producto, cantidad, precio_unitario)
+VALUES
+    (@id_pedido, 1, 2, (SELECT precio FROM productos WHERE id_producto = 1)),
+    (@id_pedido, 2, 1, (SELECT precio FROM productos WHERE id_producto = 2));
+
+SAVEPOINT antes_stock;
+
+UPDATE productos SET stock = stock - 2 WHERE id_producto = 1;
+UPDATE productos SET stock = stock - 1 WHERE id_producto = 2;
+
+IF (SELECT COUNT(*) FROM productos WHERE stock &lt; 0) &gt; 0 THEN
+    ROLLBACK TO SAVEPOINT antes_stock;
+    SELECT 'Error: stock insuficiente' AS mensaje;
+ELSE
+    COMMIT;
+    SELECT 'Pedido completado' AS mensaje;
+END IF;</code></pre></div></div>
+        </div>
+      </div>
+
+      <div class="activity">
+        <div class="activity-head"><span class="anum">8</span><h4>Índices y EXPLAIN</h4></div>
+        <div class="activity-body">
+          <p><strong>Enunciado:</strong> Crea un índice en <code>email</code> de <code>clientes</code> y otro compuesto en <code>(ciudad, nombre)</code>. Usa <code>EXPLAIN</code> para analizar una consulta que busque por <code>ciudad = 'Madrid'</code> y <code>nombre LIKE 'A%'</code>. Compara el plan con y sin índices.</p>
+          <div class="hint-toggle" onclick="toggleClass(this.nextElementSibling,'show')">&#9662; ver pista</div>
+          <div class="hint-body"><div class="hint-box">Usa <code>CREATE INDEX</code>, <code>EXPLAIN SELECT ...</code> y <code>DROP INDEX</code> para comparar.</div></div>
+          <button class="sol-toggle" onclick="toggleClass(this.nextElementSibling,'show')">Mostrar solución</button>
+          <div class="sol-body"><div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">CREATE INDEX idx_email ON clientes(email);
+CREATE INDEX idx_ciudad_nombre ON clientes(ciudad, nombre);
+
+EXPLAIN SELECT * FROM clientes WHERE ciudad = 'Madrid' AND nombre LIKE 'A%';
+
+DROP INDEX idx_ciudad_nombre ON clientes;
+EXPLAIN SELECT * FROM clientes WHERE ciudad = 'Madrid' AND nombre LIKE 'A%';
+
+CREATE INDEX idx_ciudad_nombre ON clientes(ciudad, nombre);
+
+-- Con índice: type = ref, pocas filas examinadas
+-- Sin índice:  type = ALL, se recorre la tabla entera (más lento)</code></pre></div></div>
+        </div>
+      </div>
+    </section>
+    <!-- ============ SECCIÓN 17 ============ -->
+    <section class="section" id="s17">
+      <div class="section-head"><span class="section-num">17</span><h2>Recursos y buenas prácticas</h2></div>
+      <div class="section-sub">-- lo que separa una consulta que funciona de una consulta correcta</div>
+
+      <h3 class="sub">17.1 &middot; Buenas prácticas</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Práctica</th><th>Descripción</th></tr>
+        <tr><td>Nombres descriptivos</td><td>Usa <code>id_cliente</code>, <code>nombre_producto</code> (snake_case)</td></tr>
+        <tr><td>WHERE en UPDATE/DELETE</td><td>Nunca olvides el WHERE, a menos que quieras afectar a todas las filas</td></tr>
+        <tr><td>Indentación</td><td>Organiza consultas en varias líneas para legibilidad</td></tr>
+        <tr><td>Alias</td><td>Usa alias cortos pero significativos (<code>c</code> para clientes, <code>p</code> para pedidos)</td></tr>
+        <tr><td>Comentarios</td><td>Documenta consultas complejas con <code>--</code></td></tr>
+        <tr><td>Evita SELECT *</td><td>Especifica las columnas necesarias (rendimiento y claridad)</td></tr>
+        <tr><td>Índices selectivos</td><td>Indexa columnas usadas en WHERE, JOIN, ORDER BY</td></tr>
+        <tr><td>Transacciones cortas</td><td>Mantenlas lo más breves posible</td></tr>
+        <tr><td>Backup antes de cambios</td><td>Respalda siempre antes de DELETE o UPDATE masivos</td></tr>
+      </table></div>
+
+      <h3 class="sub">17.2 &middot; Comandos de exploración</h3>
+      <div class="code-block"><div class="code-bar"><span>sql</span><button class="copy-btn" onclick="copyCode(this)">copiar</button></div><pre><code class="language-sql">SHOW TABLES;   -- MySQL
+\dt            -- PostgreSQL
+
+DESCRIBE clientes;   -- MySQL
+\d+ clientes         -- PostgreSQL
+
+SHOW DATABASES;   -- MySQL
+\l                -- PostgreSQL
+
+USE tienda;    -- MySQL
+\c tienda      -- PostgreSQL</code></pre></div>
+
+      <h3 class="sub">17.3 &middot; Diferencias entre motores</h3>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Característica</th><th>MySQL</th><th>PostgreSQL</th><th>SQL Server</th></tr>
+        <tr><td>Límite de filas</td><td><code>LIMIT n</code></td><td><code>LIMIT n</code></td><td><code>TOP n</code></td></tr>
+        <tr><td>Auto-incremento</td><td><code>AUTO_INCREMENT</code></td><td><code>SERIAL</code></td><td><code>IDENTITY</code></td></tr>
+        <tr><td>Concatenación</td><td><code>CONCAT()</code> o <code>||</code></td><td><code>||</code></td><td><code>+</code></td></tr>
+        <tr><td>Fecha actual</td><td><code>NOW()</code></td><td><code>NOW()</code></td><td><code>GETDATE()</code></td></tr>
+        <tr><td>String NULL</td><td><code>IFNULL()</code></td><td><code>COALESCE()</code></td><td><code>ISNULL()</code></td></tr>
+        <tr><td>Booleano</td><td><code>TINYINT(1)</code></td><td><code>BOOLEAN</code></td><td><code>BIT</code></td></tr>
+      </table></div>
+
+      <h3 class="sub">17.4 &middot; Recursos para profundizar</h3>
+      <ul class="plain">
+        <li><strong>Bases de datos de ejemplo:</strong> Northwind, Sakila, AdventureWorks</li>
+        <li><strong>Herramientas:</strong> MySQL Workbench, DBeaver, pgAdmin, SQL Server Management Studio</li>
+        <li><strong>Documentación oficial:</strong> <a href="https://dev.mysql.com/doc/" target="_blank" rel="noopener">MySQL Docs</a> &middot; <a href="https://www.postgresql.org/docs/" target="_blank" rel="noopener">PostgreSQL Docs</a></li>
+        <li><strong>Práctica online:</strong> SQLZOO, W3Schools, LeetCode SQL, HackerRank SQL</li>
+      </ul>
+    </section>
+
+    <!-- ============ SECCIÓN 18 ============ -->
+    <section class="section" id="s18">
+      <div class="section-head"><span class="section-num">18</span><h2>Siguientes pasos</h2></div>
+      <div class="section-sub">-- después de dominar esta guía</div>
+      <div class="accordion" id="acc18">
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)"><span class="title"><span class="pk-dot"></span>Practicar con datos reales</span><span class="chev">&#9656;</span></div><div class="acc-body"><div class="acc-body-inner"><p>Descarga datasets reales de Kaggle y repite los ejercicios de esta guía contra ellos: los datos reales tienen inconsistencias que los datasets de práctica no tienen.</p></div></div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)"><span class="title"><span class="pk-dot"></span>Optimización avanzada</span><span class="chev">&#9656;</span></div><div class="acc-body"><div class="acc-body-inner"><p>Planes de ejecución, particionamiento de tablas, replicación y sharding.</p></div></div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)"><span class="title"><span class="pk-dot"></span>Programación en el SGBD</span><span class="chev">&#9656;</span></div><div class="acc-body"><div class="acc-body-inner"><p>Procedimientos almacenados, funciones definidas por el usuario (UDF), triggers y eventos.</p></div></div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)"><span class="title"><span class="pk-dot"></span>Big Data y NoSQL</span><span class="chev">&#9656;</span></div><div class="acc-body"><div class="acc-body-inner"><p>MongoDB (documental), Redis (clave-valor), Cassandra (columnar) &mdash; otros modelos de datos para cuando el relacional no encaja.</p></div></div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)"><span class="title"><span class="pk-dot"></span>Integración con aplicaciones</span><span class="chev">&#9656;</span></div><div class="acc-body"><div class="acc-body-inner"><p>Conexión desde Python (psycopg2, PyMySQL), desde Java (JDBC), y ORMs como SQLAlchemy, Hibernate o Entity Framework.</p></div></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SECCIÓN 19 ============ -->
+    <section class="section" id="s19">
+      <div class="section-head"><span class="section-num">19</span><h2>Glosario rápido</h2></div>
+      <div class="section-sub">-- referencia de una línea por término</div>
+      <div class="tbl-wrap"><table class="data">
+        <tr><th>Término</th><th>Significado</th></tr>
+        <tr><td><code>ACID</code></td><td>Atomicidad, Consistencia, Aislamiento, Durabilidad</td></tr>
+        <tr><td><code>DDL</code></td><td>Data Definition Language (CREATE, ALTER, DROP)</td></tr>
+        <tr><td><code>DML</code></td><td>Data Manipulation Language (SELECT, INSERT, UPDATE, DELETE)</td></tr>
+        <tr><td><code>DCL</code></td><td>Data Control Language (GRANT, REVOKE)</td></tr>
+        <tr><td><code>PK</code></td><td>Primary Key (clave primaria)</td></tr>
+        <tr><td><code>FK</code></td><td>Foreign Key (clave foránea)</td></tr>
+        <tr><td><code>ER</code></td><td>Entidad-Relación (diagrama)</td></tr>
+        <tr><td><code>SGBD</code></td><td>Sistema Gestor de Bases de Datos</td></tr>
+        <tr><td>Índice</td><td>Estructura que acelera búsquedas</td></tr>
+        <tr><td>Vista</td><td>Consulta guardada como tabla virtual</td></tr>
+        <tr><td>Subconsulta</td><td>Consulta dentro de otra consulta</td></tr>
+        <tr><td>Transacción</td><td>Conjunto de operaciones que se ejecutan como una unidad</td></tr>
+      </table></div>
+    </section>
+
+    <footer class="footer">
+      <div class="glyph">&#8862;</div>
+      <p>Has completado la guía completa de SQL para 1&ordm; de ASIR / DAM / DAW.<br>Ahora toca practicar &mdash; vuelve a la <a href="#playground">consola</a> cuando quieras.</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   SQL DESDE LOS CIMIENTOS — motor de consola SQL en el navegador
+   Soporta un subconjunto real de SELECT: JOIN, WHERE, GROUP BY,
+   HAVING, ORDER BY, LIMIT, DISTINCT, funciones agregadas, CASE
+   y aritmética simple. No soporta subconsultas ni funciones de
+   ventana (OVER) — se avisa con un mensaje claro si se detectan.
+   ============================================================ */
+(function(){
+
+/* ---------------- dataset ---------------- */
+const DATA = {
+  clientes: [
+    {id_cliente:1, nombre:'Ana Pérez', email:'ana@email.com', ciudad:'Madrid', fecha_alta:'2021-03-15', telefono:'666111222', activo:true},
+    {id_cliente:2, nombre:'Luis Gómez', email:'luis@gmail.com', ciudad:'Barcelona', fecha_alta:'2022-07-01', telefono:'677222333', activo:true},
+    {id_cliente:3, nombre:'Marta Ruiz', email:'marta@gmail.com', ciudad:'Valencia', fecha_alta:'2020-01-10', telefono:null, activo:true},
+    {id_cliente:4, nombre:'Carlos Díaz', email:'carlos@empresa.com', ciudad:'Madrid', fecha_alta:'2023-05-20', telefono:'688333444', activo:true},
+    {id_cliente:5, nombre:'Elena Torres', email:'elena@gmail.com', ciudad:'Sevilla', fecha_alta:'2019-11-30', telefono:'699444555', activo:false},
+    {id_cliente:6, nombre:'Javier Soto', email:'javier@empresa.com', ciudad:'Bilbao', fecha_alta:'2022-02-14', telefono:null, activo:true},
+    {id_cliente:7, nombre:'Paula Vidal', email:'paula@gmail.com', ciudad:'Madrid', fecha_alta:'2023-09-01', telefono:'611555666', activo:true},
+    {id_cliente:8, nombre:'Diego Marín', email:'diego@empresa.com', ciudad:'Barcelona', fecha_alta:'2021-12-05', telefono:'622666777', activo:true}
+  ],
+  categorias: [
+    {id_categoria:1, nombre:'Electrónica', descripcion:'Dispositivos electrónicos'},
+    {id_categoria:2, nombre:'Ropa', descripcion:'Prendas de vestir'},
+    {id_categoria:3, nombre:'Hogar', descripcion:'Productos para el hogar'},
+    {id_categoria:4, nombre:'Deporte', descripcion:'Material deportivo'}
+  ],
+  productos: [
+    {id_producto:1, nombre:'Portátil', precio:800.00, stock:12, id_categoria:1},
+    {id_producto:2, nombre:'Smartphone', precio:450.00, stock:25, id_categoria:1},
+    {id_producto:3, nombre:'Auriculares', precio:60.00, stock:40, id_categoria:1},
+    {id_producto:4, nombre:'Monitor 24"', precio:180.00, stock:15, id_categoria:1},
+    {id_producto:5, nombre:'Camiseta', precio:20.00, stock:100, id_categoria:2},
+    {id_producto:6, nombre:'Pantalón vaquero', precio:45.00, stock:60, id_categoria:2},
+    {id_producto:7, nombre:'Sudadera', precio:35.00, stock:50, id_categoria:2},
+    {id_producto:8, nombre:'Sartén antiadherente', precio:25.00, stock:30, id_categoria:3},
+    {id_producto:9, nombre:'Juego de sábanas', precio:40.00, stock:20, id_categoria:3},
+    {id_producto:10, nombre:'Lámpara de mesa', precio:30.00, stock:18, id_categoria:3},
+    {id_producto:11, nombre:'Balón de fútbol', precio:22.00, stock:35, id_categoria:4},
+    {id_producto:12, nombre:'Zapatillas running', precio:70.00, stock:28, id_categoria:4},
+    {id_producto:13, nombre:'Mancuernas 5kg', precio:28.00, stock:22, id_categoria:4},
+    {id_producto:14, nombre:'Tablet', precio:250.00, stock:10, id_categoria:1},
+    {id_producto:15, nombre:'Cafetera', precio:55.00, stock:14, id_categoria:3},
+    {id_producto:16, nombre:'Bufanda', precio:15.00, stock:45, id_categoria:2}
+  ],
+  pedidos: [
+    {id_pedido:1, id_cliente:1, fecha_pedido:'2024-01-05', total:860.00},
+    {id_pedido:2, id_cliente:2, fecha_pedido:'2024-01-10', total:45.00},
+    {id_pedido:3, id_cliente:1, fecha_pedido:'2024-02-01', total:60.00},
+    {id_pedido:4, id_cliente:3, fecha_pedido:'2024-02-15', total:180.00},
+    {id_pedido:5, id_cliente:4, fecha_pedido:'2024-03-01', total:470.00},
+    {id_pedido:6, id_cliente:6, fecha_pedido:'2024-03-10', total:35.00},
+    {id_pedido:7, id_cliente:1, fecha_pedido:'2024-04-02', total:250.00},
+    {id_pedido:8, id_cliente:7, fecha_pedido:'2024-04-15', total:90.00},
+    {id_pedido:9, id_cliente:8, fecha_pedido:'2024-05-01', total:55.00},
+    {id_pedido:10, id_cliente:2, fecha_pedido:'2024-05-20', total:22.00},
+    {id_pedido:11, id_cliente:4, fecha_pedido:'2024-06-01', total:70.00},
+    {id_pedido:12, id_cliente:6, fecha_pedido:'2024-06-15', total:40.00}
+  ],
+  lineas_pedido: [
+    {id_linea:1, id_pedido:1, id_producto:1, cantidad:1, precio_unitario:800.00},
+    {id_linea:2, id_pedido:1, id_producto:3, cantidad:1, precio_unitario:60.00},
+    {id_linea:3, id_pedido:2, id_producto:6, cantidad:1, precio_unitario:45.00},
+    {id_linea:4, id_pedido:3, id_producto:3, cantidad:1, precio_unitario:60.00},
+    {id_linea:5, id_pedido:4, id_producto:4, cantidad:1, precio_unitario:180.00},
+    {id_linea:6, id_pedido:5, id_producto:2, cantidad:1, precio_unitario:450.00},
+    {id_linea:7, id_pedido:5, id_producto:5, cantidad:1, precio_unitario:20.00},
+    {id_linea:8, id_pedido:6, id_producto:7, cantidad:1, precio_unitario:35.00},
+    {id_linea:9, id_pedido:7, id_producto:14, cantidad:1, precio_unitario:250.00},
+    {id_linea:10, id_pedido:8, id_producto:12, cantidad:1, precio_unitario:70.00},
+    {id_linea:11, id_pedido:8, id_producto:5, cantidad:1, precio_unitario:20.00},
+    {id_linea:12, id_pedido:9, id_producto:15, cantidad:1, precio_unitario:55.00},
+    {id_linea:13, id_pedido:10, id_producto:11, cantidad:1, precio_unitario:22.00},
+    {id_linea:14, id_pedido:11, id_producto:12, cantidad:1, precio_unitario:70.00},
+    {id_linea:15, id_pedido:12, id_producto:9, cantidad:1, precio_unitario:40.00}
+  ],
+  proveedores: [
+    {id_proveedor:1, nombre:'TechSupply SL', email:'contacto@techsupply.com', telefono:'911222333'},
+    {id_proveedor:2, nombre:'ModaTextil SA', email:'ventas@modatextil.com', telefono:'933444555'},
+    {id_proveedor:3, nombre:'HogarPlus', email:'info@hogarplus.com', telefono:'955666777'},
+    {id_proveedor:4, nombre:'DeporTodo', email:'pedidos@deportodo.com', telefono:'944888999'}
+  ],
+  productos_proveedores: [
+    {id_producto:1, id_proveedor:1},{id_producto:2, id_proveedor:1},{id_producto:3, id_proveedor:1},
+    {id_producto:4, id_proveedor:1},{id_producto:14, id_proveedor:1},
+    {id_producto:5, id_proveedor:2},{id_producto:6, id_proveedor:2},{id_producto:7, id_proveedor:2},{id_producto:16, id_proveedor:2},
+    {id_producto:8, id_proveedor:3},{id_producto:9, id_proveedor:3},{id_producto:10, id_proveedor:3},{id_producto:15, id_proveedor:3},
+    {id_producto:11, id_proveedor:4},{id_producto:12, id_proveedor:4},{id_producto:13, id_proveedor:4}
+  ]
+};
+
+const SCHEMA = {
+  clientes: {pk:['id_cliente'], fk:{}, cols:['id_cliente','nombre','email','ciudad','fecha_alta','telefono','activo']},
+  categorias: {pk:['id_categoria'], fk:{}, cols:['id_categoria','nombre','descripcion']},
+  productos: {pk:['id_producto'], fk:{id_categoria:'categorias'}, cols:['id_producto','nombre','precio','stock','id_categoria']},
+  pedidos: {pk:['id_pedido'], fk:{id_cliente:'clientes'}, cols:['id_pedido','id_cliente','fecha_pedido','total']},
+  lineas_pedido: {pk:['id_linea'], fk:{id_pedido:'pedidos', id_producto:'productos'}, cols:['id_linea','id_pedido','id_producto','cantidad','precio_unitario']},
+  proveedores: {pk:['id_proveedor'], fk:{}, cols:['id_proveedor','nombre','email','telefono']},
+  productos_proveedores: {pk:['id_producto','id_proveedor'], fk:{id_producto:'productos', id_proveedor:'proveedores'}, cols:['id_producto','id_proveedor']}
+};
+
+/* ---------------- helpers ---------------- */
+function stripSqlComments(sql){
+  return sql.split('\n').map(line=>{
+    let masked = line.replace(/'([^']*)'/g, m => "'" + '#'.repeat(m.length-2) + "'");
+    const idx = masked.indexOf('--');
+    return idx>=0 ? line.slice(0, idx) : line;
+  }).join('\n');
+}
+function maskStrings(s){ return s.replace(/'([^']*)'/g, m => "'" + '#'.repeat(m.length-2) + "'"); }
+
+function splitTopLevel(str, sepChar){
+  const parts = []; let depth=0, cur='';
+  for(let i=0;i<str.length;i++){
+    const ch = str[i];
+    if(ch==='(') depth++;
+    if(ch===')') depth--;
+    if(ch===sepChar && depth===0){ parts.push(cur); cur=''; }
+    else cur += ch;
+  }
+  parts.push(cur);
+  return parts.map(p=>p.trim()).filter(p=>p.length);
+}
+function splitByWord(str, word){
+  const re = new RegExp('\\b'+word+'\\b','i');
+  const out = []; let rest = str;
+  while(true){
+    const m = re.exec(rest);
+    if(!m) break;
+    out.push(rest.slice(0,m.index));
+    rest = rest.slice(m.index+m[0].length);
+    re.lastIndex = 0;
+  }
+  out.push(rest);
+  return out.map(s=>s.trim()).filter(s=>s.length);
+}
+function idxOf(masked, keyword, start){
+  const re = new RegExp('\\b'+keyword+'\\b','i');
+  const m = re.exec(masked.slice(start));
+  return m ? start+m.index : -1;
+}
+function parseValue(raw){
+  raw = raw.trim();
+  const strM = raw.match(/^'(.*)'$/);
+  if(strM) return strM[1];
+  if(/^-?\d+(\.\d+)?$/.test(raw)) return parseFloat(raw);
+  if(/^true$/i.test(raw)) return true;
+  if(/^false$/i.test(raw)) return false;
+  return raw;
+}
+function resolveField(row, alias, col){
+  if(alias){
+    if(!(alias in row)) throw new Error(`No existe la tabla/alias "${alias}" en esta consulta.`);
+    const rec = row[alias];
+    return rec ? rec[col] : null;
+  }
+  for(const k of Object.keys(row)){
+    const rec = row[k];
+    if(rec && col in rec) return rec[col];
+  }
+  throw new Error(`No se reconoce la columna "${col}".`);
+}
+function resolveOperand(tok, row){
+  tok = tok.trim();
+  if(/^-?\d+(\.\d+)?$/.test(tok)) return parseFloat(tok);
+  const m = tok.match(/^([\w]+)\.([\w]+)$/);
+  if(m) return Number(resolveField(row, m[1], m[2]));
+  return NaN;
+}
+
+/* ---------------- expression evaluator (per-row scalar) ---------------- */
+function evalCase(expr, row){
+  let body = expr.replace(/^CASE/i,'').replace(/END\s*$/i,'').trim();
+  let elseVal = null;
+  const elseM = body.match(/\bELSE\s+([\s\S]+)$/i);
+  if(elseM){ elseVal = elseM[1].trim(); body = body.slice(0, elseM.index); }
+  const whenRe = /WHEN\s+([\s\S]+?)\s+THEN\s+([\s\S]+?)(?=(WHEN\s)|$)/gi;
+  let mm;
+  while((mm = whenRe.exec(body))){
+    const cond = mm[1].trim();
+    const thenVal = mm[2].trim();
+    if(evalAtomicCondition(cond, {type:'row', row})) return coerceLiteral(thenVal, row);
+  }
+  return elseVal!=null ? coerceLiteral(elseVal, row) : null;
+}
+function coerceLiteral(v, row){
+  v = v.trim();
+  const strM = v.match(/^'(.*)'$/);
+  if(strM) return strM[1];
+  if(/^-?\d+(\.\d+)?$/.test(v)) return parseFloat(v);
+  try{ return evalExprOnRow(v, row); }catch(e){ return v; }
+}
+function evalExprOnRow(expr, row){
+  expr = expr.trim();
+  if(/^CASE\b/i.test(expr)) return evalCase(expr, row);
+  let m = expr.match(/^\(?\s*([\w.]+)\s*([*+\/-])\s*([\w.]+)\s*\)?$/);
+  if(m){
+    const a = resolveOperand(m[1], row), b = resolveOperand(m[3], row);
+    switch(m[2]){ case '*': return a*b; case '+': return a+b; case '-': return a-b; case '/': return a/b; }
+  }
+  m = expr.match(/^([\w]+)\.([\w]+)$/);
+  if(m) return resolveField(row, m[1], m[2]);
+  m = expr.match(/^([\w]+)$/);
+  if(m) return resolveField(row, null, m[1]);
+  if(/^-?\d+(\.\d+)?$/.test(expr)) return parseFloat(expr);
+  m = expr.match(/^'(.*)'$/);
+  if(m) return m[1];
+  return expr;
+}
+
+/* ---------------- aggregate functions ---------------- */
+const AGG_RE = /^(COUNT|SUM|AVG|MIN|MAX)\s*\(([\s\S]*)\)$/i;
+function isAggregateExpr(expr){ return AGG_RE.test(expr.trim()); }
+function computeAggregate(expr, rows){
+  const m = expr.trim().match(AGG_RE);
+  if(!m) throw new Error('Función de agregación no reconocida: '+expr);
+  const fn = m[1].toUpperCase();
+  const argRaw = m[2].trim();
+  if(fn==='COUNT'){
+    if(argRaw==='*') return rows.length;
+    if(/^DISTINCT\s+/i.test(argRaw)){
+      const col = argRaw.replace(/^DISTINCT\s+/i,'');
+      const vals = rows.map(r=>evalExprOnRow(col,r)).filter(v=>v!=null);
+      return new Set(vals).size;
+    }
+    return rows.filter(r=>evalExprOnRow(argRaw,r)!=null).length;
+  }
+  const nums = rows.map(r=>Number(evalExprOnRow(argRaw,r))).filter(v=>!isNaN(v));
+  if(fn==='SUM') return round2(nums.reduce((a,b)=>a+b,0));
+  if(fn==='AVG') return nums.length? round2(nums.reduce((a,b)=>a+b,0)/nums.length) : null;
+  if(fn==='MIN') return nums.length? round2(Math.min(...nums)) : null;
+  if(fn==='MAX') return nums.length? round2(Math.max(...nums)) : null;
+}
+function round2(n){ return Math.round(n*100)/100; }
+
+/* ---------------- boolean condition evaluator (WHERE / HAVING / CASE) ---------------- */
+const LHS_PAT = '((?:COUNT|SUM|AVG|MIN|MAX)\\([^)]*\\)|(?:[\\w]+\\.)?[\\w]+)';
+function getLHSVal(lhs, ctx){
+  lhs = lhs.trim();
+  if(/^(COUNT|SUM|AVG|MIN|MAX)\(/i.test(lhs) && ctx.type==='group') return computeAggregate(lhs, ctx.rows);
+  const row = ctx.type==='row' ? ctx.row : ctx.rows[0];
+  const m = lhs.match(/^([\w]+)\.([\w]+)$/);
+  if(m) return resolveField(row, m[1], m[2]);
+  return resolveField(row, null, lhs);
+}
+function likeToRegex(pattern){
+  const esc = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/%/g,'.*').replace(/_/g,'.');
+  return new RegExp('^'+esc+'$','i');
+}
+function evalAtomicCondition(atom, ctx){
+  atom = atom.trim();
+  let m;
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+IS\\s+NOT\\s+NULL$','i')))) return getLHSVal(m[1],ctx) != null;
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+IS\\s+NULL$','i')))) return getLHSVal(m[1],ctx) == null;
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+NOT\\s+IN\\s*\\(([^)]*)\\)$','i')))){
+    const vals = splitTopLevel(m[2],',').map(parseValue);
+    return !vals.includes(getLHSVal(m[1],ctx));
+  }
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+IN\\s*\\(([^)]*)\\)$','i')))){
+    const vals = splitTopLevel(m[2],',').map(parseValue);
+    return vals.includes(getLHSVal(m[1],ctx));
+  }
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+BETWEEN\\s+([\\s\\S]+?)\\s+AND\\s+([\\s\\S]+)$','i')))){
+    const v = Number(getLHSVal(m[1],ctx)), lo = parseFloat(m[2]), hi = parseFloat(m[3]);
+    return v>=lo && v<=hi;
+  }
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s+LIKE\\s+\'([^\']*)\'$','i')))){
+    const val = getLHSVal(m[1],ctx);
+    return val!=null && likeToRegex(m[2]).test(String(val));
+  }
+  if((m = atom.match(new RegExp('^'+LHS_PAT+'\\s*(=|!=|<>|>=|<=|>|<)\\s*([\\s\\S]+)$','i')))){
+    const lhsVal = getLHSVal(m[1],ctx);
+    const op = m[2];
+    let rhsVal = parseValue(m[3]);
+    if(typeof rhsVal === 'string' && /^[\w]+\.[\w]+$/.test(rhsVal.trim())){
+      const rm = rhsVal.trim().match(/^([\w]+)\.([\w]+)$/);
+      const row = ctx.type==='row'?ctx.row:ctx.rows[0];
+      rhsVal = resolveField(row, rm[1], rm[2]);
+    }
+    const bothNum = typeof lhsVal==='number' || (typeof rhsVal==='number');
+    let a = lhsVal, b = rhsVal;
+    if(bothNum){ a = Number(a); b = Number(b); }
+    switch(op){
+      case '=': return a===b || String(a)===String(b);
+      case '!=': case '<>': return !(a===b || String(a)===String(b));
+      case '>': return a>b; case '<': return a<b;
+      case '>=': return a>=b; case '<=': return a<=b;
+    }
+  }
+  throw new Error('No se ha entendido la condición: "'+atom+'"');
+}
+function evalBoolExpr(exprStr, ctx){
+  const protectedStr = exprStr.replace(/(\bBETWEEN\s+\S+)\s+AND\s+(\S+)/gi, (m,p1,p2)=> p1+' __BETWEENAND__ '+p2);
+  const orGroups = splitByWord(protectedStr, 'OR');
+  return orGroups.some(g => splitByWord(g,'AND').every(atom => evalAtomicCondition(atom.replace(/__BETWEENAND__/g,'AND'), ctx)));
+}
+
+/* ---------------- FROM / JOIN builder ---------------- */
+function parseTableRef(str){
+  str = str.trim();
+  const m = str.match(/^([\w]+)(?:\s+(?:AS\s+)?([\w]+))?$/i);
+  if(!m) throw new Error('No se reconoce la tabla: "'+str+'"');
+  const table = m[1];
+  const alias = m[2] || m[1];
+  if(!DATA[table]) throw new Error('La tabla "'+table+'" no existe en el esquema de la consola.');
+  return {table, alias};
+}
+function parseFromClause(fromClause){
+  const parts = fromClause.split(/\b(INNER JOIN|LEFT JOIN|RIGHT JOIN|JOIN)\b/i);
+  const main = parseTableRef(parts[0]);
+  const joins = [];
+  for(let i=1;i<parts.length;i+=2){
+    const joinType = parts[i].toUpperCase().replace(/\s+/g,' ');
+    const body = parts[i+1];
+    const m = body.match(/^\s*([\w]+)(?:\s+(?:AS\s+)?([\w]+))?\s+ON\s+([\s\S]+)$/i);
+    if(!m) throw new Error('No se ha entendido la cláusula JOIN: "'+body.trim()+'"');
+    const table = m[1], alias = m[2]||m[1], cond = m[3].trim();
+    if(!DATA[table]) throw new Error('La tabla "'+table+'" no existe en el esquema de la consola.');
+    if(/^RIGHT JOIN$/.test(joinType)) throw new Error('La consola no soporta RIGHT JOIN todavía — reescríbelo como LEFT JOIN cambiando el orden de las tablas.');
+    joins.push({type: joinType, table, alias, cond});
+  }
+  return {main, joins};
+}
+function evalJoinCond(cond, row){
+  const m = cond.match(/^\s*([\w]+)\.([\w]+)\s*=\s*([\w]+)\.([\w]+)\s*$/);
+  if(!m) throw new Error('Esta consola solo soporta condiciones ON del tipo "alias.columna = alias.columna": "'+cond+'"');
+  const a = row[m[1]] ? row[m[1]][m[2]] : undefined;
+  const b = row[m[3]] ? row[m[3]][m[4]] : undefined;
+  return a === b;
+}
+function buildRows(fromInfo){
+  let rows = DATA[fromInfo.main.table].map(rec => ({[fromInfo.main.alias]: rec}));
+  for(const j of fromInfo.joins){
+    const targetRows = DATA[j.table];
+    const next = [];
+    for(const base of rows){
+      let matched = false;
+      for(const t of targetRows){
+        const candidate = Object.assign({}, base, {[j.alias]: t});
+        if(evalJoinCond(j.cond, candidate)){ next.push(candidate); matched = true; }
+      }
+      if(!matched && j.type==='LEFT JOIN'){
+        next.push(Object.assign({}, base, {[j.alias]: null}));
+      }
+    }
+    rows = next;
+  }
+  return rows;
+}
+
+/* ---------------- SELECT projection parsing ---------------- */
+function parseProjection(selectClause){
+  let clause = selectClause.trim();
+  let distinct = false;
+  if(/^DISTINCT\s+/i.test(clause)){ distinct = true; clause = clause.replace(/^DISTINCT\s+/i,''); }
+  const items = splitTopLevel(clause, ',');
+  const proj = items.map(item=>{
+    const asM = item.match(/^([\s\S]+?)\s+AS\s+([\w"'áéíóúÁÉÍÓÚñÑ]+)$/i);
+    if(asM) return {expr: asM[1].trim(), alias: asM[2].replace(/['"]/g,'')};
+    return {expr: item.trim(), alias: item.trim()};
+  });
+  return {distinct, proj};
+}
+function projectionHeader(p){ return p.alias; }
+function expandStar(expr, row){
+  if(expr === '*'){
+    const out = {};
+    for(const alias of Object.keys(row)){
+      const rec = row[alias];
+      if(rec) Object.keys(rec).forEach(c => out[c] = rec[c]);
+    }
+    return out;
+  }
+  const m = expr.match(/^([\w]+)\.\*$/);
+  if(m){
+    const rec = row[m[1]];
+    return rec ? Object.assign({}, rec) : {};
+  }
+  return null;
+}
+
+/* ---------------- ORDER BY / LIMIT ---------------- */
+function parseOrderBy(clause){
+  return splitTopLevel(clause, ',').map(item=>{
+    const m = item.trim().match(/^([\s\S]+?)\s+(ASC|DESC)$/i);
+    return m ? {expr:m[1].trim(), dir:m[2].toUpperCase()} : {expr:item.trim(), dir:'ASC'};
+  });
+}
+function parseLimit(clause){
+  clause = clause.trim();
+  let m = clause.match(/^(\d+)\s*,\s*(\d+)$/);
+  if(m) return {offset: parseInt(m[1]), limit: parseInt(m[2])};
+  m = clause.match(/^(\d+)\s+OFFSET\s+(\d+)$/i);
+  if(m) return {limit: parseInt(m[1]), offset: parseInt(m[2])};
+  m = clause.match(/^(\d+)$/);
+  if(m) return {limit: parseInt(m[1]), offset: 0};
+  throw new Error('No se ha entendido la cláusula LIMIT: "'+clause+'"');
+}
+function compareVals(a,b){
+  if(a==null && b==null) return 0;
+  if(a==null) return -1;
+  if(b==null) return 1;
+  if(typeof a === 'number' && typeof b === 'number') return a-b;
+  return String(a) < String(b) ? -1 : (String(a) > String(b) ? 1 : 0);
+}
+
+/* ---------------- main entry point ---------------- */
+function executeSelect(sql){
+  const masked = maskStrings(sql);
+  if(!/^\s*SELECT\b/i.test(masked)) throw new Error('La consola solo ejecuta sentencias SELECT. Para DDL/DML/DCL, revisa la resolución en la actividad correspondiente.');
+  // detect nested SELECT (subqueries) -> unsupported
+  const afterFirst = masked.replace(/^\s*SELECT\b/i,'');
+  if(/\bSELECT\b/i.test(afterFirst)) throw new Error('Esta consola no interpreta subconsultas. Prueba con JOIN, WHERE, GROUP BY, HAVING, ORDER BY o LIMIT — para subconsultas, revisa las resoluciones de las actividades.');
+  if(/\bOVER\s*\(/i.test(masked)) throw new Error('Esta consola no interpreta funciones de ventana (OVER). Cópialas y pruébalas en un SGBD real (MySQL 8+, PostgreSQL, SQL Server).');
+
+  let cursor = 6; // after "SELECT"
+  const fromIdx = idxOf(masked, 'FROM', cursor);
+  if(fromIdx===-1) throw new Error('Toda consulta necesita una cláusula FROM.');
+  const selectClause = sql.slice(cursor, fromIdx);
+
+  const whereIdx = idxOf(masked,'WHERE', fromIdx+4);
+  const groupIdx = idxOf(masked,'GROUP BY', fromIdx+4);
+  const havingIdx = idxOf(masked,'HAVING', fromIdx+4);
+  const orderIdx = idxOf(masked,'ORDER BY', fromIdx+4);
+  const limitIdx = idxOf(masked,'LIMIT', fromIdx+4);
+  const marks = [whereIdx,groupIdx,havingIdx,orderIdx,limitIdx,masked.length].filter(i=>i!==-1);
+  const nextAfter = (idx, len) => { const after = idx+len; const cands = marks.filter(m=>m>=after); return Math.min(...cands); };
+
+  const fromEnd = nextAfter(fromIdx,4);
+  const fromClauseText = sql.slice(fromIdx+4, fromEnd);
+  const fromInfo = parseFromClause(fromClauseText);
+
+  let whereClause=null, groupClause=null, havingClause=null, orderClause=null, limitClause=null;
+  if(whereIdx!==-1) whereClause = sql.slice(whereIdx+5, nextAfter(whereIdx,5));
+  if(groupIdx!==-1) groupClause = sql.slice(groupIdx+8, nextAfter(groupIdx,8));
+  if(havingIdx!==-1) havingClause = sql.slice(havingIdx+6, nextAfter(havingIdx,6));
+  if(orderIdx!==-1) orderClause = sql.slice(orderIdx+8, nextAfter(orderIdx,8));
+  if(limitIdx!==-1) limitClause = sql.slice(limitIdx+5, nextAfter(limitIdx,5));
+
+  const {distinct, proj} = parseProjection(selectClause);
+
+  let rows = buildRows(fromInfo);
+  if(whereClause) rows = rows.filter(r => evalBoolExpr(whereClause, {type:'row', row:r}));
+
+  const hasAgg = proj.some(p => isAggregateExpr(p.expr)) || groupClause;
+  let outputRows;
+
+  if(hasAgg){
+    let groupCols = [];
+    if(groupClause){
+      groupCols = splitTopLevel(groupClause, ',').map(c=>{
+        const m = c.trim().match(/^([\w]+)\.([\w]+)$/);
+        return m ? {alias:m[1], col:m[2]} : {alias:null, col:c.trim()};
+      });
+    }
+    const groupsMap = new Map();
+    if(rows.length===0 && !groupClause){
+      groupsMap.set('__all__', {rows:[]});
+    } else {
+      for(const r of rows){
+        const key = groupClause ? groupCols.map(gc=>resolveField(r, gc.alias, gc.col)).join('\u0002') : '__all__';
+        if(!groupsMap.has(key)) groupsMap.set(key, {rows:[]});
+        groupsMap.get(key).rows.push(r);
+      }
+    }
+    outputRows = [];
+    for(const group of groupsMap.values()){
+      if(havingClause && group.rows.length && !evalBoolExpr(havingClause, {type:'group', rows:group.rows})) continue;
+      if(havingClause && group.rows.length===0) continue;
+      const rep = group.rows[0];
+      const outRow = {};
+      for(const p of proj){
+        if(isAggregateExpr(p.expr)) outRow[p.alias] = computeAggregate(p.expr, group.rows);
+        else{
+          const star = rep? expandStar(p.expr, rep) : null;
+          if(star) Object.assign(outRow, star);
+          else outRow[p.alias] = rep ? evalExprOnRow(p.expr, rep) : null;
+        }
+      }
+      outputRows.push(outRow);
+    }
+  } else {
+    outputRows = rows.map(r=>{
+      const outRow = {};
+      for(const p of proj){
+        const star = expandStar(p.expr, r);
+        if(star) Object.assign(outRow, star);
+        else outRow[p.alias] = evalExprOnRow(p.expr, r);
+      }
+      return outRow;
+    });
+  }
+
+  if(orderClause){
+    const orderCols = parseOrderBy(orderClause);
+    outputRows.sort((a,b)=>{
+      for(const oc of orderCols){
+        let av, bv;
+        const headerMatch = Object.keys(a).find(k=>k.toLowerCase()===oc.expr.toLowerCase());
+        if(headerMatch){ av=a[headerMatch]; bv=b[headerMatch]; }
+        else{
+          const m = oc.expr.match(/^([\w]+)\.([\w]+)$/);
+          try{
+            if(hasAgg){
+              av = m? oc.expr : oc.expr; // fallback below
+            }
+          }catch(e){}
+          av = a[oc.expr]; bv = b[oc.expr];
+        }
+        let cmp = compareVals(av,bv);
+        if(oc.dir==='DESC') cmp = -cmp;
+        if(cmp!==0) return cmp;
+      }
+      return 0;
+    });
+  }
+
+  if(distinct){
+    const seen = new Set(); const uniq = [];
+    for(const r of outputRows){ const k = JSON.stringify(r); if(!seen.has(k)){ seen.add(k); uniq.push(r); } }
+    outputRows = uniq;
+  }
+
+  let meta = {total: outputRows.length};
+  if(limitClause){
+    const {limit, offset} = parseLimit(limitClause);
+    outputRows = outputRows.slice(offset, offset+limit);
+    meta.limited = true;
+  }
+  return {rows: outputRows, meta};
+}
+
+/* ---------------- example queries ---------------- */
+const EXAMPLES = {
+  ex1: "SELECT nombre, email, ciudad FROM clientes WHERE ciudad = 'Madrid';",
+  ex2: "SELECT nombre, precio, stock FROM productos ORDER BY precio DESC;",
+  ex3: "SELECT c.nombre AS categoria, COUNT(p.id_producto) AS num_productos, AVG(p.precio) AS precio_medio\nFROM productos p\nJOIN categorias c ON p.id_categoria = c.id_categoria\nGROUP BY c.id_categoria, c.nombre\nORDER BY num_productos DESC;",
+  ex4: "SELECT c.nombre, c.email\nFROM clientes c\nLEFT JOIN pedidos p ON c.id_cliente = p.id_cliente\nWHERE p.id_pedido IS NULL;",
+  ex5: "SELECT c.nombre, SUM(p.total) AS gasto_total\nFROM clientes c\nJOIN pedidos p ON c.id_cliente = p.id_cliente\nGROUP BY c.id_cliente, c.nombre\nHAVING SUM(p.total) > 100\nORDER BY gasto_total DESC;",
+  ex6: "SELECT c.nombre AS cliente, p.fecha_pedido, pr.nombre AS producto, lp.cantidad, lp.precio_unitario, (lp.cantidad * lp.precio_unitario) AS subtotal\nFROM pedidos p\nJOIN clientes c ON p.id_cliente = c.id_cliente\nJOIN lineas_pedido lp ON p.id_pedido = lp.id_pedido\nJOIN productos pr ON lp.id_producto = pr.id_producto\nWHERE p.id_pedido = 1;",
+  ex7: "SELECT nombre, precio FROM productos WHERE precio BETWEEN 50 AND 200 ORDER BY precio;",
+  ex8: "SELECT nombre, precio FROM productos ORDER BY precio DESC LIMIT 5;"
+};
+window.loadExample = function(key){
+  if(!key) return;
+  document.getElementById('sqlInput').value = EXAMPLES[key];
+  runQuery();
+  document.getElementById('exampleSelect').value = '';
+};
+
+/* ---------------- results rendering ---------------- */
+function showError(msg){
+  document.getElementById('results').innerHTML = '<div class="err">✕ '+escapeHtml(msg)+'</div>';
+}
+function escapeHtml(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function renderResults(result, note){
+  const el = document.getElementById('results');
+  const rows = result.rows;
+  if(!rows.length){
+    el.innerHTML = '<div class="meta">0 filas'+ (note||'') +'</div>';
+    return;
+  }
+  const cols = Object.keys(rows[0]);
+  let html = '<div class="meta">'+rows.length+' fila'+(rows.length===1?'':'s')+(note||'')+'</div>';
+  html += '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c)+'</th>').join('')+'</tr></thead><tbody>';
+  for(const r of rows){
+    html += '<tr>'+cols.map(c=>{
+      let v = r[c];
+      if(v===null||v===undefined) v='<span style="color:#5D7996">NULL</span>';
+      else v = escapeHtml(v);
+      return '<td>'+v+'</td>';
+    }).join('')+'</tr>';
+  }
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+window.runQuery = function(){
+  try{
+    const raw = document.getElementById('sqlInput').value;
+    const cleaned = stripSqlComments(raw);
+    const stmts = cleaned.split(';').map(s=>s.trim()).filter(Boolean);
+    if(!stmts.length){ showError('Escribe una consulta SELECT.'); return; }
+    const sql = stmts[0];
+    const note = stmts.length>1 ? ' — mostrando el resultado de la 1ª de '+stmts.length+' sentencias separadas por ";"' : '';
+    const result = executeSelect(sql);
+    renderResults(result, note);
+  }catch(e){
+    showError(e.message || String(e));
+  }
+};
+window.clearConsole = function(){
+  document.getElementById('sqlInput').value = '';
+  document.getElementById('results').innerHTML = '<div class="meta">Pulsa "Ejecutar" para ver el resultado aquí.</div>';
+};
+
+/* ---------------- copy / load-into-console / toggles ---------------- */
+window.copyCode = function(btn){
+  const block = btn.closest('.code-block');
+  const codeEl = block.querySelector('code');
+  const text = codeEl.textContent;
+  const done = ()=>{
+    const original = btn.textContent;
+    btn.textContent = '✓ copiado';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1400);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(done);
+  } else {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+    ta.select(); try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta); done();
+  }
+};
+window.loadConsole = function(btn){
+  const block = btn.closest('.code-block');
+  const codeEl = block.querySelector('code');
+  let text = stripSqlComments(codeEl.textContent);
+  const stmts = text.split(';').map(s=>s.trim()).filter(Boolean);
+  const q = (stmts.length ? stmts[0] : text.trim()) + ';';
+  document.getElementById('sqlInput').value = q;
+  document.getElementById('playground').scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(window.runQuery, 350);
+};
+window.toggleClass = function(el, cls){
+  el.classList.toggle(cls);
+};
+window.toggleAcc = function(headEl){
+  headEl.parentElement.classList.toggle('open');
+};
+
+/* ---------------- schema browser ---------------- */
+function renderSchemaBrowser(){
+  const el = document.getElementById('schemaBrowser');
+  let html = '';
+  for(const table of Object.keys(SCHEMA)){
+    const meta = SCHEMA[table];
+    html += '<details class="tbl-item"><summary>'+table+'</summary>';
+    for(const col of meta.cols){
+      let cls = 'col-row';
+      if(meta.pk.includes(col)) cls += ' pk';
+      else if(meta.fk[col]) cls += ' fk';
+      html += '<div class="'+cls+'">'+col+(meta.fk[col]?' &rarr; '+meta.fk[col]:'')+'</div>';
+    }
+    html += '</details>';
+  }
+  el.innerHTML = html;
+}
+
+/* ---------------- syntax highlighting ---------------- */
+function highlightSQL(raw){
+  const placeholders = [];
+  const stash = (cls, text) => { 
+    placeholders.push('<span class="'+cls+'">'+text+'</span>'); 
+    return '\u0000'+(placeholders.length-1)+'\u0000'; 
+  };
+  let s = raw;
+  
+  // Guardar comentarios y strings primero
+  s = s.replace(/(--[^\n]*)/g, m=>stash('cmt', m));
+  s = s.replace(/('(?:[^'])*')/g, m=>stash('str', m));
+  
+  // PROCESAR NÚMEROS ANTES de las palabras clave/funciones
+  // Pero excluyendo los placeholders
+  s = s.replace(/(?<!\u0000)\b(\d+\.\d+|\d+)\b(?!\u0000)/g, m=>'<span class="num">'+m+'</span>');
+  
+  const KW = ['GROUP BY','ORDER BY','INNER JOIN','LEFT JOIN','RIGHT JOIN','UNION ALL','START TRANSACTION','CREATE TABLE','ALTER TABLE','DROP TABLE','TRUNCATE TABLE','PRIMARY KEY','FOREIGN KEY','NOT NULL','AUTO_INCREMENT','CREATE PROCEDURE','CREATE VIEW','DROP VIEW','CREATE INDEX','CREATE UNIQUE INDEX','CREATE FULLTEXT INDEX','DROP INDEX','CREATE USER','ALTER USER','DROP USER','IDENTIFIED BY','WITH GRANT OPTION','ROLLBACK TO SAVEPOINT','EXIT HANDLER FOR','PARTITION BY','RENAME TO','DROP COLUMN','END IF','SELECT','DISTINCT','FROM','WHERE','AND','OR','NOT','IN','IS','NULL','LIKE','BETWEEN','HAVING','LIMIT','OFFSET','JOIN','ON','AS','INSERT INTO','VALUES','UPDATE','SET','DELETE','REFERENCES','UNIQUE','DEFAULT','CHECK','CASE','WHEN','THEN','ELSE','END','UNION','INTERSECT','EXCEPT','COMMIT','ROLLBACK','SAVEPOINT','DECLARE','BEGIN','SQLEXCEPTION','DELIMITER','EXPLAIN','GRANT','REVOKE','SHOW','DESC','ASC','TO','FOR','IF','OVER','ADD','MODIFY','ALL','ANY','EXISTS','CASCADE','IN'];
+  const kwSorted = [...new Set(KW)].sort((a,b)=>b.length-a.length);
+  const kwRe = new RegExp('\\b('+kwSorted.map(k=>k.replace(/ /g,'\\s+')).join('|')+')\\b','gi');
+  s = s.replace(kwRe, m => '<span class="kw">'+m+'</span>');
+  
+  const FN = ['COUNT','SUM','AVG','MIN','MAX','CONCAT','UPPER','LOWER','LENGTH','SUBSTRING','REPLACE','TRIM','LOCATE','NOW','CURDATE','CURTIME','DATE','YEAR','MONTH','DAY','DATEDIFF','DATE_ADD','DATE_SUB','COALESCE','IFNULL','ISNULL','NVL','ROW_NUMBER','RANK','DENSE_RANK','LAG','LEAD','NTILE','ROUND','GROUP_CONCAT','LAST_INSERT_ID'];
+  const fnRe = new RegExp('\\b('+FN.join('|')+')(?=\\()','gi');
+  s = s.replace(fnRe, m => '<span class="fn">'+m+'</span>');
+  
+  // Restaurar placeholders al final
+  s = s.replace(/\u0000(\d+)\u0000/g, (_,i)=>placeholders[parseInt(i)]);
+  return s;
+}
+function applyHighlighting(){
+  document.querySelectorAll('.code-block code').forEach(el=>{
+    el.innerHTML = highlightSQL(el.innerHTML);
+  });
+}
+
+/* ---------------- nav / scroll UX ---------------- */
+function initScrollUX(){
+  const sections = Array.from(document.querySelectorAll('.section, .hero, #playground'));
+  const navLinks = Array.from(document.querySelectorAll('.navtree a'));
+  const progressBar = document.getElementById('progressBar');
+  const backTop = document.getElementById('backTop');
+  function onScroll(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = docHeight>0 ? Math.min(100,(scrollTop/docHeight*100))+'%' : '0%';
+    backTop.classList.toggle('show', scrollTop > 600);
+    let currentId = null;
+    for(const sec of sections){
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 120) currentId = sec.id;
+    }
+    navLinks.forEach(a=>{
+      a.classList.toggle('active', currentId && a.getAttribute('href') === '#'+currentId);
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  backTop.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+}
+function initMobileMenu(){
+  const btn = document.getElementById('menuBtn');
+  const sidebar = document.getElementById('sidebar');
+  btn.addEventListener('click', ()=> sidebar.classList.toggle('open'));
+  sidebar.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> sidebar.classList.remove('open')));
+  document.addEventListener('click', (e)=>{
+    if(window.innerWidth<=980 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target!==btn){
+      sidebar.classList.remove('open');
+    }
+  });
+}
+
+/* ---------------- init ---------------- */
+document.addEventListener('DOMContentLoaded', function(){
+  renderSchemaBrowser();
+  applyHighlighting();
+  initScrollUX();
+  initMobileMenu();
+});
+
+})();
+</script>
+</body>
+</html>

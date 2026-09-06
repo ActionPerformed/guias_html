@@ -2,9 +2,8 @@
 /.claude/
 Claude.md
 
-# OS
-.DS_Store
-Thumbs.db
+# VS Code
+.vs/
 
 # Logs
 *.log
