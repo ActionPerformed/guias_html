@@ -4,7 +4,7 @@
 
 El conocimiento es un derecho fundamental, no un privilegio. Cuando ese conocimiento se comparte de forma libre y accesible, se convierte en una herramienta de transformación social. Estas guías nacen de esa convicción: cada una es una **cápsula informativa portable** — un archivo HTML que carga consigo todo lo necesario para funcionar sin servidores, sin instalaciones, sin dependencias.
 
-No son simplemente textos que se leen. Son espacios que se exploran. El diseño visual está pensado para invitar a la interacción: manipular código, observar qué cambia, romper cosas y aprender de los resultados. Porque aprender haciendo no es solo un método más eficaces — es también más memorable, más divertido, y más libre.
+No son simplemente textos que se leen. Son espacios que se exploran. El diseño visual está pensado para invitar a la interacción: manipular código, observar qué cambia, romper cosas y aprender de los resultados. Porque aprender haciendo no es solo un método más eficaz — es también más memorable, más divertido, y más libre.
 
 ## Cómo se generan
 
@@ -29,6 +29,8 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 
 ## Guías disponibles
 
+### Guías generales
+
 | Guía | Descripción |
 |------|-------------|
 | [guia_css_daw.html](https://actionperformed.github.io/guias_html/guia_css_daw.html) | Dominando CSS — selectores, box model, flexbox, animaciones para 2º DAW |
@@ -45,7 +47,26 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [guia_sql.html](https://actionperformed.github.io/guias_html/guia_sql.html) | SQL — consultas, joins, subconsultas y diseño de bases de datos relacionales |
 | [guia_latex.html](https://actionperformed.github.io/guias_html/guia_latex.html) | LaTeX — composición tipográfica, fórmulas matemáticas y documentos técnicos |
 | [guia_php.html](https://actionperformed.github.io/guias_html/guia_php.html) | PHP — programación del lado del servidor, formularios y conexión a bases de datos |
-| [guia_interactiva_kotlin.html](https://actionperformed.github.io/guias_html/guia_interactiva_kotlin.html) | Kotlin — lenguaje moderno de programación para JVM, Android y más |
+
+### ASETE
+
+| Guía | Descripción |
+|------|-------------|
+| [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
+
+### IAW (Implantación de Aplicaciones Web)
+
+| Guía | Descripción |
+|------|-------------|
+| [IAW - UT1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT1.html) | UT1 — Implantación de aplicaciones web |
+| [Actividad 1.1.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.1.html) | Actividad 1.1 — Instalación y configuración de servidores |
+
+### PMDM (Programación Multimedia y Dispositivos Móviles)
+
+| Guía | Descripción |
+|------|-------------|
+| [PMDM - UT1 - Kotlin.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) | UT1 — Kotlin para desarrollo Android |
+| [PDMD - UT1 - Android.html](https://actionperformed.github.io/guias_html/PMDM/PDMD%20-%20UT1%20-%20Android.html) | UT1 — Fundamentos de desarrollo Android |
 
 ---
 
