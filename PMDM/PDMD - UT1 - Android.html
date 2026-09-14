@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Studio desde Cero — Guía Interactiva DAM 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#17181C;
+  --bg-soft:#1C1E24;
+  --panel:#1E2027;
+  --panel-2:#262933;
+  --border:#33363F;
+  --border-soft:#282A33;
+  --text:#E7E8EC;
+  --text-dim:#9A9DAA;
+  --text-faint:#686B78;
+  --green:#3DDC84;
+  --green-dim:#2BAF69;
+  --blue:#4A9EFF;
+  --orange:#FFA657;
+  --red:#FF5370;
+  --purple:#C792EA;
+  --code-bg:#131417;
+  --radius:12px;
+  --maxw:900px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse 800px 460px at 8% -8%, rgba(61,220,132,0.10), transparent 58%),
+    radial-gradient(ellipse 700px 460px at 100% 6%, rgba(74,158,255,0.08), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Roboto', sans-serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Roboto', sans-serif; font-weight:700; line-height:1.25; margin:0 0 .5em; letter-spacing:-.01em;}
+p{margin:0 0 1em; color:var(--text-dim);}
+a{color:var(--blue);}
+code, pre, .mono{font-family:'JetBrains Mono', monospace;}
+::selection{background:rgba(61,220,132,0.28);}
+.skip-link{position:absolute; left:-999px; top:0; background:var(--green); color:#0A0B0D; padding:.6em 1em; border-radius:0 0 8px 0; z-index:999; font-weight:700;}
+.skip-link:focus{left:0;}
+
+/* ===== NAVBAR (IDE toolbar look) ===== */
+header.nav{
+  position:sticky; top:0; z-index:100;
+  background:rgba(23,24,28,0.9);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border-soft);
+}
+.nav-inner{max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:1.1rem; padding:.6rem 1.1rem;}
+.brand{display:flex; align-items:center; gap:.6rem; flex-shrink:0; text-decoration:none; color:var(--text);}
+.brand-mark{width:28px; height:28px; flex-shrink:0;}
+.brand-text{font-family:'Roboto'; font-weight:700; font-size:.98rem;}
+.brand-text .sub{display:block; font-family:'JetBrains Mono'; font-weight:500; font-size:.6rem; color:var(--text-faint); letter-spacing:.3px; margin-top:1px;}
+.toolbar-icons{display:flex; gap:.35rem; padding-left:.6rem; border-left:1px solid var(--border-soft); flex-shrink:0;}
+.tbi{width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.8rem; background:var(--panel-2); border:1px solid var(--border-soft); opacity:.7;}
+.navlinks{display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; flex:1;}
+.navlinks::-webkit-scrollbar{display:none;}
+.navlinks a{
+  white-space:nowrap; text-decoration:none; color:var(--text-dim); font-size:.78rem; font-weight:500;
+  padding:.42rem .7rem; border-radius:7px; transition:.15s; border:1px solid transparent; font-family:'JetBrains Mono';
+}
+.navlinks a:hover{color:var(--text); background:var(--panel-2);}
+.navlinks a.active{color:#0A0B0D; background:var(--green); border-color:var(--green); font-weight:600;}
+.navtoggle{display:none; background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:8px; width:36px; height:36px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+@media (max-width:960px){
+  .toolbar-icons{display:none;}
+  .navlinks{display:none; position:fixed; top:54px; left:0; right:0; bottom:0; flex-direction:column; overflow-y:auto; background:var(--bg-soft); padding:1rem; z-index:99; align-items:stretch;}
+  .navlinks.open{display:flex;}
+  .navlinks a{padding:.8rem 1rem; font-size:.9rem;}
+  .navtoggle{display:flex;}
+}
+
+/* ===== LAYOUT ===== */
+main{max-width:var(--maxw); margin:0 auto; padding:0 1.3rem 6rem;}
+section.block{padding:3.2rem 0; border-bottom:1px solid var(--border-soft);}
+section.block:last-of-type{border-bottom:none;}
+.eyebrow-row{display:flex; align-items:center; gap:.7rem; margin-bottom:.6rem;}
+.section-num{
+  font-family:'JetBrains Mono'; font-size:.75rem; color:var(--green); background:rgba(61,220,132,.1);
+  border:1px solid rgba(61,220,132,.3); padding:.15rem .55rem; border-radius:6px;
+}
+.block h2{font-size:1.65rem; margin:0;}
+.block > .lede{font-size:1.02rem; margin-top:.6rem;}
+
+/* ===== HERO ===== */
+.hero{padding:3.4rem 0 2.2rem;}
+.hero-kicker{display:inline-flex; align-items:center; gap:.5rem; font-family:'JetBrains Mono'; font-size:.75rem; color:var(--green); background:rgba(61,220,132,.1); border:1px solid rgba(61,220,132,.35); padding:.35rem .8rem; border-radius:999px; margin-bottom:1.2rem;}
+.hero h1{font-size:clamp(2.1rem, 5.6vw, 3.2rem); margin-bottom:.5rem;}
+.hero h1 .grad{background:linear-gradient(100deg, var(--green) 10%, var(--blue) 90%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p.lede{font-size:1.05rem; max-width:640px; color:var(--text-dim);}
+.hero-meta{display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.3rem;}
+.hero-meta span{font-family:'JetBrains Mono'; font-size:.74rem; color:var(--text-faint); background:var(--panel); border:1px solid var(--border-soft); padding:.35rem .7rem; border-radius:7px;}
+
+/* ===== IDE WINDOW CHROME (shared container style) ===== */
+.ide-window{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 30px 60px -30px rgba(61,220,132,.25);}
+.ide-titlebar{display:flex; align-items:center; justify-content:space-between; padding:.55rem .9rem; background:var(--panel-2); border-bottom:1px solid var(--border);}
+.ide-dots{display:flex; gap:.4rem;}
+.ide-dots span{width:10px; height:10px; border-radius:50%; display:inline-block;}
+.ide-dots span:nth-child(1){background:#FF5F57;} .ide-dots span:nth-child(2){background:#FEBC2E;} .ide-dots span:nth-child(3){background:#28C840;}
+.ide-titletext{font-family:'JetBrains Mono'; font-size:.72rem; color:var(--text-faint);}
+
+/* ===== LOGCAT SIGNATURE DEMO ===== */
+.logcat{margin-top:2rem;}
+.logcat-tabs{display:flex; gap:.4rem; padding:.7rem .9rem; border-bottom:1px solid var(--border-soft); flex-wrap:wrap;}
+.logcat-scenario{font-family:'JetBrains Mono'; font-size:.72rem; background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim); padding:.4rem .75rem; border-radius:7px; cursor:pointer;}
+.logcat-scenario:hover{color:var(--text); border-color:var(--green);}
+.logcat-scenario.active{background:var(--green); border-color:var(--green); color:#0A0B0D; font-weight:700;}
+.logcat-search{display:flex; align-items:center; gap:.5rem; padding:.6rem .9rem; border-bottom:1px solid var(--border-soft); background:rgba(255,255,255,.015);}
+.logcat-search input{
+  flex:1; background:var(--code-bg); border:1px solid var(--border); color:var(--text); font-family:'JetBrains Mono';
+  font-size:.78rem; padding:.4rem .7rem; border-radius:7px; outline:none;
+}
+.logcat-search input:focus{border-color:var(--green);}
+.logcat-body{background:var(--code-bg); min-height:260px; max-height:340px; overflow-y:auto; padding:.6rem 0; font-family:'JetBrains Mono'; font-size:.74rem;}
+.logline{display:flex; gap:.5rem; padding:.28rem .9rem; border-bottom:1px solid rgba(255,255,255,.02); white-space:pre-wrap; word-break:break-word;}
+.logline .lvl{flex-shrink:0; width:16px; height:16px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.63rem; font-weight:700; color:#0A0B0D; margin-top:.1rem;}
+.lvl-V{background:#8A8D9A;} .lvl-D{background:var(--blue); color:#fff;} .lvl-I{background:var(--green);} .lvl-W{background:var(--orange);} .lvl-E{background:var(--red); color:#fff;}
+.logline .tag{flex-shrink:0; color:var(--purple); min-width:90px;}
+.logline .msg{color:var(--text-dim);}
+.logline.err .msg{color:var(--red);}
+.logline.hidden{display:none;}
+.logcat-footer{display:flex; justify-content:space-between; align-items:center; padding:.65rem .9rem; border-top:1px solid var(--border-soft);}
+.logcat-status{font-family:'JetBrains Mono'; font-size:.72rem; color:var(--text-faint);}
+.run-btn{
+  font-family:'Roboto'; font-weight:700; font-size:.82rem; background:var(--green); color:#0A0B0D; border:none;
+  padding:.55rem 1.1rem; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:.4rem; transition:.15s;
+}
+.run-btn:hover{filter:brightness(1.08); transform:translateY(-1px);}
+.run-btn:disabled{opacity:.5; cursor:default; transform:none;}
+
+/* ===== CODE BLOCKS ===== */
+.codewrap{position:relative; margin:1rem 0 1.3rem;}
+pre.code{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:1rem 1.1rem; overflow-x:auto; font-size:.8rem; margin:0; line-height:1.6;}
+pre.code code{white-space:pre;}
+.copy-btn{position:absolute; top:.55rem; right:.55rem; font-family:'Roboto'; font-size:.68rem; font-weight:700; background:var(--panel-2); color:var(--text-dim); border:1px solid var(--border); padding:.3rem .6rem; border-radius:6px; cursor:pointer; opacity:.75; transition:.15s;}
+.copy-btn:hover{opacity:1; color:#fff; border-color:var(--green);}
+.copy-btn.copied{background:rgba(61,220,132,.15); color:var(--green); border-color:var(--green);}
+.kw{color:var(--purple);} .str{color:var(--green);} .cmt{color:var(--text-faint); font-style:italic;} .num{color:var(--orange);} .fn{color:var(--blue);} .ann{color:var(--orange);} .tagx{color:var(--blue);} .attr{color:var(--purple);}
+
+/* ===== TABLES ===== */
+.tblwrap{overflow-x:auto; margin:1.1rem 0;}
+table{border-collapse:collapse; width:100%; font-size:.85rem;}
+th,td{padding:.6rem .8rem; border:1px solid var(--border); text-align:left;}
+th{background:var(--panel-2); color:var(--green); font-family:'JetBrains Mono'; font-weight:600; font-size:.75rem;}
+td{color:var(--text-dim);}
+td code, th code{color:var(--text); background:rgba(74,158,255,.12); padding:.1rem .35rem; border-radius:4px; font-size:.85em;}
+tr:nth-child(even) td{background:rgba(255,255,255,.015);}
+
+/* ===== CALLOUTS ===== */
+.callout{border-radius:10px; padding:.9rem 1.1rem; margin:1rem 0; font-size:.9rem; border:1px solid;}
+.callout.tip{background:rgba(74,158,255,.08); border-color:rgba(74,158,255,.3); color:#CFE6FF;}
+.callout.warn{background:rgba(255,166,87,.08); border-color:rgba(255,166,87,.3); color:#FFE3C8;}
+.callout.key{background:rgba(61,220,132,.08); border-color:rgba(61,220,132,.3); color:#D3F5E3;}
+.callout strong{color:#fff;}
+
+/* ===== ACCORDION ===== */
+.accordion{border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:1.4rem;}
+.acc-item{border-bottom:1px solid var(--border-soft);}
+.acc-item:last-child{border-bottom:none;}
+.acc-head{width:100%; text-align:left; background:var(--panel); color:var(--text); border:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:1rem 1.2rem; font-family:'Roboto'; font-weight:700; font-size:.96rem; gap:1rem;}
+.acc-head:hover{background:var(--panel-2);}
+.acc-head .tag{font-family:'JetBrains Mono'; font-size:.68rem; color:var(--text-faint); font-weight:500;}
+.acc-chevron{transition:.25s; flex-shrink:0; color:var(--green);}
+.acc-item.open .acc-chevron{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.acc-panel-inner{padding:0 1.2rem 1.4rem;}
+.acc-item.open .acc-panel{max-height:4000px;}
+
+/* ===== TROUBLESHOOTING CARDS ===== */
+.trouble{border:1px solid var(--border); border-radius:var(--radius); background:var(--panel); padding:1.3rem; margin-top:1.1rem;}
+.trouble-head{display:flex; align-items:flex-start; gap:.7rem; margin-bottom:.5rem;}
+.trouble-icon{width:30px; height:30px; border-radius:8px; background:rgba(255,166,87,.12); border:1px solid rgba(255,166,87,.35); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.9rem;}
+.trouble h4{margin:0; font-size:.98rem;}
+.trouble-row{display:flex; gap:.6rem; margin:.6rem 0 0;}
+.reveal-btn{font-family:'Roboto'; font-weight:700; font-size:.78rem; background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim); padding:.5rem .9rem; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:.4rem;}
+.reveal-btn:hover{color:#fff; border-color:var(--green);}
+.reveal-panel{display:none; margin-top:.8rem; padding:.9rem 1rem; border-radius:9px; border:1px solid var(--border-soft); background:rgba(255,255,255,.015); font-size:.88rem;}
+.reveal-panel.show{display:block;}
+
+/* ===== FAQ ===== */
+.faq-item{border:1px solid var(--border); border-radius:10px; margin-top:.8rem; overflow:hidden;}
+.faq-q{width:100%; text-align:left; background:var(--panel); border:none; color:var(--text); font-family:'Roboto'; font-weight:700; font-size:.92rem; padding:.9rem 1.1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:1rem;}
+.faq-q:hover{background:var(--panel-2);}
+.faq-q .plus{font-family:'JetBrains Mono'; color:var(--green); font-size:1rem; flex-shrink:0;}
+.faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease; background:rgba(255,255,255,.015);}
+.faq-item.open .faq-a{max-height:400px;}
+.faq-a-inner{padding:.2rem 1.1rem 1rem; font-size:.88rem; color:var(--text-dim);}
+.faq-item.open .faq-q .plus{transform:rotate(45deg);}
+
+/* ===== IDE ZONE MAP (interactive) ===== */
+.zonemap{display:grid; grid-template-columns:110px 1fr 90px; grid-template-rows:34px 1fr 70px; gap:4px; height:340px; margin-top:1.4rem; background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:6px;}
+.zone{border-radius:6px; background:var(--panel-2); border:1px solid var(--border-soft); display:flex; align-items:center; justify-content:center; text-align:center; font-family:'JetBrains Mono'; font-size:.68rem; color:var(--text-faint); cursor:pointer; transition:.15s; padding:.4rem;}
+.zone:hover{border-color:var(--green); color:var(--text);}
+.zone.active{background:rgba(61,220,132,.14); border-color:var(--green); color:var(--green); font-weight:700;}
+.zone-toolbar{grid-column:1/4; grid-row:1;}
+.zone-project{grid-column:1; grid-row:2;}
+.zone-editor{grid-column:2; grid-row:2;}
+.zone-gradle{grid-column:3; grid-row:2;}
+.zone-bottom{grid-column:1/4; grid-row:3;}
+.zone-info{margin-top:1rem; padding:1rem 1.1rem; border:1px solid var(--border); border-radius:10px; background:var(--panel); font-size:.88rem;}
+.zone-info b{color:var(--green); display:block; font-family:'JetBrains Mono'; font-size:.78rem; margin-bottom:.3rem;}
+
+/* ===== FILE TREE (project structure) ===== */
+.filetree{font-family:'JetBrains Mono'; font-size:.83rem; background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:1rem; margin-top:1.2rem;}
+.ft-node{margin:0;}
+.ft-row{display:flex; align-items:center; gap:.4rem; padding:.3rem .3rem; border-radius:6px; cursor:pointer; color:var(--text-dim);}
+.ft-row:hover{background:var(--panel-2); color:var(--text);}
+.ft-row .ico{width:16px; text-align:center; flex-shrink:0;}
+.ft-children{margin-left:1.1rem; border-left:1px dashed var(--border); padding-left:.6rem; display:none;}
+.ft-node.open > .ft-children{display:block;}
+.ft-node.open > .ft-row .chev{transform:rotate(90deg);}
+.ft-row .chev{transition:.15s; display:inline-block; color:var(--text-faint); width:10px;}
+.ft-row.file .chev{visibility:hidden;}
+.ft-row.selected{background:rgba(61,220,132,.12); color:var(--green);}
+.ft-info{margin-top:1rem; padding:.9rem 1.1rem; border:1px solid var(--border); border-radius:10px; background:var(--panel); font-size:.87rem; min-height:52px;}
+
+/* ===== SEARCH / FILTER ===== */
+.filter-input{width:100%; background:var(--code-bg); border:1px solid var(--border); color:var(--text); font-family:'JetBrains Mono'; font-size:.85rem; padding:.65rem .9rem; border-radius:9px; outline:none; margin-top:1.2rem;}
+.filter-input:focus{border-color:var(--green);}
+.filter-input::placeholder{color:var(--text-faint);}
+.glossary-item{border-bottom:1px solid var(--border-soft); padding:.9rem 0;}
+.glossary-item:last-child{border-bottom:none;}
+.glossary-item dt{font-family:'JetBrains Mono'; font-weight:700; color:var(--green); margin-bottom:.3rem;}
+.glossary-item dd{margin:0; color:var(--text-dim); font-size:.9rem;}
+.glossary-item.hidden{display:none;}
+
+/* ===== KEYBOARD SHORTCUTS ===== */
+kbd{font-family:'JetBrains Mono'; background:var(--panel-2); border:1px solid var(--border); border-bottom-width:2px; padding:.15rem .5rem; border-radius:5px; font-size:.82em; color:var(--text);}
+.shortcut-row.hidden{display:none;}
+
+/* ===== PILLS / MISC ===== */
+.pill{display:inline-block; font-family:'JetBrains Mono'; font-size:.72rem; background:var(--panel-2); border:1px solid var(--border); color:var(--green); padding:.15rem .55rem; border-radius:6px; margin:0 .25rem .4rem 0;}
+.progress-wrap{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg, var(--green), var(--blue)); z-index:200; width:0%; transition:width .1s;}
+footer{max-width:var(--maxw); margin:0 auto; padding:2.5rem 1.3rem 4rem; color:var(--text-faint); font-size:.85rem; text-align:center; font-family:'JetBrains Mono';}
+.back-top{position:fixed; bottom:1.4rem; right:1.4rem; width:44px; height:44px; border-radius:50%; background:var(--panel-2); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:90; opacity:0; pointer-events:none; transition:.2s;}
+.back-top.show{opacity:1; pointer-events:auto;}
+ul.plain, ol.plain{padding-left:1.2rem; color:var(--text-dim);}
+ul.plain li, ol.plain li{margin-bottom:.35rem;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
+@media (max-width:640px){.grid2{grid-template-columns:1fr;} .zonemap{grid-template-columns:70px 1fr 60px;}}
+</style>
+</head>
+<body>
+<a href="#inicio" class="skip-link">Saltar al contenido</a>
+<div class="progress-wrap" id="progressBar"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#inicio" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="ag" x1="0" y1="0" x2="40" y2="40"><stop offset="0" stop-color="#3DDC84"/><stop offset="1" stop-color="#4A9EFF"/></linearGradient></defs>
+        <rect x="6" y="14" width="28" height="18" rx="4" fill="url(#ag)"/>
+        <rect x="11" y="6" width="3" height="8" rx="1.5" fill="url(#ag)"/>
+        <rect x="26" y="6" width="3" height="8" rx="1.5" fill="url(#ag)"/>
+        <circle cx="15" cy="22" r="2" fill="#0A0B0D"/><circle cx="25" cy="22" r="2" fill="#0A0B0D"/>
+      </svg>
+      <span class="brand-text">Android Studio<span class="sub">DAM 2 · Guía interactiva</span></span>
+    </a>
+    <div class="toolbar-icons"><span class="tbi">▶</span><span class="tbi">🐞</span><span class="tbi">🔨</span><span class="tbi">🔄</span></div>
+    <button class="navtoggle" id="navToggle" aria-label="Abrir menú">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="navlinks" id="navLinks">
+      <a href="#inicio">Inicio</a>
+      <a href="#preparacion">Preparación</a>
+      <a href="#instalacion">Instalación</a>
+      <a href="#configuracion">Configuración</a>
+      <a href="#proyecto-nuevo">Proyecto nuevo</a>
+      <a href="#emulador">Emulador</a>
+      <a href="#primer-contacto">Primer contacto</a>
+      <a href="#interfaz">Interfaz IDE</a>
+      <a href="#atajos">Atajos</a>
+      <a href="#estructura">Estructura</a>
+      <a href="#codigo">MainActivity</a>
+      <a href="#depuracion">Depuración</a>
+      <a href="#problemas">Problemas</a>
+      <a href="#siguientes">Y ahora qué</a>
+      <a href="#referencia">Referencia</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+  <span class="hero-kicker">🤖 Programación de Móviles y Dispositivos Multimedia — 2º DAM</span>
+  <h1>Guía básica de <span class="grad">Android Studio</span> con Kotlin</h1>
+  <p class="lede">El IDE oficial de Android, panel a panel: desde la instalación hasta leer tu primer <em>stack trace</em> en Logcat sin entrar en pánico.</p>
+  <div class="hero-meta">
+    <span>19 capítulos</span>
+    <span>Windows 11</span>
+    <span>Jetpack Compose</span>
+    <span>Kotlin</span>
+  </div>
+
+  <div class="ide-window logcat" id="heroLogcat">
+    <div class="ide-titlebar">
+      <div class="ide-dots"><span></span><span></span><span></span></div>
+      <div class="ide-titletext">Logcat — MiPrimerAplicacion</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="logcat-tabs" id="logcatScenarios">
+      <button class="logcat-scenario active" data-scenario="normal">▶ Ejecución normal</button>
+      <button class="logcat-scenario" data-scenario="warning">⚠ Con avisos</button>
+      <button class="logcat-scenario" data-scenario="crash">💥 La app se cierra</button>
+    </div>
+    <div class="logcat-search">
+      <span style="color:var(--text-faint); font-family:'JetBrains Mono'; font-size:.75rem;">🔍</span>
+      <input type="text" id="logcatFilter" placeholder="Filtrar por tag o texto (prueba «FATAL»)...">
+    </div>
+    <div class="logcat-body" id="logcatBody"></div>
+    <div class="logcat-footer">
+      <span class="logcat-status" id="logcatStatus">Listo para ejecutar</span>
+      <button class="run-btn" id="logcatRun">▶ Run 'app'</button>
+    </div>
+  </div>
+
+  <div style="display:none" id="logcatBank">
+    <div class="scenario" data-scenario="normal">
+      <div class="l" data-lvl="I" data-tag="ActivityTaskManager">Displaying com.example.miprimeraaplicacion/.MainActivity</div>
+      <div class="l" data-lvl="D" data-tag="Compose">Composing MainActivity content</div>
+      <div class="l" data-lvl="D" data-tag="EGL_emulation">eglMakeCurrent: 0xb400... surface OK</div>
+      <div class="l" data-lvl="I" data-tag="MiPrimerAplicacion">onCreate: iniciando interfaz</div>
+      <div class="l" data-lvl="V" data-tag="Choreographer">Frame rendered in 4.2ms</div>
+      <div class="l" data-lvl="I" data-tag="MiPrimerAplicacion">Greeting mostrado con name=Android</div>
+      <div class="l final" data-lvl="I" data-tag="Process">Proceso listo · sin errores</div>
+    </div>
+    <div class="scenario" data-scenario="warning">
+      <div class="l" data-lvl="I" data-tag="ActivityTaskManager">Displaying com.example.miprimeraaplicacion/.MainActivity</div>
+      <div class="l" data-lvl="W" data-tag="Compose">Recomposition triggered 3 times in 200ms — revisa el estado</div>
+      <div class="l" data-lvl="W" data-tag="OpenGLRenderer">Overdraw detectado en Column raíz</div>
+      <div class="l" data-lvl="D" data-tag="MiPrimerAplicacion">onCreate: iniciando interfaz</div>
+      <div class="l" data-lvl="W" data-tag="ResourceType">String resource id 0x7f1200aa no encontrado, usando fallback</div>
+      <div class="l final" data-lvl="I" data-tag="Process">Proceso listo · con avisos</div>
+    </div>
+    <div class="scenario" data-scenario="crash">
+      <div class="l" data-lvl="I" data-tag="ActivityTaskManager">Displaying com.example.miprimeraaplicacion/.MainActivity</div>
+      <div class="l" data-lvl="D" data-tag="MiPrimerAplicacion">onCreate: iniciando interfaz</div>
+      <div class="l err" data-lvl="E" data-tag="AndroidRuntime">FATAL EXCEPTION: main</div>
+      <div class="l err" data-lvl="E" data-tag="AndroidRuntime">Process: com.example.miprimeraaplicacion, PID: 8421</div>
+      <div class="l err" data-lvl="E" data-tag="AndroidRuntime">kotlin.KotlinNullPointerException at MainActivity.kt:24</div>
+      <div class="l err" data-lvl="E" data-tag="AndroidRuntime">    at com.example.miprimeraaplicacion.MainActivity.onCreate(MainActivity.kt:24)</div>
+      <div class="l final err" data-lvl="E" data-tag="Process">Proceso terminado inesperadamente</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 2: PREPARACIÓN ============ -->
+<section class="block" id="preparacion">
+  <div class="eyebrow-row"><span class="section-num">02</span></div>
+  <h2>Requisitos y preparación del entorno</h2>
+  <p class="lede">Antes de instalar nada, comprueba que tu equipo aguanta el IDE y el emulador con soltura.</p>
+
+  <h3 style="margin-top:1.6rem;">Requisitos del sistema (Windows 11)</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Componente</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+    <tbody>
+      <tr><td>Sistema operativo</td><td>Windows 10/11 (64 bits)</td><td>Windows 11 (64 bits)</td></tr>
+      <tr><td>Procesador</td><td>x86_64, Intel Core 2ª gen o AMD con soporte para Windows Hypervisor</td><td>Intel Core i5/i7 o AMD Ryzen recientes</td></tr>
+      <tr><td>Memoria RAM</td><td>8 GB</td><td>16 GB (para el emulador con fluidez)</td></tr>
+      <tr><td>Almacenamiento libre</td><td>8 GB</td><td>20 GB o más</td></tr>
+      <tr><td>Pantalla</td><td>1280 x 800</td><td>1920 x 1080 o superior</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">Versión de Android Studio recomendada</h3>
+  <ul class="plain">
+    <li>Usar la <strong style="color:#fff">versión estable más reciente</strong> disponible en la web oficial de Android Developers.</li>
+    <li>En el momento de redactar esta guía, la versión estable es <strong style="color:#fff">Android Studio Quail 4 (2026.1.4)</strong>.</li>
+    <li>Si el centro ya tiene instalada una versión anterior (por ejemplo, <strong style="color:#fff">Otter 2</strong>), se puede <strong style="color:#fff">instalar Quail 4 en paralelo</strong> sin sobrescribirla.</li>
+  </ul>
+  <div class="callout warn"><strong>Nota:</strong> las versiones «Canary» o «Preview» pueden tener errores. Para clase, siempre que sea posible, usa la versión estable.</div>
+
+  <h3 style="margin-top:1.6rem;">Instalación en paralelo (convivencia de dos versiones)</h3>
+  <p>Para tener dos versiones de Android Studio en el mismo equipo:</p>
+  <ol class="plain">
+    <li>Descargar el paquete <code>.zip</code> (no el <code>.exe</code>) desde la página de Preview o desde el Archivo de descargas de Android Studio.</li>
+    <li>Descomprimir el <code>.zip</code> en una carpeta separada, por ejemplo: <code>C:\Android\Quail4\</code>.</li>
+    <li>Entrar en la subcarpeta <code>bin</code> y crear un acceso directo a <code>studio64.exe</code>.</li>
+    <li>Renombrar el acceso directo para diferenciarlo (por ejemplo, «Android Studio Quail 4»).</li>
+  </ol>
+  <div class="callout tip">
+    <strong>Notas importantes:</strong>
+    <ul class="plain" style="margin-top:.5rem;">
+      <li>El paquete <code>.zip</code> <strong style="color:#fff">no se instala</strong>: no escribe en el registro de Windows ni crea entradas de menú. Es portable, aunque <strong style="color:#fff">guarda su configuración en el perfil del usuario</strong> (<code>%LOCALAPPDATA%\Google\AndroidStudio&lt;versión&gt;</code>).</li>
+      <li>Cada versión usa su <strong style="color:#fff">propia carpeta de configuración</strong>, por lo que no se pisan las preferencias.</li>
+      <li>Ambas versiones <strong style="color:#fff">comparten el mismo Android SDK</strong> por defecto.</li>
+    </ul>
+  </div>
+
+  <h3 style="margin-top:1.6rem;">Archivos <code>studio64.exe</code> y <code>studio.bat</code></h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Archivo</th><th>Para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td><code>studio64.exe</code></td><td>Ejecutable normal. Se usa siempre (a través del acceso directo).</td></tr>
+      <tr><td><code>studio.bat</code></td><td>Script de arranque que busca el JDK y configura el entorno antes de lanzar el IDE. Se usa solo para <strong style="color:#fff">diagnóstico</strong> si el IDE no arranca: ejecutarlo desde una terminal muestra los errores en pantalla.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">Dónde se guardan los proyectos</h3>
+  <p>Por defecto, Android Studio guarda los proyectos en:</p>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>C:\Users\&lt;tu-usuario&gt;\AndroidStudioProjects</code></pre></div>
+  <p>Puedes cambiarlo al crear cada proyecto.</p>
+</section>
+
+<!-- ============ SECTION 3: INSTALACIÓN ============ -->
+<section class="block" id="instalacion">
+  <div class="eyebrow-row"><span class="section-num">03</span></div>
+  <h2>Instalación de Android Studio</h2>
+
+  <h3 style="margin-top:1rem;">Instalación estándar (versión única)</h3>
+  <ol class="plain">
+    <li>Descargar el instalador desde la web oficial de Android Developers.</li>
+    <li>Ejecutar el <code>.exe</code> y aceptar los avisos de control de cuentas de usuario (UAC).</li>
+    <li>Seguir el asistente aceptando las opciones por defecto.</li>
+    <li>Al abrir por primera vez, elegir tema (claro u oscuro).</li>
+    <li>En el <strong style="color:#fff">Setup Wizard</strong>, seleccionar la opción <strong style="color:#fff">Standard</strong> para que se descarguen e instalen automáticamente los componentes esenciales (Android SDK, herramientas de compilación, etc.).</li>
+    <li>Permitir los permisos de Windows que solicite (por ejemplo, para <code>adb.exe</code>).</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Cambiar el idioma de la interfaz a español</h3>
+  <p>Si prefieres la interfaz en español:</p>
+  <ol class="plain">
+    <li>Ir a <strong style="color:#fff">Settings &gt; Appearance &amp; Behavior &gt; System Settings &gt; Language</strong>.</li>
+    <li>Seleccionar <strong style="color:#fff">Español</strong>.</li>
+    <li>Reiniciar Android Studio.</li>
+  </ol>
+  <div class="callout tip"><strong>Consejo:</strong> aunque la interfaz esté en español, muchos mensajes de error de Gradle seguirán en inglés. Es bueno acostumbrarse a ambos.</div>
+</section>
+
+<!-- ============ SECTION 4: CONFIGURACIÓN ============ -->
+<section class="block" id="configuracion">
+  <div class="eyebrow-row"><span class="section-num">04</span></div>
+  <h2>Configuración inicial y antivirus</h2>
+
+  <h3 style="margin-top:1rem;">Exclusión de Windows Defender</h3>
+  <p>Los cierres repentinos de Android Studio suelen deberse al escaneo en tiempo real de Windows Defender. Se recomienda añadir estas carpetas a las <strong style="color:#fff">exclusiones</strong> de Seguridad de Windows:</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Carpeta</th><th>Ruta típica</th></tr></thead>
+    <tbody>
+      <tr><td>Caché de Gradle</td><td><code>%USERPROFILE%\.gradle</code></td></tr>
+      <tr><td>Proyectos</td><td><code>%USERPROFILE%\AndroidStudioProjects</code></td></tr>
+      <tr><td>SDK de Android</td><td><code>%USERPROFILE%\AppData\Local\Android\Sdk</code></td></tr>
+      <tr><td>Configuración del IDE</td><td><code>%LOCALAPPDATA%\Google\AndroidStudio&lt;versión&gt;</code></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong style="color:#fff">Cómo añadirlas:</strong></p>
+  <ol class="plain">
+    <li>Abrir <strong style="color:#fff">Seguridad de Windows</strong>.</li>
+    <li>Ir a <strong style="color:#fff">Protección frente a virus y amenazas &gt; Administrar la configuración &gt; Exclusiones</strong>.</li>
+    <li>Añadir cada carpeta.</li>
+  </ol>
+  <div class="callout warn"><strong>Aviso:</strong> si hay otro antivirus instalado (Kaspersky, ESET, etc.), aplica las mismas exclusiones en él. Una actualización de Windows puede borrar las exclusiones: revísalas de vez en cuando.</div>
+
+  <h3 style="margin-top:1.6rem;">Configuración del JDK</h3>
+  <p>Android Studio incluye su propio JDK (JetBrains Runtime). Normalmente no necesitas configurar nada.</p>
+  <p>Si tienes problemas de compilación por incompatibilidad de versiones:</p>
+  <ol class="plain">
+    <li>Ir a <strong style="color:#fff">Settings &gt; Build, Execution, Deployment &gt; Build Tools &gt; Gradle</strong>.</li>
+    <li>En <strong style="color:#fff">Gradle JDK</strong>, seleccionar una versión compatible (por ejemplo, <strong style="color:#fff">17</strong>).</li>
+    <li>Pulsar <strong style="color:#fff">Apply</strong> y <strong style="color:#fff">OK</strong>.</li>
+    <li>Hacer <strong style="color:#fff">File &gt; Sync Project with Gradle Files</strong>.</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Gestión del SDK</h3>
+  <p>Desde <strong style="color:#fff">Tools &gt; SDK Manager</strong> puedes:</p>
+  <ul class="plain">
+    <li>Ver qué versiones del SDK de Android tienes instaladas.</li>
+    <li>Instalar nuevas plataformas (por ejemplo, Android 15).</li>
+    <li>Instalar herramientas de compilación adicionales.</li>
+    <li>Actualizar componentes existentes.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 5: PROYECTO NUEVO ============ -->
+<section class="block" id="proyecto-nuevo">
+  <div class="eyebrow-row"><span class="section-num">05</span></div>
+  <h2>Creación de un proyecto nuevo</h2>
+
+  <h3 style="margin-top:1rem;">Pasos</h3>
+  <ol class="plain">
+    <li>En la pantalla de bienvenida, pulsar <strong style="color:#fff">«New Project»</strong>.</li>
+    <li>Elegir la plantilla <strong style="color:#fff">«Empty Activity»</strong> (pestaña «Phone and Tablet»).</li>
+    <li>Configurar:
+      <ul class="plain" style="margin-top:.4rem;">
+        <li><strong style="color:#fff">Name</strong>: nombre de la app (por ejemplo, <code>MiPrimerAplicacion</code>).</li>
+        <li><strong style="color:#fff">Package name</strong>: se genera automáticamente (<code>com.example.miprimeraaplicacion</code>).</li>
+        <li><strong style="color:#fff">Minimum SDK</strong>: se recomienda <strong style="color:#fff">API 24 (Android 7.0 Nougat)</strong> para máxima compatibilidad.</li>
+      </ul>
+    </li>
+    <li>Pulsar <strong style="color:#fff">«Finish»</strong> y esperar a que Gradle configure el proyecto.</li>
+  </ol>
+  <div class="callout tip"><strong>Nota:</strong> la primera vez que se crea un proyecto, Android Studio descarga muchas dependencias. Puede tardar varios minutos. Verás una barra de progreso en la parte inferior.</div>
+
+  <h3 style="margin-top:1.6rem;">Qué ocurre internamente al crear el proyecto</h3>
+  <ol class="plain">
+    <li>Android Studio genera la estructura de carpetas.</li>
+    <li>Crea los archivos <code>build.gradle.kts</code> con las dependencias básicas.</li>
+    <li>Descarga el <strong style="color:#fff">Gradle Wrapper</strong> correspondiente.</li>
+    <li>Descarga las dependencias de AndroidX, Compose, etc.</li>
+    <li>Indexa todos los archivos (verás «Indexing...» en la parte inferior).</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Sobre el Gradle Wrapper</h3>
+  <ul class="plain">
+    <li>Android Studio no usa una instalación externa de Gradle, sino el <strong style="color:#fff">Gradle Wrapper</strong> del proyecto.</li>
+    <li>El wrapper se define en <code>gradle/wrapper/gradle-wrapper.properties</code> (indica la versión) y se ejecuta con <code>gradlew</code> / <code>gradlew.bat</code>.</li>
+    <li>Cada proyecto tiene su propio wrapper, por lo que puede usar una versión distinta de Gradle.</li>
+    <li>Al cambiar de versión, el wrapper descarga automáticamente los binarios necesarios la primera vez.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 6: EMULADOR ============ -->
+<section class="block" id="emulador">
+  <div class="eyebrow-row"><span class="section-num">06</span></div>
+  <h2>El emulador (AVD) y cómo ejecutar la app</h2>
+
+  <h3 style="margin-top:1rem;">¿Qué es un AVD?</h3>
+  <p>Un <strong style="color:#fff">AVD (Android Virtual Device)</strong> es un emulador de teléfono Android que se ejecuta en tu ordenador. Te permite probar apps sin necesidad de un móvil físico.</p>
+
+  <h3 style="margin-top:1.6rem;">Crear un AVD</h3>
+  <ol class="plain">
+    <li>Ir a <strong style="color:#fff">Tools &gt; Device Manager</strong>.</li>
+    <li>Pulsar <strong style="color:#fff">«+» (Create Virtual Device)</strong>.</li>
+    <li>Elegir un modelo (por ejemplo, <strong style="color:#fff">Pixel 6</strong>).</li>
+    <li>Seleccionar una imagen del sistema (por ejemplo, <strong style="color:#fff">Android 14 / UpsideDownCake</strong>). Si no está descargada, pulsar el icono de descarga y aceptar los términos.</li>
+    <li>Ponerle un nombre al AVD (por ejemplo, <code>Pixel_Clase</code>) y finalizar.</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Ejecutar la app: flujo completo</h3>
+  <ol class="plain">
+    <li><strong style="color:#fff">Seleccionar dispositivo:</strong> en la barra superior, en el desplegable de dispositivo, elegir el AVD que acabas de crear.</li>
+    <li><strong style="color:#fff">Pulsar Run (▶️)</strong> o usar <kbd>Shift</kbd>+<kbd>F10</kbd>.</li>
+    <li><strong style="color:#fff">Esperar la compilación:</strong> verás el progreso en el panel Build (abajo). La primera vez tarda más.</li>
+    <li><strong style="color:#fff">Arranque del emulador:</strong> si no estaba abierto, se abrirá automáticamente. Puede tardar 1-2 minutos.</li>
+    <li><strong style="color:#fff">Instalación y ejecución:</strong> Android Studio instala la app en el emulador y la abre.</li>
+    <li><strong style="color:#fff">Resultado:</strong> verás tu app en pantalla.</li>
+  </ol>
+  <div class="callout tip"><strong>Consejo:</strong> no cierres el emulador entre ejecuciones. Dejarlo abierto en segundo plano acelera mucho las siguientes compilaciones.</div>
+
+  <h3 style="margin-top:1.6rem;">Si algo falla</h3>
+  <ul class="plain">
+    <li><strong style="color:#fff"><code>BUILD FAILED</code></strong>: mira el panel Build para ver el error real.</li>
+    <li><strong style="color:#fff">El emulador no arranca</strong>: revisa que la virtualización esté activada en la BIOS/UEFI.</li>
+    <li><strong style="color:#fff">La app se cierra al abrirse</strong>: mira el panel Logcat para ver el error.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 7: PRIMER CONTACTO ============ -->
+<section class="block" id="primer-contacto">
+  <div class="eyebrow-row"><span class="section-num">07</span></div>
+  <h2>Primer contacto práctico: modificar el Hola Mundo</h2>
+  <p class="lede"><strong style="color:#fff">Objetivo:</strong> modificar el texto que muestra la app por defecto y ver el resultado en el emulador.</p>
+
+  <h3 style="margin-top:1rem;">Pasos</h3>
+  <ol class="plain">
+    <li>Abre <code>MainActivity.kt</code> (en <code>app &gt; java &gt; com.example.miprimeraaplicacion</code>).</li>
+    <li>Localiza la función <code>Greeting</code>:</li>
+  </ol>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="ann">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Greeting</span>(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = <span class="str">"Hello $name!"</span>,
+        modifier = modifier
+    )
+}</code></pre></div>
+  <p>3. Cambia el texto por algo como:</p>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>text = <span class="str">"¡Hola desde mi primera app!"</span>,</code></pre></div>
+  <ol class="plain" start="4">
+    <li>En el editor, pulsa <strong style="color:#fff">Split</strong> (arriba a la derecha) para ver la previsualización. Verás el cambio reflejado en el panel Design.</li>
+    <li>Pulsa <strong style="color:#fff">Run (▶️)</strong> para ejecutar la app en el emulador.</li>
+    <li>Observa el resultado.</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Experimenta</h3>
+  <p>Prueba a cambiar:</p>
+  <ul class="plain">
+    <li>El <strong style="color:#fff">color de fondo</strong> en <code>ui/theme/Color.kt</code>.</li>
+    <li>El <strong style="color:#fff">texto</strong> que se pasa a <code>Greeting</code> desde <code>MainActivity</code>.</li>
+    <li>Añadir <strong style="color:#fff">otro <code>Text</code></strong> debajo del primero.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 8: INTERFAZ IDE ============ -->
+<section class="block" id="interfaz">
+  <div class="eyebrow-row"><span class="section-num">08</span></div>
+  <h2>Interfaz de Android Studio</h2>
+  <p class="lede">Toca cada zona de la ventana para ver qué hace y su equivalente si vienes de Eclipse.</p>
+
+  <div class="zonemap" id="zoneMap">
+    <div class="zone zone-toolbar" data-zone="toolbar">Toolbar + menús</div>
+    <div class="zone zone-project" data-zone="project">Project</div>
+    <div class="zone zone-editor" data-zone="editor">Editor</div>
+    <div class="zone zone-gradle" data-zone="gradle">Gradle</div>
+    <div class="zone zone-bottom" data-zone="bottom">Build · Logcat · Terminal</div>
+  </div>
+  <div class="zone-info" id="zoneInfo"></div>
+
+  <div style="display:none" id="zoneBank">
+    <div data-zone="toolbar"><b>Barra superior — Toolbar + menús</b>Contiene los botones Run, Debug, Build y Sync, además de los desplegables de dispositivo y configuración. Equivalente a los menús + toolbar de Eclipse.</div>
+    <div data-zone="project"><b>Panel Project</b>Por defecto en modo <strong style="color:#fff">Android</strong> (vista agrupada y amigable); puedes cambiar a modo <strong style="color:#fff">Project</strong> para ver la estructura real de carpetas. Equivale al Package Explorer de Eclipse. Contiene <code>app &gt; java</code> (código Kotlin), <code>app &gt; res</code> (recursos) y <code>Gradle Scripts</code>.</div>
+    <div data-zone="editor"><b>Editor</b>Pestañas de archivos, con opción de Split Right / Split Down. En archivos Compose o layouts XML aparecen los botones <strong style="color:#fff">Code / Split / Design</strong> para alternar entre código y previsualización.</div>
+    <div data-zone="gradle"><b>Panel Gradle</b>Muestra las tareas de Gradle del proyecto. Permite ejecutar tareas concretas con doble clic. Equivale al panel Outline/Tasks de Eclipse.</div>
+    <div data-zone="bottom"><b>Panel inferior — Build, Logcat, Terminal</b><strong style="color:#fff">Build</strong>: resultado de las compilaciones, con los errores reales cuando algo falla (busca <code>FAILURE</code> o <code>What went wrong</code>). <strong style="color:#fff">Logcat</strong>: visor de logs del dispositivo/emulador. <strong style="color:#fff">Terminal</strong>: terminal integrada en la raíz del proyecto, útil para <code>./gradlew</code>. Equivale a la Console y a Problems de Eclipse.</div>
+  </div>
+
+  <p style="margin-top:1.2rem; font-size:.85rem; color:var(--text-faint);">Las ventanas se muestran u ocultan desde <strong style="color:#fff">View &gt; Tool Windows</strong>.</p>
+
+  <h3 style="margin-top:1.8rem;">Toolbar: botones esenciales</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Botón</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td>▶️ <strong style="color:#fff">Run</strong></td><td>Compila e instala la app en el dispositivo/emulador</td></tr>
+      <tr><td>🐞 <strong style="color:#fff">Debug</strong></td><td>Igual, pero en modo depuración</td></tr>
+      <tr><td>🔨 <strong style="color:#fff">Build</strong></td><td>Solo compila</td></tr>
+      <tr><td>🔄 <strong style="color:#fff">Sync</strong></td><td>Sincroniza cambios de Gradle</td></tr>
+      <tr><td>Desplegable de dispositivo</td><td>Elige emulador o móvil físico</td></tr>
+      <tr><td>Desplegable de configuración</td><td>Normalmente <code>app</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">Menú superior: acciones clave</h3>
+  <ul class="plain">
+    <li><strong style="color:#fff">File &gt; New &gt; New Project</strong>: crear proyecto.</li>
+    <li><strong style="color:#fff">File &gt; Sync Project with Gradle Files</strong>: resincronizar Gradle.</li>
+    <li><strong style="color:#fff">Build &gt; Clean Project</strong> / <strong style="color:#fff">Rebuild Project</strong>: limpiar y reconstruir.</li>
+    <li><strong style="color:#fff">Tools &gt; Device Manager</strong>: gestionar emuladores.</li>
+    <li><strong style="color:#fff">Tools &gt; SDK Manager</strong>: gestionar versiones del SDK.</li>
+    <li><strong style="color:#fff">Help &gt; Check for Updates</strong>: actualizar Android Studio.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 9: ATAJOS ============ -->
+<section class="block" id="atajos">
+  <div class="eyebrow-row"><span class="section-num">09</span></div>
+  <h2>Atajos de teclado esenciales</h2>
+  <p class="lede">Escribe para filtrar la tabla y encuentra el atajo que necesitas.</p>
+  <input type="text" class="filter-input" id="shortcutFilter" placeholder="Buscar atajo (ej. «buscar», «formatear», «run»)...">
+  <div class="tblwrap"><table>
+    <thead><tr><th>Acción</th><th>Atajo</th></tr></thead>
+    <tbody id="shortcutBody">
+      <tr class="shortcut-row"><td>Ejecutar app</td><td><kbd>Shift</kbd> + <kbd>F10</kbd></td></tr>
+      <tr class="shortcut-row"><td>Debug</td><td><kbd>Shift</kbd> + <kbd>F9</kbd></td></tr>
+      <tr class="shortcut-row"><td>Buscar en todo</td><td><kbd>Shift</kbd> <kbd>Shift</kbd></td></tr>
+      <tr class="shortcut-row"><td>Buscar en archivo</td><td><kbd>Ctrl</kbd> + <kbd>F</kbd></td></tr>
+      <tr class="shortcut-row"><td>Buscar en proyecto</td><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd></td></tr>
+      <tr class="shortcut-row"><td>Ir a archivo</td><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd></td></tr>
+      <tr class="shortcut-row"><td>Ir a clase</td><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td></tr>
+      <tr class="shortcut-row"><td>Formatear código</td><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd></td></tr>
+      <tr class="shortcut-row"><td>Comentar línea</td><td><kbd>Ctrl</kbd> + <kbd>/</kbd></td></tr>
+      <tr class="shortcut-row"><td>Duplicar línea</td><td><kbd>Ctrl</kbd> + <kbd>D</kbd></td></tr>
+      <tr class="shortcut-row"><td>Borrar línea</td><td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td></tr>
+      <tr class="shortcut-row"><td>Renombrar</td><td><kbd>Shift</kbd> + <kbd>F6</kbd></td></tr>
+      <tr class="shortcut-row"><td>Ver definición</td><td><kbd>Ctrl</kbd> + <kbd>B</kbd></td></tr>
+      <tr class="shortcut-row"><td>Replegar/desplegar bloque</td><td><kbd>Ctrl</kbd> + <kbd>-</kbd> / <kbd>Ctrl</kbd> + <kbd>+</kbd></td></tr>
+    </tbody>
+  </table></div>
+  <p id="shortcutEmpty" style="display:none; text-align:center; color:var(--text-faint); margin-top:1rem;">Ningún atajo coincide con esa búsqueda.</p>
+</section>
+
+<!-- ============ SECTION 10: ESTRUCTURA ============ -->
+<section class="block" id="estructura">
+  <div class="eyebrow-row"><span class="section-num">10</span></div>
+  <h2>Estructura de un proyecto Kotlin</h2>
+  <p class="lede">Haz clic en cualquier carpeta o archivo del árbol para ver qué contiene.</p>
+
+  <div class="filetree" id="fileTree">
+    <div class="ft-node open">
+      <div class="ft-row" data-info="root"><span class="chev">▸</span><span class="ico">📁</span>MiPrimerAplicacion/</div>
+      <div class="ft-children">
+        <div class="ft-node open">
+          <div class="ft-row" data-info="app"><span class="chev">▸</span><span class="ico">📁</span>app/</div>
+          <div class="ft-children">
+            <div class="ft-node open">
+              <div class="ft-row" data-info="src-main"><span class="chev">▸</span><span class="ico">📁</span>src/main/</div>
+              <div class="ft-children">
+                <div class="ft-node open">
+                  <div class="ft-row" data-info="java"><span class="chev">▸</span><span class="ico">📁</span>java/ com/ejemplo/miprimeraaplicacion/</div>
+                  <div class="ft-children">
+                    <div class="ft-node"><div class="ft-row file" data-info="mainactivity"><span class="chev"></span><span class="ico">📄</span>MainActivity.kt</div></div>
+                    <div class="ft-node"><div class="ft-row file" data-info="uitheme"><span class="chev"></span><span class="ico">📁</span>ui/theme/</div></div>
+                  </div>
+                </div>
+                <div class="ft-node"><div class="ft-row file" data-info="res"><span class="chev"></span><span class="ico">📁</span>res/</div></div>
+                <div class="ft-node"><div class="ft-row file" data-info="manifest"><span class="chev"></span><span class="ico">📄</span>AndroidManifest.xml</div></div>
+              </div>
+            </div>
+            <div class="ft-node"><div class="ft-row file" data-info="test"><span class="chev"></span><span class="ico">📁</span>src/test/</div></div>
+            <div class="ft-node"><div class="ft-row file" data-info="androidtest"><span class="chev"></span><span class="ico">📁</span>src/androidTest/</div></div>
+            <div class="ft-node"><div class="ft-row file" data-info="buildgradleapp"><span class="chev"></span><span class="ico">📄</span>build.gradle.kts</div></div>
+            <div class="ft-node"><div class="ft-row file" data-info="proguard"><span class="chev"></span><span class="ico">📄</span>proguard-rules.pro</div></div>
+          </div>
+        </div>
+        <div class="ft-node"><div class="ft-row file" data-info="gradlewrapper"><span class="chev"></span><span class="ico">📁</span>gradle/wrapper/</div></div>
+        <div class="ft-node"><div class="ft-row file" data-info="buildgradleroot"><span class="chev"></span><span class="ico">📄</span>build.gradle.kts</div></div>
+        <div class="ft-node"><div class="ft-row file" data-info="settingsgradle"><span class="chev"></span><span class="ico">📄</span>settings.gradle.kts</div></div>
+        <div class="ft-node"><div class="ft-row file" data-info="gradleprops"><span class="chev"></span><span class="ico">📄</span>gradle.properties</div></div>
+        <div class="ft-node"><div class="ft-row file" data-info="gradlew"><span class="chev"></span><span class="ico">📄</span>gradlew / gradlew.bat</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft-info" id="ftInfo">👆 Haz clic en un elemento del árbol para ver su descripción.</div>
+
+  <div style="display:none" id="ftBank">
+    <span data-info="root">Raíz del proyecto. Contiene el módulo <code>app</code> y los scripts de configuración compartidos.</span>
+    <span data-info="app">Módulo de la aplicación: aquí vive todo el código y los recursos de tu app.</span>
+    <span data-info="src-main">Código y recursos principales de la app final (lo que se compila en el APK).</span>
+    <span data-info="java">A pesar del nombre, contiene archivos <code>.kt</code> de Kotlin: <code>MainActivity.kt</code> (actividad principal) y <code>ui/theme/</code> (tema visual).</span>
+    <span data-info="mainactivity">Actividad principal de la app. Punto de entrada de la interfaz Compose — la vemos en detalle en la siguiente sección.</span>
+    <span data-info="uitheme">Contiene <code>Color.kt</code> (colores), <code>Theme.kt</code> (tema claro/oscuro) y <code>Type.kt</code> (tipografía).</span>
+    <span data-info="res">Recursos: <code>drawable/</code> (imágenes), <code>mipmap/</code> (iconos), <code>values/</code> (strings, colores, estilos) y <code>xml/</code> (configuraciones XML). Con Compose, <code>res/layout/</code> ya no se usa.</span>
+    <span data-info="manifest">El «DNI» de la app: declara paquete, permisos, actividades y el punto de entrada. La vemos en detalle más abajo.</span>
+    <span data-info="test">Tests unitarios que se ejecutan en la JVM (sin dispositivo ni emulador).</span>
+    <span data-info="androidtest">Tests instrumentados: se ejecutan en un dispositivo o emulador real.</span>
+    <span data-info="buildgradleapp">Configuración del módulo <code>app</code>: <code>compileSdk</code>, <code>minSdk</code>, <code>targetSdk</code>, <code>applicationId</code> y el bloque <code>dependencies</code>.</span>
+    <span data-info="proguard">Reglas de ofuscación y reducción de código para compilaciones de <em>release</em>.</span>
+    <span data-info="gradlewrapper">Versión de Gradle y <code>.jar</code> del wrapper — permite que el proyecto use Gradle sin instalarlo.</span>
+    <span data-info="buildgradleroot">Configuración global: plugins y ajustes comunes a todos los módulos del proyecto.</span>
+    <span data-info="settingsgradle">Declara los módulos del proyecto (normalmente solo <code>:app</code>).</span>
+    <span data-info="gradleprops">Propiedades de Gradle: memoria asignada, flags de compilación, etc.</span>
+    <span data-info="gradlew">Scripts para ejecutar Gradle sin necesidad de instalarlo en el sistema.</span>
+  </div>
+
+  <h3 style="margin-top:1.8rem;"><code>build.gradle.kts</code> del módulo <code>app</code> (ejemplo real)</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace = <span class="str">"com.example.miprimeraaplicacion"</span>
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = <span class="str">"com.example.miprimeraaplicacion"</span>
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = <span class="str">"1.0"</span>
+
+        testInstrumentationRunner = <span class="str">"androidx.test.runner.AndroidJUnitRunner"</span>
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = <span class="kw">false</span>
+            proguardFiles(
+                getDefaultProguardFile(<span class="str">"proguard-android-optimize.txt"</span>),
+                <span class="str">"proguard-rules.pro"</span>
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = <span class="str">"17"</span>
+    }
+    buildFeatures {
+        compose = <span class="kw">true</span>
+    }
+}
+
+dependencies {
+    implementation(<span class="str">"androidx.core:core-ktx:1.15.0"</span>)
+    implementation(<span class="str">"androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"</span>)
+    implementation(<span class="str">"androidx.activity:activity-compose:1.9.3"</span>)
+    implementation(platform(<span class="str">"androidx.compose:compose-bom:2024.12.01"</span>))
+    implementation(<span class="str">"androidx.compose.ui:ui"</span>)
+    implementation(<span class="str">"androidx.compose.ui:ui-graphics"</span>)
+    implementation(<span class="str">"androidx.compose.ui:ui-tooling-preview"</span>)
+    implementation(<span class="str">"androidx.compose.material3:material3"</span>)
+    testImplementation(<span class="str">"junit:junit:4.13.2"</span>)
+    androidTestImplementation(<span class="str">"androidx.test.ext:junit:1.2.1"</span>)
+    androidTestImplementation(<span class="str">"androidx.test.espresso:espresso-core:3.6.1"</span>)
+    androidTestImplementation(platform(<span class="str">"androidx.compose:compose-bom:2024.12.01"</span>))
+    androidTestImplementation(<span class="str">"androidx.compose.ui:ui-test-junit4"</span>)
+    debugImplementation(<span class="str">"androidx.compose.ui:ui-tooling"</span>)
+    debugImplementation(<span class="str">"androidx.compose.ui:ui-test-manifest"</span>)
+}</code></pre></div>
+  <div class="callout tip"><strong>Nota:</strong> los números de versión pueden variar según la versión de Android Studio. Lo importante es entender la estructura: <code>compileSdk</code>, <code>minSdk</code>, <code>targetSdk</code>, <code>applicationId</code> y el bloque <code>dependencies</code>.</div>
+</section>
+
+<!-- ============ SECTION 11-13: CÓDIGO ============ -->
+<section class="block" id="codigo">
+  <div class="eyebrow-row"><span class="section-num">11-13</span></div>
+  <h2>El código de <code>MainActivity.kt</code>, el Manifest y los recursos</h2>
+
+  <h3 style="margin-top:1rem;">Código completo</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">package</span> com.example.miprimeraplicacion
+
+<span class="kw">import</span> android.os.Bundle
+<span class="kw">import</span> androidx.activity.ComponentActivity
+<span class="kw">import</span> androidx.activity.compose.setContent
+<span class="kw">import</span> androidx.activity.enableEdgeToEdge
+<span class="kw">import</span> androidx.compose.foundation.layout.fillMaxSize
+<span class="kw">import</span> androidx.compose.foundation.layout.padding
+<span class="kw">import</span> androidx.compose.material3.Scaffold
+<span class="kw">import</span> androidx.compose.material3.Text
+<span class="kw">import</span> androidx.compose.runtime.Composable
+<span class="kw">import</span> androidx.compose.ui.Modifier
+<span class="kw">import</span> androidx.compose.ui.tooling.preview.Preview
+<span class="kw">import</span> com.example.miprimeraplicacion.ui.theme.MiPrimerAplicacionTheme
+
+<span class="kw">class</span> <span class="fn">MainActivity</span> : ComponentActivity() {
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="kw">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            MiPrimerAplicacionTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Greeting(
+                        name = <span class="str">"Android"</span>,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+        }
+    }
+}
+
+<span class="ann">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Greeting</span>(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = <span class="str">"Hello $name!"</span>,
+        modifier = modifier
+    )
+}
+
+<span class="ann">@Preview</span>(showBackground = <span class="kw">true</span>)
+<span class="ann">@Composable</span>
+<span class="kw">fun</span> <span class="fn">GreetingPreview</span>() {
+    MiPrimerAplicacionTheme {
+        Greeting(<span class="str">"Android"</span>)
+    }
+}</code></pre></div>
+
+  <h3 style="margin-top:1.8rem;">Explicación por bloques</h3>
+  <div class="accordion" id="accMainActivity">
+    <div class="acc-item open">
+      <button class="acc-head"><span>Paquete e imports</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li><code>package</code>: identifica el archivo dentro del proyecto. Coincide con la ruta de carpetas.</li>
+          <li><code>import</code>: trae clases y funciones de otras librerías. Los que empiezan por <code>androidx.compose</code> son de Jetpack Compose.</li>
+        </ul>
+      </div></div>
+    </div>
+    <div class="acc-item">
+      <button class="acc-head"><span>Clase MainActivity</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li>Hereda de <code>ComponentActivity</code>, versión moderna pensada para Compose.</li>
+          <li><code>onCreate</code>: método que se ejecuta al crear la Activity. Es el punto de entrada.</li>
+          <li><code>super.onCreate(...)</code>: inicializa la clase padre.</li>
+          <li><code>enableEdgeToEdge()</code>: hace que la app ocupe toda la pantalla, incluso detrás de las barras del sistema.</li>
+        </ul>
+      </div></div>
+    </div>
+    <div class="acc-item">
+      <button class="acc-head"><span>setContent y tema</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li><code>setContent { ... }</code>: conecta Compose con la Activity. Todo lo que va dentro es interfaz declarativa.</li>
+          <li><code>MiPrimerAplicacionTheme</code>: aplica colores, tipografía y formas definidos en <code>ui/theme/</code>.</li>
+        </ul>
+      </div></div>
+    </div>
+    <div class="acc-item">
+      <button class="acc-head"><span>Scaffold</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li>Componente de Material 3 que proporciona la estructura básica de pantalla (barra superior, inferior, etc.).</li>
+          <li><code>Modifier.fillMaxSize()</code>: ocupa toda la pantalla.</li>
+          <li><code>innerPadding</code>: padding interno calculado por el Scaffold para que el contenido no quede tapado por las barras del sistema.</li>
+        </ul>
+      </div></div>
+    </div>
+    <div class="acc-item">
+      <button class="acc-head"><span>Función Greeting</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li><code>@Composable</code>: marca la función como parte de la interfaz. Solo las funciones así pueden llamar a otros composables.</li>
+          <li>Recibe <code>name</code> (String) y <code>modifier</code> (Modifier, por defecto vacío).</li>
+          <li><code>Text(...)</code>: composable que muestra texto. Equivale a un <code>TextView</code> clásico.</li>
+          <li><code>"Hello $name!"</code>: interpolación de strings. <code>$name</code> se sustituye por el valor de la variable.</li>
+        </ul>
+        <div class="callout key"><strong>¿Por qué se pasa <code>modifier</code> como parámetro?</strong> Es una convención de Compose: cada composable acepta un <code>Modifier</code> para que quien lo use pueda aplicar padding, tamaño, etc. desde fuera. Esto hace los composables reutilizables.</div>
+      </div></div>
+    </div>
+    <div class="acc-item">
+      <button class="acc-head"><span>Función GreetingPreview</span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="acc-panel"><div class="acc-panel-inner">
+        <ul class="plain">
+          <li><code>@Preview</code>: le dice a Android Studio que muestre esta función en el panel de vista previa. No se ejecuta en la app, solo en el IDE.</li>
+          <li><code>showBackground = true</code>: muestra un fondo blanco detrás de la previsualización.</li>
+          <li>Envuelve <code>Greeting("Android")</code> en el tema para que use los mismos colores y tipografía que la app real.</li>
+        </ul>
+      </div></div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.8rem;">Flujo de ejecución</h3>
+  <div class="codewrap"><pre class="code" style="border-color:var(--border-soft)"><code>MainActivity.onCreate()
+    → setContent { ... }           <span class="cmt">← conecta Compose con la Activity</span>
+        → MiPrimerAplicacionTheme  <span class="cmt">← aplica colores y tipografía</span>
+            → Scaffold             <span class="cmt">← estructura de pantalla + padding</span>
+                → Greeting()       <span class="cmt">← el contenido visible</span>
+                    → Text()       <span class="cmt">← el texto en pantalla</span></code></pre></div>
+  <p>En paralelo, <code>GreetingPreview</code> permite ver <code>Greeting</code> en el panel Design o Split del editor, sin ejecutar la app.</p>
+
+  <div class="callout key">
+    <strong>Conceptos mínimos para empezar:</strong>
+    <ol class="plain" style="margin-top:.5rem;">
+      <li><code>onCreate</code> es el punto de entrada de la Activity.</li>
+      <li><code>setContent</code> es donde se describe la interfaz.</li>
+      <li><code>Greeting</code> es una función que dibuja algo en pantalla.</li>
+      <li><code>@Composable</code> marca las funciones que forman parte de la interfaz.</li>
+      <li><code>@Preview</code> sirve para ver el resultado sin ejecutar.</li>
+    </ol>
+  </div>
+
+  <h3 style="margin-top:2rem;"><code>AndroidManifest.xml</code> y su relación con MainActivity</h3>
+  <p>Es el «DNI» de la aplicación. Declara el <strong style="color:#fff">paquete</strong> de la app, los <strong style="color:#fff">permisos</strong> que necesita, las <strong style="color:#fff">actividades</strong> que contiene, el <strong style="color:#fff">punto de entrada</strong> y la <strong style="color:#fff">versión</strong>/SDK mínimo-objetivo.</p>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>&lt;?xml version=<span class="str">"1.0"</span> encoding=<span class="str">"utf-8"</span>?&gt;
+&lt;<span class="tagx">manifest</span> <span class="attr">xmlns:android</span>=<span class="str">"http://schemas.android.com/apk/res/android"</span>&gt;
+
+    &lt;<span class="tagx">application</span>
+        <span class="attr">android:allowBackup</span>=<span class="str">"true"</span>
+        <span class="attr">android:icon</span>=<span class="str">"@mipmap/ic_launcher"</span>
+        <span class="attr">android:label</span>=<span class="str">"@string/app_name"</span>
+        <span class="attr">android:theme</span>=<span class="str">"@style/Theme.MiPrimerAplicacion"</span>&gt;
+
+        &lt;<span class="tagx">activity</span>
+            <span class="attr">android:name</span>=<span class="str">".MainActivity"</span>
+            <span class="attr">android:exported</span>=<span class="str">"true"</span>
+            <span class="attr">android:theme</span>=<span class="str">"@style/Theme.MiPrimerAplicacion"</span>&gt;
+            &lt;<span class="tagx">intent-filter</span>&gt;
+                &lt;<span class="tagx">action</span> <span class="attr">android:name</span>=<span class="str">"android.intent.action.MAIN"</span> /&gt;
+                &lt;<span class="tagx">category</span> <span class="attr">android:name</span>=<span class="str">"android.intent.category.LAUNCHER"</span> /&gt;
+            &lt;/<span class="tagx">intent-filter</span>&gt;
+        &lt;/<span class="tagx">activity</span>&gt;
+
+    &lt;/<span class="tagx">application</span>&gt;
+
+&lt;/<span class="tagx">manifest</span>&gt;</code></pre></div>
+  <ul class="plain">
+    <li>La etiqueta <code>&lt;activity android:name=".MainActivity"&gt;</code> declara que existe una Activity llamada <code>MainActivity</code>.</li>
+    <li>El <code>&lt;intent-filter&gt;</code> con <code>MAIN</code> y <code>LAUNCHER</code> indica que <strong style="color:#fff">esa Activity es el punto de entrada</strong> de la app: es la que se abre al pulsar el icono.</li>
+    <li>Si creas una segunda Activity, tienes que registrarla aquí también.</li>
+  </ul>
+
+  <h3 style="margin-top:2rem;">Recursos: <code>strings.xml</code> y buenas prácticas</h3>
+  <p>Es un archivo en <code>res/values/</code> donde se definen todos los textos de la app.</p>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>&lt;<span class="tagx">resources</span>&gt;
+    &lt;<span class="tagx">string</span> <span class="attr">name</span>=<span class="str">"app_name"</span>&gt;Mi Primera Aplicación&lt;/<span class="tagx">string</span>&gt;
+    &lt;<span class="tagx">string</span> <span class="attr">name</span>=<span class="str">"saludo"</span>&gt;¡Hola desde mi app!&lt;/<span class="tagx">string</span>&gt;
+&lt;/<span class="tagx">resources</span>&gt;</code></pre></div>
+  <p><strong style="color:#fff">¿Por qué usarlo en lugar de hardcodear textos?</strong></p>
+  <ul class="plain">
+    <li><strong style="color:#fff">Internacionalización</strong>: puedes crear <code>values-en/strings.xml</code>, <code>values-fr/strings.xml</code>, etc. para traducir la app.</li>
+    <li><strong style="color:#fff">Mantenimiento</strong>: si cambias un texto, lo cambias en un solo sitio.</li>
+    <li><strong style="color:#fff">Buenas prácticas</strong>: es el estándar de Android.</li>
+  </ul>
+  <p>Cómo usarlo en Compose:</p>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Text(text = stringResource(id = R.string.saludo))</code></pre></div>
+  <div class="callout tip"><strong>Nota:</strong> para apps de aprendizaje, hardcodear textos es aceptable al principio. Pero es bueno acostumbrarse a <code>strings.xml</code> desde el principio.</div>
+</section>
+
+<!-- ============ SECTION 14: DEPURACIÓN ============ -->
+<section class="block" id="depuracion">
+  <div class="eyebrow-row"><span class="section-num">14</span></div>
+  <h2>Depuración básica: Logcat y Debug</h2>
+
+  <h3 style="margin-top:1rem;">Logcat</h3>
+  <p>Logcat muestra los mensajes que emite la app mientras se ejecuta. Es tu mejor amigo cuando algo falla.</p>
+  <ul class="plain">
+    <li><strong style="color:#fff">Niveles de log</strong>: <code>Verbose</code>, <code>Debug</code>, <code>Info</code>, <code>Warn</code>, <code>Error</code>.</li>
+    <li><strong style="color:#fff">Filtros</strong>: puedes filtrar por nivel, por tag o por texto.</li>
+    <li><strong style="color:#fff">Uso típico</strong>: si la app se cierra inesperadamente, busca <code>FATAL EXCEPTION</code> en Logcat.</li>
+  </ul>
+  <div class="callout key">Prueba el simulador de Logcat de la cabecera de la guía: cambia el escenario a «💥 La app se cierra» y filtra por <code>FATAL</code> para ver justo lo que describe este apartado.</div>
+
+  <h3 style="margin-top:1.6rem;">Cómo escribir un log desde el código</h3>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">import</span> android.util.Log
+
+Log.d(<span class="str">"MiTag"</span>, <span class="str">"Mensaje de depuración"</span>)
+Log.e(<span class="str">"MiTag"</span>, <span class="str">"Mensaje de error"</span>)</code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">Debug con puntos de ruptura</h3>
+  <ol class="plain">
+    <li>Haz clic en el margen izquierdo del editor, junto a la línea donde quieras parar. Aparecerá un punto rojo.</li>
+    <li>Pulsa 🐞 Debug (<kbd>Shift</kbd>+<kbd>F9</kbd>).</li>
+    <li>La app se ejecutará y se detendrá en esa línea.</li>
+    <li>En el panel Debugger puedes:
+      <ul class="plain" style="margin-top:.4rem;">
+        <li>Ver el valor de las variables.</li>
+        <li>Avanzar paso a paso (<kbd>F8</kbd>).</li>
+        <li>Entrar en una función (<kbd>F7</kbd>).</li>
+        <li>Continuar (<kbd>F9</kbd>).</li>
+      </ul>
+    </li>
+  </ol>
+</section>
+
+<!-- ============ SECTION 15: PROBLEMAS FRECUENTES ============ -->
+<section class="block" id="problemas">
+  <div class="eyebrow-row"><span class="section-num">15</span></div>
+  <h2>Problemas frecuentes y soluciones</h2>
+  <p class="lede">Antes de pedir ayuda, comprueba si tu problema está aquí. Piensa primero en la causa antes de revelar la solución.</p>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">⚠</span><h4>Advertencia «Unable to strip the following libraries»</h4></div>
+    <div class="codewrap"><pre class="code" style="border-color:var(--border-soft)"><code>Unable to strip the following libraries, packaging them as they are:
+libandroidx.graphics.path.so.</code></pre></div>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-1">🔎 Ver solución</button></div>
+    <div class="reveal-panel" id="tr-1">Es solo una <strong style="color:#fff">advertencia, no un error</strong>. La biblioteca ya viene sin símbolos de depuración, así que Gradle no puede «strippearla» y la empaqueta tal cual. No requiere acción: se puede ignorar con seguridad.</div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">⚠</span><h4>Error de compilación por incompatibilidad de Gradle</h4></div>
+    <p><strong style="color:#fff">Síntoma:</strong> la compilación falla con <code>Execution failed for task ':app:compileDebugKotlin'</code> y/o un aviso de que Gradle ya está en una versión más nueva.</p>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-2">🔎 Ver causa y solución</button></div>
+    <div class="reveal-panel" id="tr-2">
+      <p style="margin-bottom:.6rem;"><strong style="color:#fff">Causa:</strong> el proyecto usa una versión de Gradle que no es compatible con la versión del Android Gradle Plugin (AGP). Por ejemplo, AGP 8.x no es compatible con Gradle 9.6+.</p>
+      <p style="margin-bottom:.3rem;"><strong style="color:#fff">Solución:</strong></p>
+      <ol class="plain">
+        <li>Aceptar el enlace de actualización que ofrece Android Studio. Esto reescribe <code>gradle/wrapper/gradle-wrapper.properties</code> con la nueva versión.</li>
+        <li>Pulsar Sync para que Gradle descargue los binarios necesarios (<code>.jar</code>, <code>.pom</code>, <code>.module</code>).</li>
+        <li>Volver a compilar.</li>
+      </ol>
+      <p style="margin:0;"><strong style="color:#fff">Alternativa:</strong> ajustar el JDK del IDE en <strong style="color:#fff">Settings &gt; Build, Execution, Deployment &gt; Build Tools &gt; Gradle &gt; Gradle JDK</strong> a una versión compatible (por ejemplo, 17).</p>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">📋</span><h4>Cómo leer un error de Gradle</h4></div>
+    <p>Los errores de Gradle son larguísimos. Para encontrar el problema real:</p>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-3">🔎 Ver método</button></div>
+    <div class="reveal-panel" id="tr-3">
+      <ol class="plain">
+        <li>Abre el panel <strong style="color:#fff">Build</strong> (abajo).</li>
+        <li>Busca la línea que empieza por <code>FAILURE</code>.</li>
+        <li>Justo debajo, busca <code>What went wrong</code>.</li>
+        <li>Ahí está la descripción del error real.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">💥</span><h4>Cierres repentinos del IDE</h4></div>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-4">🔎 Ver causa y solución</button></div>
+    <div class="reveal-panel" id="tr-4">
+      <p style="margin-bottom:.4rem;"><strong style="color:#fff">Causa más probable:</strong> Windows Defender escaneando en tiempo real las carpetas de trabajo.</p>
+      <p style="margin:0;"><strong style="color:#fff">Solución:</strong> añade las exclusiones indicadas en el apartado de configuración inicial. Reinicia el equipo para limpiar bloqueos huérfanos.</p>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">📱</span><h4>El emulador no arranca</h4></div>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-5">🔎 Ver solución</button></div>
+    <div class="reveal-panel" id="tr-5">
+      <ul class="plain">
+        <li>Revisa que la <strong style="color:#fff">virtualización</strong> esté activada en la BIOS/UEFI.</li>
+        <li>En Windows 11, comprueba que <strong style="color:#fff">Hyper-V</strong> o <strong style="color:#fff">Windows Hypervisor Platform</strong> estén activados.</li>
+        <li>Prueba a crear un AVD con una imagen del sistema más ligera.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">🔄</span><h4>Gradle se queda colgado en «Sync»</h4></div>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-6">🔎 Ver solución</button></div>
+    <div class="reveal-panel" id="tr-6">
+      <ul class="plain">
+        <li>Comprueba la conexión a internet (Gradle descarga dependencias).</li>
+        <li>Prueba <strong style="color:#fff">File &gt; Invalidate Caches / Restart</strong>.</li>
+        <li>Si persiste, borra la carpeta <code>.gradle</code> del proyecto y vuelve a sincronizar.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="trouble">
+    <div class="trouble-head"><span class="trouble-icon">⏳</span><h4>«Indexing» tarda mucho</h4></div>
+    <div class="trouble-row"><button class="reveal-btn" data-target="tr-7">🔎 Ver explicación</button></div>
+    <div class="reveal-panel" id="tr-7">Es normal la primera vez. Android Studio está indexando todos los archivos del proyecto y las dependencias. En proyectos grandes puede tardar varios minutos.</div>
+  </div>
+</section>
+
+<!-- ============ SECTION 16-17: GIT + SIGUIENTES PASOS ============ -->
+<section class="block" id="siguientes">
+  <div class="eyebrow-row"><span class="section-num">16-17</span></div>
+  <h2>Control de versiones con Git y siguientes pasos</h2>
+
+  <h3 style="margin-top:1rem;">Inicializar Git en el proyecto</h3>
+  <p>Android Studio detecta automáticamente si el proyecto no está bajo control de versiones. Puedes:</p>
+  <ul class="plain">
+    <li>Ir a <strong style="color:#fff">VCS &gt; Enable Version Control Integration</strong> y elegir <strong style="color:#fff">Git</strong>.</li>
+    <li>O hacerlo desde terminal:</li>
+  </ul>
+  <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>git init
+git add .
+git commit -m <span class="str">"Primer commit"</span></code></pre></div>
+
+  <h3 style="margin-top:1.6rem;">Archivos que NO debes subir</h3>
+  <p>Android Studio genera un archivo <code>.gitignore</code> por defecto que excluye:</p>
+  <ul class="plain">
+    <li><code>.gradle/</code> → caché de Gradle.</li>
+    <li><code>build/</code> → artefactos de compilación.</li>
+    <li><code>local.properties</code> → rutas locales del SDK.</li>
+    <li><code>.idea/</code> → configuración del IDE.</li>
+  </ul>
+  <div class="callout warn"><strong>Nota:</strong> no borres el <code>.gitignore</code>. Es tu amigo.</div>
+
+  <h3 style="margin-top:1.6rem;">Conectar con GitHub</h3>
+  <ol class="plain">
+    <li><strong style="color:#fff">File &gt; Settings &gt; Version Control &gt; GitHub</strong> → añadir tu cuenta.</li>
+    <li><strong style="color:#fff">Git &gt; GitHub &gt; Share Project on GitHub</strong>.</li>
+    <li>Elegir nombre y visibilidad del repositorio.</li>
+  </ol>
+
+  <h3 style="margin-top:2rem;">Siguientes pasos</h3>
+  <p>Una vez dominado lo básico, estos son los siguientes pasos naturales:</p>
+  <div class="grid2" style="margin-top:1rem;">
+    <div class="trouble" style="margin-top:0;"><h4>Añadir interactividad</h4><ul class="plain"><li>Un <code>Button</code> que al pulsarlo cambie un texto.</li><li>Estado con <code>remember { mutableStateOf(...) }</code>.</li></ul></div>
+    <div class="trouble" style="margin-top:0;"><h4>Organizar la interfaz</h4><ul class="plain"><li><code>Column</code>, <code>Row</code> y <code>Box</code> para organizar elementos.</li><li><code>Modifier</code> para padding, tamaño, alineación.</li></ul></div>
+    <div class="trouble" style="margin-top:0;"><h4>Navegar entre pantallas</h4><ul class="plain"><li>Añadir una segunda pantalla.</li><li><strong style="color:#fff">Navigation Compose</strong> para navegar entre ellas.</li></ul></div>
+    <div class="trouble" style="margin-top:0;"><h4>Persistir datos</h4><ul class="plain"><li><strong style="color:#fff">SharedPreferences</strong> o <strong style="color:#fff">DataStore</strong>.</li><li>Bases de datos con <strong style="color:#fff">Room</strong>.</li></ul></div>
+    <div class="trouble" style="margin-top:0;"><h4>Consumir APIs</h4><ul class="plain"><li>Peticiones HTTP con <strong style="color:#fff">Retrofit</strong> o <strong style="color:#fff">Ktor</strong>.</li><li>Parsear JSON con <strong style="color:#fff">Kotlin Serialization</strong>.</li></ul></div>
+    <div class="trouble" style="margin-top:0;"><h4>Recursos recomendados</h4><ul class="plain"><li><a href="https://developer.android.com" target="_blank" rel="noopener">developer.android.com</a></li><li><a href="https://developer.android.com/codelabs" target="_blank" rel="noopener">Codelabs de Android</a></li><li><a href="https://play.kotlinlang.org" target="_blank" rel="noopener">Kotlin Playground</a></li><li>Curso «Android Basics with Compose» (Google)</li></ul></div>
+  </div>
+</section>
+
+<!-- ============ SECTION 18-19: REFERENCIA (GLOSARIO + FAQ) ============ -->
+<section class="block" id="referencia">
+  <div class="eyebrow-row"><span class="section-num">18-19</span></div>
+  <h2>Glosario y preguntas frecuentes</h2>
+
+  <h3 style="margin-top:1rem;">Glosario</h3>
+  <input type="text" class="filter-input" id="glossaryFilter" placeholder="Buscar término (ej. «gradle», «avd», «sdk»)...">
+  <dl id="glossaryList" style="margin-top:.6rem;">
+    <div class="glossary-item"><dt>Activity</dt><dd>Pantalla de la aplicación. Es el componente básico de la UI en Android.</dd></div>
+    <div class="glossary-item"><dt>AGP</dt><dd>Android Gradle Plugin. Plugin que integra Gradle con Android.</dd></div>
+    <div class="glossary-item"><dt>AVD</dt><dd>Android Virtual Device. Emulador de teléfono Android.</dd></div>
+    <div class="glossary-item"><dt>Composable</dt><dd>Función marcada con <code>@Composable</code> que forma parte de la interfaz en Compose.</dd></div>
+    <div class="glossary-item"><dt>Compose</dt><dd>Jetpack Compose. Sistema de interfaz moderno de Android.</dd></div>
+    <div class="glossary-item"><dt>Gradle</dt><dd>Sistema de construcción y gestión de dependencias.</dd></div>
+    <div class="glossary-item"><dt>Gradle Wrapper</dt><dd>Mecanismo que permite usar Gradle sin instalarlo, descargando la versión que el proyecto necesita.</dd></div>
+    <div class="glossary-item"><dt>JDK</dt><dd>Java Development Kit. Entorno de desarrollo para Java, necesario para ejecutar Gradle y Kotlin.</dd></div>
+    <div class="glossary-item"><dt>Logcat</dt><dd>Visor de logs del dispositivo o emulador.</dd></div>
+    <div class="glossary-item"><dt>Modifier</dt><dd>Objeto de Compose que permite aplicar modificaciones a un composable (padding, tamaño, etc.).</dd></div>
+    <div class="glossary-item"><dt>Package name</dt><dd>Identificador único de la app (por ejemplo, <code>com.example.miapp</code>).</dd></div>
+    <div class="glossary-item"><dt>Scaffold</dt><dd>Componente de Material 3 que proporciona la estructura básica de una pantalla.</dd></div>
+    <div class="glossary-item"><dt>SDK</dt><dd>Software Development Kit. Conjunto de herramientas para desarrollar en una plataforma.</dd></div>
+    <div class="glossary-item"><dt>Target SDK</dt><dd>Versión de Android para la que está optimizada la app.</dd></div>
+  </dl>
+  <p id="glossaryEmpty" style="display:none; text-align:center; color:var(--text-faint); margin-top:1rem;">Ningún término coincide con esa búsqueda.</p>
+
+  <h3 style="margin-top:2.2rem;">Preguntas frecuentes</h3>
+  <div id="faqList">
+    <div class="faq-item"><button class="faq-q"><span>¿Puedo usar Kotlin sin saber Java?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Sí. Kotlin es un lenguaje independiente y no necesitas saber Java para aprenderlo.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Qué diferencia hay entre Compose y XML?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">XML es el sistema clásico de layouts. Compose es el sistema moderno, donde la interfaz se describe en Kotlin. Compose es más conciso y menos propenso a errores.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Necesito un móvil físico?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">No. El emulador (AVD) es suficiente para aprender y probar apps.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Por qué tarda tanto la primera compilación?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Porque Gradle descarga todas las dependencias necesarias. Las siguientes compilaciones son mucho más rápidas.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Qué hago si Android Studio se cierra solo?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Añade las exclusiones de antivirus indicadas en el apartado de configuración inicial. Si persiste, reinicia el equipo.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Puedo tener varias versiones de Android Studio instaladas?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Sí. Descarga el <code>.zip</code> en lugar del <code>.exe</code> y descomprímelo en una carpeta separada.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Qué es el Gradle Wrapper?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Es un mecanismo que permite que cada proyecto use su propia versión de Gradle sin que tengas que instalarlo manualmente.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Dónde se guardan mis proyectos?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Por defecto en <code>C:\Users\&lt;tu-usuario&gt;\AndroidStudioProjects</code>.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Puedo cambiar el idioma de Android Studio?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Sí, en <strong style="color:#fff">Settings &gt; Appearance &amp; Behavior &gt; System Settings &gt; Language</strong>.</div></div></div>
+    <div class="faq-item"><button class="faq-q"><span>¿Qué hago si un error de Gradle no tiene sentido?</span><span class="plus">+</span></button><div class="faq-a"><div class="faq-a-inner">Busca <code>FAILURE</code> y <code>What went wrong</code> en el panel Build. Ahí está la causa real.</div></div></div>
+  </div>
+
+</section>
+
+</main>
+<footer>Guía interactiva de Android Studio para 2º DAM · Programación de Móviles y Dispositivos Multimedia</footer>
+<button class="back-top" id="backTop" aria-label="Volver arriba">↑</button>
+<script id="app-script">
+(function(){
+  "use strict";
+
+  /* ---------- Mobile nav toggle ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  /* ---------- Scroll progress + back to top ---------- */
+  var progressBar = document.getElementById('progressBar');
+  var backTop = document.getElementById('backTop');
+  function onScroll(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = (scrolled || 0) + '%';
+    backTop.classList.toggle('show', window.scrollY > 700);
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  backTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  /* ---------- Scrollspy ---------- */
+  var navA = Array.from(navLinks.querySelectorAll('a'));
+  var idToLink = {};
+  navA.forEach(function(a){ idToLink[a.getAttribute('href').slice(1)] = a; });
+  var allSections = Array.from(document.querySelectorAll('section[id]'));
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        navA.forEach(function(a){ a.classList.remove('active'); });
+        var link = idToLink[entry.target.id];
+        if(link) link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  allSections.forEach(function(s){ spy.observe(s); });
+
+  /* ---------- Accordions (reused for MainActivity explanation) ---------- */
+  document.querySelectorAll('.acc-head').forEach(function(head){
+    head.addEventListener('click', function(){ head.parentElement.classList.toggle('open'); });
+  });
+
+  /* ---------- FAQ accordion ---------- */
+  document.querySelectorAll('.faq-q').forEach(function(btn){
+    btn.addEventListener('click', function(){ btn.closest('.faq-item').classList.toggle('open'); });
+  });
+
+  /* ---------- Copy buttons ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.copy-btn');
+    if(!btn) return;
+    var wrap = btn.closest('.codewrap');
+    var codeEl = wrap.querySelector('pre.code code');
+    var text = codeEl.innerText;
+    var finish = function(){
+      var old = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('copied'); }, 1400);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(finish).catch(function(){ fallbackCopy(text); finish(); });
+    } else { fallbackCopy(text); finish(); }
+  });
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- Troubleshooting reveal toggles ---------- */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var panel = document.getElementById(btn.getAttribute('data-target'));
+      if(!panel) return;
+      var showing = panel.classList.toggle('show');
+      if(showing && btn.textContent.indexOf('Ver') > -1){
+        btn.textContent = btn.textContent.replace('Ver', 'Ocultar');
+      } else if(!showing && btn.textContent.indexOf('Ocultar') > -1){
+        btn.textContent = btn.textContent.replace('Ocultar', 'Ver');
+      }
+    });
+  });
+
+  /* ---------- Shortcut filter ---------- */
+  var shortcutFilter = document.getElementById('shortcutFilter');
+  var shortcutRows = document.querySelectorAll('.shortcut-row');
+  var shortcutEmpty = document.getElementById('shortcutEmpty');
+  shortcutFilter.addEventListener('input', function(){
+    var q = shortcutFilter.value.trim().toLowerCase();
+    var visible = 0;
+    shortcutRows.forEach(function(row){
+      var match = row.textContent.toLowerCase().indexOf(q) > -1;
+      row.classList.toggle('hidden', !match);
+      if(match) visible++;
+    });
+    shortcutEmpty.style.display = visible === 0 ? 'block' : 'none';
+  });
+
+  /* ---------- Glossary filter ---------- */
+  var glossaryFilter = document.getElementById('glossaryFilter');
+  var glossaryItems = document.querySelectorAll('.glossary-item');
+  var glossaryEmpty = document.getElementById('glossaryEmpty');
+  glossaryFilter.addEventListener('input', function(){
+    var q = glossaryFilter.value.trim().toLowerCase();
+    var visible = 0;
+    glossaryItems.forEach(function(item){
+      var match = item.textContent.toLowerCase().indexOf(q) > -1;
+      item.classList.toggle('hidden', !match);
+      if(match) visible++;
+    });
+    glossaryEmpty.style.display = visible === 0 ? 'block' : 'none';
+  });
+
+  /* ---------- IDE zone map ---------- */
+  var zones = document.querySelectorAll('.zone');
+  var zoneInfo = document.getElementById('zoneInfo');
+  function showZone(name){
+    zones.forEach(function(z){ z.classList.toggle('active', z.getAttribute('data-zone') === name); });
+    var data = document.querySelector('#zoneBank [data-zone="' + name + '"]');
+    zoneInfo.innerHTML = data ? data.innerHTML : '';
+  }
+  zones.forEach(function(z){
+    z.addEventListener('click', function(){ showZone(z.getAttribute('data-zone')); });
+  });
+  showZone('toolbar');
+
+  /* ---------- File tree ---------- */
+  var ftInfo = document.getElementById('ftInfo');
+  document.querySelectorAll('.ft-row').forEach(function(row){
+    row.addEventListener('click', function(e){
+      e.stopPropagation();
+      var node = row.parentElement;
+      if(node.querySelector(':scope > .ft-children')){
+        node.classList.toggle('open');
+      }
+      document.querySelectorAll('.ft-row.selected').forEach(function(r){ r.classList.remove('selected'); });
+      row.classList.add('selected');
+      var key = row.getAttribute('data-info');
+      var data = document.querySelector('#ftBank [data-info="' + key + '"]');
+      if(data) ftInfo.innerHTML = data.innerHTML;
+    });
+  });
+
+  /* ---------- Logcat simulator (signature demo) ---------- */
+  var scenarioBtns = document.querySelectorAll('.logcat-scenario');
+  var logcatBody = document.getElementById('logcatBody');
+  var logcatRun = document.getElementById('logcatRun');
+  var logcatStatus = document.getElementById('logcatStatus');
+  var logcatFilter = document.getElementById('logcatFilter');
+  var currentScenario = 'normal';
+
+  function levelBadge(lvl){ return '<span class="lvl lvl-' + lvl + '">' + lvl + '</span>'; }
+
+  function renderPlaceholder(){
+    logcatBody.innerHTML = '<div style="padding:1rem .9rem; color:var(--text-faint);">// pulsa «Run \'app\'» para ver el registro de esta ejecución</div>';
+    logcatStatus.textContent = 'Listo para ejecutar';
+  }
+
+  function applyFilter(){
+    var q = logcatFilter.value.trim().toLowerCase();
+    logcatBody.querySelectorAll('.logline').forEach(function(line){
+      var match = line.textContent.toLowerCase().indexOf(q) > -1;
+      line.classList.toggle('hidden', !match);
+    });
+  }
+  logcatFilter.addEventListener('input', applyFilter);
+
+  scenarioBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      scenarioBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentScenario = btn.getAttribute('data-scenario');
+      renderPlaceholder();
+    });
+  });
+
+  logcatRun.addEventListener('click', function(){
+    var lines = document.querySelectorAll('#logcatBank .scenario[data-scenario="' + currentScenario + '"] .l');
+    logcatBody.innerHTML = '';
+    logcatRun.disabled = true;
+    logcatStatus.textContent = 'Ejecutando...';
+    var i = 0;
+    function next(){
+      if(i >= lines.length){
+        logcatRun.disabled = false;
+        logcatStatus.textContent = currentScenario === 'crash' ? 'Proceso terminado (código 1)' : 'Proceso en ejecución';
+        applyFilter();
+        return;
+      }
+      var src = lines[i];
+      var div = document.createElement('div');
+      div.className = 'logline' + (src.classList.contains('err') ? ' err' : '');
+      div.innerHTML = levelBadge(src.getAttribute('data-lvl')) + '<span class="tag">' + src.getAttribute('data-tag') + '</span><span class="msg">' + src.textContent + '</span>';
+      logcatBody.appendChild(div);
+      logcatBody.scrollTop = logcatBody.scrollHeight;
+      i++;
+      setTimeout(next, 260);
+    }
+    next();
+  });
+  renderPlaceholder();
+
+})();
+</script>
+</body>
+</html>

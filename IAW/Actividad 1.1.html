@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Despliegue de un stack LEMP con Docker · v1.0 · ASIR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f14; --bg-panel:#111823; --bg-panel-2:#161f2b; --bg-raised:#1b2532;
+  --border:#223042; --border-soft:#1a2431; --grid-line:rgba(120,170,220,0.055);
+  --text:#e7edf3; --text-dim:#93a6ba; --text-faint:#5b6b7d;
+  --docker:#2496ed; --docker-dim:#12365a;
+  --nginx:#2ecc71; --nginx-dim:#123a26;
+  --mariadb:#e0a23a; --mariadb-dim:#4a3212;
+  --pma:#f2954a; --pma-dim:#4a2f12;
+  --volume:#b28cf5; --volume-dim:#2c2148;
+  --danger:#f2555a; --danger-dim:#4a1618;
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --font-head:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.65;
+  background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:34px 34px;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} html{scroll-behavior:auto;}}
+::selection{background:var(--docker-dim); color:#fff;}
+h1,h2,h3,h4{font-family:var(--font-head); font-weight:600; letter-spacing:-0.01em; margin:0 0 .5em;}
+p{margin:0 0 1em; color:var(--text-dim); max-width:72ch;}
+code, pre, .mono{font-family:var(--font-mono);}
+code{background:var(--bg-raised); padding:1.5px 6px; border-radius:4px; color:var(--nginx); font-size:.88em;}
+a{color:var(--docker);}
+:focus-visible{outline:2px solid var(--docker); outline-offset:2px; border-radius:3px;}
+
+.topbar{position:sticky; top:0; z-index:60; display:flex; align-items:center; gap:14px; padding:0 18px; height:56px;
+  background:rgba(11,15,20,0.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+.topbar .brand{display:flex; align-items:center; gap:9px; font-family:var(--font-head); font-weight:600; font-size:15px; color:var(--text); white-space:nowrap;}
+.brand-dot{width:9px;height:9px;border-radius:2px; background:var(--docker); box-shadow:0 0 10px var(--docker); flex:none;}
+.topbar .sep{color:var(--text-faint); font-weight:400;}
+.topbar .subject{color:var(--text-dim); font-size:13px; font-family:var(--font-mono); display:none;}
+@media(min-width:720px){.topbar .subject{display:inline;}}
+.ver-pill{font-family:var(--font-mono); font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--nginx-dim); color:var(--nginx); border:1px solid var(--nginx); flex:none;}
+.menu-btn{margin-left:auto; display:flex; align-items:center; gap:6px; background:var(--bg-raised); border:1px solid var(--border); color:var(--text);
+  font-family:var(--font-mono); font-size:12px; padding:7px 11px; border-radius:var(--radius-s); cursor:pointer;}
+@media(min-width:960px){.menu-btn{display:none;}}
+.progress-track{position:absolute; left:0; bottom:-1px; height:2px; width:100%;}
+.progress-bar{height:100%; width:0%; background:linear-gradient(90deg,var(--docker),var(--nginx)); transition:width .1s linear;}
+
+.shell{display:flex; max-width:1180px; margin:0 auto; align-items:flex-start;}
+.toc{width:250px; flex:none; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; padding:26px 14px 40px 18px; border-right:1px solid var(--border-soft); display:none;}
+@media(min-width:960px){.toc{display:block;}}
+.toc-title{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:var(--text-faint); margin:0 0 10px 8px; text-transform:uppercase;}
+.toc a{display:block; padding:5px 8px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:12.6px; border-left:2px solid transparent; margin-bottom:1px;}
+.toc a:hover{color:var(--text); background:var(--bg-panel);}
+.toc a.active{color:var(--text); border-left-color:var(--docker); background:var(--bg-panel); font-weight:500;}
+.toc .num{color:var(--text-faint); font-family:var(--font-mono); font-size:10.5px; margin-right:6px;}
+
+.toc-drawer{position:fixed; inset:0; z-index:80; display:none;}
+.toc-drawer.open{display:block;}
+.toc-drawer .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55);}
+.toc-drawer .panel{position:absolute; top:0; left:0; bottom:0; width:78%; max-width:320px; background:var(--bg-panel); border-right:1px solid var(--border); padding:20px 16px; overflow-y:auto;}
+.toc-drawer .panel a{display:block; padding:9px 10px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:14px;}
+.toc-drawer .panel a:hover, .toc-drawer .panel a.active{background:var(--bg-raised); color:var(--text);}
+
+main{flex:1; min-width:0; padding:0 18px;}
+.content{max-width:760px; margin:0 auto; padding:0 0 80px;}
+
+.titleblock{margin:40px 0 40px; border:1px solid var(--border); border-radius:var(--radius-l); background:var(--bg-panel); overflow:hidden;}
+.tb-top{padding:26px 26px 18px; border-bottom:1px solid var(--border-soft);}
+.tb-top .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--nginx); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.tb-top .eyebrow .blink{width:6px;height:6px;border-radius:50%;background:var(--nginx); animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.tb-top h1{font-size:clamp(24px,3.6vw,34px); line-height:1.2; margin:0;}
+.tb-meta{display:grid; grid-template-columns:repeat(2,1fr);}
+@media(min-width:600px){.tb-meta{grid-template-columns:repeat(4,1fr);}}
+.tb-cell{padding:14px 18px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft);}
+.tb-cell:last-child{border-right:none;}
+.tb-cell .k{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; color:var(--text-faint); text-transform:uppercase; margin-bottom:3px;}
+.tb-cell .v{font-family:var(--font-mono); font-size:13px; color:var(--text); font-weight:600;}
+
+section.block{scroll-margin-top:72px; margin-bottom:52px;}
+.block-head{display:flex; align-items:baseline; gap:12px; margin-bottom:16px;}
+.block-head .idx{font-family:var(--font-mono); font-size:13px; color:var(--text-faint); flex:none;}
+.block-head h2{font-size:22px; margin:0;}
+.panel{background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius-l); padding:22px 24px;}
+.panel + .panel{margin-top:14px;}
+.panel h3{font-size:15.5px; margin-bottom:8px;}
+.panel h4{font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); margin-bottom:8px;}
+
+.tbl-wrap{overflow-x:auto; margin:16px 0; border:1px solid var(--border-soft); border-radius:var(--radius-m);}
+table{width:100%; border-collapse:collapse; font-size:13.4px;}
+thead th{text-align:left; font-family:var(--font-mono); font-weight:500; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; padding:9px 13px; background:var(--bg-raised); border-bottom:1px solid var(--border);}
+tbody td{padding:9px 13px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody td strong{color:var(--text); font-weight:600;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+td.yes{color:var(--nginx); font-family:var(--font-mono);}
+td.no{color:var(--danger); font-family:var(--font-mono);}
+
+.code-block{position:relative; margin:16px 0; border-radius:var(--radius-m); border:1px solid var(--border); background:#0a0e13; overflow:hidden;}
+.code-block .cb-head{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--bg-raised); border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+.code-block pre{margin:0; padding:15px; overflow-x:auto; font-size:12.8px; line-height:1.6; color:#d3e0ec;}
+.code-block .cmt{color:#5b6b7d;}
+.copy-btn{background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-mono); font-size:10.5px; padding:3px 9px; border-radius:5px; cursor:pointer;}
+.copy-btn:hover{color:var(--text); border-color:var(--text-dim);}
+.copy-btn.copied{color:var(--nginx); border-color:var(--nginx);}
+
+.tabs{border:1px solid var(--border); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.tab-nav{display:flex; background:var(--bg-raised); border-bottom:1px solid var(--border); overflow-x:auto;}
+.tab-nav button{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); background:transparent; border:none; padding:10px 15px; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent;}
+.tab-nav button.active{color:var(--text); border-bottom-color:var(--docker); background:var(--bg-panel);}
+.tab-panel{display:none; padding:16px;}
+.tab-panel.active{display:block;}
+.tab-panel .code-block{margin:0;}
+
+.accordion{border:1px solid var(--border-soft); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.acc-item + .acc-item{border-top:1px solid var(--border-soft);}
+.acc-trigger{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--bg-panel-2); border:none; color:var(--text); text-align:left; padding:13px 16px; font-family:var(--font-body); font-size:14px; font-weight:500; cursor:pointer;}
+.acc-trigger:hover{background:var(--bg-raised);}
+.acc-trigger .chev{transition:transform .2s ease; color:var(--text-faint); flex:none;}
+.acc-item.open .acc-trigger .chev{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.acc-panel-inner{padding:4px 16px 16px;}
+
+.question{display:flex; gap:12px; align-items:flex-start; border:1px dashed var(--docker); background:var(--docker-dim); border-radius:var(--radius-m); padding:13px 16px; margin:14px 0;}
+.question .q-mark{font-family:var(--font-head); font-weight:700; font-size:15px; color:var(--docker); width:22px; height:22px; border-radius:50%; border:1.5px solid var(--docker); display:flex; align-items:center; justify-content:center; flex:none;}
+.question p{margin:0; color:#cfe4fb; font-size:13.8px;}
+
+.tip{border-left:3px solid var(--mariadb); background:var(--mariadb-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.4px;}
+.tip strong{color:var(--mariadb); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.tip p{margin:0; color:#e9d9b8;}
+.important{border-left:3px solid var(--danger); background:var(--danger-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.4px;}
+.important strong{color:var(--danger); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.important p{margin:0; color:#f7d7d8;}
+
+.topology-wrap{border:1px solid var(--border-soft); border-radius:var(--radius-l); background:var(--bg-panel-2); padding:20px; margin:16px 0;}
+.topology-svg{width:100%; height:auto; display:block;}
+.topo-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
+.topo-node-label{font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:600; fill:#fff;}
+
+.step-list{margin:0 0 12px; padding-left:22px; color:var(--text-dim); font-size:14px;}
+.step-list li{margin-bottom:5px;}
+ul.plain, ol.plain{margin:12px 0; padding-left:22px; color:var(--text-dim); font-size:14px;}
+ul.plain li, ol.plain li{margin-bottom:6px;}
+
+.check-row{display:flex; align-items:flex-start; gap:9px; padding:6px 0;}
+.check-row input[type=checkbox]{appearance:none; width:17px; height:17px; border:1.5px solid var(--border); border-radius:4px; background:var(--bg-panel); cursor:pointer; flex:none; margin-top:2px; position:relative;}
+.check-row input[type=checkbox]:checked{background:var(--nginx); border-color:var(--nginx);}
+.check-row input[type=checkbox]:checked::after{content:''; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid #06210f; border-width:0 2px 2px 0; transform:rotate(45deg);}
+.check-row label{font-size:13.6px; color:var(--text-dim); cursor:pointer;}
+.check-row input[type=checkbox]:checked ~ label{color:var(--text-faint); text-decoration:line-through;}
+
+.crit-row{display:grid; grid-template-columns:1fr auto; gap:6px 14px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-soft);}
+.crit-row:last-child{border-bottom:none;}
+.crit-name{font-size:13.6px; color:var(--text);}
+.crit-indicator{grid-column:1/2; font-size:12px; color:var(--text-faint);}
+.crit-weight{font-family:var(--font-mono); font-size:12.5px; color:var(--nginx); text-align:right;}
+.crit-bar-track{grid-column:1/-1; height:5px; border-radius:3px; background:var(--bg-raised); overflow:hidden;}
+.crit-bar-fill{height:100%; background:linear-gradient(90deg,var(--docker),var(--nginx));}
+
+/* SIMULATOR 1: persistence lifecycle */
+.sim-wrap{border:1px solid var(--border); border-radius:var(--radius-l); background:radial-gradient(circle at 20% 0%, rgba(36,150,237,0.08), transparent 55%), var(--bg-panel); padding:22px; margin:18px 0;}
+.sim-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:6px;}
+.sim-title{display:flex; align-items:center; gap:9px;}
+.sim-title .dot{width:8px;height:8px;border-radius:50%; background:var(--nginx); box-shadow:0 0 8px var(--nginx); animation:blink 2s infinite;}
+.sim-title span{font-family:var(--font-mono); font-size:12px; color:var(--text-dim);}
+.sim-state{font-family:var(--font-mono); font-size:11px; padding:4px 10px; border-radius:999px; border:1px solid var(--border); color:var(--text-dim);}
+.sim-state.state-up{color:var(--nginx); border-color:var(--nginx);}
+.sim-state.state-down{color:var(--text-faint);}
+.sim-state.state-empty{color:var(--danger); border-color:var(--danger);}
+.sim-stage{position:relative; min-height:280px; border:1px solid var(--border-soft); border-radius:var(--radius-m); background:#0a0e13; margin:14px 0; overflow:hidden;}
+.net-boundary{position:absolute; left:6%; right:6%; top:14%; bottom:22%; border:1.5px dashed var(--border); border-radius:var(--radius-l); opacity:0; transition:opacity .5s ease;}
+.net-boundary.show{opacity:1;}
+.net-label{position:absolute; top:-11px; left:16px; background:#0a0e13; padding:0 8px; font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+.sim-node{position:absolute; width:112px; padding:11px 9px; border-radius:var(--radius-m); border:1.5px solid var(--border); background:var(--bg-panel-2); text-align:center; opacity:0; transform:translateY(14px) scale(.92); transition:opacity .45s ease, transform .45s ease;}
+.sim-node.show{opacity:1; transform:translateY(0) scale(1);}
+.sim-node .n-icon{font-size:19px; margin-bottom:3px;}
+.sim-node .n-name{font-family:var(--font-mono); font-size:11px; color:var(--text); font-weight:600;}
+.sim-node .n-port{font-family:var(--font-mono); font-size:9px; color:var(--text-faint); margin-top:2px;}
+#node-nginx{left:10%; top:26%; border-color:var(--nginx);}
+#node-mariadb{left:41.5%; top:26%; border-color:var(--mariadb);}
+#node-phpmyadmin{right:10%; top:26%; border-color:var(--pma);}
+.sim-volume{position:absolute; left:41.5%; bottom:6%; width:112px; text-align:center; opacity:0; transform:scale(.9); transition:opacity .4s ease, transform .4s ease;}
+.sim-volume.show{opacity:1; transform:scale(1);}
+.sim-volume .v-cyl{width:60px; height:42px; margin:0 auto 5px; border-radius:10px/8px; background:linear-gradient(var(--volume-dim), #171225); border:1.5px solid var(--volume); position:relative;}
+.sim-volume.wiped .v-cyl{border-color:var(--danger); background:linear-gradient(var(--danger-dim), #1a0e10);}
+.sim-volume .v-name{font-family:var(--font-mono); font-size:9.5px; color:var(--volume);}
+.sim-volume.wiped .v-name{color:var(--danger);}
+.sim-volume .v-data{font-family:var(--font-mono); font-size:9px; color:var(--text-dim); margin-top:2px; min-height:11px;}
+.sim-link{position:absolute; height:1.5px; background:var(--border); opacity:0; transition:opacity .4s ease .1s;}
+.sim-link.show{opacity:1;}
+.sim-link.data-flow::after{content:''; position:absolute; top:-1.5px; left:0; width:8px; height:4.5px; border-radius:2px; background:var(--nginx); animation:flow 1.8s linear infinite;}
+@keyframes flow{0%{left:0;}100%{left:calc(100% - 8px);}}
+.sim-controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.sim-btn{font-family:var(--font-mono); font-size:12px; padding:9px 14px; border-radius:var(--radius-s); border:1px solid var(--border); background:var(--bg-raised); color:var(--text); cursor:pointer;}
+.sim-btn:hover{border-color:var(--docker);}
+.sim-btn.primary{background:var(--nginx-dim); border-color:var(--nginx); color:var(--nginx);}
+.sim-btn.danger{background:var(--danger-dim); border-color:var(--danger); color:var(--danger);}
+.sim-btn.add-data{background:var(--volume-dim); border-color:var(--volume); color:var(--volume);}
+.sim-btn:disabled{opacity:.35; cursor:not-allowed;}
+.sim-log{margin-top:12px; background:#070a0e; border:1px solid var(--border-soft); border-radius:var(--radius-s); padding:10px 14px; font-family:var(--font-mono); font-size:11.6px; color:var(--text-dim); min-height:52px; max-height:110px; overflow-y:auto;}
+.sim-log .log-line{margin-bottom:3px;}
+.sim-log .log-line.ok{color:var(--nginx);}
+.sim-log .log-line.warn{color:var(--danger);}
+.sim-log .log-line.sys{color:var(--text-faint);}
+
+/* SIMULATOR 2: load test visualizer */
+.load-wrap{border:1px solid var(--border); border-radius:var(--radius-l); background:var(--bg-panel); padding:22px; margin:18px 0;}
+.load-head{font-family:var(--font-mono); font-size:12px; color:var(--pma); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
+.load-controls{display:flex; align-items:center; gap:14px; margin:14px 0; flex-wrap:wrap;}
+.load-controls label{font-family:var(--font-mono); font-size:12px; color:var(--text-dim);}
+.load-controls input[type=range]{flex:1; min-width:160px; accent-color:var(--pma);}
+.load-val{font-family:var(--font-mono); font-size:14px; color:var(--pma); font-weight:700; min-width:64px; text-align:right;}
+.load-chart{display:flex; align-items:flex-end; gap:14px; height:150px; border-bottom:1px solid var(--border); padding-bottom:0; margin-bottom:8px;}
+.load-bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:6px;}
+.load-bar{width:60%; border-radius:4px 4px 0 0; transition:height .3s ease, background .3s ease;}
+.load-bar.rps{background:var(--nginx);}
+.load-bar.latency{background:var(--docker);}
+.load-bar.errors{background:var(--danger);}
+.load-bar-label{font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+.load-bar-value{font-family:var(--font-mono); font-size:12px; color:var(--text); font-weight:600;}
+.load-note{font-size:12.5px; margin-top:8px;}
+
+footer{border-top:1px solid var(--border-soft); padding:34px 18px 60px; text-align:center;}
+footer p{margin:0 auto; max-width:60ch; font-size:13px; color:var(--text-faint);}
+footer .next-practice{display:inline-block; margin-top:14px; padding:10px 18px; border-radius:999px; border:1px solid var(--pma); color:var(--pma); font-family:var(--font-mono); font-size:12.5px;}
+
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-dot"></span>LEMP<span class="sep">/</span>Docker</div>
+  <span class="ver-pill">v1.0</span>
+  <span class="subject">Implantación de Aplicaciones Web · 2º ASIR · Guía práctica</span>
+  <button class="menu-btn" id="menuBtn">☰ Índice</button>
+  <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<div class="toc-drawer" id="tocDrawer">
+  <div class="backdrop" id="tocBackdrop"></div>
+  <div class="panel" id="tocDrawerPanel"></div>
+</div>
+
+<div class="shell">
+  <nav class="toc" id="tocDesktop"><p class="toc-title">Contenidos</p></nav>
+
+  <main>
+    <div class="content">
+
+      <div class="titleblock">
+        <div class="tb-top">
+          <div class="eyebrow"><span class="blink"></span>GUÍA PRÁCTICA · V1.0 · EDICIÓN AMPLIADA</div>
+          <h1>Despliegue de un stack LEMP con Docker</h1>
+        </div>
+        <div class="tb-meta">
+          <div class="tb-cell"><div class="k">Módulo</div><div class="v">Implant. Apps Web</div></div>
+          <div class="tb-cell"><div class="k">Curso</div><div class="v">2º ASIR</div></div>
+          <div class="tb-cell"><div class="k">Duración</div><div class="v">6–8 h trabajo</div></div>
+          <div class="tb-cell"><div class="k">Versión</div><div class="v">1.0 (12/09/2026)</div></div>
+        </div>
+      </div>
+
+      <!-- 1 INTRODUCCIÓN -->
+      <section class="block" id="introduccion" data-title="Introducción">
+        <div class="block-head"><span class="idx">01</span><h2>Introducción</h2></div>
+        <div class="panel">
+          <p>Esta guía práctica te llevará a desplegar un <strong style="color:var(--text)">stack LEMP completo</strong> usando Docker: un servidor web Nginx, una base de datos MariaDB y un panel de administración phpMyAdmin. Todo ello orquestado con Docker Compose.</p>
+          <p>Se trabajará sobre lso conceptos desarrollados en la Unidad de Trabajo 1. Si algo no te suena (qué es un volumen, qué diferencia hay entre cliente y servidor, qué es un proxy inverso), consulta la guía teórica de la unidad antes de continuar.</p>
+          <p>El objetivo es que, al terminar, no solo tengas el stack funcionando sino que también hayas comprobado su comportamiento bajo carga,  aplicado mecanismos de control de acceso y sepas cómo apagarlo limpiamente (con y sin borrado de datos).</p>
+        </div>
+      </section>
+
+      <!-- 2 OBJETIVOS -->
+      <section class="block" id="objetivos" data-title="Objetivos de aprendizaje">
+        <div class="block-head"><span class="idx">02</span><h2>Objetivos de aprendizaje</h2></div>
+        <div class="panel">
+          <ul class="plain">
+            <li>Preparar un entorno de trabajo con Docker en Windows 11.</li>
+            <li>Definir un stack multi-contenedor con Docker Compose.</li>
+            <li>Configurar Nginx como servidor web sirviendo contenido estático.</li>
+            <li>Desplegar MariaDB con persistencia de datos mediante volúmenes.</li>
+            <li>Integrar phpMyAdmin para administrar la base de datos desde el navegador.</li>
+            <li>Verificar el correcto funcionamiento de cada componente.</li>
+            <li>Ejecutar pruebas de carga con ApacheBench e interpretar los resultados.</li>
+            <li>Aplicar mecanismos de gestión de acceso (autenticación básica, restricción por IP).</li>
+            <li>Diferenciar entre apagar el stack conservando datos y borrarlos definitivamente.</li>
+            <li>Diagnosticar y resolver problemas frecuentes.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3 PRERREQUISITOS -->
+      <section class="block" id="prerrequisitos" data-title="Prerrequisitos">
+        <div class="block-head"><span class="idx">03</span><h2>Prerrequisitos</h2></div>
+        <div class="panel">
+          <p>Antes de empezar, asegúrate de que tienes:</p>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">Windows 11</strong> con Docker instalado y funcionando.</li>
+            <li>Una terminal (PowerShell o Windows Terminal).</li>
+            <li>Un editor de texto (VS Code, Notepad++...).</li>
+          </ul>
+          <h4>Verificación rápida de Docker</h4>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-verdocker">Copiar</button></div><pre id="c-verdocker">docker --version
+docker compose version</pre></div>
+          <p style="font-size:13.4px;">Ambos comandos deben devolver una versión. Si alguno falla, revisa la instalación de Docker antes de continuar.</p>
+        </div>
+      </section>
+
+      <!-- 4 PREPARACIÓN SO -->
+      <section class="block" id="preparacion" data-title="Preparación del sistema">
+        <div class="block-head"><span class="idx">04</span><h2>Preparación del sistema operativo del servidor</h2></div>
+        <div class="panel">
+          <h3>Paso 1 · Crear la estructura de carpetas</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-mkdir">Copiar</button></div><pre id="c-mkdir">mkdir C:\proyectos\mi-proyecto\config\nginx
+cd C:\proyectos\mi-proyecto</pre></div>
+          <div class="code-block"><div class="cb-head"><span>árbol de directorios</span><button class="copy-btn" data-copy="c-tree">Copiar</button></div><pre id="c-tree">C:\proyectos\mi-proyecto\
+├── config\
+│   └── nginx\
+│       └── default.conf
+├── docker-compose.yml
+└── index.html</pre></div>
+          <div class="tip"><strong>Consejo</strong><p>Evita rutas con espacios o caracteres especiales. Docker y algunos comandos pueden dar problemas.</p></div>
+        </div>
+        <div class="panel">
+          <h3>Paso 2 · Verificar recursos asignados a Docker</h3>
+          <p style="font-size:13.6px;">Docker Desktop permite limitar la CPU, RAM y disco que puede usar el motor de Docker. Para esta práctica, con <strong style="color:var(--text)">2&nbsp;GB de RAM y 2&nbsp;CPU</strong> es suficiente. Puedes comprobarlo en Docker Desktop → Settings → Resources.</p>
+          <h3>Paso 3 · Verificar que los puertos están libres</h3>
+          <p style="font-size:13.6px;">Vamos a usar los puertos <strong style="color:var(--text)">8080</strong> (Nginx) y <strong style="color:var(--text)">8081</strong> (phpMyAdmin).</p>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-netstat">Copiar</button></div><pre id="c-netstat">netstat -ano | findstr :8080
+netstat -ano | findstr :8081</pre></div>
+          <p style="font-size:13.4px;">Si no devuelven nada, están libres. Si devuelven algo, cambia el puerto en el <code>docker-compose.yml</code> más adelante.</p>
+        </div>
+      </section>
+
+      <!-- 5 ARQUITECTURA -->
+      <section class="block" id="arquitectura" data-title="Arquitectura del stack">
+        <div class="block-head"><span class="idx">05</span><h2>Arquitectura del stack a desplegar</h2></div>
+        <div class="panel">
+          <div class="topology-wrap">
+			<p style="font-size:13.4px;">En esta práctica, desplegaremos la siguiente arquitectura, con los contenedores de Nginx y MariaDB-phpMyAdmin no conectados.</p>
+			<svg class="topology-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+			  <!-- Equipo host -->
+			  <rect x="10" y="10" width="880" height="260" rx="10" fill="none" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="26" y="30" class="topo-label">TU EQUIPO (Windows 11)</text>
+
+			  <!-- Red Docker -->
+			  <rect x="26" y="42" width="848" height="210" rx="10" fill="none" stroke="#2496ed" stroke-width="1.3"/>
+			  <text x="40" y="60" class="topo-label" fill="#2496ed">Docker · red: mi-red</text>
+
+			  <!-- Nginx -->
+			  <rect x="55" y="80" width="150" height="52" rx="8" fill="#123a26" stroke="#2ecc71" stroke-width="1.4"/>
+			  <text x="130" y="102" text-anchor="middle" class="topo-node-label">Nginx</text>
+			  <text x="130" y="118" text-anchor="middle" class="topo-label" fill="#2ecc71">:8080→80</text>
+
+			  <!-- MariaDB -->
+			  <rect x="475" y="80" width="150" height="52" rx="8" fill="#4a3212" stroke="#e0a23a" stroke-width="1.4"/>
+			  <text x="550" y="102" text-anchor="middle" class="topo-node-label">MariaDB</text>
+			  <text x="550" y="118" text-anchor="middle" class="topo-label" fill="#e0a23a">3306 (interno)</text>
+
+			  <!-- phpMyAdmin -->
+			  <rect x="695" y="80" width="150" height="52" rx="8" fill="#4a2f12" stroke="#f2954a" stroke-width="1.4"/>
+			  <text x="770" y="102" text-anchor="middle" class="topo-node-label">phpMyAdmin</text>
+			  <text x="770" y="118" text-anchor="middle" class="topo-label" fill="#f2954a">:8081→80</text>
+
+			  <!-- Flecha phpMyAdmin -> MariaDB -->
+			  <line x1="695" y1="106" x2="627" y2="106" stroke="#f2954a" stroke-width="1.4"/>
+			  <text x="661" y="98" text-anchor="middle" class="topo-label" fill="#f2954a" font-size="9">PMA_HOST</text>
+
+			  <!-- Volumen mariadb_data (cilindro) -->
+			  <g transform="translate(475, 175)">
+				<ellipse cx="75" cy="15" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+				<rect x="0" y="15" width="150" height="55" fill="#2a1d4a" stroke="none"/>
+				<line x1="0" y1="15" x2="0" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+				<line x1="150" y1="15" x2="150" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+				<ellipse cx="75" cy="70" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+				<ellipse cx="75" cy="15" rx="75" ry="12" fill="none" stroke="#b28cf5" stroke-width="1.4"/>
+				<text x="75" y="42" text-anchor="middle" class="topo-node-label" font-size="12">mariadb_data</text>
+				<text x="75" y="58" text-anchor="middle" class="topo-label" fill="#b28cf5" font-size="10">(volumen)</text>
+			  </g>
+
+			  <!-- Mount MariaDB -> volumen (línea punteada) -->
+			  <line x1="550" y1="132" x2="550" y2="175" stroke="#b28cf5" stroke-width="1.2" stroke-dasharray="3 2"/>
+			  <text x="558" y="158" class="topo-label" fill="#b28cf5" font-size="9">mount</text>
+
+			  <!-- Puertos hacia el host -->
+			  <line x1="130" y1="222" x2="130" y2="242" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="130" y="258" text-anchor="middle" class="topo-label">localhost:8080</text>
+
+			  <line x1="770" y1="132" x2="770" y2="242" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="770" y="258" text-anchor="middle" class="topo-label">localhost:8081</text>
+			</svg>
+			<p style="font-size:13.4px;">En siguientes prácticas, añadiremos el módulo de PHP-FRM para poder atacar la base de datos desde Nginx.</p>
+			<svg class="topology-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+			  <!-- Equipo host -->
+			  <rect x="10" y="10" width="880" height="260" rx="10" fill="none" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="26" y="30" class="topo-label">TU EQUIPO (Windows 11)</text>
+
+			  <!-- Red Docker -->
+			  <rect x="26" y="42" width="848" height="210" rx="10" fill="none" stroke="#2496ed" stroke-width="1.3"/>
+			  <text x="40" y="60" class="topo-label" fill="#2496ed">Docker · red: mi-red</text>
+
+			  <!-- Nginx -->
+			  <rect x="55" y="80" width="150" height="52" rx="8" fill="#123a26" stroke="#2ecc71" stroke-width="1.4"/>
+			  <text x="130" y="102" text-anchor="middle" class="topo-node-label">Nginx</text>
+			  <text x="130" y="118" text-anchor="middle" class="topo-label" fill="#2ecc71">:8080→80</text>
+
+			  <!-- PHP-FPM -->
+			  <rect x="265" y="80" width="150" height="52" rx="8" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+			  <text x="340" y="102" text-anchor="middle" class="topo-node-label">PHP-FPM</text>
+			  <text x="340" y="118" text-anchor="middle" class="topo-label" fill="#b28cf5">:9000</text>
+
+			  <!-- MariaDB -->
+			  <rect x="475" y="80" width="150" height="52" rx="8" fill="#4a3212" stroke="#e0a23a" stroke-width="1.4"/>
+			  <text x="550" y="102" text-anchor="middle" class="topo-node-label">MariaDB</text>
+			  <text x="550" y="118" text-anchor="middle" class="topo-label" fill="#e0a23a">3306 (interno)</text>
+
+			  <!-- phpMyAdmin -->
+			  <rect x="695" y="80" width="150" height="52" rx="8" fill="#4a2f12" stroke="#f2954a" stroke-width="1.4"/>
+			  <text x="770" y="102" text-anchor="middle" class="topo-node-label">phpMyAdmin</text>
+			  <text x="770" y="118" text-anchor="middle" class="topo-label" fill="#f2954a">:8081→80</text>
+
+			  <!-- Flecha Nginx -> PHP-FPM -->
+			  <line x1="205" y1="106" x2="263" y2="106" stroke="#2ecc71" stroke-width="1.4"/>
+			  <text x="234" y="98" text-anchor="middle" class="topo-label" fill="#2ecc71" font-size="9">FastCGI</text>
+
+			  <!-- Flecha PHP-FPM -> MariaDB -->
+			  <line x1="415" y1="106" x2="473" y2="106" stroke="#b28cf5" stroke-width="1.4"/>
+			  <text x="444" y="98" text-anchor="middle" class="topo-label" fill="#b28cf5" font-size="9">SQL</text>
+
+			  <!-- Flecha phpMyAdmin -> MariaDB -->
+			  <line x1="695" y1="106" x2="627" y2="106" stroke="#f2954a" stroke-width="1.4"/>
+			  <text x="661" y="98" text-anchor="middle" class="topo-label" fill="#f2954a" font-size="9">PMA_HOST</text>
+
+			  <!-- Volumen mariadb_data (cilindro) -->
+			  <g transform="translate(475, 175)">
+				<ellipse cx="75" cy="15" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+				<rect x="0" y="15" width="150" height="55" fill="#2a1d4a" stroke="none"/>
+				<line x1="0" y1="15" x2="0" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+				<line x1="150" y1="15" x2="150" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+				<ellipse cx="75" cy="70" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+				<ellipse cx="75" cy="15" rx="75" ry="12" fill="none" stroke="#b28cf5" stroke-width="1.4"/>
+				<text x="75" y="42" text-anchor="middle" class="topo-node-label" font-size="12">mariadb_data</text>
+				<text x="75" y="58" text-anchor="middle" class="topo-label" fill="#b28cf5" font-size="10">(volumen)</text>
+			  </g>
+
+			  <!-- Mount MariaDB -> volumen (línea punteada) -->
+			  <line x1="550" y1="132" x2="550" y2="175" stroke="#b28cf5" stroke-width="1.2" stroke-dasharray="3 2"/>
+			  <text x="558" y="158" class="topo-label" fill="#b28cf5" font-size="9">mount</text>
+
+			  <!-- Puertos hacia el host -->
+			  <line x1="130" y1="222" x2="130" y2="242" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="130" y="258" text-anchor="middle" class="topo-label">localhost:8080</text>
+
+			  <line x1="770" y1="132" x2="770" y2="242" stroke="#5b6b7d" stroke-width="1.3"/>
+			  <text x="770" y="258" text-anchor="middle" class="topo-label">localhost:8081</text>
+			</svg>
+          </div>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">Nginx</strong> sirve la página estática en <code>localhost:8080</code>.</li>
+            <li><strong style="color:var(--text)">phpMyAdmin</strong> se conecta a MariaDB por nombre de servicio (<code>mariadb</code>) y se expone en <code>localhost:8081</code>.</li>
+            <li><strong style="color:var(--text)">MariaDB</strong> guarda sus datos en el volumen <code>mariadb_data</code>.</li>
+			<li><strong style="color:var(--text)">PHP-FPM</strong> actuaría como puente de acceso entre Nginx y MariaDB (no lo instalaremos en esta práctica).</li>
+            <li>Los cuatro contenedores comparten la red <code>mi-red</code>, lo que permite que se resuelvan por nombre.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 6 CREACIÓN PASO A PASO -->
+      <section class="block" id="creacion" data-title="Creación del stack">
+        <div class="block-head"><span class="idx">06</span><h2>Creación del stack paso a paso con Docker Compose</h2></div>
+        <div class="panel">
+          <h3>Paso 1 · Crear <code>docker-compose.yml</code></h3>
+          <div class="code-block">
+            <div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="compose-yml">Copiar</button></div>
+            <pre id="compose-yml">services:
+  nginx:
+    image: nginx:alpine
+    container_name: mi-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./html:/usr/share/nginx/html:ro
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mi-mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: mi_app
+      MARIADB_USER: usuario
+      MARIADB_PASSWORD: userpass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: mi-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
+
+networks:
+  mi-red:</pre>
+          </div>
+          <div class="important"><strong>Atención</strong><p>Las contraseñas <code>rootpass</code>, <code>userpass</code> son de ejemplo. En producción usa contraseñas robustas y gestiónalas con variables de entorno o secretos.</p></div>
+
+          <h3 style="margin-top:20px;">Pasos 2–3 · Configuración de Nginx y página estática</h3>
+          <div class="tabs">
+            <div class="tab-nav">
+              <button class="active" data-tab="tab-nginxconf">config/nginx/default.conf</button>
+              <button data-tab="tab-index">index.html</button>
+            </div>
+            <div class="tab-panel active" id="tab-nginxconf">
+              <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="nginx-conf">Copiar</button></div><pre id="nginx-conf">server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+}</pre></div>
+            </div>
+            <div class="tab-panel" id="tab-index">
+              <div class="code-block"><div class="cb-head"><span>html</span><button class="copy-btn" data-copy="index-html">Copiar</button></div><pre id="index-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Práctica ASIR - Stack LEMP&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Stack LEMP funcionando&lt;/h1&gt;
+    &lt;p&gt;Nginx está sirviendo esta página correctamente.&lt;/p&gt;
+    &lt;p&gt;Panel de administración de la base de datos:
+       &lt;a href="http://localhost:8081"&gt;http://localhost:8081&lt;/a&gt;
+    &lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:20px;">Pasos 4–6 · Validar, levantar y verificar</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell · validar</span><button class="copy-btn" data-copy="c-config">Copiar</button></div><pre id="c-config">docker compose config</pre></div>
+          <div class="code-block"><div class="cb-head"><span>powershell · levantar</span><button class="copy-btn" data-copy="c-up">Copiar</button></div><pre id="c-up">docker compose up -d</pre></div>
+          <p style="font-size:13.4px;">La primera vez descargará las imágenes (Nginx Alpine ~21&nbsp;MB, MariaDB ~400&nbsp;MB, phpMyAdmin ~500&nbsp;MB). Puede tardar unos minutos.</p>
+          <div class="code-block"><div class="cb-head"><span>powershell · estado</span><button class="copy-btn" data-copy="c-ps">Copiar</button></div><pre id="c-ps">docker compose ps</pre></div>
+          <p style="font-size:13.4px;">Debes ver los tres contenedores en estado <code>running</code> (o <code>Up</code>).</p>
+        </div>
+      </section>
+
+      <!-- 7 COMPROBACIÓN -->
+      <section class="block" id="comprobacion" data-title="Comprobación del sistema">
+        <div class="block-head"><span class="idx">07</span><h2>Comprobación del sistema</h2></div>
+        <div class="panel">
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>1 · Nginx sirve la página → localhost:8080</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner"><p>Debes ver la página HTML que creaste.</p></div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>2 · phpMyAdmin se conecta a MariaDB → localhost:8081</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p>Inicia sesión con usuario <code>root</code> y contraseña <code>rootpass</code>. Si entras, verás la base de datos <code>mi_app</code> en el panel izquierdo.</p>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>3 · Ver los logs de cada servicio</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-logs">Copiar</button></div><pre id="c-logs">docker compose logs nginx
+docker compose logs mariadb
+docker compose logs phpmyadmin</pre></div>
+                <div class="tip"><strong>Consejo</strong><p>Si algo no funciona, los logs suelen contener la pista. Busca líneas con <code>error</code>, <code>failed</code> o <code>warning</code>.</p></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>4 · Entrar dentro de un contenedor</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-exec">Copiar</button></div><pre id="c-exec">docker exec -it mi-nginx sh</pre></div>
+                <div class="code-block"><div class="cb-head"><span>sh</span><button class="copy-btn" data-copy="c-inside">Copiar</button></div><pre id="c-inside">hostname -i          <span class="cmt"># IP del contenedor</span>
+ping mariadb         <span class="cmt"># Resolución por nombre</span>
+cat /etc/hosts       <span class="cmt"># Archivo de hosts</span>
+exit                 <span class="cmt"># Salir</span></pre></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>5 · Inspeccionar la configuración real</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-inspect">Copiar</button></div><pre id="c-inspect">docker inspect mi-nginx --format "{{json .NetworkSettings.Networks}}"
+docker inspect mi-mariadb --format "{{json .Mounts}}"</pre></div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 PRUEBAS DE CARGA -->
+      <section class="block" id="pruebas-carga" data-title="Pruebas de carga">
+        <div class="block-head"><span class="idx">08</span><h2>Pruebas de carga</h2></div>
+        <div class="panel">
+          <p>Una vez verificado que el stack funciona, vamos a someterlo a estrés para entender sus límites.</p>
+          <h3>¿Qué es una prueba de carga?</h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Métrica</th><th>Qué indica</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Tiempo de respuesta</strong></td><td>Cuánto tarda el servidor en devolver una página</td></tr>
+              <tr><td><strong>Throughput</strong></td><td>Peticiones por segundo que procesa</td></tr>
+              <tr><td><strong>Tasa de errores</strong></td><td>Peticiones que fallan bajo presión</td></tr>
+              <tr><td><strong>Uso de recursos</strong></td><td>CPU, RAM y disco durante la prueba</td></tr>
+            </tbody>
+          </table></div>
+
+          <h3>Herramientas de prueba</h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Herramienta</th><th>Tipo</th><th>Complejidad</th><th>Ideal para</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ApacheBench (ab)</strong></td><td>CLI</td><td>Baja</td><td>Pruebas rápidas de contenido estático</td></tr>
+              <tr><td><strong>wrk</strong></td><td>CLI</td><td>Media</td><td>Pruebas de alto rendimiento</td></tr>
+              <tr><td><strong>JMeter</strong></td><td>GUI/CLI</td><td>Alta</td><td>Escenarios complejos</td></tr>
+              <tr><td><strong>Locust</strong></td><td>Python</td><td>Media</td><td>Simulación de usuarios realistas</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="panel">
+          <h3>Actividad 8.1 · Prueba básica con ApacheBench</h3>
+          <p style="font-size:13.4px; font-weight:600; color:var(--text);">Paso 1 — Instalar <code>ab</code> dentro del contenedor de Nginx</p>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-apk">Copiar</button></div><pre id="c-apk">docker exec -it mi-nginx sh
+apk add --no-cache apache2-utils</pre></div>
+          <p style="font-size:13.4px; font-weight:600; color:var(--text);">Paso 2 — Ejecutar la prueba</p>
+          <div class="code-block"><div class="cb-head"><span>sh</span><button class="copy-btn" data-copy="c-ab">Copiar</button></div><pre id="c-ab">ab -n 1000 -c 10 http://localhost/</pre></div>
+          <ul class="plain"><li><code>-n 1000</code>: 1000 peticiones totales.</li><li><code>-c 10</code>: 10 usuarios concurrentes.</li></ul>
+          <p style="font-size:13.4px; font-weight:600; color:var(--text);">Paso 3 — Interpretar los resultados</p>
+          <ul class="plain">
+            <li><code>Requests per second</code>: throughput del servidor.</li>
+            <li><code>Time per request</code>: tiempo medio por petición.</li>
+            <li><code>Failed requests</code>: si hay errores, algo va mal.</li>
+            <li><code>Transfer rate</code>: velocidad de transferencia.</li>
+          </ul>
+          <p style="font-size:13.4px; font-weight:600; color:var(--text);">Paso 4 — Variar la concurrencia</p>
+          <div class="code-block"><div class="cb-head"><span>sh</span><button class="copy-btn" data-copy="c-abvar">Copiar</button></div><pre id="c-abvar">ab -n 1000 -c 1 http://localhost/
+ab -n 1000 -c 50 http://localhost/
+ab -n 1000 -c 200 http://localhost/</pre></div>
+
+          <div class="load-wrap">
+            <div class="load-head">Simulador · efecto de la concurrencia (ilustrativo, no son datos reales de tu equipo)</div>
+            <p style="font-size:12.8px; margin-bottom:0;">Mueve el deslizador para explorar cómo tienden a comportarse throughput, latencia y errores al aumentar la concurrencia con <code>ab</code> — la forma de las curvas es real, los valores concretos dependen de tu hardware.</p>
+            <div class="load-controls">
+              <label for="concSlider">Concurrencia (-c)</label>
+              <input type="range" id="concSlider" min="1" max="300" value="10" step="1">
+              <span class="load-val" id="concVal">10</span>
+            </div>
+            <div class="load-chart">
+              <div class="load-bar-col"><div class="load-bar-value" id="valRps">—</div><div class="load-bar rps" id="barRps" style="height:10%;"></div><div class="load-bar-label">req/s</div></div>
+              <div class="load-bar-col"><div class="load-bar-value" id="valLatency">—</div><div class="load-bar latency" id="barLatency" style="height:10%;"></div><div class="load-bar-label">ms/petición</div></div>
+              <div class="load-bar-col"><div class="load-bar-value" id="valErrors">—</div><div class="load-bar errors" id="barErrors" style="height:2%;"></div><div class="load-bar-label">% fallidas</div></div>
+            </div>
+            <p class="load-note" id="loadNote" style="color:var(--text-dim);"></p>
+          </div>
+
+          <h3 style="margin-top:6px;">Actividad 8.2 · Prueba con Locust (opcional, avanzada. ⚠️ Requiere Python)</h3>
+          <div class="code-block"><div class="cb-head"><span>python · locustfile.py</span><button class="copy-btn" data-copy="c-locustfile">Copiar</button></div><pre id="c-locustfile">from locust import HttpUser, task, between
+
+class MiUsuario(HttpUser):
+    wait_time = between(1, 5)
+
+    @task
+    def index(self):
+        self.client.get("/")</pre></div>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-locustrun">Copiar</button></div><pre id="c-locustrun">pip install locust
+locust -f locustfile.py --host=http://localhost:8080</pre></div>
+          <p style="font-size:13.4px;">Accede a <code>http://localhost:8089</code> y configura el número de usuarios y la tasa de spawn.</p>
+
+          <h3>Actividad 8.3 · Monitorizar recursos durante la prueba</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-stats">Copiar</button></div><pre id="c-stats">docker stats</pre></div>
+
+          <div class="question"><span class="q-mark">1</span><p>¿Cuántas peticiones por segundo procesa Nginx en tu entorno? ¿Varía al aumentar la concurrencia?</p></div>
+          <div class="question"><span class="q-mark">2</span><p>¿En qué momento empiezan a aparecer errores? ¿Por qué crees que sucede?</p></div>
+          <div class="question"><span class="q-mark">3</span><p>¿Qué componente del stack parece el cuello de botella: Nginx, la red o el sistema operativo?</p></div>
+          <div class="question"><span class="q-mark">4</span><p>¿Qué diferencia hay entre <code>-c 1</code> y <code>-c 200</code>? ¿Por qué el tiempo de respuesta cambia?</p></div>
+        </div>
+      </section>
+
+      <!-- 9 UTILIDADES -->
+      <section class="block" id="utilidades" data-title="Utilidades de prueba e instalación">
+        <div class="block-head"><span class="idx">09</span><h2>Utilidades de prueba e instalación integrada</h2></div>
+        <div class="panel">
+          <p>Además de las herramientas de carga, existen utilidades para diagnosticar y monitorizar el stack.</p>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Utilidad</th><th>Función</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><code>curl</code></td><td>Peticiones HTTP desde terminal</td><td><code>curl -I http://localhost:8080</code></td></tr>
+              <tr><td><code>wget</code></td><td>Descarga de archivos</td><td><code>wget http://localhost:8080/index.html</code></td></tr>
+              <tr><td><code>ping</code></td><td>Comprobar conectividad</td><td><code>ping mariadb</code></td></tr>
+              <tr><td><code>netstat</code> / <code>ss</code></td><td>Ver puertos abiertos</td><td><code>ss -tuln</code></td></tr>
+              <tr><td><code>dig</code> / <code>nslookup</code></td><td>Consultas DNS</td><td><code>nslookup mariadb</code></td></tr>
+              <tr><td><code>docker stats</code></td><td>Recursos en tiempo real</td><td><code>docker stats</code></td></tr>
+              <tr><td><code>docker top</code></td><td>Procesos dentro de un contenedor</td><td><code>docker top mi-nginx</code></td></tr>
+            </tbody>
+          </table></div>
+
+          <h3>Instalación integrada</h3>
+          <p style="font-size:13.6px;">Cuando trabajas con contenedores, la «instalación» se hace de dos formas: <strong style="color:var(--text)">dentro del contenedor</strong> (con el gestor de paquetes de la imagen: <code>apk</code> en Alpine, <code>apt</code> en Debian) o <strong style="color:var(--text)">en el anfitrión</strong> (<code>winget</code> en Windows, <code>apt</code> en Linux).</p>
+          <div class="important"><strong>Importante</strong><p>En esta práctica instalarás <code>apache2-utils</code> dentro del contenedor de Nginx con <code>apk</code>. Ese cambio se pierde al eliminar el contenedor: no persiste, porque no está en un volumen.</p></div>
+
+          <h3>Actividad 9.1 · Diagnóstico con curl</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-curl">Copiar</button></div><pre id="c-curl">curl -I http://localhost:8080</pre></div>
+          <p style="font-size:13.4px;">Observa las cabeceras HTTP que devuelve Nginx: código de estado, tipo de contenido, servidor, etc.</p>
+
+          <h3>Actividad 9.2 · Ver procesos dentro de un contenedor</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-top">Copiar</button></div><pre id="c-top">docker top mi-nginx
+docker top mi-mariadb</pre></div>
+        </div>
+      </section>
+
+      <!-- 10 GESTIÓN DE ACCESO APLICADA -->
+      <section class="block" id="gestion-acceso" data-title="Gestión de acceso aplicada">
+        <div class="block-head"><span class="idx">10</span><h2>Gestión de acceso aplicada</h2></div>
+        <div class="panel">
+          <p>Vamos a aplicar dos mecanismos de control de acceso en Nginx y uno en MariaDB.</p>
+          <h3>Actividad 10.1 · Autenticación básica HTTP en Nginx</h3>
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>Paso 1 · Crear el archivo de contraseñas</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-htpasswd">Copiar</button></div><pre id="c-htpasswd">docker exec -it mi-nginx sh
+apk add --no-cache apache2-utils
+htpasswd -c /etc/nginx/.htpasswd admin</pre></div>
+                <p style="font-size:13px;">Introduce la contraseña cuando se solicite.</p>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>Paso 2 · Modificar default.conf</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="c-nginxprot">Copiar</button></div><pre id="c-nginxprot">server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+
+    location /protegido/ {
+        auth_basic "Área restringida";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+
+        root /usr/share/nginx/html;
+    }
+}</pre></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>Pasos 3–5 · Carpeta protegida, recarga y prueba</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p style="font-size:13px;">Crea una carpeta <code>protegido</code> con un <code>index.html</code> dentro y añade el montaje al <code>docker-compose.yml</code>:</p>
+                <div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-volprot">Copiar</button></div><pre id="c-volprot">volumes:
+  - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  - ./index.html:/usr/share/nginx/html/index.html:ro
+  - ./protegido:/usr/share/nginx/html/protegido:ro</pre></div>
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-reload2">Copiar</button></div><pre id="c-reload2">docker compose up -d
+docker exec mi-nginx nginx -s reload</pre></div>
+                <p style="font-size:13px;">Accede a <code>http://localhost:8080/protegido/</code>. El navegador debe pedir credenciales.</p>
+              </div></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:20px;">Actividad 10.2 · Restricción por IP</h3>
+          <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="c-allowip">Copiar</button></div><pre id="c-allowip">location /admin/ {
+    allow 192.168.1.0/24;
+    allow 127.0.0.1;
+    deny all;
+
+    root /usr/share/nginx/html;
+}</pre></div>
+          <p style="font-size:13.4px;">Recarga Nginx y prueba el acceso.</p>
+
+          <h3>Actividad 10.3 · Gestión de usuarios en MariaDB</h3>
+          <p style="font-size:13.4px;">Desde phpMyAdmin (<code>localhost:8081</code>), ejecuta en la pestaña SQL:</p>
+          <div class="accordion">
+            <div class="acc-item"><button class="acc-trigger"><span>Crear un usuario</span><span class="chev">▾</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql-create">Copiar</button></div><pre id="sql-create">CREATE USER 'app_user'@'%' IDENTIFIED BY 'contraseña_segura';</pre></div></div></div></div>
+            <div class="acc-item"><button class="acc-trigger"><span>Otorgar permisos limitados</span><span class="chev">▾</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql-grant">Copiar</button></div><pre id="sql-grant">GRANT SELECT, INSERT, UPDATE, DELETE ON mi_app.* TO 'app_user'@'%';
+FLUSH PRIVILEGES;</pre></div></div></div></div>
+            <div class="acc-item"><button class="acc-trigger"><span>Ver permisos</span><span class="chev">▾</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql-show">Copiar</button></div><pre id="sql-show">SHOW GRANTS FOR 'app_user'@'%';</pre></div></div></div></div>
+            <div class="acc-item"><button class="acc-trigger"><span>Revocar un permiso</span><span class="chev">▾</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql-revoke">Copiar</button></div><pre id="sql-revoke">REVOKE DELETE ON mi_app.* FROM 'app_user'@'%';
+FLUSH PRIVILEGES;</pre></div></div></div></div>
+          </div>
+
+          <div class="question"><span class="q-mark">1</span><p>¿Qué diferencia hay entre <code>satisfy all</code> y <code>satisfy any</code>? ¿Cuándo usarías cada uno?</p></div>
+          <div class="question"><span class="q-mark">2</span><p>¿Por qué la autenticación básica HTTP debe usarse siempre sobre HTTPS?</p></div>
+          <div class="question"><span class="q-mark">3</span><p>¿Por qué es mala práctica que la aplicación se conecte a MariaDB como <code>root</code>?</p></div>
+        </div>
+      </section>
+
+      <!-- 11 APAGAR STACK -->
+      <section class="block" id="apagar" data-title="Apagar el stack">
+        <div class="block-head"><span class="idx">11</span><h2>Apagar el stack y borrar datos persistidos</h2></div>
+        <div class="panel">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Acción</th><th><code>down</code></th><th><code>down --volumes</code></th></tr></thead>
+            <tbody>
+              <tr><td>Para contenedores</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><td>Elimina contenedores</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><td>Elimina red</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+              <tr><td>Elimina volúmenes</td><td class="no">✗</td><td class="yes">✓</td></tr>
+              <tr><td><strong>Datos de MariaDB</strong></td><td><strong style="color:var(--nginx)">Se conservan</strong></td><td><strong style="color:var(--danger)">Se borran</strong></td></tr>
+              <tr><td>Imágenes descargadas</td><td class="no">✗ no se borran</td><td class="no">✗ no se borran</td></tr>
+              <tr><td>Archivos del proyecto</td><td class="no">✗ no se borran</td><td class="no">✗ no se borran</td></tr>
+            </tbody>
+          </table></div>
+
+          <h4 style="margin-top:18px;">Otras variantes útiles</h4>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Comando</th><th>Efecto</th></tr></thead>
+            <tbody>
+              <tr><td><code>docker compose stop</code></td><td>Para los contenedores sin eliminarlos</td></tr>
+              <tr><td><code>docker compose start</code></td><td>Rearranca los contenedores parados</td></tr>
+              <tr><td><code>docker compose restart</code></td><td>Reinicia los contenedores</td></tr>
+              <tr><td><code>docker compose down --rmi all</code></td><td>Además, elimina las imágenes descargadas</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="sim-wrap">
+          <div class="sim-head">
+            <div class="sim-title"><span class="dot"></span><span>SIMULADOR · ciclo de vida del stack (ejercicio demostrativo)</span></div>
+            <span class="sim-state state-empty" id="simStateBadge">detenido</span>
+          </div>
+          <p style="font-size:13px; margin:6px 0 0;">Reproduce aquí los 8 pasos del ejercicio antes de hacerlo en tu terminal real.</p>
+
+          <div class="sim-stage" id="simStage">
+            <div class="net-boundary" id="netBoundary"><span class="net-label">red: mi-red</span></div>
+            <div class="sim-link" id="link2"></div>
+            <div class="sim-node" id="node-nginx"><div class="n-icon">🌐</div><div class="n-name">nginx</div><div class="n-port">:8080</div></div>
+            <div class="sim-node" id="node-mariadb"><div class="n-icon">🗄️</div><div class="n-name">mariadb</div><div class="n-port">interno</div></div>
+            <div class="sim-node" id="node-phpmyadmin"><div class="n-icon">🛠️</div><div class="n-name">phpmyadmin</div><div class="n-port">:8081</div></div>
+            <div class="sim-volume" id="simVolume"><div class="v-cyl"></div><div class="v-name">vol: mariadb_data</div><div class="v-data" id="volData"></div></div>
+          </div>
+
+          <div class="sim-controls">
+            <button class="sim-btn primary" id="btnUp">▸ docker compose up -d</button>
+            <button class="sim-btn add-data" id="btnAddData" disabled>+ crear registro en phpMyAdmin</button>
+            <button class="sim-btn" id="btnDown" disabled>■ docker compose down</button>
+            <button class="sim-btn danger" id="btnDownVol" disabled>⨯ docker compose down --volumes</button>
+          </div>
+          <div class="sim-log" id="simLog"><div class="log-line sys">$ esperando acción…</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Ejercicio demostrativo</h3>
+          <ol class="step-list">
+            <li><code>docker compose up -d</code></li>
+            <li>Entra en phpMyAdmin y crea una tabla con un registro.</li>
+            <li><code>docker compose down</code></li>
+            <li><code>docker compose up -d</code></li>
+            <li>Comprueba en phpMyAdmin que los datos siguen ahí.</li>
+            <li><code>docker compose down --volumes</code></li>
+            <li><code>docker compose up -d</code></li>
+            <li>Comprueba que los datos han desaparecido.</li>
+          </ol>
+          <div class="question"><p>¿Dónde vivían los datos para sobrevivir al primer <code>down</code>? ¿Qué los eliminó en el segundo caso?</p></div>
+        </div>
+      </section>
+
+      <!-- 12 SOLUCIÓN DE PROBLEMAS -->
+      <section class="block" id="problemas" data-title="Solución de problemas">
+        <div class="block-head"><span class="idx">12</span><h2>Solución de problemas frecuentes</h2></div>
+        <div class="panel">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Problema</th><th>Causa probable</th><th>Solución</th></tr></thead>
+            <tbody>
+              <tr><td>Puerto 8080 ya en uso</td><td>Otro servicio ocupa el puerto</td><td>Cambiar el mapeo en <code>docker-compose.yml</code></td></tr>
+              <tr><td>phpMyAdmin no conecta</td><td>MariaDB aún no está lista</td><td>Esperar unos segundos y refrescar</td></tr>
+              <tr><td>Contenedor no arranca</td><td>Error de configuración</td><td><code>docker compose logs &lt;servicio&gt;</code></td></tr>
+              <tr><td>Permiso denegado en bind mount</td><td>Permisos de archivos en Windows</td><td>Verificar que Docker Desktop tiene acceso a <code>C:\</code></td></tr>
+              <tr><td>Datos no persisten</td><td>Volumen mal montado</td><td><code>docker inspect mi-mariadb --format "{{json .Mounts}}"</code></td></tr>
+              <tr><td>Cambio de contraseña no surte efecto</td><td>El volumen ya existe con la antigua</td><td><code>docker compose down --volumes</code> y volver a levantar</td></tr>
+              <tr><td>Nginx no recarga configuración</td><td>No se ejecutó <code>reload</code></td><td><code>docker exec mi-nginx nginx -s reload</code></td></tr>
+              <tr><td><code>ab</code> no encuentra el host</td><td>Ejecutado fuera del contenedor</td><td>Ejecutar <code>ab</code> dentro de <code>mi-nginx</code></td></tr>
+            </tbody>
+          </table></div>
+          <div class="tip"><strong>Consejo</strong><p>Ante cualquier error, empieza siempre por <code>docker compose logs &lt;servicio&gt;</code> y <code>docker compose ps</code>.</p></div>
+        </div>
+      </section>
+
+      <!-- 13 ACTIVIDADES ENRIQUECEDORAS -->
+      <section class="block" id="actividades" data-title="Actividades enriquecedoras">
+        <div class="block-head"><span class="idx">13</span><h2>Actividades enriquecedoras</h2></div>
+        <div class="panel">
+          <h3>Bloque 1 · Persistencia</h3>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">1.1</strong> — Crea un registro en phpMyAdmin, haz <code>down</code>, vuelve a levantar y comprueba que sigue ahí.</li>
+            <li><strong style="color:var(--text)">1.2</strong> — Repite el ejercicio con <code>down --volumes</code> y comprueba que los datos desaparecen.</li>
+          </ul>
+          <div class="check-row"><input type="checkbox" id="chk-1"><label for="chk-1">Bloque 1 completado</label></div>
+
+          <h3 style="margin-top:16px;">Bloque 2 · Red interna</h3>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">2.1</strong> — Entra en <code>mi-nginx</code> y haz <code>ping mariadb</code> y <code>ping phpmyadmin</code>.</li>
+            <li><strong style="color:var(--text)">2.2</strong> — Para MariaDB con <code>docker stop mi-mariadb</code>, comprueba que phpMyAdmin falla, y arráncala de nuevo.</li>
+          </ul>
+          <div class="check-row"><input type="checkbox" id="chk-2"><label for="chk-2">Bloque 2 completado</label></div>
+
+          <h3 style="margin-top:16px;">Bloque 3 · Inspección</h3>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">3.1</strong> — Ejecuta <code>docker compose logs -f nginx</code> y observa en tiempo real mientras accedes a la web.</li>
+            <li><strong style="color:var(--text)">3.2</strong> — Usa <code>docker inspect</code> para ver la red y los volúmenes de cada contenedor.</li>
+          </ul>
+          <div class="check-row"><input type="checkbox" id="chk-3"><label for="chk-3">Bloque 3 completado</label></div>
+
+          <h3 style="margin-top:16px;">Bloque 4 · Modificación en caliente</h3>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">4.1</strong> — Edita <code>index.html</code>, refresca el navegador y comprueba que el cambio se ve sin reiniciar nada.</li>
+            <li><strong style="color:var(--text)">4.2</strong> — Edita <code>default.conf</code>, recarga Nginx con <code>nginx -s reload</code> y comprueba el cambio.</li>
+          </ul>
+          <div class="check-row"><input type="checkbox" id="chk-4"><label for="chk-4">Bloque 4 completado</label></div>
+
+          <h3 style="margin-top:16px;">Bloque 5 · Averiguar el «por qué»</h3>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">5.1</strong> — Cambia el mapeo de puertos de Nginx a <code>9090:80</code> y comprueba que <code>localhost:8080</code> deja de funcionar.</li>
+            <li><strong style="color:var(--text)">5.2</strong> — Cambia <code>MARIADB_ROOT_PASSWORD</code> en el YAML, levanta el stack y comprueba que phpMyAdmin falla si el volumen ya existía.</li>
+          </ul>
+          <div class="check-row"><input type="checkbox" id="chk-5"><label for="chk-5">Bloque 5 completado</label></div>
+        </div>
+      </section>
+
+      <!-- 14 RETOS AVANZADOS -->
+      <section class="block" id="retos" data-title="Retos para alumnado avanzado">
+        <div class="block-head"><span class="idx">14</span><h2>Retos para alumnado avanzado</h2></div>
+        <div class="panel">
+          <ol class="plain">
+            <li><strong style="color:var(--text)">Conectar con un cliente SQL externo:</strong> expón el puerto 3306 de MariaDB y conéctate con DBeaver o HeidiSQL desde Windows.</li>
+            <li><strong style="color:var(--text)">Dos instancias del stack:</strong> levanta dos copias del stack con puertos distintos y comprueba que coexisten.</li>
+            <li><strong style="color:var(--text)">Migrar a <code>docker run</code>:</strong> reproduce el stack sin Docker Compose, usando solo <code>docker network create</code>, <code>docker volume create</code> y <code>docker run</code>.</li>
+            <li><strong style="color:var(--text)">Añadir HTTPS:</strong> genera un certificado autofirmado y configura Nginx para servir por HTTPS.</li>
+            <li><strong style="color:var(--text)">Monitorización:</strong> instala <code>ctop</code> o usa <code>docker stats</code> para registrar el uso de recursos durante una prueba de carga.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 16 CONEXIÓN CON LA PRÁCTICA 2 -->
+      <section class="block" id="practica-2" data-title="Conexión con la Práctica 2">
+        <div class="block-head"><span class="idx">16</span><h2>Conexión con la Práctica 2 (WordPress)</h2></div>
+        <div class="panel">
+          <p>Esta práctica sienta las bases para una segunda en la que se añadirá WordPress. La progresión prevista:</p>
+          <ol class="plain">
+            <li>Añadir un servicio <code>wordpress</code> al <code>docker-compose.yml</code>, conectado a la misma red y a MariaDB.</li>
+            <li>Modificar la configuración de Nginx para que actúe como proxy inverso hacia WordPress (<code>proxy_pass http://wordpress;</code>).</li>
+            <li>Mantener phpMyAdmin como herramienta de administración de la base de datos de WordPress.</li>
+          </ol>
+          <p>Todo lo aprendido aquí (redes, volúmenes, variables de entorno, depuración con logs, gestión de acceso) se reutilizará directamente, permitiendo centrarse en los conceptos nuevos (proxy inverso, PHP-FPM, WordPress) sin arrastrar dudas anteriores.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>Guía práctica v1.0 · Implantación de Aplicaciones Web · 2º ASIR — despliegue de un stack LEMP con Docker.</p>
+  <span class="next-practice">→ Práctica 2: WordPress + proxy inverso</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* TOC */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.block[id]'));
+  var tocDesktop = document.getElementById('tocDesktop');
+  var tocDrawerPanel = document.getElementById('tocDrawerPanel');
+  sections.forEach(function(sec, i){
+    var title = sec.getAttribute('data-title') || sec.id;
+    var num = String(i+1).padStart(2,'0');
+    var a1 = document.createElement('a');
+    a1.href = '#' + sec.id; a1.dataset.target = sec.id;
+    a1.innerHTML = '<span class="num">'+num+'</span>' + title;
+    tocDesktop.appendChild(a1);
+    tocDrawerPanel.appendChild(a1.cloneNode(true));
+  });
+
+  var menuBtn = document.getElementById('menuBtn');
+  var drawer = document.getElementById('tocDrawer');
+  var backdrop = document.getElementById('tocBackdrop');
+  function closeDrawer(){ drawer.classList.remove('open'); }
+  menuBtn.addEventListener('click', function(){ drawer.classList.add('open'); });
+  backdrop.addEventListener('click', closeDrawer);
+  tocDrawerPanel.addEventListener('click', function(e){ if(e.target.closest('a')) closeDrawer(); });
+
+  var allTocLinks = document.querySelectorAll('.toc a, .toc-drawer a');
+  var progressBar = document.getElementById('progressBar');
+  function onScroll(){
+    var scrollY = window.scrollY;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollY/docH*100) : 0) + '%';
+    var current = sections[0] ? sections[0].id : null;
+    for(var i=0;i<sections.length;i++){
+      var rect = sections[i].getBoundingClientRect();
+      if(rect.top <= 110){ current = sections[i].id; }
+    }
+    allTocLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.target === current); });
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if(!el) return;
+      navigator.clipboard.writeText(el.innerText).then(function(){
+        var orig = btn.textContent;
+        btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  document.querySelectorAll('.acc-trigger').forEach(function(trigger){
+    trigger.addEventListener('click', function(){
+      var item = trigger.closest('.acc-item');
+      var panel = item.querySelector('.acc-panel');
+      var isOpen = item.classList.contains('open');
+      if(isOpen){ panel.style.maxHeight = null; item.classList.remove('open'); }
+      else { item.classList.add('open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+    if(trigger.closest('.acc-item').classList.contains('open')){
+      var panel = trigger.closest('.acc-item').querySelector('.acc-panel');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    }
+  });
+
+  document.querySelectorAll('.tabs').forEach(function(tabGroup){
+    var buttons = tabGroup.querySelectorAll('.tab-nav button');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        buttons.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        tabGroup.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  });
+
+  /* SIMULATOR 1: persistence lifecycle */
+  var stage = document.getElementById('simStage');
+  var netBoundary = document.getElementById('netBoundary');
+  var nodeNginx = document.getElementById('node-nginx');
+  var nodeMariadb = document.getElementById('node-mariadb');
+  var nodePma = document.getElementById('node-phpmyadmin');
+  var simVolume = document.getElementById('simVolume');
+  var volData = document.getElementById('volData');
+  var link2 = document.getElementById('link2');
+  var stateBadge = document.getElementById('simStateBadge');
+  var log = document.getElementById('simLog');
+  var btnUp = document.getElementById('btnUp');
+  var btnAddData = document.getElementById('btnAddData');
+  var btnDown = document.getElementById('btnDown');
+  var btnDownVol = document.getElementById('btnDownVol');
+  var state = 'stopped'; var volumeExists = false; var hasData = false;
+
+  function logLine(text, cls){
+    var d = document.createElement('div');
+    d.className = 'log-line ' + (cls||'sys');
+    d.textContent = '$ ' + text;
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+  function positionLinks(){
+    var stageRect = stage.getBoundingClientRect();
+    var m = nodeMariadb.getBoundingClientRect(), p = nodePma.getBoundingClientRect();
+    var m2 = { x: m.left - stageRect.left + m.width, y: m.top - stageRect.top + m.height/2 };
+    var p2 = { x: p.left - stageRect.left, y: p.top - stageRect.top + p.height/2 };
+    link2.style.left = m2.x + 'px'; link2.style.top = m2.y + 'px'; link2.style.width = (p2.x - m2.x) + 'px';
+  }
+  function render(){
+    stateBadge.className = 'sim-state ' + (state==='up' ? 'state-up' : (state==='down-soft' ? 'state-down' : 'state-empty'));
+    stateBadge.textContent = state==='up' ? 'en ejecución' : (state==='down-soft' ? 'detenido (red y contenedores fuera)' : 'sin desplegar');
+    var running = state === 'up';
+    netBoundary.classList.toggle('show', running);
+    [nodeNginx, nodeMariadb, nodePma].forEach(function(n){ n.classList.toggle('show', running); });
+    link2.classList.toggle('show', running); link2.classList.toggle('data-flow', running);
+    simVolume.classList.toggle('show', volumeExists);
+    simVolume.classList.toggle('wiped', !volumeExists && state !== 'stopped');
+    volData.textContent = hasData ? '📄 registro #1' : (volumeExists ? '(vacío)' : '');
+    btnUp.disabled = running; btnAddData.disabled = !running; btnDown.disabled = !running; btnDownVol.disabled = !running;
+    if(running){ requestAnimationFrame(positionLinks); }
+  }
+  btnUp.addEventListener('click', function(){
+    state = 'up';
+    if(!volumeExists){ volumeExists = true; logLine('docker compose up -d', 'ok'); logLine('creando red mi-red, contenedores y volumen mariadb_data…', 'sys'); }
+    else { logLine('docker compose up -d', 'ok'); logLine('volumen mariadb_data ya existía → se reutiliza', 'sys'); }
+    render();
+  });
+  btnAddData.addEventListener('click', function(){ hasData = true; logLine('registro creado desde phpMyAdmin → escrito en mariadb_data', 'ok'); render(); });
+  btnDown.addEventListener('click', function(){ state = 'down-soft'; logLine('docker compose down', 'warn'); logLine('contenedores y red eliminados — el volumen se conserva', 'ok'); render(); });
+  btnDownVol.addEventListener('click', function(){ state = 'down-soft'; volumeExists = false; hasData = false; logLine('docker compose down --volumes', 'warn'); logLine('contenedores, red y volumen eliminados — datos perdidos', 'warn'); render(); });
+  window.addEventListener('resize', function(){ if(state==='up') positionLinks(); });
+  render();
+
+  /* SIMULATOR 2: load test visualizer */
+  var concSlider = document.getElementById('concSlider');
+  var concVal = document.getElementById('concVal');
+  var barRps = document.getElementById('barRps');
+  var barLatency = document.getElementById('barLatency');
+  var barErrors = document.getElementById('barErrors');
+  var valRps = document.getElementById('valRps');
+  var valLatency = document.getElementById('valLatency');
+  var valErrors = document.getElementById('valErrors');
+  var loadNote = document.getElementById('loadNote');
+
+  function computeLoad(c){
+    // illustrative model: throughput rises then saturates; latency grows slowly then spikes; errors appear past a knee
+    var maxRps = 1450;
+    var rps = maxRps * (1 - Math.exp(-c/35)) * (c > 180 ? (1 - (c-180)/500) : 1);
+    rps = Math.max(50, rps);
+    var latency = 6 + Math.pow(c/22, 1.8);
+    var errors = c <= 120 ? 0 : Math.min(38, (c-120)/4.2);
+    return { rps: rps, latency: latency, errors: errors };
+  }
+  function updateLoad(){
+    var c = parseInt(concSlider.value, 10);
+    concVal.textContent = c;
+    var r = computeLoad(c);
+    var rpsPct = Math.min(100, (r.rps/1450)*100);
+    var latPct = Math.min(100, (r.latency/260)*100);
+    var errPct = Math.min(100, (r.errors/40)*100);
+    barRps.style.height = Math.max(4, rpsPct) + '%';
+    barLatency.style.height = Math.max(4, latPct) + '%';
+    barErrors.style.height = Math.max(2, errPct) + '%';
+    valRps.textContent = Math.round(r.rps);
+    valLatency.textContent = Math.round(r.latency);
+    valErrors.textContent = r.errors.toFixed(1) + '%';
+    if(c < 30){ loadNote.textContent = 'Baja concurrencia: el servidor responde con holgura, latencia mínima.'; }
+    else if(c < 120){ loadNote.textContent = 'El throughput empieza a estabilizarse; la latencia crece de forma moderada.'; }
+    else if(c < 200){ loadNote.textContent = 'Zona de saturación: aparecen las primeras peticiones fallidas.'; }
+    else { loadNote.textContent = 'Sobrecarga: el throughput cae y la tasa de error se dispara — este es el tipo de límite que buscas encontrar con -c 200.'; }
+  }
+  concSlider.addEventListener('input', updateLoad);
+  updateLoad();
+
+})();
+</script>
+</body>
+</html>

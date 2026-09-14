@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servidores de aplicaciones web y stacks LEMP · Guía teórica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --paper:#eeede6;
+  --paper-raised:#f8f7f2;
+  --paper-sunken:#e4e2d8;
+  --ink:#1c1b17;
+  --ink-dim:#57554a;
+  --ink-faint:#8f8c7d;
+  --rule:#d3d0c2;
+  --rule-strong:#b8b5a4;
+
+  --accent:#2c3f73;
+  --accent-soft:#e2e6f1;
+  --accent-line:#8fa0cc;
+
+  --signal:#93630f;
+  --signal-soft:#f2e6cc;
+
+  --danger:#7d2e2c;
+  --danger-soft:#f0dcd8;
+
+  --ok:#2f5d3a;
+  --ok-soft:#dfe9de;
+
+  --code-bg:#181c22;
+  --code-bg-2:#12151a;
+  --code-text:#dbe3ee;
+  --code-border:#2a3038;
+  --code-comment:#6b7686;
+
+  --radius-s:4px;
+  --radius-m:8px;
+  --radius-l:3px;
+  --font-serif:'Source Serif 4', Georgia, serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-serif);
+  line-height:1.68;
+  font-size:16.5px;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  html{scroll-behavior:auto;}
+}
+::selection{background:var(--accent-soft); color:var(--accent);}
+p{margin:0 0 1em; color:var(--ink-dim); max-width:66ch;}
+h1,h2,h3,h4{font-family:var(--font-serif); font-weight:600; letter-spacing:-0.005em; color:var(--ink); margin:0 0 .5em;}
+code{font-family:var(--font-mono); font-size:.87em; background:var(--paper-sunken); padding:1.5px 5px; border-radius:3px; color:var(--accent);}
+a{color:var(--accent);}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+/* ============ TOPBAR ============ */
+.topbar{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; gap:16px;
+  padding:0 20px; height:54px;
+  background:rgba(238,237,230,0.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule-strong);
+}
+.topbar .brand{
+  display:flex; align-items:baseline; gap:8px;
+  font-family:var(--font-mono); font-weight:600; font-size:13px; color:var(--ink);
+  white-space:nowrap;
+}
+.brand .doc-id{color:var(--accent); font-weight:700;}
+.topbar .subject{
+  color:var(--ink-faint); font-size:12.5px; font-family:var(--font-mono); display:none; border-left:1px solid var(--rule-strong); padding-left:16px;
+}
+@media(min-width:760px){.topbar .subject{display:inline;}}
+.menu-btn{
+  margin-left:auto;
+  display:flex; align-items:center; gap:6px;
+  background:var(--paper-raised); border:1px solid var(--rule-strong); color:var(--ink);
+  font-family:var(--font-mono); font-size:11.5px;
+  padding:7px 11px; border-radius:var(--radius-s); cursor:pointer;
+}
+@media(min-width:980px){.menu-btn{display:none;}}
+.progress-track{position:absolute; left:0; bottom:-1px; height:2px; width:100%;}
+.progress-bar{height:100%; width:0%; background:var(--accent); transition:width .1s linear;}
+
+/* ============ LAYOUT ============ */
+.shell{display:flex; max-width:1200px; margin:0 auto; align-items:flex-start;}
+.toc{
+  width:246px; flex:none;
+  position:sticky; top:54px; height:calc(100vh - 54px); overflow-y:auto;
+  padding:28px 12px 40px 20px;
+  display:none;
+}
+@media(min-width:980px){.toc{display:block;}}
+.toc-title{font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; color:var(--ink-faint); margin:0 0 10px 6px; text-transform:uppercase;}
+.toc a{
+  display:flex; gap:8px; padding:5px 6px; border-radius:3px;
+  color:var(--ink-dim); text-decoration:none; font-size:13px; font-family:var(--font-mono);
+  border-left:2px solid transparent; margin-bottom:1px;
+}
+.toc a:hover{color:var(--ink); background:var(--paper-raised);}
+.toc a.active{color:var(--accent); border-left-color:var(--accent); font-weight:600;}
+.toc .num{color:var(--ink-faint); flex:none;}
+.toc a.active .num{color:var(--accent);}
+
+.toc-drawer{position:fixed; inset:0; z-index:80; display:none;}
+.toc-drawer.open{display:block;}
+.toc-drawer .backdrop{position:absolute; inset:0; background:rgba(20,18,12,.5);}
+.toc-drawer .panel{position:absolute; top:0; left:0; bottom:0; width:80%; max-width:320px; background:var(--paper-raised); border-right:1px solid var(--rule-strong); padding:20px 16px; overflow-y:auto;}
+.toc-drawer .panel a{display:flex; gap:8px; padding:9px 10px; border-radius:4px; color:var(--ink-dim); text-decoration:none; font-size:14px; font-family:var(--font-mono);}
+.toc-drawer .panel a:hover, .toc-drawer .panel a.active{background:var(--accent-soft); color:var(--accent);}
+
+main{flex:1; min-width:0; padding:0 20px;}
+.content{max-width:740px; margin:0 auto; padding:0 0 90px;}
+
+/* ============ TITLE BLOCK (frontmatter) ============ */
+.titleblock{
+  margin:40px 0 46px; border:1.5px solid var(--ink); background:var(--paper-raised);
+}
+.tb-top{padding:26px 26px 18px; border-bottom:1px solid var(--rule-strong);}
+.tb-top .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin-bottom:10px;}
+.tb-top h1{font-size:clamp(24px,3.6vw,34px); line-height:1.2; margin:0;}
+.tb-meta{display:grid; grid-template-columns:repeat(2,1fr); }
+@media(min-width:600px){.tb-meta{grid-template-columns:repeat(4,1fr);}}
+.tb-cell{padding:14px 18px; border-right:1px solid var(--rule-strong); border-bottom:1px solid var(--rule-strong);}
+.tb-cell:nth-child(2n){border-right:none;}
+@media(min-width:600px){.tb-cell{border-right:1px solid var(--rule-strong);} .tb-cell:nth-child(2n){border-right:1px solid var(--rule-strong);} .tb-cell:last-child{border-right:none;}}
+.tb-cell .k{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; color:var(--ink-faint); text-transform:uppercase; margin-bottom:3px;}
+.tb-cell .v{font-family:var(--font-mono); font-size:13px; color:var(--ink); font-weight:600;}
+
+/* ============ CLAUSE / SECTION ============ */
+section.clause{scroll-margin-top:70px; margin-bottom:56px; display:flex; gap:20px;}
+.clause-gutter{
+  flex:none; width:40px; padding-top:4px;
+  font-family:var(--font-mono); font-size:12px; color:var(--ink-faint);
+  text-align:right; border-right:1px solid var(--rule); padding-right:16px;
+}
+@media(max-width:560px){.clause-gutter{width:26px; padding-right:8px; font-size:10.5px;}}
+.clause-main{flex:1; min-width:0;}
+.clause-main h2{font-size:23px; margin-bottom:16px;}
+
+.subsection{margin:22px 0;}
+.subsection h3{font-size:16px; color:var(--accent); margin-bottom:10px;}
+.subsection h4{font-family:var(--font-mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); margin-bottom:10px;}
+
+/* ============ TABLES ============ */
+.tbl-wrap{overflow-x:auto; margin:16px 0; border:1px solid var(--rule-strong); background:var(--paper-raised);}
+table{width:100%; border-collapse:collapse; font-size:13.6px; font-family:var(--font-serif);}
+thead th{
+  text-align:left; font-family:var(--font-mono); font-weight:600; font-size:10.5px;
+  color:var(--ink-faint); text-transform:uppercase; letter-spacing:.04em;
+  padding:9px 13px; background:var(--paper-sunken); border-bottom:1px solid var(--rule-strong);
+}
+tbody td{padding:9px 13px; border-bottom:1px solid var(--rule); color:var(--ink-dim); vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody td strong{color:var(--ink); font-weight:600;}
+tbody td code{white-space:nowrap;}
+tbody tr:hover td{background:var(--paper);}
+
+/* ============ CODE BLOCKS ============ */
+.code-block{position:relative; margin:16px 0; border-radius:var(--radius-l); border:1px solid var(--code-border); background:var(--code-bg); overflow:hidden;}
+.code-block .cb-head{display:flex; align-items:center; justify-content:space-between; padding:7px 12px; background:var(--code-bg-2); border-bottom:1px solid var(--code-border); font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint);}
+.code-block pre{margin:0; padding:15px; overflow-x:auto; font-family:var(--font-mono); font-size:12.6px; line-height:1.65; color:var(--code-text);}
+.code-block .cmt{color:var(--code-comment);}
+.copy-btn{background:transparent; border:1px solid var(--code-border); color:var(--ink-faint); font-family:var(--font-mono); font-size:10px; padding:3px 9px; border-radius:4px; cursor:pointer;}
+.copy-btn:hover{color:var(--code-text); border-color:var(--ink-faint);}
+.copy-btn.copied{color:#7fd99a; border-color:#7fd99a;}
+
+/* ============ CALLOUTS ============ */
+.note{border-left:3px solid var(--accent); background:var(--accent-soft); padding:12px 16px; margin:16px 0; font-size:13.8px;}
+.note strong{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); display:block; margin-bottom:4px;}
+.note p{margin:0; color:#2a3350;}
+
+.question{
+  position:relative; margin:20px 0 20px 4px; padding:14px 16px 14px 20px;
+  background:var(--signal-soft); border-left:3px solid var(--signal);
+}
+.question::before{content:'PREGUNTA'; position:absolute; top:-9px; left:14px; background:var(--signal); color:#fff; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; padding:2px 8px; border-radius:2px;}
+.question p{margin:0; color:#4a3a17; font-size:14.2px; font-style:italic;}
+
+/* checklist (objetivos / prerrequisitos) */
+.checklist{list-style:none; margin:16px 0; padding:0; display:grid; gap:8px;}
+.checklist li{display:flex; gap:10px; align-items:flex-start; font-size:14.5px; color:var(--ink-dim);}
+.checklist li::before{content:'—'; color:var(--accent); font-family:var(--font-mono); flex:none; font-weight:700;}
+
+/* plain bullet list styling */
+ul.plain, ol.plain{margin:12px 0; padding-left:22px; color:var(--ink-dim); font-size:14.5px;}
+ul.plain li, ol.plain li{margin-bottom:6px;}
+
+/* ============ DIAGRAM (ink line-art) ============ */
+.diagram-wrap{border:1px solid var(--rule-strong); background:var(--paper-raised); padding:20px; margin:18px 0;}
+.diagram-svg{width:100%; height:auto; display:block;}
+.dg-label{font-family:'JetBrains Mono',monospace; font-size:11px; fill:var(--ink-faint);}
+.dg-node-label{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; fill:var(--ink);}
+
+/* ============ TABS (stack comparison) ============ */
+.tabs{border:1px solid var(--rule-strong); margin:16px 0; background:var(--paper-raised);}
+.tab-nav{display:flex; border-bottom:1px solid var(--rule-strong); overflow-x:auto;}
+.tab-nav button{font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); background:transparent; border:none; padding:10px 15px; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent;}
+.tab-nav button.active{color:var(--accent); border-bottom-color:var(--accent); background:var(--paper);}
+.tab-panel{display:none; padding:16px;}
+.tab-panel.active{display:block;}
+.tab-panel p{margin:0 0 8px;}
+.tab-panel .stack-composition{font-family:var(--font-mono); font-size:12.5px; color:var(--accent); margin-bottom:8px;}
+
+/* ============ ACCORDION ============ */
+.accordion{border:1px solid var(--rule-strong); margin:16px 0; background:var(--paper-raised);}
+.acc-item + .acc-item{border-top:1px solid var(--rule-strong);}
+.acc-trigger{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:transparent; border:none; color:var(--ink); text-align:left; padding:13px 16px; font-family:var(--font-mono); font-size:13px; font-weight:600; cursor:pointer;}
+.acc-trigger:hover{background:var(--paper);}
+.acc-trigger .chev{color:var(--ink-faint); transition:transform .2s ease; flex:none;}
+.acc-item.open .acc-trigger .chev{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.acc-panel-inner{padding:0 16px 16px;}
+
+/* module inspector (terminal reveal) */
+.inspector{border:1px solid var(--rule-strong); background:var(--paper-raised); margin:16px 0;}
+.inspector-head{display:flex; align-items:center; justify-content:space-between; padding:12px 16px; flex-wrap:wrap; gap:10px;}
+.inspector-head p{margin:0; font-size:13.5px;}
+.inspector-btn{font-family:var(--font-mono); font-size:12px; padding:8px 14px; border-radius:3px; border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent); cursor:pointer; flex:none;}
+.inspector-btn:hover{background:var(--accent); color:#fff;}
+.inspector-output{display:none; border-top:1px solid var(--rule-strong); background:var(--code-bg); padding:14px 16px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); max-height:220px; overflow-y:auto;}
+.inspector-output.show{display:block;}
+.inspector-output .out-line{padding:2px 0; color:#9fd3a8;}
+.inspector-output .out-line .fn{color:#dbe3ee; font-weight:600;}
+.inspector-output .out-line .desc{color:var(--code-comment);}
+
+/* ============ SIGNATURE DEMO: request lifecycle ============ */
+.sim-wrap{border:1.5px solid var(--ink); background:var(--paper-raised); padding:24px; margin:20px 0;}
+.sim-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;}
+.sim-title{font-family:var(--font-mono); font-size:11.5px; letter-spacing:.05em; color:var(--accent); text-transform:uppercase;}
+.sim-toggle{display:flex; border:1px solid var(--rule-strong); border-radius:3px; overflow:hidden;}
+.sim-toggle button{font-family:var(--font-mono); font-size:11.5px; padding:6px 12px; background:var(--paper-raised); border:none; color:var(--ink-faint); cursor:pointer;}
+.sim-toggle button.active{background:var(--accent); color:#fff;}
+.sim-stage{position:relative; min-height:230px; border:1px solid var(--rule-strong); background:var(--paper); margin:16px 0;}
+.sim-controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+.sim-btn{font-family:var(--font-mono); font-size:12.5px; padding:10px 16px; border-radius:3px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer;}
+.sim-btn:hover{background:var(--accent); border-color:var(--accent);}
+.sim-btn:disabled{opacity:.35; cursor:not-allowed;}
+.sim-log{margin-top:12px; background:var(--code-bg); border:1px solid var(--code-border); border-radius:3px; padding:10px 14px; font-family:var(--font-mono); font-size:11.8px; color:var(--code-text); min-height:56px; max-height:130px; overflow-y:auto;}
+.sim-log .log-line{margin-bottom:3px;}
+.sim-log .log-line.ok{color:#8fd39c;}
+.sim-log .log-line.hop{color:#e8c27a;}
+.sim-log .log-line.sys{color:var(--code-comment);}
+
+/* glossary as dictionary */
+.glossary-search{display:flex; align-items:center; gap:8px; background:var(--paper-raised); border:1px solid var(--rule-strong); padding:9px 16px; margin-bottom:16px;}
+.glossary-search input{background:transparent; border:none; outline:none; color:var(--ink); font-family:var(--font-mono); font-size:13.5px; width:100%;}
+.glossary-search input::placeholder{color:var(--ink-faint);}
+dl.glossary{margin:0; border-top:1px solid var(--rule-strong);}
+dl.glossary .g-entry{display:grid; grid-template-columns:170px 1fr; gap:14px; padding:11px 0; border-bottom:1px solid var(--rule); align-items:baseline;}
+@media(max-width:600px){dl.glossary .g-entry{grid-template-columns:1fr;}}
+dl.glossary dt{font-family:var(--font-mono); font-weight:700; font-size:13px; color:var(--accent);}
+dl.glossary dd{margin:0; font-size:13.6px; color:var(--ink-dim);}
+.g-hidden{display:none;}
+
+/* references */
+.ref-group{margin-bottom:20px;}
+.ref-group h4{font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); margin-bottom:10px;}
+.ref-list{list-style:none; margin:0; padding:0; display:grid; gap:7px;}
+.ref-list li{font-size:13.8px; padding:8px 12px; background:var(--paper-raised); border:1px solid var(--rule); border-left:2px solid var(--accent);}
+.ref-list a{text-decoration:none; font-family:var(--font-mono); font-size:13px;}
+.ref-list a:hover{text-decoration:underline;}
+.ref-list .ref-title{color:var(--ink); font-family:var(--font-serif); font-size:13.8px; display:block; margin-bottom:1px;}
+
+/* connection map */
+.link-map{display:grid; gap:10px; margin:16px 0;}
+.link-row{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; padding:11px 14px; background:var(--paper-raised); border:1px solid var(--rule-strong); font-size:13.6px;}
+.link-row .from{color:var(--ink-dim);}
+.link-row .to{color:var(--accent); font-weight:600; text-align:right;}
+.link-row .arrow{font-family:var(--font-mono); color:var(--ink-faint); font-size:13px;}
+@media(max-width:560px){.link-row{grid-template-columns:1fr; text-align:left;} .link-row .to{text-align:left;} .link-row .arrow{display:none;}}
+
+footer{border-top:1px solid var(--rule-strong); padding:34px 20px 60px; text-align:center;}
+footer p{margin:0 auto; max-width:60ch; font-size:13px; color:var(--ink-faint); font-family:var(--font-mono);}
+footer .next-guide{display:inline-block; margin-top:14px; padding:10px 18px; border:1px solid var(--accent); color:var(--accent); font-family:var(--font-mono); font-size:12px;}
+
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--rule-strong); border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="doc-id">UT1</span>· Servidores web &amp; LEMP</div>
+  <span class="subject">Implantación de Aplicaciones Web · 2º ASIR · Guía teórica</span>
+  <button class="menu-btn" id="menuBtn">≡ Índice</button>
+  <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<div class="toc-drawer" id="tocDrawer">
+  <div class="backdrop" id="tocBackdrop"></div>
+  <div class="panel" id="tocDrawerPanel"></div>
+</div>
+
+<div class="shell">
+  <nav class="toc" id="tocDesktop">
+    <p class="toc-title">Índice del documento</p>
+  </nav>
+
+  <main>
+    <div class="content">
+
+      <div class="titleblock">
+        <div class="tb-top">
+          <div class="eyebrow">Guía teórica · UT1</div>
+          <h1>Servidores de aplicaciones web y stacks LEMP</h1>
+        </div>
+        <div class="tb-meta">
+          <div class="tb-cell"><div class="k">Módulo</div><div class="v">Implant. Apps Web</div></div>
+          <div class="tb-cell"><div class="k">Curso</div><div class="v">2º ASIR</div></div>
+          <div class="tb-cell"><div class="k">Duración</div><div class="v">4–6 h estudio</div></div>
+          <div class="tb-cell"><div class="k">Versión</div><div class="v">1.0</div></div>
+        </div>
+      </div>
+
+      <!-- 1. INTRODUCCIÓN -->
+      <section class="clause" id="introduccion" data-title="Introducción">
+        <div class="clause-gutter">§1</div>
+        <div class="clause-main">
+          <h2>Introducción</h2>
+          <p>Cuando accedemos a una aplicación web, detrás hay una infraestructura compleja que combina varios componentes: un servidor web que recibe las peticiones, un intérprete de lenguaje que ejecuta el código, una base de datos que almacena la información y un sistema operativo que lo sustenta todo. Entender cómo encajan estas piezas es fundamental para cualquier administrador de sistemas.</p>
+          <p>Esta guía teórica acompaña a la práctica de despliegue de un stack LEMP con Docker. Los conceptos que aquí se explican, después se aplicarán. El objetivo es que, al acabar esta Unidad de Trabajo, te familiarices con los principales componentes de un stack web.</p>
+        </div>
+      </section>
+
+      <!-- 2. OBJETIVOS -->
+      <section class="clause" id="objetivos" data-title="Objetivos de aprendizaje">
+        <div class="clause-gutter">§2</div>
+        <div class="clause-main">
+          <h2>Objetivos de aprendizaje</h2>
+          <ul class="checklist">
+            <li>Identificar los componentes de un stack web y explicar la función de cada uno.</li>
+            <li>Analizar los requerimientos técnicos de una aplicación web antes de desplegarla.</li>
+            <li>Diferenciar los tipos de servidores de aplicaciones y elegir el más adecuado según el caso.</li>
+            <li>Distinguir entre lenguajes de script de cliente y de servidor, y entender cómo interactúan.</li>
+            <li>Describir la arquitectura de un stack LEMP y justificar cada elección tecnológica.</li>
+            <li>Explicar qué son los módulos y componentes de un servidor web y cómo se configuran.</li>
+            <li>Comprender los mecanismos de gestión de acceso: autenticación, autorización y permisos.</li>
+            <li>Identificar prácticas básicas de seguridad en el despliegue de aplicaciones web.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3. PRERREQUISITOS -->
+      <section class="clause" id="prerrequisitos" data-title="Prerrequisitos">
+        <div class="clause-gutter">§3</div>
+        <div class="clause-main">
+          <h2>Prerrequisitos</h2>
+          <p>Para aprovechar esta guía es necesario disponer de:</p>
+          <ul class="checklist">
+            <li>Conocimientos básicos de redes: direcciones IP, puertos, protocolo HTTP.</li>
+            <li>Nociones básicas de SQL y bases de datos relacionales.</li>
+            <li>Conceptos elementales de HTML y CSS.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 4. ANÁLISIS DE REQUERIMIENTOS -->
+      <section class="clause" id="requerimientos" data-title="Análisis de requerimientos">
+        <div class="clause-gutter">§4</div>
+        <div class="clause-main">
+          <h2>Análisis de requerimientos</h2>
+          <p>Antes de desplegar cualquier aplicación web, lo primero es <strong style="color:var(--ink)">analizar qué necesita</strong>. Este paso, que a menudo se salta, es el que evita problemas posteriores: elegir mal el servidor, dimensionar mal los recursos o ignorar requisitos de seguridad puede arruinar un despliegue.</p>
+
+          <div class="subsection">
+            <h3>Tipos de requerimientos</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Tipo</th><th>Qué incluye</th><th>Ejemplo</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Funcionales</strong></td><td>Qué debe hacer la aplicación</td><td>«Los usuarios deben poder registrarse y hacer login»</td></tr>
+                <tr><td><strong>Técnicos</strong></td><td>Con qué debe funcionar</td><td>«PHP 8.2 o superior, MariaDB 10.6+, Nginx 1.24+»</td></tr>
+                <tr><td><strong>De infraestructura</strong></td><td>Recursos necesarios</td><td>CPU, RAM, disco, ancho de banda</td></tr>
+                <tr><td><strong>De red</strong></td><td>Puertos, protocolos, firewall</td><td>«Abrir 80 y 443, cerrar el resto»</td></tr>
+                <tr><td><strong>De seguridad</strong></td><td>Protección de datos y accesos</td><td>«HTTPS obligatorio, contraseñas hasheadas»</td></tr>
+                <tr><td><strong>De escalabilidad</strong></td><td>Cómo debe crecer</td><td>«Debe soportar 1000 usuarios concurrentes»</td></tr>
+              </tbody>
+            </table></div>
+			<div class="note"><strong>Nota</strong><p>En la siguiente práctica trabajarás con contenedores en tu equipo local. Los recursos del anfitrión (tu PC) son los que limitan. Docker Desktop permite asignar CPU y RAM al motor de Docker, pero no puede dar más de lo que tiene el equipo físico.</p></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Elección de tecnologías</h3>
+            <p>Cada decisión técnica tiene implicaciones. Algunos criterios para elegir:</p>
+            <ul class="plain">
+              <li><strong style="color:var(--ink)">Servidor web:</strong> Nginx es más eficiente para contenido estático y proxy inverso; Apache es más flexible con <code>.htaccess</code> y módulos dinámicos; Caddy simplifica HTTPS automático.</li>
+              <li><strong style="color:var(--ink)">Base de datos:</strong> MariaDB y MySQL se integran en el ecosistema web por su sencillez y omnipresencia (Wordpress, Magento, Laravel...); PostgreSQL es más potente en tipos avanzados; SQLite es ligero pero no apto para concurrencia alta.</li>
+              <li><strong style="color:var(--ink)">Lenguaje de servidor:</strong> PHP es el estándar de facto en hosting compartido; Python y Node.js son más comunes en aplicaciones modernas; Java es habitual en entornos empresariales.</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>Imagina que tienes que desplegar una tienda online pequeña (menos de 100 productos, tráfico moderado). ¿Qué requerimientos técnicos, de infraestructura y de seguridad establecerías antes de empezar? Justifica cada decisión.</p></div>
+        </div>
+      </section>
+
+      <!-- 5. TIPOS DE SERVIDORES -->
+      <section class="clause" id="tipos-servidores" data-title="Tipos de servidores de aplicaciones">
+        <div class="clause-gutter">§5</div>
+        <div class="clause-main">
+          <h2>Tipos de servidores de aplicaciones</h2>
+          <p>Un <strong style="color:var(--ink)">servidor de aplicaciones</strong> es el software que recibe peticiones HTTP y devuelve respuestas. Pero no todos los servidores son iguales: algunos sirven solo contenido estático, otros ejecutan código, otros actúan como intermediarios.</p>
+
+          <div class="subsection">
+            <h3>Clasificación</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Tipo</th><th>Función principal</th><th>Ejemplos</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Servidor web puro</strong></td><td>Sirve archivos estáticos (HTML, CSS, JS, imágenes)</td><td>Nginx, Apache (modo estático), Lighttpd</td></tr>
+                <tr><td><strong>Servidor de aplicaciones</strong></td><td>Ejecuta código de servidor y genera respuestas dinámicas</td><td>Tomcat, WildFly, Node.js, Gunicorn</td></tr>
+                <tr><td><strong>Proxy inverso</strong></td><td>Recibe peticiones y las redirige a otros servicios internos</td><td>Nginx, HAProxy, Traefik</td></tr>
+                <tr><td><strong>Balanceador de carga</strong></td><td>Distribuye peticiones entre varios servidores</td><td>Nginx, HAProxy, AWS ELB</td></tr>
+                <tr><td><strong>Servidor completo</strong></td><td>Combina todo lo anterior</td><td>Apache con módulos, IIS</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Comparativa de servidores web</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Servidor</th><th>Origen</th><th>Concurrencia</th><th>Puntos fuertes</th><th>Puntos débiles</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Nginx</strong></td><td>Rusia (2004)</td><td>Async / eventos</td><td>Alto rendimiento, bajo consumo, proxy inverso excelente</td><td>Menos flexible para <code>.htaccess</code></td></tr>
+                <tr><td><strong>Apache HTTP Server</strong></td><td>EE.UU. (1995)</td><td>Procesos/hilos</td><td>Flexible, gran ecosistema de módulos, <code>.htaccess</code></td><td>Mayor consumo bajo carga</td></tr>
+                <tr><td><strong>Caddy</strong></td><td>EE.UU. (2015)</td><td>Async</td><td>HTTPS automático, config sencilla</td><td>Menos maduro, menos módulos</td></tr>
+                <tr><td><strong>IIS</strong></td><td>Microsoft (1995)</td><td>Hilos</td><td>Integración Windows/Active Directory</td><td>Solo Windows, licencia</td></tr>
+                <tr><td><strong>Lighttpd</strong></td><td>Alemania (2003)</td><td>Async</td><td>Ligero, rápido para estático</td><td>Menos usado, menos documentación</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Servidores de aplicaciones específicos</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Servidor</th><th>Lenguaje</th><th>Caso de uso</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Tomcat</strong></td><td>Java</td><td>Aplicaciones Java EE / Jakarta EE</td></tr>
+                <tr><td><strong>WildFly</strong></td><td>Java</td><td>Aplicaciones empresariales Java</td></tr>
+                <tr><td><strong>Gunicorn</strong></td><td>Python</td><td>Aplicaciones Django / Flask</td></tr>
+                <tr><td><strong>uWSGI</strong></td><td>Python</td><td>Aplicaciones WSGI</td></tr>
+                <tr><td><strong>Node.js</strong></td><td>JavaScript</td><td>Aplicaciones en tiempo real, APIs</td></tr>
+                <tr><td><strong>PHP-FPM</strong></td><td>PHP</td><td>Procesamiento de PHP para Nginx/Apache</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>¿Por qué Nginx en esta práctica?</h3>
+            <p>Nginx se ha convertido en el estándar de facto para servidores web modernos por varias razones:</p>
+            <ul class="plain">
+              <li><strong style="color:var(--ink)">Rendimiento:</strong> su modelo asíncrono maneja miles de conexiones concurrentes con muy poca memoria.</li>
+              <li><strong style="color:var(--ink)">Versatilidad:</strong> sirve contenido estático, actúa como proxy inverso, balancea carga y cachea respuestas.</li>
+              <li><strong style="color:var(--ink)">Ecosistema:</strong> imágenes Docker oficiales, documentación abundante, comunidad enorme.</li>
+              <li><strong style="color:var(--ink)">Uso profesional:</strong> presente en la mayoría de stacks modernos (LEMP, MEAN, JAMstack).</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>Si tuvieras que desplegar una aplicación Java empresarial, ¿elegirías Nginx como servidor principal? ¿Por qué? ¿Qué papel jugaría Tomcat en ese escenario?</p></div>
+        </div>
+      </section>
+
+      <!-- 6. LENGUAJES CLIENTE/SERVIDOR -->
+      <section class="clause" id="lenguajes" data-title="Lenguajes de script en cliente y servidor">
+        <div class="clause-gutter">§6</div>
+        <div class="clause-main">
+          <h2>Lenguajes de script en cliente y servidor</h2>
+          <p>Una aplicación web moderna combina código que se ejecuta en dos lugares distintos: el <strong style="color:var(--ink)">navegador del usuario</strong> (cliente) y el <strong style="color:var(--ink)">servidor</strong>. Entender esta separación es clave para comprender cómo funciona cualquier aplicación web.</p>
+
+          <div class="subsection">
+            <h3>Código de cliente</h3>
+            <p>Se ejecuta en el navegador del usuario. El servidor solo lo envía; no lo procesa.</p>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Lenguaje</th><th>Función</th><th>Ejemplo</th></tr></thead>
+              <tbody>
+                <tr><td><strong>HTML</strong></td><td>Estructura del contenido</td><td><code>&lt;h1&gt;Título&lt;/h1&gt;</code></td></tr>
+                <tr><td><strong>CSS</strong></td><td>Presentación visual</td><td><code>body { font-family: sans-serif; }</code></td></tr>
+                <tr><td><strong>JavaScript</strong></td><td>Interactividad, lógica en el navegador</td><td><code>getElementById("btn").addEventListener(...)</code></td></tr>
+                <tr><td><strong>TypeScript</strong></td><td>JavaScript con tipos (se compila a JS)</td><td><code>const nombre: string = "Ana";</code></td></tr>
+                <tr><td><strong>WebAssembly</strong></td><td>Código compilado de alto rendimiento</td><td>Módulos de cifrado, juegos</td></tr>
+              </tbody>
+            </table></div>
+            <p style="font-size:13.6px;">El servidor web (Nginx, Apache) simplemente <strong style="color:var(--ink)">entrega</strong> estos archivos al navegador. No los ejecuta.</p>
+          </div>
+
+          <div class="subsection">
+            <h3>Código de servidor</h3>
+            <p>Se ejecuta en el servidor antes de enviar la respuesta al cliente. El usuario nunca ve este código, solo el resultado.</p>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Lenguaje</th><th>Entorno típico</th><th>Caso de uso</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PHP</strong></td><td>PHP-FPM + Nginx/Apache</td><td>WordPress, aplicaciones web clásicas</td></tr>
+                <tr><td><strong>Python</strong></td><td>Gunicorn/uWSGI + Nginx</td><td>Django, Flask, APIs</td></tr>
+                <tr><td><strong>Node.js</strong></td><td>Node + Nginx (proxy)</td><td>APIs REST, aplicaciones en tiempo real</td></tr>
+                <tr><td><strong>Java</strong></td><td>Tomcat/WildFly</td><td>Aplicaciones empresariales</td></tr>
+                <tr><td><strong>Ruby</strong></td><td>Puma + Nginx</td><td>Ruby on Rails</td></tr>
+                <tr><td><strong>C#</strong></td><td>IIS / .NET</td><td>Aplicaciones Microsoft</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>¿Cómo interactúan cliente y servidor?</h3>
+            <div class="diagram-wrap">
+              <svg class="diagram-svg" viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="30" width="160" height="90" fill="none" stroke="#1c1b17" stroke-width="1.4"/>
+                <text x="90" y="55" text-anchor="middle" class="dg-node-label">NAVEGADOR</text>
+                <text x="90" y="72" text-anchor="middle" class="dg-label">(cliente)</text>
+                <text x="90" y="98" text-anchor="middle" class="dg-label">HTML / CSS / JS</text>
+
+                <rect x="390" y="30" width="160" height="90" fill="none" stroke="#1c1b17" stroke-width="1.4"/>
+                <text x="470" y="55" text-anchor="middle" class="dg-node-label">SERVIDOR</text>
+                <text x="470" y="72" text-anchor="middle" class="dg-label">(servidor)</text>
+                <text x="470" y="98" text-anchor="middle" class="dg-label">PHP / Python / …</text>
+
+                <line x1="172" y1="58" x2="388" y2="58" stroke="#2c3f73" stroke-width="1.4" marker-end="url(#arrow1)"/>
+                <text x="280" y="48" text-anchor="middle" class="dg-label" fill="#2c3f73">Petición HTTP</text>
+                <line x1="388" y1="92" x2="172" y2="92" stroke="#8f8c7d" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow2)"/>
+                <text x="280" y="112" text-anchor="middle" class="dg-label">Respuesta HTTP</text>
+
+                <defs>
+                  <marker id="arrow1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2c3f73"/></marker>
+                  <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8f8c7d"/></marker>
+                </defs>
+              </svg>
+            </div>
+            <ol class="plain">
+              <li>El usuario escribe una URL o hace clic en un enlace.</li>
+              <li>El navegador envía una petición HTTP al servidor.</li>
+              <li>El servidor ejecuta el código de servidor (si procede).</li>
+              <li>El servidor devuelve HTML, CSS y JS al navegador.</li>
+              <li>El navegador renderiza la página y ejecuta el JavaScript de cliente.</li>
+              <li>Si hay interacción (AJAX, fetch), el ciclo se repite sin recargar la página.</li>
+            </ol>
+          </div>
+
+          <div class="subsection">
+            <h3>El caso de PHP en un stack LEMP</h3>
+            <p>PHP es un lenguaje de servidor. Para que Nginx pueda ejecutar PHP, necesita un componente intermedio: <strong style="color:var(--ink)">PHP-FPM</strong> (FastCGI Process Manager). El flujo es:</p>
+            <div class="code-block"><div class="cb-head"><span>flujo</span></div><pre>Navegador → Nginx → PHP-FPM → (ejecuta PHP) → Nginx → Navegador</pre></div>
+            <p style="font-size:13.6px;">Nginx recibe la petición, detecta que es un archivo <code>.php</code>, y se la pasa a PHP-FPM mediante el protocolo FastCGI. PHP-FPM ejecuta el código y devuelve el resultado a Nginx, que lo envía al navegador.</p>
+            <div class="note"><strong>Nota para la práctica</strong><p>En la primera práctica no hay PHP propio que ejecutar, por eso no se instala PHP-FPM. phpMyAdmin trae su propio intérprete PHP interno. En la segunda práctica, al añadir WordPress, PHP-FPM será imprescindible.</p></div>
+          </div>
+
+          <div class="question"><p>¿Por qué crees que el código de cliente (JavaScript) se puede ver con «Ver código fuente» pero el de servidor (PHP) no? ¿Qué implicaciones tiene esto para la seguridad?</p></div>
+        </div>
+      </section>
+
+      <!-- 7. ARQUITECTURA LEMP -->
+      <section class="clause" id="arquitectura-lemp" data-title="Arquitectura de un stack LEMP">
+        <div class="clause-gutter">§7</div>
+        <div class="clause-main">
+          <h2>Arquitectura de un stack LEMP</h2>
+          <p>Un <strong style="color:var(--ink)">stack</strong> es un conjunto de tecnologías que trabajan juntas para servir una aplicación web. El más común es el <strong style="color:var(--accent)">LEMP</strong>:</p>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Letra</th><th>Tecnología</th><th>Función</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--font-mono); font-weight:700;">L</td><td>Linux</td><td>Sistema operativo base</td></tr>
+              <tr><td style="font-family:var(--font-mono); font-weight:700; color:var(--accent);">E</td><td>Nginx (Engine-X)</td><td>Servidor web / proxy inverso</td></tr>
+              <tr><td style="font-family:var(--font-mono); font-weight:700; color:var(--signal);">M</td><td>MariaDB (o MySQL)</td><td>Base de datos</td></tr>
+              <tr><td style="font-family:var(--font-mono); font-weight:700;">P</td><td>PHP</td><td>Lenguaje de servidor</td></tr>
+            </tbody>
+          </table></div>
+
+          <div class="subsection">
+            <h3>Otros stacks habituales</h3>
+            <div class="tabs">
+              <div class="tab-nav">
+                <button class="active" data-tab="tab-lamp">LAMP</button>
+                <button data-tab="tab-lemp">LEMP</button>
+                <button data-tab="tab-mean">MEAN</button>
+                <button data-tab="tab-mern">MERN</button>
+                <button data-tab="tab-jam">JAMstack</button>
+              </div>
+              <div class="tab-panel active" id="tab-lamp"><div class="stack-composition">Linux + Apache + MySQL + PHP</div><p>Hosting compartido, WordPress.</p></div>
+              <div class="tab-panel" id="tab-lemp"><div class="stack-composition">Linux + Nginx + MariaDB + PHP</div><p>Aplicaciones modernas, alto rendimiento.</p></div>
+              <div class="tab-panel" id="tab-mean"><div class="stack-composition">MongoDB + Express + Angular + Node</div><p>Aplicaciones JavaScript full-stack.</p></div>
+              <div class="tab-panel" id="tab-mern"><div class="stack-composition">MongoDB + Express + React + Node</div><p>Como MEAN pero con React.</p></div>
+              <div class="tab-panel" id="tab-jam"><div class="stack-composition">JavaScript + APIs + Markup</div><p>Sitios estáticos modernos.</p></div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Diagrama de un stack LEMP y flujo de una petición</h3>
+            <p style="font-size:13.6px;">Esta es la demo central de la guía: elige si el navegador pide un recurso <strong>estático</strong> o <strong>dinámico</strong> y sigue el recorrido de la petición.</p>
+
+            <div class="sim-wrap">
+              <div class="sim-head">
+                <span class="sim-title">Simulador · ciclo de vida de una petición HTTP</span>
+                <div class="sim-toggle">
+                  <button class="active" id="toggleStatic">GET /logo.png (estático)</button>
+                  <button id="toggleDynamic">GET /index.php (dinámico)</button>
+                </div>
+              </div>
+
+              <div class="sim-stage" id="simStage">
+                <svg class="diagram-svg" viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg" style="position:absolute; inset:0; width:100%; height:100%;">
+                  <rect x="20" y="10" width="580" height="180" fill="none" stroke="#1c1b17" stroke-width="1.2"/>
+                  <text x="34" y="26" class="dg-label">SERVIDOR LINUX</text>
+
+                  <rect x="45" y="45" width="120" height="55" fill="none" stroke="#2c3f73" stroke-width="1.4" id="box-nginx"/>
+                  <text x="105" y="68" text-anchor="middle" class="dg-node-label">NGINX</text>
+                  <text x="105" y="84" text-anchor="middle" class="dg-label">puerto 80</text>
+
+                  <rect x="240" y="45" width="130" height="55" fill="none" stroke="#93630f" stroke-width="1.4" id="box-phpfpm"/>
+                  <text x="305" y="68" text-anchor="middle" class="dg-node-label">PHP-FPM</text>
+                  <text x="305" y="84" text-anchor="middle" class="dg-label">FastCGI</text>
+
+                  <rect x="445" y="45" width="130" height="55" fill="none" stroke="#7d2e2c" stroke-width="1.4" id="box-mariadb"/>
+                  <text x="510" y="68" text-anchor="middle" class="dg-node-label">MARIADB</text>
+                  <text x="510" y="84" text-anchor="middle" class="dg-label">puerto 3306</text>
+
+                  <rect x="150" y="140" width="140" height="40" fill="none" stroke="#57554a" stroke-width="1.2" id="box-files"/>
+                  <text x="220" y="164" text-anchor="middle" class="dg-node-label" style="font-size:11px;">ARCHIVOS DE LA APP</text>
+
+                  <line x1="105" y1="100" x2="105" y2="140" stroke="#57554a" stroke-width="1" stroke-dasharray="3 3"/>
+                  <line x1="150" y1="160" x2="105" y2="160" stroke="#57554a" stroke-width="1" stroke-dasharray="3 3"/>
+                  <line x1="220" y1="140" x2="220" y2="100" stroke="#57554a" stroke-width="1" stroke-dasharray="3 3"/>
+                  <line x1="290" y1="160" x2="510" y2="160" stroke="#57554a" stroke-width="1" stroke-dasharray="3 3"/>
+                  <line x1="510" y1="160" x2="510" y2="100" stroke="#57554a" stroke-width="1" stroke-dasharray="3 3"/>
+
+                  <rect x="255" y="220" width="110" height="34" fill="none" stroke="#1c1b17" stroke-width="1.2"/>
+                  <text x="310" y="241" text-anchor="middle" class="dg-node-label">NAVEGADOR</text>
+                  <line x1="310" y1="190" x2="310" y2="218" stroke="#1c1b17" stroke-width="1.2"/>
+                  <line x1="310" y1="45" x2="310" y2="20" stroke="none"/>
+                  <line x1="165" y1="72" x2="240" y2="72" stroke="#2c3f73" stroke-width="1.2" stroke-dasharray="2 2"/>
+                  <line x1="370" y1="72" x2="445" y2="72" stroke="#93630f" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+                  <circle id="packet" cx="310" cy="234" r="6" fill="#2c3f73"/>
+                </svg>
+              </div>
+
+              <div class="sim-controls">
+                <button class="sim-btn" id="btnSend">▸ Enviar petición</button>
+                <button class="sim-btn" id="btnReset" disabled>↺ Reiniciar</button>
+              </div>
+              <div class="sim-log" id="simLog"><div class="log-line sys">$ listo — elige el tipo de recurso y pulsa «Enviar petición»</div></div>
+            </div>
+
+            <ol class="plain">
+              <li>El navegador envía una petición HTTP a Nginx.</li>
+              <li>Nginx comprueba si el recurso es estático (imagen, CSS) o dinámico (<code>.php</code>).</li>
+              <li>Si es estático, lo sirve directamente.</li>
+              <li>Si es dinámico, pasa la petición a PHP-FPM.</li>
+              <li>PHP-FPM ejecuta el código PHP, que consulta MariaDB si es necesario.</li>
+              <li>PHP-FPM devuelve el HTML generado a Nginx.</li>
+              <li>Nginx envía la respuesta al navegador.</li>
+            </ol>
+          </div>
+
+          <div class="subsection">
+            <h3>¿Por qué Docker para montar un LEMP?</h3>
+            <p>Tradicionalmente, un LEMP se montaba instalando cada componente directamente en el sistema operativo (con <code>apt</code>, <code>yum</code>, etc.). Docker aporta ventajas:</p>
+            <ul class="plain">
+              <li><strong style="color:var(--ink)">Aislamiento:</strong> cada servicio en su propio contenedor, sin conflictos de versiones.</li>
+              <li><strong style="color:var(--ink)">Reproducibilidad:</strong> el mismo stack funciona igual en cualquier equipo.</li>
+              <li><strong style="color:var(--ink)">Portabilidad:</strong> se puede mover de un servidor a otro sin reinstalar nada.</li>
+              <li><strong style="color:var(--ink)">Facilidad de limpieza:</strong> se borra el contenedor y no queda rastro.</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>¿Qué ventajas e inconvenientes tiene montar un LEMP con Docker frente a instalarlo directamente sobre el sistema operativo? Piensa en rendimiento, seguridad y facilidad de mantenimiento.</p></div>
+        </div>
+      </section>
+
+      <!-- 8. MÓDULOS Y COMPONENTES -->
+      <section class="clause" id="modulos" data-title="Módulos y componentes">
+        <div class="clause-gutter">§8</div>
+        <div class="clause-main">
+          <h2>Módulos y componentes</h2>
+          <p>Tanto los servidores web como las bases de datos y los intérpretes de lenguaje se organizan en <strong style="color:var(--ink)">módulos</strong> o <strong style="color:var(--ink)">componentes</strong> que añaden funcionalidad. Conocerlos permite adaptar el servidor a las necesidades de cada aplicación.</p>
+
+          <div class="subsection">
+            <h3>Módulos de Nginx</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Módulo</th><th>Función</th></tr></thead>
+              <tbody>
+                <tr><td><code>ngx_http_core_module</code></td><td>Núcleo del servidor HTTP</td></tr>
+                <tr><td><code>ngx_http_ssl_module</code></td><td>Soporte HTTPS/TLS</td></tr>
+                <tr><td><code>ngx_http_gzip_module</code></td><td>Compresión de respuestas</td></tr>
+                <tr><td><code>ngx_http_proxy_module</code></td><td>Proxy inverso</td></tr>
+                <tr><td><code>ngx_http_fastcgi_module</code></td><td>Comunicación con PHP-FPM</td></tr>
+                <tr><td><code>ngx_http_rewrite_module</code></td><td>Reescritura de URLs</td></tr>
+                <tr><td><code>ngx_http_auth_basic_module</code></td><td>Autenticación básica HTTP</td></tr>
+                <tr><td><code>ngx_http_access_module</code></td><td>Restricción por IP (<code>allow</code>/<code>deny</code>)</td></tr>
+                <tr><td><code>ngx_http_log_module</code></td><td>Registro de accesos</td></tr>
+              </tbody>
+            </table></div>
+            <div class="inspector">
+              <div class="inspector-head"><p>Cómo ver los módulos compilados de Nginx:</p><button class="inspector-btn" data-target="out-nginx" data-cmd="nginx -V">▸ nginx -V</button></div>
+              <div class="inspector-output" id="out-nginx">
+                <div class="out-line sys">$ nginx -V</div>
+                <div class="out-line">nginx version: nginx/1.25.3</div>
+                <div class="out-line">configure arguments: <span class="fn">--with-http_ssl_module</span> <span class="desc"># HTTPS/TLS</span></div>
+                <div class="out-line"><span class="fn">--with-http_gzip_static_module</span> <span class="desc"># compresión</span></div>
+                <div class="out-line"><span class="fn">--with-http_v2_module</span> <span class="fn">--with-http_realip_module</span></div>
+                <div class="out-line sys"># … el resto de módulos activos aparecerían aquí</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Extensiones de PHP</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Extensión</th><th>Función</th></tr></thead>
+              <tbody>
+                <tr><td><code>mysqli</code> / <code>pdo_mysql</code></td><td>Conexión a MySQL/MariaDB</td></tr>
+                <tr><td><code>gd</code> / <code>imagick</code></td><td>Manipulación de imágenes</td></tr>
+                <tr><td><code>curl</code></td><td>Peticiones HTTP desde PHP</td></tr>
+                <tr><td><code>mbstring</code></td><td>Manejo de cadenas multibyte</td></tr>
+                <tr><td><code>xml</code></td><td>Procesamiento de XML</td></tr>
+                <tr><td><code>json</code></td><td>Codificación/decodificación JSON</td></tr>
+                <tr><td><code>opcache</code></td><td>Caché de bytecode PHP</td></tr>
+              </tbody>
+            </table></div>
+            <div class="inspector">
+              <div class="inspector-head"><p>Cómo ver las extensiones instaladas de PHP:</p><button class="inspector-btn" data-target="out-php" data-cmd="php -m">▸ php -m</button></div>
+              <div class="inspector-output" id="out-php">
+                <div class="out-line sys">$ php -m</div>
+                <div class="out-line"><span class="fn">Core</span>, <span class="fn">curl</span>, <span class="fn">gd</span>, <span class="fn">json</span></div>
+                <div class="out-line"><span class="fn">mbstring</span>, <span class="fn">mysqli</span>, <span class="fn">opcache</span></div>
+                <div class="out-line"><span class="fn">pdo_mysql</span>, <span class="fn">xml</span> <span class="desc"># según la imagen usada</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Componentes de MariaDB</h3>
+            <p>MariaDB se organiza en <strong style="color:var(--ink)">motores de almacenamiento</strong> y <strong style="color:var(--ink)">plugins</strong>:</p>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Motor</th><th>Característica</th></tr></thead>
+              <tbody>
+                <tr><td><strong>InnoDB</strong></td><td>Transaccional, ACID, por defecto</td></tr>
+                <tr><td><strong>MyISAM</strong></td><td>No transaccional, más rápido en lectura</td></tr>
+                <tr><td><strong>Aria</strong></td><td>Alternativa a MyISAM, más robusta</td></tr>
+                <tr><td><strong>Memory</strong></td><td>Almacenamiento en RAM</td></tr>
+                <tr><td><strong>ColumnStore</strong></td><td>Orientado a análisis de datos</td></tr>
+              </tbody>
+            </table></div>
+            <div class="inspector">
+              <div class="inspector-head"><p>Cómo ver los motores disponibles:</p><button class="inspector-btn" data-target="out-mariadb" data-cmd="SHOW ENGINES;">▸ SHOW ENGINES;</button></div>
+              <div class="inspector-output" id="out-mariadb">
+                <div class="out-line sys">MariaDB&gt; SHOW ENGINES;</div>
+                <div class="out-line"><span class="fn">InnoDB</span> — DEFAULT <span class="desc"># transaccional, ACID</span></div>
+                <div class="out-line"><span class="fn">MyISAM</span> — YES <span class="desc"># no transaccional</span></div>
+                <div class="out-line"><span class="fn">Aria</span> — YES <span class="desc"># alternativa robusta a MyISAM</span></div>
+                <div class="out-line"><span class="fn">MEMORY</span> — YES <span class="desc"># en RAM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>¿Por qué es importante conocer los módulos?</h3>
+            <p>Porque determinan qué puede hacer tu servidor. Si por ejemplo necesitas HTTPS y Nginx no tiene <code>ngx_http_ssl_module</code>, no funcionará. Así, conocer los módulos te permite:</p>
+            <ul class="plain">
+              <li>Diagnosticar por qué algo no funciona.</li>
+              <li>Saber qué puedes activar sin reinstalar.</li>
+              <li>Elegir la imagen Docker adecuada (algunas traen módulos extra).</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>Si quisieras servir una aplicación WordPress con imágenes redimensionadas automáticamente, ¿qué módulos de Nginx y qué extensiones de PHP necesitarías como mínimo?</p></div>
+        </div>
+      </section>
+
+      <!-- 9. GESTIÓN DE ACCESO -->
+      <section class="clause" id="gestion-acceso" data-title="Gestión de acceso: conceptos">
+        <div class="clause-gutter">§9</div>
+        <div class="clause-main">
+          <h2>Gestión de acceso: conceptos</h2>
+          <p>La <strong style="color:var(--ink)">gestión de acceso</strong> es el conjunto de mecanismos que controlan quién puede hacer qué en un sistema. En el contexto de un servidor web y una base de datos, abarca tres conceptos fundamentales: autenticación, autorización y auditoría.</p>
+
+          <div class="subsection">
+            <h3>Autenticación — verifica quién eres</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Método</th><th>Descripción</th><th>Uso típico</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Usuario y contraseña</strong></td><td>Credenciales clásicas</td><td>Paneles de administración</td></tr>
+                <tr><td><strong>Autenticación básica HTTP</strong></td><td>Usuario/contraseña en cabecera HTTP</td><td>Protección simple de directorios</td></tr>
+                <tr><td><strong>Tokens</strong></td><td>Cadenas temporales</td><td>APIs</td></tr>
+                <tr><td><strong>Certificados</strong></td><td>Clave pública/privada</td><td>Comunicaciones seguras</td></tr>
+                <tr><td><strong>OAuth / OpenID</strong></td><td>Delegación a terceros</td><td>Login con Google, GitHub</td></tr>
+                <tr><td><strong>MFA</strong></td><td>Segundo factor (TOTP, SMS)</td><td>Acceso a sistemas críticos</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Autorización — determina qué puedes hacer</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Modelo</th><th>Descripción</th><th>Ejemplo</th></tr></thead>
+              <tbody>
+                <tr><td><strong>ACL</strong></td><td>Permisos por recurso y usuario</td><td>Archivos del sistema</td></tr>
+                <tr><td><strong>Roles (RBAC)</strong></td><td>Permisos agrupados en roles</td><td>Usuario, editor, administrador</td></tr>
+                <tr><td><strong>Permisos por IP</strong></td><td>Restricción según origen</td><td><code>allow</code> / <code>deny</code> en Nginx</td></tr>
+                <tr><td><strong>Permisos granulares</strong></td><td>Por tabla, columna o fila</td><td><code>GRANT SELECT ON tabla</code> en MariaDB</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Auditoría — registra qué se ha hecho</h3>
+            <ul class="plain">
+              <li>Logs de acceso de Nginx (<code>access.log</code>).</li>
+              <li>Logs de error de Nginx (<code>error.log</code>).</li>
+              <li>Logs de MariaDB (<code>general_log</code>, <code>slow_query_log</code>).</li>
+              <li>Logs del sistema (<code>syslog</code>, <code>journalctl</code>).</li>
+            </ul>
+          </div>
+
+          <div class="subsection">
+            <h3>Gestión de acceso en Nginx</h3>
+            <p style="font-size:13.6px;">Nginx ofrece dos mecanismos principales:</p>
+            <h4>Autenticación básica HTTP</h4>
+            <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="c-authbasic">Copiar</button></div><pre id="c-authbasic">location /protegido/ {
+    auth_basic "Área restringida";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+}</pre></div>
+            <h4>Restricción por IP</h4>
+            <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="c-allowdeny">Copiar</button></div><pre id="c-allowdeny">location /admin/ {
+    allow 192.168.1.0/24;
+    deny all;
+}</pre></div>
+            <p style="font-size:13.6px;">Ambos pueden combinarse con la directiva <code>satisfy</code>.</p>
+          </div>
+
+          <div class="subsection">
+            <h3>Gestión de acceso en MariaDB</h3>
+            <p style="font-size:13.6px;">MariaDB tiene su propio sistema de usuarios y permisos, independiente del sistema operativo.</p>
+            <div class="accordion">
+              <div class="acc-item">
+                <button class="acc-trigger"><span>Crear un usuario</span><span class="chev">▾</span></button>
+                <div class="acc-panel"><div class="acc-panel-inner">
+                  <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql1">Copiar</button></div><pre id="sql1">CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'contraseña_segura';</pre></div>
+                </div></div>
+              </div>
+              <div class="acc-item">
+                <button class="acc-trigger"><span>Otorgar permisos</span><span class="chev">▾</span></button>
+                <div class="acc-panel"><div class="acc-panel-inner">
+                  <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql2">Copiar</button></div><pre id="sql2">GRANT SELECT, INSERT, UPDATE, DELETE ON mi_app.* TO 'app_user'@'localhost';</pre></div>
+                </div></div>
+              </div>
+              <div class="acc-item">
+                <button class="acc-trigger"><span>Ver permisos</span><span class="chev">▾</span></button>
+                <div class="acc-panel"><div class="acc-panel-inner">
+                  <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql4">Copiar</button></div><pre id="sql4">SHOW GRANTS FOR 'app_user'@'localhost';</pre></div>
+                </div></div>
+              </div>
+              <div class="acc-item">
+                <button class="acc-trigger"><span>Revocar permisos</span><span class="chev">▾</span></button>
+                <div class="acc-panel"><div class="acc-panel-inner">
+                  <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="sql5">Copiar</button></div><pre id="sql5">REVOKE DELETE ON mi_app.* FROM 'app_user'@'localhost';</pre></div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Principio de mínimo privilegio</h3>
+            <p>El <strong style="color:var(--ink)">principio de mínimo privilegio</strong> establece que cada usuario o servicio debe tener <strong style="color:var(--ink)">solo los permisos estrictamente necesarios</strong> para realizar su función. Aplicado a un stack web:</p>
+            <ul class="plain">
+              <li>La aplicación <strong style="color:var(--danger)">no</strong> debe conectarse como <code>root</code> a la base de datos.</li>
+              <li>El usuario de la aplicación solo debe tener permisos sobre <strong style="color:var(--ink)">su</strong> base de datos.</li>
+              <li>Nginx debe ejecutarse con un usuario sin privilegios (<code>www-data</code>, <code>nginx</code>).</li>
+              <li>Los contenedores no deben ejecutarse como <code>root</code> si no es imprescindible.</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>¿Por qué es peligroso que una aplicación WordPress se conecte a MariaDB con el usuario <code>root</code>? ¿Qué podría pasar si un atacante consigue las credenciales?</p></div>
+        </div>
+      </section>
+
+      <!-- 10. SEGURIDAD -->
+      <section class="clause" id="seguridad" data-title="Seguridad básica en servidores web">
+        <div class="clause-gutter">§10</div>
+        <div class="clause-main">
+          <h2>Seguridad básica en servidores web</h2>
+          <p>La seguridad no es un añadido: es parte del diseño. Estos son los aspectos básicos que todo administrador debe considerar.</p>
+
+          <div class="subsection">
+            <h3>Superficie de ataque</h3>
+            <p>La <strong style="color:var(--ink)">superficie de ataque</strong> es el conjunto de puntos por los que un atacante podría intentar entrar. Cuanto menor sea, mejor.</p>
+            <ul class="plain">
+              <li><strong style="color:var(--ink)">Puertos abiertos:</strong> solo los necesarios (80, 443). Cerrar el resto.</li>
+              <li><strong style="color:var(--ink)">Servicios expuestos:</strong> no exponer MariaDB a internet si no es imprescindible.</li>
+              <li><strong style="color:var(--ink)">Versiones desactualizadas:</strong> mantener imágenes y paquetes al día.</li>
+              <li><strong style="color:var(--ink)">Credenciales débiles:</strong> usar contraseñas robustas y únicas.</li>
+              <li><strong style="color:var(--ink)">Información filtrada:</strong> no mostrar versiones en cabeceras HTTP.</li>
+            </ul>
+          </div>
+
+          <div class="subsection">
+            <h3>Buenas prácticas</h3>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Práctica</th><th>Por qué</th></tr></thead>
+              <tbody>
+                <tr><td>Usar HTTPS</td><td>Cifra el tráfico; evita interceptación</td></tr>
+                <tr><td>Contraseñas robustas</td><td>Evita fuerza bruta</td></tr>
+                <tr><td>Usuario no root para la app</td><td>Limita daños si hay brecha</td></tr>
+                <tr><td>Red interna para BD</td><td>Evita exposición innecesaria</td></tr>
+                <tr><td>Logs activados</td><td>Permite detectar incidentes</td></tr>
+                <tr><td>Copias de seguridad</td><td>Permite recuperarse de fallos</td></tr>
+                <tr><td>Actualizaciones periódicas</td><td>Cierra vulnerabilidades conocidas</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Cabeceras de seguridad HTTP</h3>
+            <p style="font-size:13.6px;">Nginx puede añadir cabeceras que mejoran la seguridad del navegador:</p>
+            <div class="code-block"><div class="cb-head"><span>nginx</span><button class="copy-btn" data-copy="c-headers">Copiar</button></div><pre id="c-headers">add_header X-Frame-Options "SAMEORIGIN";
+add_header X-Content-Type-Options "nosniff";
+add_header X-XSS-Protection "1; mode=block";
+add_header Strict-Transport-Security "max-age=31536000" always;</pre></div>
+          </div>
+
+          <div class="subsection">
+            <h3>Contenedores y seguridad</h3>
+            <ul class="plain">
+              <li><strong style="color:var(--ink)">No ejecutar como root:</strong> usar <code>USER</code> en el Dockerfile o <code>--user</code> en <code>docker run</code>.</li>
+              <li><strong style="color:var(--ink)">Imágenes oficiales:</strong> evitar imágenes de fuentes desconocidas.</li>
+              <li><strong style="color:var(--ink)">Imágenes minimalistas:</strong> Alpine reduce la superficie de ataque.</li>
+              <li><strong style="color:var(--ink)">Redes aisladas:</strong> cada stack en su propia red.</li>
+              <li><strong style="color:var(--ink)">Volúmenes de solo lectura:</strong> montar configuraciones con <code>:ro</code>.</li>
+            </ul>
+          </div>
+
+          <div class="question"><p>¿Qué diferencias de seguridad hay entre exponer MariaDB al exterior (puerto 3306 abierto) y mantenerla solo accesible desde la red interna de Docker?</p></div>
+        </div>
+      </section>
+
+      <!-- 11. GLOSARIO -->
+      <section class="clause" id="glosario" data-title="Glosario">
+        <div class="clause-gutter">§11</div>
+        <div class="clause-main">
+          <h2>Glosario</h2>
+          <dl class="glossary" id="glossaryList">
+            <div class="g-entry"><dt>ACL</dt><dd>Access Control List. Lista de permisos por recurso.</dd></div>
+            <div class="g-entry"><dt>Apache</dt><dd>Servidor web de código abierto, muy extendido.</dd></div>
+            <div class="g-entry"><dt>Bind mount</dt><dd>Montaje de una carpeta del anfitrión dentro de un contenedor.</dd></div>
+            <div class="g-entry"><dt>Cliente</dt><dd>Programa que solicita recursos (el navegador).</dd></div>
+            <div class="g-entry"><dt>Contenedor</dt><dd>Instancia en ejecución de una imagen Docker.</dd></div>
+            <div class="g-entry"><dt>Docker</dt><dd>Plataforma de virtualización ligera basada en contenedores.</dd></div>
+            <div class="g-entry"><dt>FastCGI</dt><dd>Protocolo de comunicación entre servidor web e intérprete.</dd></div>
+            <div class="g-entry"><dt>HTTPS</dt><dd>HTTP sobre TLS, cifrado.</dd></div>
+            <div class="g-entry"><dt>Imagen</dt><dd>Plantilla de solo lectura para crear contenedores.</dd></div>
+            <div class="g-entry"><dt>LEMP</dt><dd>Stack Linux + Nginx + MariaDB + PHP.</dd></div>
+            <div class="g-entry"><dt>MariaDB</dt><dd>SGBD relacional, fork de MySQL.</dd></div>
+            <div class="g-entry"><dt>Módulo</dt><dd>Componente que añade funcionalidad a un servidor.</dd></div>
+            <div class="g-entry"><dt>Nginx</dt><dd>Servidor web y proxy inverso de alto rendimiento.</dd></div>
+            <div class="g-entry"><dt>PHP-FPM</dt><dd>Procesador de PHP para servidores web.</dd></div>
+            <div class="g-entry"><dt>Proxy inverso</dt><dd>Servidor que redirige peticiones a servicios internos.</dd></div>
+            <div class="g-entry"><dt>Servidor</dt><dd>Programa que responde a peticiones de clientes.</dd></div>
+            <div class="g-entry"><dt>SQL</dt><dd>Lenguaje de consulta estructurado para bases de datos.</dd></div>
+            <div class="g-entry"><dt>Stack</dt><dd>Conjunto de tecnologías que trabajan juntas.</dd></div>
+            <div class="g-entry"><dt>Volumen</dt><dd>Almacenamiento persistente gestionado por Docker.</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- 12. REFERENCIAS -->
+      <section class="clause" id="referencias" data-title="Referencias">
+        <div class="clause-gutter">§12</div>
+        <div class="clause-main">
+          <h2>Referencias</h2>
+
+          <div class="ref-group">
+            <h4>Documentación oficial</h4>
+            <ul class="ref-list">
+              <li><span class="ref-title">Docker</span><a href="https://docs.docker.com" target="_blank" rel="noopener">docs.docker.com</a></li>
+              <li><span class="ref-title">Docker Compose</span><a href="https://docs.docker.com/compose" target="_blank" rel="noopener">docs.docker.com/compose</a></li>
+              <li><span class="ref-title">Nginx</span><a href="https://nginx.org/en/docs" target="_blank" rel="noopener">nginx.org/en/docs</a></li>
+              <li><span class="ref-title">MariaDB</span><a href="https://mariadb.com/kb/en" target="_blank" rel="noopener">mariadb.com/kb/en</a></li>
+              <li><span class="ref-title">phpMyAdmin</span><a href="https://www.phpmyadmin.net/docs" target="_blank" rel="noopener">phpmyadmin.net/docs</a></li>
+              <li><span class="ref-title">PHP</span><a href="https://www.php.net/manual" target="_blank" rel="noopener">php.net/manual</a></li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h4>Lecturas recomendadas</h4>
+            <ul class="ref-list">
+              <li><span class="ref-title">Nginx Cookbook</span><span style="font-family:var(--font-serif); font-size:13px; color:var(--ink-faint);">Derek DeJonghe (O'Reilly)</span></li>
+              <li><span class="ref-title">Docker Deep Dive</span><span style="font-family:var(--font-serif); font-size:13px; color:var(--ink-faint);">Nigel Poulton</span></li>
+              <li><span class="ref-title">The Linux Command Line</span><span style="font-family:var(--font-serif); font-size:13px; color:var(--ink-faint);">William Shotts</span></li>
+              <li><span class="ref-title">Web Application Security</span><span style="font-family:var(--font-serif); font-size:13px; color:var(--ink-faint);">Andrew Hoffman (O'Reilly)</span></li>
+            </ul>
+          </div>
+
+          <div class="ref-group">
+            <h4>Recursos adicionales</h4>
+            <ul class="ref-list">
+              <li><span class="ref-title">W3C HTTP Specification</span><a href="https://www.w3.org/Protocols" target="_blank" rel="noopener">w3.org/Protocols</a></li>
+              <li><span class="ref-title">OWASP Top 10</span><a href="https://owasp.org/www-project-top-ten" target="_blank" rel="noopener">owasp.org/www-project-top-ten</a></li>
+              <li><span class="ref-title">MDN Web Docs</span><a href="https://developer.mozilla.org" target="_blank" rel="noopener">developer.mozilla.org</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONEXIÓN CON LA GUÍA PRÁCTICA -->
+      <section class="clause" id="conexion-practica" data-title="Conexión con la guía práctica">
+        <div class="clause-gutter">＋</div>
+        <div class="clause-main">
+          <h2>Conexión con la guía práctica</h2>
+          <p>Esta guía teórica es la base conceptual para la <strong style="color:var(--ink)">guía práctica</strong>, donde se trabajarán los siguientes conceptos:</p>
+          <div class="link-map">
+            <div class="link-row"><span class="from">Análisis de requerimientos</span><span class="arrow">→</span><span class="to">se aplicará al dimensionar el stack</span></div>
+            <div class="link-row"><span class="from">Tipos de servidores</span><span class="arrow">→</span><span class="to">se elegirá Nginx y se justificará</span></div>
+            <div class="link-row"><span class="from">Lenguajes de script</span><span class="arrow">→</span><span class="to">se verá PHP-FPM en acción (Práctica 2)</span></div>
+            <div class="link-row"><span class="from">Arquitectura LEMP</span><span class="arrow">→</span><span class="to">se montará paso a paso con Docker</span></div>
+            <div class="link-row"><span class="from">Módulos y componentes</span><span class="arrow">→</span><span class="to">se inspeccionarán los módulos de Nginx</span></div>
+            <div class="link-row"><span class="from">Gestión de acceso</span><span class="arrow">→</span><span class="to">htpasswd + usuarios en MariaDB</span></div>
+            <div class="link-row"><span class="from">Seguridad</span><span class="arrow">→</span><span class="to">se aplicarán buenas prácticas en el stack</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>UT1 · Servidores de aplicaciones web y stacks LEMP — Implantación de Aplicaciones Web · 2º ASIR · v1.0</p>
+  <span class="next-guide">→ Guía práctica: despliegue del LEMP con Docker</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- TOC generation ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.clause[id]'));
+  var tocDesktop = document.getElementById('tocDesktop');
+  var tocDrawerPanel = document.getElementById('tocDrawerPanel');
+
+  sections.forEach(function(sec, i){
+    var title = sec.getAttribute('data-title') || sec.id;
+    var gutter = sec.querySelector('.clause-gutter');
+    var num = gutter ? gutter.textContent : String(i+1);
+    var a1 = document.createElement('a');
+    a1.href = '#' + sec.id; a1.dataset.target = sec.id;
+    a1.innerHTML = '<span class="num">'+num+'</span>' + title;
+    tocDesktop.appendChild(a1);
+    tocDrawerPanel.appendChild(a1.cloneNode(true));
+  });
+
+  /* ---------- mobile drawer ---------- */
+  var menuBtn = document.getElementById('menuBtn');
+  var drawer = document.getElementById('tocDrawer');
+  var backdrop = document.getElementById('tocBackdrop');
+  function closeDrawer(){ drawer.classList.remove('open'); }
+  menuBtn.addEventListener('click', function(){ drawer.classList.add('open'); });
+  backdrop.addEventListener('click', closeDrawer);
+  tocDrawerPanel.addEventListener('click', function(e){ if(e.target.closest('a')) closeDrawer(); });
+
+  /* ---------- scrollspy + progress ---------- */
+  var allTocLinks = document.querySelectorAll('.toc a, .toc-drawer a');
+  var progressBar = document.getElementById('progressBar');
+  function onScroll(){
+    var scrollY = window.scrollY;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollY/docH*100) : 0) + '%';
+    var current = sections[0] ? sections[0].id : null;
+    for(var i=0;i<sections.length;i++){
+      var rect = sections[i].getBoundingClientRect();
+      if(rect.top <= 110){ current = sections[i].id; }
+    }
+    allTocLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.target === current); });
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  /* ---------- copy to clipboard ---------- */
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if(!el) return;
+      navigator.clipboard.writeText(el.innerText).then(function(){
+        var orig = btn.textContent;
+        btn.textContent = '✓ copiado'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  /* ---------- accordions ---------- */
+  document.querySelectorAll('.acc-trigger').forEach(function(trigger){
+    trigger.addEventListener('click', function(){
+      var item = trigger.closest('.acc-item');
+      var panel = item.querySelector('.acc-panel');
+      var isOpen = item.classList.contains('open');
+      if(isOpen){ panel.style.maxHeight = null; item.classList.remove('open'); }
+      else { item.classList.add('open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+  });
+
+  /* ---------- tabs ---------- */
+  document.querySelectorAll('.tabs').forEach(function(tabGroup){
+    var buttons = tabGroup.querySelectorAll('.tab-nav button');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        buttons.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        tabGroup.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  });
+
+  /* ---------- glossary search ---------- */
+  var searchInput = document.getElementById('glossarySearch');
+  var gEntries = document.querySelectorAll('.g-entry');
+  searchInput.addEventListener('input', function(){
+    var q = searchInput.value.trim().toLowerCase();
+    gEntries.forEach(function(entry){
+      entry.classList.toggle('g-hidden', q.length>0 && entry.textContent.toLowerCase().indexOf(q) === -1);
+    });
+  });
+
+  /* ---------- module inspectors ---------- */
+  document.querySelectorAll('.inspector-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var out = document.getElementById(btn.getAttribute('data-target'));
+      var showing = out.classList.contains('show');
+      out.classList.toggle('show', !showing);
+      btn.textContent = showing ? '▸ ' + btn.getAttribute('data-cmd') : '▾ ' + btn.getAttribute('data-cmd');
+    });
+  });
+
+  /* ---------- SIGNATURE DEMO: HTTP request lifecycle ---------- */
+  var mode = 'static'; // static | dynamic
+  var toggleStatic = document.getElementById('toggleStatic');
+  var toggleDynamic = document.getElementById('toggleDynamic');
+  var btnSend = document.getElementById('btnSend');
+  var btnReset = document.getElementById('btnReset');
+  var log = document.getElementById('simLog');
+  var packet = document.getElementById('packet');
+  var running = false;
+
+  function setMode(m){
+    if(running) return;
+    mode = m;
+    toggleStatic.classList.toggle('active', m==='static');
+    toggleDynamic.classList.toggle('active', m==='dynamic');
+    logReset();
+  }
+  toggleStatic.addEventListener('click', function(){ setMode('static'); });
+  toggleDynamic.addEventListener('click', function(){ setMode('dynamic'); });
+
+  function logLine(text, cls){
+    var d = document.createElement('div');
+    d.className = 'log-line ' + (cls||'sys');
+    d.textContent = '$ ' + text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+  function logReset(){
+    log.innerHTML = '';
+    logLine('listo — recurso: ' + (mode==='static' ? 'GET /logo.png (estático)' : 'GET /index.php (dinámico)'), 'sys');
+    packet.setAttribute('cx', 310); packet.setAttribute('cy', 234);
+  }
+
+  function moveTo(x, y, dur){
+    return new Promise(function(resolve){
+      var start = performance.now();
+      var x0 = parseFloat(packet.getAttribute('cx')), y0 = parseFloat(packet.getAttribute('cy'));
+      function step(now){
+        var t = Math.min(1, (now-start)/dur);
+        packet.setAttribute('cx', x0 + (x-x0)*t);
+        packet.setAttribute('cy', y0 + (y-y0)*t);
+        if(t<1){ requestAnimationFrame(step); } else { resolve(); }
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  btnSend.addEventListener('click', async function(){
+    if(running) return;
+    running = true;
+    btnSend.disabled = true; btnReset.disabled = true;
+    toggleStatic.disabled = true; toggleDynamic.disabled = true;
+
+    logLine('navegador → nginx : GET ' + (mode==='static' ? '/logo.png' : '/index.php'), 'hop');
+    await moveTo(105, 72, 500);
+    await wait(150);
+    logLine('nginx analiza la extensión del recurso…', 'sys');
+    await wait(400);
+
+    if(mode === 'static'){
+      logLine('recurso estático → nginx lo sirve directamente desde disco', 'ok');
+      await moveTo(220, 150, 400);
+      await wait(250);
+      await moveTo(105, 72, 400);
+      await wait(150);
+      logLine('nginx → navegador : 200 OK (logo.png)', 'ok');
+      await moveTo(310, 234, 500);
+    } else {
+      logLine('recurso .php → nginx delega en PHP-FPM (FastCGI)', 'hop');
+      await moveTo(305, 72, 450);
+      await wait(150);
+      logLine('PHP-FPM ejecuta index.php…', 'sys');
+      await wait(350);
+      logLine('PHP-FPM → MariaDB : consulta SQL', 'hop');
+      await moveTo(510, 72, 450);
+      await wait(150);
+      logLine('MariaDB devuelve el resultado de la consulta', 'ok');
+      await moveTo(305, 72, 450);
+      await wait(150);
+      logLine('PHP-FPM devuelve HTML generado a nginx', 'hop');
+      await moveTo(105, 72, 450);
+      await wait(150);
+      logLine('nginx → navegador : 200 OK (HTML generado)', 'ok');
+      await moveTo(310, 234, 500);
+    }
+
+    btnSend.disabled = false; btnReset.disabled = false;
+    running = false;
+  });
+
+  btnReset.addEventListener('click', function(){
+    if(running) return;
+    logReset();
+    toggleStatic.disabled = false; toggleDynamic.disabled = false;
+  });
+
+  logReset();
+
+})();
+</script>
+</body>
+</html>
