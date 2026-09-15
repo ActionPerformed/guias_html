@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lenguajes de Guiones de Servidor — Guía DAM 2º</title>
+<meta name="description" content="Guía didáctica interactiva de lenguajes de guiones de servidor (PHP) para 2º de DAM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef0f5; --bg-alt:#e4e7f0; --surface:#ffffff; --surface-2:#f6f7fb;
+  --ink:#1b1e2b; --ink-soft:#565a72; --line:#d7dae5; --line-strong:#c1c5d6;
+  --accent:#54578f; --accent-strong:#3d3f6e; --accent-soft:#e6e6f5;
+  --accent-2:#a63a52;
+  --success:#2f7a52; --success-bg:#e1f2e7; --success-line:#b7ddc4;
+  --warn:#93590c; --warn-bg:#faedd6; --warn-line:#e9cd97;
+  --danger:#a63a52; --danger-bg:#f8e2e7; --danger-line:#e9b9c4;
+  --info:#2f6690; --info-bg:#e1edf6; --info-line:#b9d3e5;
+  --code-bg:#1b1e2b; --code-ink:#e7e6f0; --code-line:#2c3049;
+  --radius:8px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'IBM Plex Sans',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 2px rgba(27,30,43,.06), 0 8px 24px -12px rgba(27,30,43,.18);
+  --sidebar-w:280px;
+}
+[data-theme="dark"]{
+  --bg:#0f111a; --bg-alt:#151827; --surface:#181b29; --surface-2:#1f2334;
+  --ink:#e9e8f2; --ink-soft:#a3a7c2; --line:#2b2f45; --line-strong:#3a3f5c;
+  --accent:#9a9de0; --accent-strong:#b7b9ea; --accent-soft:#242848;
+  --accent-2:#e08298;
+  --success:#7fd3a3; --success-bg:#132a1e; --success-line:#245439;
+  --warn:#eab868; --warn-bg:#2c220f; --warn-line:#553e17;
+  --danger:#e08298; --danger-bg:#301c22; --danger-line:#5a2c37;
+  --info:#8ec4ea; --info-bg:#101f2c; --info-line:#1f3d54;
+  --code-bg:#0b0d15; --code-ink:#e4e3ef; --code-line:#242840;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); line-height:1.6; font-size:16px;
+  transition:background .25s ease, color .25s ease;
+}
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; color:var(--ink); line-height:1.2; margin:0 0 .5em}
+p{margin:0 0 1em; max-width:72ch}
+a{color:var(--accent-strong)}
+a:hover{text-decoration-thickness:2px}
+code{font-family:var(--font-mono); font-size:.88em; background:var(--surface-2); padding:.1em .35em; border-radius:4px; border:1px solid var(--line)}
+
+.skip-link{position:absolute; left:-999px; top:0; background:var(--accent); color:#fff; padding:.6em 1em; z-index:999; border-radius:0 0 6px 0}
+.skip-link:focus{left:0}
+
+:focus-visible{outline:3px solid var(--accent-2); outline-offset:2px}
+
+/* scroll progress */
+.scrollbar{position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); z-index:1000; transition:width .1s linear}
+
+/* HERO */
+.hero{position:relative; overflow:hidden; background:linear-gradient(180deg,var(--bg-alt),var(--bg)); border-bottom:1px solid var(--line); padding:2.5rem 1.5rem 2rem}
+.hero__stripe{position:absolute; inset:0 0 auto 0; height:8px;
+  background:repeating-linear-gradient(135deg, var(--accent) 0 14px, var(--accent-2) 14px 28px);
+  opacity:.85;
+}
+.hero__inner{max-width:1200px; margin:0 auto; padding-top:.75rem}
+.hero__badge{display:inline-block; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.02em; color:var(--accent-strong); background:var(--accent-soft); border:1px solid var(--line-strong); padding:.3em .7em; border-radius:999px; margin-bottom:1rem}
+.hero h1{font-size:clamp(1.9rem,4vw,2.9rem); max-width:16ch}
+.hero__sub{color:var(--ink-soft); font-size:1.05rem; max-width:60ch}
+.hero__stats{display:flex; flex-wrap:wrap; gap:1.5rem; margin:1.5rem 0}
+.stat{display:flex; flex-direction:column; min-width:90px}
+.stat__num{font-family:var(--font-display); font-weight:700; font-size:1.4rem; color:var(--accent-strong)}
+.stat__label{font-size:.78rem; color:var(--ink-soft)}
+.hero__actions{display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; margin-top:1rem}
+.hero__overall{display:flex; flex-direction:column; gap:.25rem; font-size:.82rem; color:var(--ink-soft); min-width:180px}
+.hero__overall-bar{width:100%; height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+#overall-progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .3s ease}
+
+.btn{font-family:var(--font-body); font-weight:600; font-size:.88rem; border-radius:6px; padding:.55em 1em; cursor:pointer; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); display:inline-flex; align-items:center; gap:.4em; transition:all .15s ease}
+.btn:hover{border-color:var(--accent); color:var(--accent-strong)}
+.btn--ghost{background:transparent}
+.btn--accent{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn--accent:hover{background:var(--accent-strong); color:#fff}
+
+/* LAYOUT */
+.layout{display:grid; grid-template-columns:var(--sidebar-w) minmax(0,1fr); max-width:1200px; margin:0 auto; gap:2.5rem; padding:2rem 1.5rem 4rem; align-items:start}
+.sidebar{position:sticky; top:1rem; max-height:calc(100vh - 2rem); overflow-y:auto; padding-right:.5rem}
+.sidebar__search{margin-bottom:1rem; position:relative}
+#search-input{width:100%; padding:.6em .8em; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); font-family:var(--font-body); font-size:.9rem}
+.sidebar__search-results{position:absolute; top:110%; left:0; right:0; background:var(--surface); border:1px solid var(--line-strong); border-radius:6px; box-shadow:var(--shadow); max-height:280px; overflow-y:auto; z-index:50}
+.sidebar__search-results button{display:block; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--line); padding:.6em .8em; font-size:.82rem; color:var(--ink); cursor:pointer; font-family:var(--font-body)}
+.sidebar__search-results button:hover{background:var(--accent-soft)}
+.sidebar__search-results .noresult{padding:.6em .8em; color:var(--ink-soft); font-size:.82rem}
+
+.navlist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.15rem}
+.navlink{display:flex; align-items:center; gap:.6em; padding:.55em .6em; border-radius:6px; text-decoration:none; color:var(--ink-soft); font-size:.88rem; border:1px solid transparent; position:relative}
+.navlink:hover{background:var(--surface-2); color:var(--ink)}
+.navlink.active{background:var(--accent-soft); color:var(--accent-strong); border-color:var(--line-strong); font-weight:600}
+.navlink__num{font-family:var(--font-mono); font-size:.72rem; width:1.6em; height:1.6em; border-radius:4px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid var(--line)}
+.navlink.active .navlink__num{background:var(--accent); color:#fff; border-color:var(--accent)}
+.navlink__title{flex:1; line-height:1.25}
+.navlink__progress{width:6px; height:6px; border-radius:99px; background:var(--line-strong); flex-shrink:0}
+.navlink__progress.has-progress{background:var(--success)}
+.sidebar__note{font-size:.72rem; color:var(--ink-soft); margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line)}
+
+.content{min-width:0}
+
+/* BLOCKS */
+.block{margin-bottom:3.5rem; scroll-margin-top:1rem}
+.block__head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:1.4rem; padding-bottom:.8rem; border-bottom:2px solid var(--line)}
+.block__num{font-family:var(--font-mono); font-weight:700; font-size:1rem; color:var(--accent); background:var(--accent-soft); border:1px solid var(--line-strong); width:2em; height:2em; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0}
+.block__head h2{font-size:1.5rem; margin:0}
+.block__body > .objectives{margin-bottom:1.5rem}
+
+.subsection{margin-bottom:1.8rem; scroll-margin-top:1rem}
+.subsection h3{font-size:1.12rem; color:var(--accent-strong); margin-bottom:.6rem}
+.plainlist{margin:0 0 1em; padding-left:1.3em}
+.plainlist li{margin-bottom:.3em}
+.figcaption{font-size:.8rem; color:var(--ink-soft); font-style:italic}
+
+.objectives{background:var(--surface); border:1px dashed var(--line-strong); border-radius:var(--radius); padding:1em 1.2em}
+.objectives__label{font-family:var(--font-mono); font-size:.75rem; letter-spacing:.03em; color:var(--accent-strong); display:block; margin-bottom:.4em}
+.objectives ul{margin:0; padding-left:1.2em}
+
+/* TABLES */
+.table-wrap{overflow-x:auto; margin-bottom:1.4em; border:1px solid var(--line); border-radius:var(--radius)}
+table{border-collapse:collapse; width:100%; font-size:.9rem; background:var(--surface)}
+th,td{padding:.6em .8em; text-align:left; border-bottom:1px solid var(--line)}
+thead th{background:var(--surface-2); font-family:var(--font-display); font-weight:600; color:var(--accent-strong); white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+
+/* CODE */
+.codeblock{margin:0 0 1.4em; border-radius:var(--radius); overflow:hidden; border:1px solid var(--code-line); box-shadow:var(--shadow)}
+.codeblock__bar{display:flex; align-items:center; justify-content:space-between; background:var(--code-line); color:var(--code-ink); padding:.4em .8em; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase}
+.copybtn{display:flex; align-items:center; gap:.3em; background:transparent; border:1px solid rgba(255,255,255,.25); color:var(--code-ink); border-radius:4px; padding:.25em .55em; font-size:.7rem; cursor:pointer; font-family:var(--font-body); text-transform:none}
+.copybtn:hover{background:rgba(255,255,255,.12)}
+.copybtn.copied{border-color:var(--success); color:var(--success)}
+.codeblock pre{margin:0; background:var(--code-bg); padding:1em 1.2em; overflow-x:auto}
+.codeblock code{background:none; border:none; padding:0; color:var(--code-ink); font-size:.85rem; line-height:1.6; white-space:pre}
+/* highlight tokens */
+.tok-kw{color:#c586c0} .tok-str{color:#ce9178} .tok-com{color:#6a9955; font-style:italic}
+.tok-var{color:#9cdcfe} .tok-fn{color:#dcdcaa} .tok-num{color:#b5cea8} .tok-tag{color:#e06c75} .tok-attr{color:#d19a66}
+
+/* CALLOUTS */
+.callout{display:flex; gap:.8em; padding:.9em 1.1em; border-radius:var(--radius); margin-bottom:1.4em; border:1px solid; align-items:flex-start}
+.callout__icon{font-size:1.15em; line-height:1.4}
+.callout__body strong{display:block; margin-bottom:.15em}
+.callout__body p{margin:0; font-size:.92rem}
+.callout--warn{background:var(--warn-bg); border-color:var(--warn-line); color:var(--warn)}
+.callout--danger{background:var(--danger-bg); border-color:var(--danger-line); color:var(--danger)}
+.callout--success{background:var(--success-bg); border-color:var(--success-line); color:var(--success)}
+.callout--info{background:var(--info-bg); border-color:var(--info-line); color:var(--info)}
+.callout__body{color:var(--ink)}
+
+/* REVEAL / DETAILS */
+.reveal{margin:0 0 1.2em; border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--surface); overflow:hidden}
+.reveal summary{cursor:pointer; padding:.7em 1em; font-weight:600; font-size:.9rem; color:var(--accent-strong); list-style:none; display:flex; align-items:center; gap:.5em; background:var(--surface-2)}
+.reveal summary::-webkit-details-marker{display:none}
+.reveal summary::before{content:'▸'; transition:transform .15s ease}
+.reveal[open] summary::before{transform:rotate(90deg)}
+.reveal__body{padding:1em}
+.reveal__body>*:last-child{margin-bottom:0}
+.reveal--solution summary{color:var(--success)}
+
+/* EXERCISES */
+.exercise{border:1.5px solid var(--accent); border-radius:var(--radius); padding:1.2em 1.3em; margin:0 0 1.6em; background:var(--surface); position:relative}
+.exercise__tag{font-family:var(--font-mono); font-size:.72rem; font-weight:600; color:#fff; background:var(--accent); display:inline-block; padding:.2em .6em; border-radius:4px; margin-bottom:.6em}
+.exercise h4{margin-bottom:.5em; font-size:1.05rem}
+.exercise__statement{font-size:.94rem}
+.exercise__statement ul,.exercise__statement ol{padding-left:1.3em}
+.exercise__criteria{margin-top:1em; padding-top:.9em; border-top:1px dashed var(--line-strong)}
+.exercise__criteria-label{font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft); display:block; margin-bottom:.4em}
+
+/* CHECKLISTS */
+.checklist{list-style:none; margin:0 0 1.2em; padding:0; display:flex; flex-direction:column; gap:.35em}
+.checklist--numbered{list-style:none}
+.checkitem label,.checklist label{display:flex; align-items:flex-start; gap:.6em; font-size:.9rem; cursor:pointer; padding:.3em .4em; border-radius:6px}
+.checklist label:hover{background:var(--surface-2)}
+.checklist input[type=checkbox]{margin-top:.2em; width:16px; height:16px; accent-color:var(--accent); flex-shrink:0}
+.checklist label span em{color:var(--ink-soft); font-style:normal; font-size:.85em}
+.track-check:checked + span{color:var(--ink-soft); text-decoration:line-through}
+
+.resourcelist{list-style:none; padding:0; display:flex; flex-direction:column; gap:.5em}
+.resourcelist a{font-size:.95rem}
+
+/* SIGNATURE DEMO — border simulator */
+.signature-demo{margin:2rem 0; border:2px solid var(--accent); border-radius:12px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow)}
+.signature-demo__head{padding:1.3em 1.4em .8em; background:linear-gradient(135deg,var(--accent-soft),transparent)}
+.signature-demo__badge{font-family:var(--font-mono); font-size:.72rem; font-weight:700; color:#fff; background:var(--accent-2); padding:.25em .7em; border-radius:99px; display:inline-block; margin-bottom:.6em}
+.signature-demo__head h3{margin-bottom:.3em}
+.signature-demo__head p{font-size:.92rem; color:var(--ink-soft); margin-bottom:0}
+.border-sim{display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; padding:0 1.4em 1.4em}
+.border-sim__side{background:var(--surface-2); border:1px solid var(--line); padding:1em; display:flex; flex-direction:column; gap:.7em}
+.border-sim__side--client{border-radius:8px 0 0 8px}
+.border-sim__side--server{border-radius:0 8px 8px 0}
+.border-sim__side h4{font-size:.88rem; margin-bottom:0}
+.border-sim__field{font-family:var(--font-mono); font-size:.82rem; display:flex; align-items:center; gap:.4em; flex-wrap:wrap; color:var(--ink-soft)}
+.border-sim__field input{font-family:var(--font-mono); border:1px solid var(--line-strong); border-radius:4px; padding:.3em .5em; background:var(--surface); color:var(--ink); width:110px}
+.border-sim__viewsource{background:var(--code-bg); border-radius:6px; padding:.7em .9em; flex:1}
+.border-sim__label{font-family:var(--font-mono); font-size:.68rem; color:var(--code-ink); opacity:.65; display:block; margin-bottom:.4em}
+.border-sim__viewsource pre{margin:0}
+.border-sim__viewsource code{color:var(--code-ink); font-size:.8rem; white-space:pre-wrap; word-break:break-word; background:none; border:none; padding:0; display:inline-block}
+.border-sim__side--server pre{background:var(--code-bg); border-radius:6px; padding:.8em .9em; margin:0; flex:1; overflow-x:auto}
+.border-sim__side--server code{color:var(--code-ink); font-size:.78rem; background:none; border:none; padding:0; display:inline-block}
+.border-sim__gate{width:64px; position:relative; display:flex; align-items:center; justify-content:center; background:repeating-linear-gradient(135deg, var(--accent) 0 8px, var(--surface) 8px 16px); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.border-sim__barrier{position:absolute; top:8px; left:50%; width:4px; height:calc(100% - 16px); background:var(--accent-2); transform:translateX(-50%) rotate(0deg); transform-origin:top center; border-radius:4px; transition:transform .4s ease}
+.border-sim__barrier.open{transform:translateX(-50%) rotate(80deg)}
+.border-sim__packet{position:absolute; left:-6px; top:50%; width:14px; height:14px; border-radius:3px; background:var(--accent-strong); transform:translate(0,-50%); opacity:0; box-shadow:0 0 0 3px var(--surface)}
+.border-sim__packet.fly{animation:flyacross 1.1s ease forwards}
+@keyframes flyacross{
+  0%{opacity:1; left:-6px; transform:translate(0,-50%) scale(1)}
+  50%{opacity:1; left:50%; transform:translate(-50%,-50%) scale(1.15)}
+  100%{opacity:0; left:calc(100% + 6px); transform:translate(0,-50%) scale(.9)}
+}
+.border-sim__stamp{position:absolute; bottom:6px; left:50%; transform:translateX(-50%) scale(.6) rotate(-8deg); font-family:var(--font-mono); font-size:.55rem; font-weight:700; color:var(--accent-2); border:2px solid var(--accent-2); border-radius:4px; padding:.1em .3em; opacity:0; white-space:nowrap}
+.border-sim__stamp.show{animation:stamp .5s ease forwards .55s}
+@keyframes stamp{0%{opacity:0; transform:translateX(-50%) scale(1.8) rotate(-8deg)} 60%{opacity:1; transform:translateX(-50%) scale(.55) rotate(-8deg)} 100%{opacity:1; transform:translateX(-50%) scale(.6) rotate(-8deg)}}
+
+/* HTTP DIAGRAM */
+.httpdiagram{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:1.2em; margin-bottom:.4em}
+.httpdiagram svg{width:100%; height:auto; display:block}
+.httpdiagram .lane-label{font-family:var(--font-mono); font-size:11px; fill:var(--ink-soft)}
+.httpdiagram .lane-line{stroke:var(--line-strong); stroke-width:1}
+.httpdiagram .msg-line{stroke:var(--accent); stroke-width:2; fill:none}
+.httpdiagram .msg-line--resp{stroke:var(--accent-2); stroke-dasharray:4 3}
+.httpdiagram .msg-label{font-family:var(--font-mono); font-size:10.5px; fill:var(--ink)}
+.httpdiagram .node-box{fill:var(--surface-2); stroke:var(--line-strong)}
+.httpdiagram .node-label{font-family:var(--font-body); font-weight:600; font-size:12px; fill:var(--ink)}
+.httpdiagram-controls{display:flex; gap:.5em; margin-top:.6em}
+
+/* FOOTER */
+.sitefooter{border-top:1px solid var(--line); padding:2rem 1.5rem; text-align:center; color:var(--ink-soft); font-size:.85rem}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr; padding-top:1rem}
+  .sidebar{position:static; max-height:none; order:2; margin-top:2rem; border-top:1px solid var(--line); padding-top:1rem}
+  .content{order:1}
+  .border-sim{grid-template-columns:1fr; }
+  .border-sim__gate{width:100%; height:56px; transform:rotate(0deg)}
+  .border-sim__barrier{top:50%; left:8px; width:calc(100% - 16px); height:4px; transform:translateY(-50%) rotate(0deg)}
+  .border-sim__barrier.open{transform:translateY(-50%) rotate(0deg) scaleX(.15)}
+  .border-sim__packet{left:50%; top:-6px; transform:translate(-50%,0)}
+  .border-sim__packet.fly{animation:flydown 1.1s ease forwards}
+}
+@keyframes flydown{
+  0%{opacity:1; top:-6px} 50%{opacity:1; top:50%} 100%{opacity:0; top:calc(100% + 6px)}
+}
+
+/* PRINT */
+@media print{
+  .sidebar,.hero__actions,.scrollbar,.skip-link,.copybtn,#print-btn,#theme-toggle{display:none !important}
+  .layout{display:block}
+  .hero{background:none; border:none}
+  body{background:#fff; color:#000}
+  .block{page-break-inside:avoid; margin-bottom:1.5rem}
+  a{color:#000; text-decoration:underline}
+  .codeblock,.exercise,.callout,.reveal{page-break-inside:avoid}
+}
+
+</style>
+</head>
+<body>
+<a href="#contenido" class="skip-link">Saltar al contenido</a>
+<div class="scrollbar" id="scrollbar" role="progressbar" aria-label="Progreso de lectura" aria-valuemin="0" aria-valuemax="100"></div>
+
+<header class="hero">
+  <div class="hero__stripe" aria-hidden="true"></div>
+  <div class="hero__inner">
+    <div class="hero__badge">DWES · 2º DAM · Módulo de Desarrollo Web en Entorno Servidor</div>
+    <h1>Lenguajes de guiones de servidor</h1>
+    <p class="hero__sub">Guía didáctica interactiva — PHP 8.x, con referencias comparativas a Node.js, Python y Java.</p>
+    <div class="hero__stats">
+      <div class="stat"><span class="stat__num">40h</span><span class="stat__label">duración estimada</span></div>
+      <div class="stat"><span class="stat__num">20</span><span class="stat__label">sesiones</span></div>
+      <div class="stat"><span class="stat__num">12</span><span class="stat__label">bloques + anexos</span></div>
+      <div class="stat"><span class="stat__num">PHP 8.x</span><span class="stat__label">lenguaje principal</span></div>
+    </div>
+    <div class="hero__actions">
+      <button id="theme-toggle" class="btn btn--ghost" aria-label="Cambiar tema claro/oscuro">
+        <span id="theme-icon" aria-hidden="true">🌙</span> <span id="theme-label">Modo oscuro</span>
+      </button>
+      <button id="print-btn" class="btn btn--ghost">🖨️ Exportar / imprimir</button>
+      <div class="hero__overall" aria-live="polite">
+        <span id="overall-progress-label">Progreso: 0%</span>
+        <div class="hero__overall-bar"><div id="overall-progress-fill"></div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="Navegación de bloques">
+    <div class="sidebar__search">
+      <input type="search" id="search-input" placeholder="Buscar en la guía…" aria-label="Buscar en la guía">
+      <div class="sidebar__search-results" id="search-results" hidden></div>
+    </div>
+    <ul class="navlist">
+      <li><a href="#bloque-0" class="navlink" data-navid="bloque-0">
+  <span class="navlink__num">0</span>
+  <span class="navlink__title">Contexto, prerrequisitos y evaluación inicial</span>
+  <span class="navlink__progress" data-progress-for="bloque-0"></span>
+</a></li><li><a href="#bloque-a" class="navlink" data-navid="bloque-a">
+  <span class="navlink__num">A</span>
+  <span class="navlink__title">Lenguajes de guiones de servidor</span>
+  <span class="navlink__progress" data-progress-for="bloque-a"></span>
+</a></li><li><a href="#bloque-b" class="navlink" data-navid="bloque-b">
+  <span class="navlink__num">B</span>
+  <span class="navlink__title">Relación servidor ↔ cliente</span>
+  <span class="navlink__progress" data-progress-for="bloque-b"></span>
+</a></li><li><a href="#bloque-c" class="navlink" data-navid="bloque-c">
+  <span class="navlink__num">C</span>
+  <span class="navlink__title">Sintaxis básica</span>
+  <span class="navlink__progress" data-progress-for="bloque-c"></span>
+</a></li><li><a href="#bloque-d" class="navlink" data-navid="bloque-d">
+  <span class="navlink__num">D</span>
+  <span class="navlink__title">Estructuras de control</span>
+  <span class="navlink__progress" data-progress-for="bloque-d"></span>
+</a></li><li><a href="#bloque-e" class="navlink" data-navid="bloque-e">
+  <span class="navlink__num">E</span>
+  <span class="navlink__title">Funciones</span>
+  <span class="navlink__progress" data-progress-for="bloque-e"></span>
+</a></li><li><a href="#bloque-f" class="navlink" data-navid="bloque-f">
+  <span class="navlink__num">F</span>
+  <span class="navlink__title">Procesamiento de formularios</span>
+  <span class="navlink__progress" data-progress-for="bloque-f"></span>
+</a></li><li><a href="#bloque-g" class="navlink" data-navid="bloque-g">
+  <span class="navlink__num">G</span>
+  <span class="navlink__title">Mecanismos de persistencia</span>
+  <span class="navlink__progress" data-progress-for="bloque-g"></span>
+</a></li><li><a href="#bloque-h" class="navlink" data-navid="bloque-h">
+  <span class="navlink__num">H</span>
+  <span class="navlink__title">Gestión de usuarios</span>
+  <span class="navlink__progress" data-progress-for="bloque-h"></span>
+</a></li><li><a href="#bloque-i" class="navlink" data-navid="bloque-i">
+  <span class="navlink__num">I</span>
+  <span class="navlink__title">Entornos de ejecución</span>
+  <span class="navlink__progress" data-progress-for="bloque-i"></span>
+</a></li><li><a href="#bloque-j" class="navlink" data-navid="bloque-j">
+  <span class="navlink__num">J</span>
+  <span class="navlink__title">Seguridad transversal</span>
+  <span class="navlink__progress" data-progress-for="bloque-j"></span>
+</a></li><li><a href="#bloque-k" class="navlink" data-navid="bloque-k">
+  <span class="navlink__num">K</span>
+  <span class="navlink__title">Proyecto integrador</span>
+  <span class="navlink__progress" data-progress-for="bloque-k"></span>
+</a></li><li><a href="#bloque-l" class="navlink" data-navid="bloque-l">
+  <span class="navlink__num">L</span>
+  <span class="navlink__title">Evaluación final</span>
+  <span class="navlink__progress" data-progress-for="bloque-l"></span>
+</a></li><li><a href="#anexos" class="navlink" data-navid="anexos">
+  <span class="navlink__num">§</span>
+  <span class="navlink__title">Anexos</span>
+  <span class="navlink__progress" data-progress-for="anexos"></span>
+</a></li>
+    </ul>
+    <p class="sidebar__note">El progreso de esta guía se guarda solo en este navegador.</p>
+  </nav>
+
+  <main id="contenido" class="content">
+    <article class="block" id="bloque-0" data-block="bloque-0">
+  <header class="block__head">
+    <span class="block__num">0</span>
+    <h2>📋 Contexto, prerrequisitos y evaluación inicial</h2>
+  </header>
+  <div class="block__body">
+    <section class="subsection" id="s0-1"><h3>0.1 Prerrequisitos</h3>
+<p>Antes de empezar esta unidad, el alumnado debe dominar:</p>
+<ul class="plainlist">
+<li><strong>HTML5 semántico</strong> y formularios básicos (<code>&lt;input&gt;</code>, <code>&lt;form&gt;</code>, <code>method</code>, <code>action</code>).</li>
+<li><strong>CSS</strong> básico para maquetar.</li>
+<li><strong>JavaScript</strong> del lado cliente (manipulación del DOM, eventos).</li>
+<li><strong>HTTP básico</strong>: métodos GET/POST, códigos de estado, cabeceras.</li>
+<li>Uso de un <strong>entorno LAMP/XAMPP</strong> o <strong>Docker</strong>.</li>
+</ul></section><section class="subsection" id="s0-2"><h3>0.2 Conexión con otros módulos</h3><div class="table-wrap"><table><thead><tr><th>Módulo</th><th>Relación</th></tr></thead><tbody><tr><td>Lenguajes de Marcas (1º)</td><td>HTML/CSS/JS de base</td></tr><tr><td>Desarrollo Web en Entorno Cliente (2º)</td><td>Comunicación asíncrona (fetch/AJAX)</td></tr><tr><td>Acceso a Datos (2º)</td><td>PDO, MySQL, gestión de ficheros</td></tr><tr><td>Programación (1º)</td><td>Estructuras de control, funciones</td></tr></tbody></table></div></section><section class="subsection" id="s0-3"><h3>0.3 Entornos de desarrollo recomendados</h3>
+<ul class="plainlist">
+<li><strong>XAMPP / Laragon</strong> — arranque rápido</li>
+<li><strong>Docker + docker-compose</strong> — entornos reproducibles</li>
+<li><strong>VS Code</strong> con extensiones: PHP Intelephense, PHP Debug</li>
+</ul></section><section class="subsection" id="s0-4"><h3>0.4 Test diagnóstico (10 preguntas)</h3><p><em>El alumnado responde antes de empezar. El docente ajusta el ritmo según resultados.</em> Marca cada pregunta según la respondas para ver tu progreso.</p><ol class="checklist checklist--numbered" data-group-list="diag0"><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck1"><span>¿Qué diferencia hay entre HTML y PHP?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck2"><span>¿Qué método HTTP usarías para enviar una contraseña? ¿Por qué?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck3"><span>¿Qué ocurre si abres un archivo <code>.php</code> directamente con el navegador sin servidor?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck4"><span>¿Cómo se ve el código JavaScript en “ver código fuente”? ¿Y el PHP?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck5"><span>¿Qué es una cookie? ¿Dónde se almacena?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck6"><span>¿Qué significa que un lenguaje sea “de servidor”?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck7"><span>¿Qué es un bucle <code>foreach</code>? ¿Cuándo lo usarías?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck8"><span>¿Qué devuelve <code>$_POST['nombre']</code> si el campo no se ha enviado?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck9"><span>¿Qué diferencia hay entre <code>==</code> y <code>===</code>?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="diag0" id="ck10"><span>¿Qué es un hash? ¿Para qué sirve?</span></label></li></ol></section>
+  </div>
+</article><article class="block" id="bloque-a" data-block="bloque-a">
+  <header class="block__head">
+    <span class="block__num">A</span>
+    <h2>🌐 Lenguajes de guiones de servidor</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Identificar los lenguajes de servidor más relevantes.</li><li>Reconocer su ámbito de aplicación y criterios de elección.</li></ul></div><section class="subsection" id="s-a-1"><h3>A.1 ¿Qué es un lenguaje de guiones de servidor?</h3>
+<p>Un <strong>lenguaje de guiones de servidor</strong> se ejecuta en el servidor web y genera dinámicamente la respuesta HTTP (normalmente HTML) que se envía al cliente. El código original <strong>nunca llega al navegador</strong>: solo el resultado.</p></section><section class="subsection" id="s-a-2"><h3>A.2 Lenguajes más relevantes</h3><div class="table-wrap"><table><thead><tr><th>Lenguaje</th><th>Runtime/Entorno</th><th>Ámbito de aplicación</th><th>Empresas/ejemplos</th></tr></thead><tbody><tr><td><strong>PHP</strong></td><td>Apache/Nginx + mod_php, PHP-FPM</td><td>Web tradicional, CMS, hosting compartido</td><td>WordPress, Moodle, Wikipedia</td></tr><tr><td><strong>Node.js (JS)</strong></td><td>V8 + Express/Nest</td><td>APIs REST, tiempo real, microservicios</td><td>Netflix, PayPal, LinkedIn</td></tr><tr><td><strong>Python</strong></td><td>WSGI (Flask) / ASGI (Django, FastAPI)</td><td>Data science, APIs, prototipado</td><td>Instagram, Spotify</td></tr><tr><td><strong>Java</strong></td><td>Tomcat, WildFly, Spring Boot</td><td>Banca, gran empresa</td><td>Netflix (backend), bancos</td></tr><tr><td><strong>C# / ASP.NET</strong></td><td>IIS, .NET Core</td><td>Ecosistema Microsoft</td><td>Stack Overflow, Microsoft</td></tr><tr><td><strong>Ruby on Rails</strong></td><td>Puma, Passenger</td><td>Startups, MVPs</td><td>GitHub (antiguo), Shopify</td></tr><tr><td><strong>Go</strong></td><td>net/http, Gin</td><td>Microservicios, alta concurrencia</td><td>Uber, Twitch</td></tr><tr><td><strong>Rust (Actix)</strong></td><td>Actix, Rocket</td><td>Alto rendimiento</td><td>Discord (parcial)</td></tr></tbody></table></div></section><section class="subsection" id="s-a-3"><h3>A.3 Criterios de elección</h3><div class="table-wrap"><table><thead><tr><th>Criterio</th><th>PHP</th><th>Node.js</th><th>Python</th><th>Java</th></tr></thead><tbody><tr><td>Curva de aprendizaje</td><td>Baja</td><td>Media</td><td>Baja</td><td>Alta</td></tr><tr><td>Rendimiento (req/s)</td><td>Medio</td><td>Alto</td><td>Medio</td><td>Alto</td></tr><tr><td>Tipado</td><td>Débil (mejorable con <code>declare(strict_types=1)</code>)</td><td>Dinámico (TS opcional)</td><td>Dinámico</td><td>Fuerte</td></tr><tr><td>Ecosistema web</td><td>Excelente</td><td>Excelente</td><td>Bueno</td><td>Bueno</td></tr><tr><td>Hosting barato</td><td>✅</td><td>⚠️</td><td>⚠️</td><td>❌</td></tr><tr><td>Ideal para…</td><td>CMS, hosting compartido</td><td>APIs, realtime, SPA backend</td><td>Data/IA, prototipos</td><td>Banca, gran empresa</td></tr><tr><td>Concurrencia</td><td>Procesos</td><td>Event loop</td><td>GIL (limitado)</td><td>Hilos</td></tr></tbody></table></div></section><section class="subsection" id="s-a-4"><h3>A.4 Comparativa de código: el mismo script en 3 lenguajes</h3><p><strong>PHP</strong></p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb1" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb1" class="lang-php">&lt;?php
+$nombre = $_GET[&#x27;nombre&#x27;] ?? &#x27;invitado&#x27;;
+echo &quot;&lt;h1&gt;Hola, &quot; . htmlspecialchars($nombre) . &quot;&lt;/h1&gt;&quot;;</code></pre>
+</div><p><strong>Node.js + Express</strong></p><div class="codeblock" data-lang="javascript">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">javascript</span>
+    <button class="copybtn" data-target="cb2" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb2" class="lang-javascript">const express = require(&#x27;express&#x27;);
+const app = express();
+
+app.get(&#x27;/saludo&#x27;, (req, res) =&gt; {
+  const nombre = req.query.nombre || &#x27;invitado&#x27;;
+  res.send(`&lt;h1&gt;Hola, ${nombre}&lt;/h1&gt;`);
+});
+
+app.listen(3000);</code></pre>
+</div><p><strong>Python + Flask</strong></p><div class="codeblock" data-lang="python">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">python</span>
+    <button class="copybtn" data-target="cb3" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb3" class="lang-python">from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.route(&#x27;/saludo&#x27;)
+def saludo():
+    nombre = request.args.get(&#x27;nombre&#x27;, &#x27;invitado&#x27;)
+    return f&quot;&lt;h1&gt;Hola, {escape(nombre)}&lt;/h1&gt;&quot;</code></pre>
+</div></section><div class="exercise" id="ejercicio-a-1">
+  <div class="exercise__tag">🧩 Ejercicio A.1</div>
+  <h4>Investigación grupal</h4>
+  <div class="exercise__statement"><p><strong>Objetivo:</strong> identificar y comparar lenguajes de servidor.</p>
+<p><strong>Dinámica:</strong></p>
+<ol><li>Dividir la clase en 4 grupos.</li><li>Cada grupo investiga un lenguaje (PHP, Node.js, Python, Java).</li>
+<li>Responden: ¿Qué empresas lo usan? ¿Qué tipo de proyectos? ¿Ventajas y desventajas?</li>
+<li>Presentación de 5 min por grupo + puesta en común.</li></ol></div>
+<div class="exercise__criteria"><span class="exercise__criteria-label">Criterios de evaluación</span><ul class="checklist" data-group-list="A.1"><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="A.1" id="ck11">
+    <span>Identifica el lenguaje y su runtime <em>(25%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="A.1" id="ck12">
+    <span>Cita 3 casos reales de uso <em>(25%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="A.1" id="ck13">
+    <span>Expone ventajas/desventajas <em>(25%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="A.1" id="ck14">
+    <span>Presentación clara y tiempo respetado <em>(25%)</em></span>
+  </label>
+</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-b" data-block="bloque-b">
+  <header class="block__head">
+    <span class="block__num">B</span>
+    <h2>🔁 Relación servidor ↔ cliente</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Comprender el ciclo HTTP completo.</li><li>Reconocer qué parte del código se ejecuta en cada lado.</li><li>Entender la generación dinámica de HTML/CSS/JS desde el servidor.</li></ul></div><section class="subsection" id="s-b-1"><h3>B.1 Ciclo petición/respuesta</h3><div id="diagrama-http" class="httpdiagram" role="img" aria-label="Diagrama del ciclo petición-respuesta HTTP con PHP"></div><p class="figcaption">Diagrama interactivo — pulsa ▶ para reproducir la secuencia paso a paso.</p></section><section class="subsection" id="s-b-2"><h3>B.2 ¿Qué ve el cliente?</h3><p><strong>Código en el servidor</strong> (<code>saludo.php</code>):</p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb4" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb4" class="lang-php">&lt;?php
+$nombre = $_GET[&#x27;nombre&#x27;] ?? &#x27;invitado&#x27;;
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Saludo&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hola, &lt;?= htmlspecialchars($nombre) ?&gt; 👋&lt;/h1&gt;
+  &lt;p&gt;Fecha: &lt;?= date(&#x27;d/m/Y H:i&#x27;) ?&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div><p><strong>Lo que recibe el navegador</strong> (Ver código fuente):</p><div class="codeblock" data-lang="html">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">html</span>
+    <button class="copybtn" data-target="cb5" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb5" class="lang-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Saludo&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hola, Ana 👋&lt;/h1&gt;
+  &lt;p&gt;Fecha: 14/03/2026 10:23&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div><aside class="callout callout--danger">
+  <span class="callout__icon" aria-hidden="true">🔒</span>
+  <div class="callout__body"><strong>Nunca aparece el <code>&lt;?php ... ?&gt;</code>.</strong><p>Si aparece, el servidor no está interpretando PHP.</p></div>
+</aside></section><section class="subsection" id="s-b-3"><h3>B.3 Generación dinámica de CSS y JS</h3><p>El servidor también puede generar CSS o JS dinámicamente:</p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb6" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb6" class="lang-php">/* estilos.php */
+&lt;?php
+header(&#x27;Content-Type: text/css&#x27;);
+$color = $_COOKIE[&#x27;tema&#x27;] ?? &#x27;light&#x27;;
+?&gt;
+body {
+  background: &lt;?= $color === &#x27;dark&#x27; ? &#x27;#222&#x27; : &#x27;#fff&#x27; ?&gt;;
+  color: &lt;?= $color === &#x27;dark&#x27; ? &#x27;#eee&#x27; : &#x27;#000&#x27; ?&gt;;
+}</code></pre>
+</div><div class="codeblock" data-lang="html">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">html</span>
+    <button class="copybtn" data-target="cb7" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb7" class="lang-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;estilos.php&quot;&gt;</code></pre>
+</div></section><section class="subsection" id="s-b-4"><h3>B.4 AJAX / Fetch: cliente consume al servidor</h3><p>El servidor también puede responder a peticiones <strong>asíncronas</strong> desde JavaScript:</p><div class="codeblock" data-lang="javascript">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">javascript</span>
+    <button class="copybtn" data-target="cb8" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb8" class="lang-javascript">// cliente.js
+fetch(&#x27;/api/usuarios.php&#x27;)
+  .then(res =&gt; res.json())
+  .then(data =&gt; console.log(data));</code></pre>
+</div><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb9" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb9" class="lang-php">// api/usuarios.php
+&lt;?php
+header(&#x27;Content-Type: application/json&#x27;);
+echo json_encode([&#x27;usuarios&#x27; =&gt; [&#x27;Ana&#x27;, &#x27;Luis&#x27;, &#x27;Eva&#x27;]]);</code></pre>
+</div></section><div class="signature-demo" id="frontera">
+  <div class="signature-demo__head">
+    <span class="signature-demo__badge">🛂 Demo insignia</span>
+    <h3>Simulador de la frontera cliente ↔ servidor</h3>
+    <p>Cambia el nombre, pulsa <strong>Enviar petición</strong> y observa: el código PHP nunca cruza la frontera — solo su resultado.</p>
+  </div>
+  <div class="border-sim">
+    <div class="border-sim__side border-sim__side--client">
+      <h4>🖥️ Navegador (cliente)</h4>
+      <label class="border-sim__field">GET saludo.php?nombre=
+        <input type="text" id="frontera-nombre" value="Ana" maxlength="20" autocomplete="off">
+      </label>
+      <button id="frontera-send" class="btn btn--accent">Enviar petición →</button>
+      <div class="border-sim__viewsource">
+        <span class="border-sim__label">Lo que ve el cliente (ver código fuente)</span>
+        <pre><code id="frontera-output" class="lang-html"></code></pre>
+      </div>
+    </div>
+    <div class="border-sim__gate" id="frontera-gate" aria-hidden="true">
+      <div class="border-sim__barrier" id="frontera-barrier"></div>
+      <div class="border-sim__packet" id="frontera-packet"></div>
+      <span class="border-sim__stamp" id="frontera-stamp">PROCESADO</span>
+    </div>
+    <div class="border-sim__side border-sim__side--server">
+      <h4>🗄️ Servidor (PHP — nunca visible)</h4>
+      <pre><code class="lang-php">&lt;?php
+$nombre = $_GET['nombre'] ?? 'invitado';
+?&gt;
+&lt;h1&gt;Hola, &lt;?= htmlspecialchars($nombre) ?&gt; 👋&lt;/h1&gt;
+&lt;p&gt;Fecha: &lt;?= date('d/m/Y H:i') ?&gt;&lt;/p&gt;</code></pre>
+    </div>
+  </div>
+</div><div class="exercise" id="ejercicio-b-1">
+  <div class="exercise__tag">🧩 Ejercicio B.1</div>
+  <h4>¿Qué ve el cliente?</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea un script <code>info.php</code> que muestre:</p>
+<ul><li>Tu nombre</li><li>La fecha actual</li><li>El navegador del cliente (usa <code>$_SERVER['HTTP_USER_AGENT']</code>)</li></ul>
+<p>Después abre DevTools → Network y responde:</p>
+<ol><li>¿Aparece el código PHP en la respuesta?</li><li>¿Qué cabeceras envía el servidor?</li>
+<li>¿Qué diferencia hay entre el código fuente que ves y el código que escribiste?</li></ol></div>
+<details class="reveal reveal--hint">
+  <summary>💡 Ver pistas</summary>
+  <div class="reveal__body"><ul><li>Usa <code>date('d/m/Y H:i:s')</code></li>
+<li>Escapa con <code>htmlspecialchars($_SERVER['HTTP_USER_AGENT'])</code></li>
+<li><code>header('Content-Type: text/html; charset=utf-8')</code></li></ul></div>
+</details>
+<div class="exercise__criteria"><span class="exercise__criteria-label">Criterios de evaluación</span><ul class="checklist" data-group-list="B.1"><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="B.1" id="ck15">
+    <span>Muestra los 3 datos requeridos <em>(60%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="B.1" id="ck16">
+    <span>Escapa correctamente la salida <em>(20%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="B.1" id="ck17">
+    <span>Responde correctamente a las 3 preguntas <em>(20%)</em></span>
+  </label>
+</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-c" data-block="bloque-c">
+  <header class="block__head">
+    <span class="block__num">C</span>
+    <h2>🔤 Sintaxis básica</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Escribir scripts sencillos con sintaxis correcta.</li><li>Manejar variables, tipos, operadores y errores.</li></ul></div><section class="subsection" id="s-c-1"><h3>C.1 Estructura de un script</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb10" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb10" class="lang-php">&lt;?php
+declare(strict_types=1);
+// Todo el código PHP va entre etiquetas &lt;?php ... ?&gt;
+// Puede haber múltiples bloques en un mismo archivo
+?&gt;
+
+&lt;p&gt;Texto HTML&lt;/p&gt;
+
+&lt;?php
+// Segundo bloque PHP
+echo &quot;Hola desde PHP&quot;;</code></pre>
+</div></section><section class="subsection" id="s-c-2"><h3>C.2 Variables y tipos</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb11" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb11" class="lang-php">&lt;?php
+$entero    = 42;              // int
+$decimal   = 3.14;            // float
+$cadena    = &quot;Hola DAM&quot;;      // string
+$bool      = true;            // bool
+$array     = [&quot;PHP&quot;, &quot;JS&quot;];   // array
+$asoc      = [&quot;nombre&quot; =&gt; &quot;Ana&quot;, &quot;edad&quot; =&gt; 25]; // array asociativo
+$nulo      = null;            // null
+
+var_dump($entero);            // int(42)
+gettype($cadena);             // &quot;string&quot;</code></pre>
+</div></section><section class="subsection" id="s-c-3"><h3>C.3 Constantes</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb12" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb12" class="lang-php">const IVA = 0.21;
+define(&#x27;APP_NAME&#x27;, &#x27;MiApp&#x27;);
+
+echo IVA;         // 0.21
+echo APP_NAME;    // MiApp</code></pre>
+</div></section><section class="subsection" id="s-c-4"><h3>C.4 Operadores</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb13" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb13" class="lang-php">$a = 10; $b = 3;
+
+// Aritméticos
+$a + $b;    // 13
+$a - $b;    // 7
+$a * $b;    // 30
+$a / $b;    // 3.333...
+$a % $b;    // 1  (módulo)
+$a ** $b;   // 1000
+
+// Comparación
+$a == &quot;10&quot;;   // true  (débil)
+$a === &quot;10&quot;;  // false (estricta) ✅ usar esta
+$a != $b;     // true
+$a &lt;=&gt; $b;    // 1 (spaceship)
+
+// Lógicos
+$a &gt; 5 &amp;&amp; $b &lt; 5;   // true
+$a &gt; 5 || $b &gt; 5;   // true
+!$bool;             // negación
+
+// Concatenación
+&quot;$a y $b&quot;;          // &quot;10 y 3&quot; (interpolación)
+$a . &quot;-&quot; . $b;      // &quot;10-3&quot;</code></pre>
+</div></section><section class="subsection" id="s-c-5"><h3>C.5 Interpolación de cadenas</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb14" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb14" class="lang-php">$nombre = &quot;Lucía&quot;;
+$edad   = 30;
+
+echo &quot;Hola $nombre&quot;;                  // Hola Lucía
+echo &#x27;Hola $nombre&#x27;;                  // Hola $nombre (literal)
+echo &quot;Hola {$nombre}, tienes $edad&quot;;  // Hola Lucía, tienes 30
+echo &quot;Array: {$asoc[&#x27;nombre&#x27;]}&quot;;      // Array: Ana</code></pre>
+</div></section><section class="subsection" id="s-c-6"><h3>C.6 Manejo de errores básico</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb15" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb15" class="lang-php">&lt;?php
+declare(strict_types=1);
+
+// Mostrar errores en desarrollo
+ini_set(&#x27;display_errors&#x27;, 1);
+error_reporting(E_ALL);
+
+// Comprobar existencia de variables
+$nombre = $_GET[&#x27;nombre&#x27;] ?? &#x27;invitado&#x27;;   // null coalescing
+
+// Verificar división por cero
+$divisor = 0;
+if ($divisor === 0) {
+    echo &quot;Error: división por cero&quot;;
+} else {
+    echo 10 / $divisor;
+}
+
+// try/catch (excepciones)
+try {
+    $pdo = new PDO(&quot;mysql:host=localhost;dbname=test&quot;, &quot;user&quot;, &quot;pass&quot;);
+} catch (PDOException $e) {
+    error_log(&quot;Error BD: &quot; . $e-&gt;getMessage());
+    echo &quot;Error de conexión&quot;;
+}</code></pre>
+</div></section><div class="exercise" id="ejercicio-c-1">
+  <div class="exercise__tag">🧩 Ejercicio C.1</div>
+  <h4>Ficha personal</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea un script <code>ficha.php</code> que:</p>
+<ol><li>Reciba por GET los parámetros <code>nombre</code>, <code>edad</code>, <code>ciudad</code>.</li>
+<li>Muestre una tabla HTML con esos datos.</li>
+<li>Si falta algún parámetro, muestre "Datos incompletos".</li>
+<li>Escapa toda la salida con <code>htmlspecialchars</code>.</li></ol></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb16" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb16" class="lang-php">&lt;?php
+declare(strict_types=1);
+
+$nombre = trim($_GET[&#x27;nombre&#x27;] ?? &#x27;&#x27;);
+$edad   = (int)($_GET[&#x27;edad&#x27;] ?? 0);
+$ciudad = trim($_GET[&#x27;ciudad&#x27;] ?? &#x27;&#x27;);
+
+if ($nombre === &#x27;&#x27; || $edad === 0 || $ciudad === &#x27;&#x27;) {
+    exit(&quot;&lt;p&gt;Datos incompletos&lt;/p&gt;&quot;);
+}
+
+function e(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES, &#x27;UTF-8&#x27;);
+}
+?&gt;
+&lt;table border=&quot;1&quot;&gt;
+  &lt;tr&gt;&lt;th&gt;Nombre&lt;/th&gt;&lt;td&gt;&lt;?= e($nombre) ?&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;th&gt;Edad&lt;/th&gt;&lt;td&gt;&lt;?= $edad ?&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;th&gt;Ciudad&lt;/th&gt;&lt;td&gt;&lt;?= e($ciudad) ?&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+</div></div>
+</details>
+<div class="exercise__criteria"><span class="exercise__criteria-label">Criterios de evaluación</span><ul class="checklist" data-group-list="C.1"><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="C.1" id="ck18">
+    <span>Recibe correctamente los 3 parámetros <em>(40%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="C.1" id="ck19">
+    <span>Valida datos incompletos <em>(30%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="C.1" id="ck20">
+    <span>Escapa la salida <em>(30%)</em></span>
+  </label>
+</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-d" data-block="bloque-d">
+  <header class="block__head">
+    <span class="block__num">D</span>
+    <h2>🔀 Estructuras de control</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Emplear condicionales (<code>if</code>, <code>switch</code>, <code>match</code>) y bucles (<code>for</code>, <code>while</code>, <code>foreach</code>).</li></ul></div><section class="subsection" id="s-d-1"><h3>D.1 Condicionales</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb17" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb17" class="lang-php">$nota = 7.5;
+
+if ($nota &gt;= 9) {
+    echo &quot;Sobresaliente&quot;;
+} elseif ($nota &gt;= 7) {
+    echo &quot;Notable&quot;;
+} elseif ($nota &gt;= 5) {
+    echo &quot;Aprobado&quot;;
+} else {
+    echo &quot;Suspenso&quot;;
+}
+
+// Operador ternario
+$estado = $nota &gt;= 5 ? &quot;Aprobado&quot; : &quot;Suspenso&quot;;
+
+// Null coalescing (??) — muy útil
+$nombre = $_GET[&#x27;nombre&#x27;] ?? &#x27;invitado&#x27;;
+
+// switch clásico
+$dia = &quot;lunes&quot;;
+switch ($dia) {
+    case &quot;sábado&quot;:
+    case &quot;domingo&quot;:
+        echo &quot;Fin de semana&quot;;
+        break;
+    default:
+        echo &quot;Laborable&quot;;
+}
+
+// match (PHP 8+) — más limpio y devuelve valor
+$mensaje = match($dia) {
+    &quot;sábado&quot;, &quot;domingo&quot; =&gt; &quot;Fin de semana&quot;,
+    &quot;lunes&quot;, &quot;martes&quot;, &quot;miércoles&quot;, &quot;jueves&quot;, &quot;viernes&quot; =&gt; &quot;Laborable&quot;,
+    default =&gt; &quot;Día no válido&quot;,
+};</code></pre>
+</div></section><section class="subsection" id="s-d-2"><h3>D.2 Bucles</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb18" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb18" class="lang-php">// for clásico
+for ($i = 1; $i &lt;= 5; $i++) {
+    echo &quot;Número: $i&lt;br&gt;&quot;;
+}
+
+// while
+$contador = 0;
+while ($contador &lt; 3) {
+    echo &quot;Contador: $contador&lt;br&gt;&quot;;
+    $contador++;
+}
+
+// do-while (ejecuta al menos una vez)
+$i = 10;
+do {
+    echo &quot;i = $i&lt;br&gt;&quot;;
+    $i++;
+} while ($i &lt; 5);
+
+// foreach (arrays)
+$lenguajes = [&quot;PHP&quot;, &quot;Node&quot;, &quot;Python&quot;];
+foreach ($lenguajes as $lenguaje) {
+    echo &quot;$lenguaje&lt;br&gt;&quot;;
+}
+
+// foreach con índice
+foreach ($lenguajes as $i =&gt; $lenguaje) {
+    echo &quot;$i: $lenguaje&lt;br&gt;&quot;;
+}
+
+// foreach sobre array asociativo
+$persona = [&quot;nombre&quot; =&gt; &quot;Ana&quot;, &quot;edad&quot; =&gt; 25, &quot;ciudad&quot; =&gt; &quot;Madrid&quot;];
+foreach ($persona as $clave =&gt; $valor) {
+    echo &quot;$clave: $valor&lt;br&gt;&quot;;
+}
+
+// break y continue
+foreach ($lenguajes as $l) {
+    if ($l === &quot;Node&quot;) continue;   // salta
+    if ($l === &quot;Python&quot;) break;    // corta
+    echo $l;
+}</code></pre>
+</div></section><section class="subsection" id="s-d-3"><h3>D.3 Bucles anidados</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb19" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb19" class="lang-php">// Tabla de multiplicar 1..5
+echo &quot;&lt;table border=&#x27;1&#x27;&gt;&quot;;
+for ($i = 1; $i &lt;= 5; $i++) {
+    echo &quot;&lt;tr&gt;&quot;;
+    for ($j = 1; $j &lt;= 5; $j++) {
+        echo &quot;&lt;td&gt;&quot; . ($i * $j) . &quot;&lt;/td&gt;&quot;;
+    }
+    echo &quot;&lt;/tr&gt;&quot;;
+}
+echo &quot;&lt;/table&gt;&quot;;</code></pre>
+</div></section><div class="exercise" id="ejercicio-d-1">
+  <div class="exercise__tag">🧩 Ejercicio D.1</div>
+  <h4>Tabla de cuadrados</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Genera una tabla HTML con los números del 1 al 10 y su cuadrado. Las filas pares deben tener la clase CSS <code>par</code>. Usa <code>for</code>.</p></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb20" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb20" class="lang-php">&lt;table&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;N&lt;/th&gt;&lt;th&gt;N²&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;
+  &lt;?php for ($i = 1; $i &lt;= 10; $i++): ?&gt;
+    &lt;tr class=&quot;&lt;?= $i % 2 === 0 ? &#x27;par&#x27; : &#x27;&#x27; ?&gt;&quot;&gt;
+      &lt;td&gt;&lt;?= $i ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?= $i * $i ?&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;?php endfor; ?&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+</div></div>
+</details>
+</div><div class="exercise" id="ejercicio-d-2">
+  <div class="exercise__tag">🧩 Ejercicio D.2</div>
+  <h4>Pirámide con while</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Imprime una pirámide de asteriscos de 5 alturas usando <code>while</code> anidado.</p></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb21" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb21" class="lang-php">&lt;?php
+$altura = 5;
+$i = 1;
+while ($i &lt;= $altura) {
+    $j = 1;
+    while ($j &lt;= $i) {
+        echo &quot;*&quot;;
+        $j++;
+    }
+    echo &quot;&lt;br&gt;&quot;;
+    $i++;
+}</code></pre>
+</div></div>
+</details>
+</div>
+  </div>
+</article><article class="block" id="bloque-e" data-block="bloque-e">
+  <header class="block__head">
+    <span class="block__num">E</span>
+    <h2>🧩 Funciones</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Definir y usar funciones con parámetros y retorno.</li><li>Comprender ámbito, paso por referencia, recursividad y closures.</li></ul></div><section class="subsection" id="s-e-1"><h3>E.1 Definición básica</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb22" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb22" class="lang-php">&lt;?php
+declare(strict_types=1);
+
+function saludar(string $nombre, string $saludo = &quot;Hola&quot;): string {
+    return &quot;$saludo, $nombre!&quot;;
+}
+
+echo saludar(&quot;Marta&quot;);                 // Hola, Marta!
+echo saludar(&quot;Luis&quot;, &quot;Buenos días&quot;);   // Buenos días, Luis!</code></pre>
+</div></section><section class="subsection" id="s-e-2"><h3>E.2 Parámetros: por valor, por referencia y variádicos</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb23" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb23" class="lang-php">// Por valor (copia)
+function incrementar(int $n): int {
+    return $n + 1;
+}
+
+// Por referencia (modifica original)
+function añadirElemento(array &amp;$arr, $elemento): void {
+    $arr[] = $elemento;
+}
+
+$lista = [1, 2];
+añadirElemento($lista, 3);
+print_r($lista); // [1, 2, 3]
+
+// Variádicos
+function sumar(int ...$numeros): int {
+    return array_sum($numeros);
+}
+echo sumar(1, 2, 3, 4); // 10</code></pre>
+</div></section><section class="subsection" id="s-e-3"><h3>E.3 Ámbito de variables</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb24" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb24" class="lang-php">$global = &quot;fuera&quot;;
+
+function prueba() {
+    // echo $global;   ❌ Error: no definida
+    global $global;    // ✅ forma de acceder
+    echo $global;
+}
+
+// Alternativa moderna: usar parámetros
+function prueba2(string $valor): void {
+    echo $valor;
+}
+prueba2($global);</code></pre>
+</div></section><section class="subsection" id="s-e-4"><h3>E.4 Funciones anónimas y closures</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb25" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb25" class="lang-php">// Función anónima
+$doble = function($x) { return $x * 2; };
+echo $doble(5); // 10
+
+// Arrow function (PHP 7.4+)
+$doble2 = fn($x) =&gt; $x * 2;
+
+// Closure con use
+$factor = 3;
+$multiplicar = function($x) use ($factor) {
+    return $x * $factor;
+};
+echo $multiplicar(4); // 12
+
+// Aplicadas a arrays
+$nombres = [&quot;ana&quot;, &quot;luis&quot;, &quot;eva&quot;];
+$mayus = array_map(fn($n) =&gt; strtoupper($n), $nombres);
+$largos = array_filter($nombres, fn($n) =&gt; strlen($n) &gt; 3);</code></pre>
+</div></section><section class="subsection" id="s-e-5"><h3>E.5 Recursividad</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb26" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb26" class="lang-php">function factorial(int $n): int {
+    if ($n &lt;= 1) return 1;
+    return $n * factorial($n - 1);
+}
+echo factorial(5); // 120
+
+function fibonacci(int $n): int {
+    if ($n &lt;= 1) return $n;
+    return fibonacci($n - 1) + fibonacci($n - 2);
+}
+echo fibonacci(10); // 55</code></pre>
+</div></section><section class="subsection" id="s-e-6"><h3>E.6 Buenas prácticas</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb27" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb27" class="lang-php">// ✅ Nombres descriptivos
+function calcularIMC(float $peso, float $altura): float { ... }
+
+// ✅ Tipado estricto
+declare(strict_types=1);
+
+// ✅ Una función = una responsabilidad
+// ❌ Evitar funciones de 100 líneas
+
+// ✅ Documentar con PHPDoc
+/**
+ * Calcula el IMC.
+ * @param float $peso Peso en kg
+ * @param float $altura Altura en metros
+ * @return float IMC redondeado a 2 decimales
+ */
+function calcularIMC(float $peso, float $altura): float {
+    return round($peso / ($altura ** 2), 2);
+}</code></pre>
+</div></section><div class="exercise" id="ejercicio-e-1">
+  <div class="exercise__tag">🧩 Ejercicio E.1</div>
+  <h4>Calculadora de IMC</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea dos funciones:</p>
+<ul><li><code>calcularIMC(float $peso, float $altura): float</code> — devuelve IMC redondeado a 2 decimales.</li>
+<li><code>categoriaIMC(float $imc): string</code> — devuelve "Bajo peso" (&lt;18.5), "Normal" (18.5–24.9), "Sobrepeso" (25–29.9) u "Obesidad" (≥30).</li></ul>
+<p>Pruébalas con 3 casos.</p></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb28" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb28" class="lang-php">&lt;?php
+declare(strict_types=1);
+
+function calcularIMC(float $peso, float $altura): float {
+    if ($altura &lt;= 0) {
+        throw new InvalidArgumentException(&quot;Altura inválida&quot;);
+    }
+    return round($peso / ($altura ** 2), 2);
+}
+
+function categoriaIMC(float $imc): string {
+    return match(true) {
+        $imc &lt; 18.5 =&gt; &quot;Bajo peso&quot;,
+        $imc &lt; 25   =&gt; &quot;Normal&quot;,
+        $imc &lt; 30   =&gt; &quot;Sobrepeso&quot;,
+        default     =&gt; &quot;Obesidad&quot;,
+    };
+}
+
+$casos = [[50, 1.75], [70, 1.75], [95, 1.75]];
+foreach ($casos as [$p, $a]) {
+    $imc = calcularIMC($p, $a);
+    echo &quot;Peso: $p kg, Altura: $a m → IMC: $imc (&quot; . categoriaIMC($imc) . &quot;)&lt;br&gt;&quot;;
+}</code></pre>
+</div></div>
+</details>
+</div><div class="exercise" id="ejercicio-e-2">
+  <div class="exercise__tag">🧩 Ejercicio E.2</div>
+  <h4>Recursividad</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Implementa <code>sumaDigitos(int $n): int</code> que sume los dígitos de un número recursivamente. Ejemplo: <code>sumaDigitos(1234) = 10</code>.</p></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb29" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb29" class="lang-php">function sumaDigitos(int $n): int {
+    if ($n &lt; 10) return $n;
+    return ($n % 10) + sumaDigitos(intdiv($n, 10));
+}</code></pre>
+</div></div>
+</details>
+</div>
+  </div>
+</article><article class="block" id="bloque-f" data-block="bloque-f">
+  <header class="block__head">
+    <span class="block__num">F</span>
+    <h2>📝 Procesamiento de formularios</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Procesar formularios enviados desde el cliente.</li><li>Validar en servidor y escapar salida.</li><li>Proteger contra CSRF y subir ficheros.</li></ul></div><section class="subsection" id="s-f-1"><h3>F.1 Formulario básico</h3><div class="codeblock" data-lang="html">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">html</span>
+    <button class="copybtn" data-target="cb30" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb30" class="lang-html">&lt;!-- formulario.html --&gt;
+&lt;form action=&quot;procesar.php&quot; method=&quot;POST&quot;&gt;
+  &lt;label&gt;Nombre: &lt;input type=&quot;text&quot; name=&quot;nombre&quot; required&gt;&lt;/label&gt;
+  &lt;label&gt;Email:  &lt;input type=&quot;email&quot; name=&quot;email&quot; required&gt;&lt;/label&gt;
+  &lt;label&gt;Edad:   &lt;input type=&quot;number&quot; name=&quot;edad&quot; min=&quot;0&quot;&gt;&lt;/label&gt;
+  &lt;button type=&quot;submit&quot;&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+</div></section><section class="subsection" id="s-f-2"><h3>F.2 Procesamiento con validación</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb31" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb31" class="lang-php">&lt;?php
+// procesar.php
+declare(strict_types=1);
+
+if ($_SERVER[&quot;REQUEST_METHOD&quot;] !== &quot;POST&quot;) {
+    http_response_code(405);
+    exit(&quot;Método no permitido&quot;);
+}
+
+function e(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES, &#x27;UTF-8&#x27;);
+}
+
+$nombre = trim($_POST[&quot;nombre&quot;] ?? &quot;&quot;);
+$email  = filter_input(INPUT_POST, &quot;email&quot;, FILTER_VALIDATE_EMAIL);
+$edad   = filter_input(INPUT_POST, &quot;edad&quot;, FILTER_VALIDATE_INT);
+
+$errores = [];
+if ($nombre === &quot;&quot;)                    $errores[] = &quot;El nombre es obligatorio.&quot;;
+if (mb_strlen($nombre) &gt; 50)           $errores[] = &quot;El nombre es demasiado largo.&quot;;
+if (!$email)                           $errores[] = &quot;Email no válido.&quot;;
+if ($edad === false || $edad &lt; 0 || $edad &gt; 120) $errores[] = &quot;Edad incorrecta.&quot;;
+
+if ($errores) {
+    foreach ($errores as $e) echo &quot;&lt;p&gt;⚠️ &quot; . e($e) . &quot;&lt;/p&gt;&quot;;
+} else {
+    echo &quot;&lt;p&gt;✅ Registrado: &quot; . e($nombre) . &quot; (&quot; . e($email) . &quot;), $edad años&lt;/p&gt;&quot;;
+}</code></pre>
+</div></section><section class="subsection" id="s-f-3"><h3>F.3 GET vs POST</h3><div class="table-wrap"><table><thead><tr><th>Característica</th><th>GET</th><th>POST</th></tr></thead><tbody><tr><td>Visibilidad</td><td>URL</td><td>Cuerpo HTTP</td></tr><tr><td>Límite tamaño</td><td>~2000 chars</td><td>Amplio</td></tr><tr><td>Idempotente</td><td>Sí</td><td>No</td></tr><tr><td>Cacheable</td><td>Sí</td><td>No</td></tr><tr><td>Uso típico</td><td>Búsquedas, filtros</td><td>Login, altas, datos sensibles</td></tr><tr><td>Seguridad</td><td>❌ datos en URL</td><td>✅ mejor (pero no basta)</td></tr></tbody></table></div><aside class="callout callout--warn">
+  <span class="callout__icon" aria-hidden="true">⚠️</span>
+  <div class="callout__body"><strong>POST no cifra nada por sí solo</strong><p>Usa HTTPS siempre.</p></div>
+</aside></section><section class="subsection" id="s-f-4"><h3>F.4 Protección CSRF</h3><p>El <strong>Cross-Site Request Forgery</strong> ocurre cuando un sitio externo envía un formulario en nombre del usuario autenticado.</p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb32" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb32" class="lang-php">// formulario.php
+session_start();
+if (empty($_SESSION[&#x27;csrf&#x27;])) {
+    $_SESSION[&#x27;csrf&#x27;] = bin2hex(random_bytes(32));
+}
+?&gt;
+&lt;form method=&quot;POST&quot; action=&quot;procesar.php&quot;&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;csrf&quot; value=&quot;&lt;?= $_SESSION[&#x27;csrf&#x27;] ?&gt;&quot;&gt;
+  &lt;input type=&quot;text&quot; name=&quot;nombre&quot;&gt;
+  &lt;button&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+</div><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb33" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb33" class="lang-php">// procesar.php
+session_start();
+if (!hash_equals($_SESSION[&#x27;csrf&#x27;] ?? &#x27;&#x27;, $_POST[&#x27;csrf&#x27;] ?? &#x27;&#x27;)) {
+    http_response_code(403);
+    exit(&quot;CSRF token inválido&quot;);
+}
+// ... procesar</code></pre>
+</div></section><section class="subsection" id="s-f-5"><h3>F.5 Subida de ficheros</h3><div class="codeblock" data-lang="html">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">html</span>
+    <button class="copybtn" data-target="cb34" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb34" class="lang-html">&lt;form method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;
+  &lt;input type=&quot;file&quot; name=&quot;archivo&quot; accept=&quot;image/*&quot;&gt;
+  &lt;button&gt;Subir&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+</div><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb35" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb35" class="lang-php">&lt;?php
+if (!isset($_FILES[&#x27;archivo&#x27;]) || $_FILES[&#x27;archivo&#x27;][&#x27;error&#x27;] !== UPLOAD_ERR_OK) {
+    exit(&quot;Error al subir&quot;);
+}
+
+$max = 2 * 1024 * 1024; // 2 MB
+if ($_FILES[&#x27;archivo&#x27;][&#x27;size&#x27;] &gt; $max) exit(&quot;Fichero demasiado grande&quot;);
+
+$tipos = [&#x27;image/jpeg&#x27;, &#x27;image/png&#x27;, &#x27;image/gif&#x27;];
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$tipo  = finfo_file($finfo, $_FILES[&#x27;archivo&#x27;][&#x27;tmp_name&#x27;]);
+if (!in_array($tipo, $tipos, true)) exit(&quot;Tipo no permitido&quot;);
+
+$nombre = bin2hex(random_bytes(16)) . &#x27;.&#x27; . pathinfo($_FILES[&#x27;archivo&#x27;][&#x27;name&#x27;], PATHINFO_EXTENSION);
+move_uploaded_file($_FILES[&#x27;archivo&#x27;][&#x27;tmp_name&#x27;], __DIR__ . &quot;/uploads/$nombre&quot;);
+echo &quot;Subido: $nombre&quot;;</code></pre>
+</div><aside class="callout callout--danger">
+  <span class="callout__icon" aria-hidden="true">🔒</span>
+  <div class="callout__body"><strong>Nunca confíes en <code>$_FILES['archivo']['type']</code></strong><p>Se puede falsear. Usa <code>finfo</code>.</p></div>
+</aside></section><div class="exercise" id="ejercicio-f-1">
+  <div class="exercise__tag">🧩 Ejercicio F.1</div>
+  <h4>Contacto con validación y CSRF</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea un formulario de contacto (nombre, email, mensaje) con:</p>
+<ul><li>Validación servidor (campos obligatorios, email válido, mensaje 10–500 chars).</li>
+<li>Token CSRF.</li><li>Si todo es correcto, muestra "gracias" personalizado.</li>
+<li>Si no, repinta el formulario con los errores.</li></ul></div>
+</div><div class="exercise" id="ejercicio-f-2">
+  <div class="exercise__tag">🧩 Ejercicio F.2</div>
+  <h4>Galería de imágenes</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Añade subida de imagen al formulario anterior. Guarda en <code>uploads/</code> y muestra la miniatura al usuario.</p></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-g" data-block="bloque-g">
+  <header class="block__head">
+    <span class="block__num">G</span>
+    <h2>💾 Mecanismos de persistencia</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Utilizar cookies, sesiones y ficheros.</li><li>Introducir bases de datos con PDO.</li><li>Comparar mecanismos y elegir el adecuado.</li></ul></div><section class="subsection" id="s-g-1"><h3>G.1 Comparativa general</h3><div class="table-wrap"><table><thead><tr><th>Mecanismo</th><th>Ubicación</th><th>Persistencia</th><th>Seguridad</th><th>Escalabilidad</th><th>Ideal para</th></tr></thead><tbody><tr><td>Cookie</td><td>Cliente</td><td>Configurable</td><td>Baja</td><td>Alta</td><td>Preferencias, tema</td></tr><tr><td>Sesión</td><td>Servidor (memoria/fichero)</td><td>Cierre navegador (por defecto)</td><td>Media</td><td>Media</td><td>Login, carrito</td></tr><tr><td>Fichero JSON</td><td>Servidor (disco)</td><td>Permanente</td><td>Media</td><td>Baja</td><td>Prototipos, configs</td></tr><tr><td>Base de datos</td><td>Servidor</td><td>Permanente</td><td>Alta</td><td>Alta</td><td>Datos reales</td></tr><tr><td><code>localStorage</code></td><td>Cliente</td><td>Permanente</td><td>Baja</td><td>Alta</td><td>Solo cliente (no auth)</td></tr></tbody></table></div></section><section class="subsection" id="s-g-2"><h3>G.2 Cookies</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb36" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb36" class="lang-php">// Crear cookie (1 hora)
+setcookie(&quot;idioma&quot;, &quot;es&quot;, [
+    &#x27;expires&#x27;  =&gt; time() + 3600,
+    &#x27;path&#x27;     =&gt; &#x27;/&#x27;,
+    &#x27;secure&#x27;   =&gt; true,      // solo HTTPS
+    &#x27;httponly&#x27; =&gt; true,      // no accesible desde JS
+    &#x27;samesite&#x27; =&gt; &#x27;Strict&#x27;,  // anti-CSRF
+]);
+
+// Leer
+$idioma = $_COOKIE[&quot;idioma&quot;] ?? &quot;en&quot;;
+
+// Borrar
+setcookie(&quot;idioma&quot;, &quot;&quot;, time() - 3600, &quot;/&quot;);</code></pre>
+</div><aside class="callout callout--warn">
+  <span class="callout__icon" aria-hidden="true">⚠️</span>
+  <div class="callout__body"><strong><code>setcookie()</code> debe llamarse antes de cualquier salida HTML.</strong><p></p></div>
+</aside></section><section class="subsection" id="s-g-3"><h3>G.3 Sesiones</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb37" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb37" class="lang-php">// Configuración segura (antes de session_start)
+ini_set(&#x27;session.cookie_httponly&#x27;, &#x27;1&#x27;);
+ini_set(&#x27;session.cookie_secure&#x27;, &#x27;1&#x27;);
+ini_set(&#x27;session.use_strict_mode&#x27;, &#x27;1&#x27;);
+
+session_start();
+
+// Regenerar ID al hacer login (previene fijación de sesión)
+session_regenerate_id(true);
+
+$_SESSION[&quot;usuario&quot;] = &quot;ana&quot;;
+$_SESSION[&quot;rol&quot;]     = &quot;admin&quot;;
+
+// Leer
+echo $_SESSION[&quot;usuario&quot;] ?? &quot;invitado&quot;;
+
+// Cerrar
+session_unset();
+session_destroy();</code></pre>
+</div></section><section class="subsection" id="s-g-4"><h3>G.4 Persistencia en ficheros JSON</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb38" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb38" class="lang-php">function leerJson(string $ruta): array {
+    if (!file_exists($ruta)) return [];
+    $contenido = file_get_contents($ruta);
+    return json_decode($contenido, true) ?? [];
+}
+
+function guardarJson(string $ruta, array $datos): void {
+    file_put_contents(
+        $ruta,
+        json_encode($datos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+        LOCK_EX
+    );
+}
+
+$tareas = leerJson(&quot;tareas.json&quot;);
+$tareas[] = [&quot;id&quot; =&gt; uniqid(), &quot;texto&quot; =&gt; &quot;Estudiar PHP&quot;, &quot;hecha&quot; =&gt; false];
+guardarJson(&quot;tareas.json&quot;, $tareas);</code></pre>
+</div><aside class="callout callout--warn">
+  <span class="callout__icon" aria-hidden="true">⚠️</span>
+  <div class="callout__body"><strong>Los ficheros JSON no escalan bien con muchos usuarios concurrentes.</strong><p>Para producción usa BD.</p></div>
+</aside></section><section class="subsection" id="s-g-5"><h3>G.5 Bases de datos con PDO</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb39" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb39" class="lang-php">&lt;?php
+declare(strict_types=1);
+
+$dsn = &quot;mysql:host=localhost;dbname=dam;charset=utf8mb4&quot;;
+$pdo = new PDO($dsn, &quot;user&quot;, &quot;pass&quot;, [
+    PDO::ATTR_ERRMODE            =&gt; PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   =&gt; false,
+]);
+
+// INSERT con consulta preparada (anti-inyección)
+$stmt = $pdo-&gt;prepare(&quot;INSERT INTO usuarios (nombre, email) VALUES (?, ?)&quot;);
+$stmt-&gt;execute([$nombre, $email]);
+
+// SELECT
+$stmt = $pdo-&gt;prepare(&quot;SELECT * FROM usuarios WHERE nombre = ?&quot;);
+$stmt-&gt;execute([$nombre]);
+$usuario = $stmt-&gt;fetch();
+
+// SELECT múltiple
+$stmt = $pdo-&gt;query(&quot;SELECT * FROM tareas WHERE hecha = 0&quot;);
+$tareas = $stmt-&gt;fetchAll();</code></pre>
+</div><aside class="callout callout--success">
+  <span class="callout__icon" aria-hidden="true">✅</span>
+  <div class="callout__body"><strong>Siempre usa consultas preparadas.</strong><p>Nunca concatenes variables en SQL.</p></div>
+</aside></section><div class="exercise" id="ejercicio-g-1">
+  <div class="exercise__tag">🧩 Ejercicio G.1</div>
+  <h4>Contador de visitas</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Implementa un contador de visitas por usuario:</p>
+<ul><li>Si no existe cookie <code>visitas</code>, créala con valor 1.</li>
+<li>Si existe, increméntala y muestra "Esta es tu visita número N".</li>
+<li>Añade una cookie de preferencia <code>tema</code> (light/dark) con botón para cambiarla.</li></ul></div>
+</div><div class="exercise" id="ejercicio-g-2">
+  <div class="exercise__tag">🧩 Ejercicio G.2</div>
+  <h4>Lista de tareas con sesión</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea un gestor de tareas en <code>$_SESSION</code>:</p>
+<ul><li>Formulario para añadir tarea.</li><li>Lista de tareas con botón de borrar.</li>
+<li>Las tareas persisten mientras dure la sesión.</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-h" data-block="bloque-h">
+  <header class="block__head">
+    <span class="block__num">H</span>
+    <h2>👤 Gestión de usuarios</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Implementar registro, login y logout.</li><li>Usar hash de contraseñas y verificación.</li><li>Gestionar roles y permisos granulares.</li><li>Añadir recuperación de contraseña y bloqueo por intentos.</li></ul></div><section class="subsection" id="s-h-1"><h3>H.1 Estructura del proyecto</h3><div class="codeblock" data-lang="text">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">text</span>
+    <button class="copybtn" data-target="cb40" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb40" class="lang-text">/usuarios
+  ├── config.php
+  ├── registro.php
+  ├── login.php
+  ├── logout.php
+  ├── panel.php
+  ├── admin.php
+  ├── recuperar.php
+  ├── usuarios.json
+  └── intentos.json</code></pre>
+</div></section><section class="subsection" id="s-h-2"><h3>H.2 Registro con hash</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb41" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb41" class="lang-php">// registro.php (fragmento)
+declare(strict_types=1);
+
+$usuario  = trim($_POST[&quot;usuario&quot;] ?? &quot;&quot;);
+$password = $_POST[&quot;password&quot;] ?? &quot;&quot;;
+$password2 = $_POST[&quot;password2&quot;] ?? &quot;&quot;;
+
+$errores = [];
+if (!preg_match(&#x27;/^[a-zA-Z0-9_]{3,20}$/&#x27;, $usuario)) {
+    $errores[] = &quot;Usuario inválido (3-20, alfanumérico)&quot;;
+}
+if (strlen($password) &lt; 8) {
+    $errores[] = &quot;Contraseña mínimo 8 caracteres&quot;;
+}
+if ($password !== $password2) {
+    $errores[] = &quot;Las contraseñas no coinciden&quot;;
+}
+
+if (!$errores) {
+    $usuarios = leerJson(&quot;usuarios.json&quot;);
+    if (isset($usuarios[$usuario])) {
+        $errores[] = &quot;El usuario ya existe&quot;;
+    } else {
+        $usuarios[$usuario] = [
+            &quot;hash&quot; =&gt; password_hash($password, PASSWORD_DEFAULT),
+            &quot;rol&quot;  =&gt; &quot;user&quot;,
+            &quot;creado&quot; =&gt; date(&#x27;c&#x27;),
+        ];
+        guardarJson(&quot;usuarios.json&quot;, $usuarios);
+        echo &quot;Usuario registrado ✅&quot;;
+    }
+}</code></pre>
+</div></section><section class="subsection" id="s-h-3"><h3>H.3 Login con bloqueo por intentos</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb42" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb42" class="lang-php">// login.php
+declare(strict_types=1);
+session_start();
+
+$usuario  = $_POST[&quot;usuario&quot;] ?? &quot;&quot;;
+$password = $_POST[&quot;password&quot;] ?? &quot;&quot;;
+
+$intentos = leerJson(&quot;intentos.json&quot;);
+$ahora    = time();
+
+// Limpiar intentos antiguos (&gt;15 min)
+$intentos = array_filter($intentos, fn($t) =&gt; $t &gt; $ahora - 900);
+
+$clave = &quot;ip_&quot; . ($_SERVER[&#x27;REMOTE_ADDR&#x27;] ?? &#x27;desconocida&#x27;);
+if (($intentos[$clave] ?? 0) &gt;= 5) {
+    exit(&quot;Demasiados intentos. Espera 15 minutos.&quot;);
+}
+
+$usuarios = leerJson(&quot;usuarios.json&quot;);
+
+if (isset($usuarios[$usuario]) &amp;&amp;
+    password_verify($password, $usuarios[$usuario][&quot;hash&quot;])) {
+
+    session_regenerate_id(true);
+    unset($intentos[$clave]);
+    guardarJson(&quot;intentos.json&quot;, $intentos);
+
+    $_SESSION[&quot;usuario&quot;] = $usuario;
+    $_SESSION[&quot;rol&quot;]     = $usuarios[$usuario][&quot;rol&quot;];
+    header(&quot;Location: panel.php&quot;);
+    exit;
+}
+
+$intentos[$clave] = ($intentos[$clave] ?? 0) + 1;
+guardarJson(&quot;intentos.json&quot;, $intentos);
+echo &quot;Credenciales incorrectas&quot;;</code></pre>
+</div></section><section class="subsection" id="s-h-4"><h3>H.4 Logout</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb43" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb43" class="lang-php">// logout.php
+session_start();
+
+// Borrar cookie de sesión
+if (ini_get(&quot;session.use_cookies&quot;)) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), &#x27;&#x27;, time() - 42000,
+        $params[&quot;path&quot;], $params[&quot;domain&quot;],
+        $params[&quot;secure&quot;], $params[&quot;httponly&quot;]
+    );
+}
+
+session_unset();
+session_destroy();
+header(&quot;Location: login.php&quot;);</code></pre>
+</div></section><section class="subsection" id="s-h-5"><h3>H.5 Roles y permisos granulares</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb44" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb44" class="lang-php">// permisos.php
+const PERMISOS = [
+    &#x27;invitado&#x27; =&gt; [&#x27;ver_inicio&#x27;, &#x27;ver_login&#x27;],
+    &#x27;user&#x27;     =&gt; [&#x27;ver_inicio&#x27;, &#x27;ver_panel&#x27;, &#x27;editar_perfil&#x27;, &#x27;ver_tareas&#x27;],
+    &#x27;admin&#x27;    =&gt; [&#x27;ver_inicio&#x27;, &#x27;ver_panel&#x27;, &#x27;editar_perfil&#x27;, &#x27;ver_tareas&#x27;,
+                   &#x27;gestionar_usuarios&#x27;, &#x27;ver_logs&#x27;, &#x27;borrar_cualquiera&#x27;],
+];
+
+function tienePermiso(string $rol, string $accion): bool {
+    return in_array($accion, PERMISOS[$rol] ?? [], true);
+}
+
+function requerirPermiso(string $accion): void {
+    session_start();
+    $rol = $_SESSION[&#x27;rol&#x27;] ?? &#x27;invitado&#x27;;
+    if (!tienePermiso($rol, $accion)) {
+        http_response_code(403);
+        exit(&quot;⛔ Acceso denegado&quot;);
+    }
+}</code></pre>
+</div><p>Uso:</p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb45" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb45" class="lang-php">// admin.php
+require &#x27;permisos.php&#x27;;
+requerirPermiso(&#x27;gestionar_usuarios&#x27;);
+// ... contenido admin</code></pre>
+</div></section><section class="subsection" id="s-h-6"><h3>H.6 Recuperación de contraseña (básica)</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb46" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb46" class="lang-php">// recuperar.php (simplificado)
+// 1. Usuario introduce email
+// 2. Generar token aleatorio, guardar hash + expiración
+// 3. (En real) Enviar email con enlace
+// 4. Usuario accede con token, cambia contraseña
+
+$token = bin2hex(random_bytes(32));
+$tokens[$email] = [
+    &quot;hash&quot; =&gt; hash(&#x27;sha256&#x27;, $token),
+    &quot;expira&quot; =&gt; time() + 3600,
+];
+// Enlace: https://midominio/reset.php?token=$token&amp;email=$email</code></pre>
+</div><aside class="callout callout--info">
+  <span class="callout__icon" aria-hidden="true">📌</span>
+  <div class="callout__body"><strong>En un entorno real se usaría PHPMailer o similar.</strong><p></p></div>
+</aside></section><div class="exercise" id="ejercicio-h-1">
+  <div class="exercise__tag">🧩 Ejercicio H.1</div>
+  <h4>Sistema completo de usuarios</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Implementa un sistema con:</p>
+<ul><li>Registro (con validación y hash).</li><li>Login (con bloqueo tras 5 intentos).</li>
+<li>Logout.</li><li>Panel de usuario (solo logueados).</li><li>Panel de admin (solo rol admin).</li>
+<li>Protección CSRF en todos los formularios.</li></ul></div>
+<div class="exercise__criteria"><span class="exercise__criteria-label">Criterios de evaluación</span><ul class="checklist" data-group-list="H.1"><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="H.1" id="ck21">
+    <span>Registro valida y hashea <em>(20%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="H.1" id="ck22">
+    <span>Login verifica y bloquea <em>(20%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="H.1" id="ck23">
+    <span>Sesión persistente y logout correcto <em>(20%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="H.1" id="ck24">
+    <span>Roles funcionan <em>(20%)</em></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="H.1" id="ck25">
+    <span>CSRF y escapado <em>(20%)</em></span>
+  </label>
+</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-i" data-block="bloque-i">
+  <header class="block__head">
+    <span class="block__num">I</span>
+    <h2>🌍 Entornos de ejecución</h2>
+  </header>
+  <div class="block__body">
+    <aside class="callout callout--warn">
+  <span class="callout__icon" aria-hidden="true">⚠️</span>
+  <div class="callout__body"><strong>Este criterio tiene dos dimensiones que conviene no confundir.</strong><p></p></div>
+</aside><section class="subsection" id="s-i-1"><h3>I.1 Entornos técnicos (dev / test / prod)</h3><div class="table-wrap"><table><thead><tr><th>Entorno</th><th>Propósito</th><th><code>display_errors</code></th><th>Datos</th><th>Acceso</th></tr></thead><tbody><tr><td><strong>Desarrollo</strong></td><td>Programar y depurar</td><td><code>On</code></td><td>Ficticios</td><td>Solo dev</td></tr><tr><td><strong>Test/Staging</strong></td><td>QA, pruebas</td><td><code>On</code> (logs)</td><td>Copia de prod</td><td>Equipo</td></tr><tr><td><strong>Producción</strong></td><td>Usuarios reales</td><td><code>Off</code></td><td>Reales</td><td>Público</td></tr></tbody></table></div><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb47" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb47" class="lang-php">// config.php
+define(&quot;ENTORNO&quot;, getenv(&quot;APP_ENV&quot;) ?: &quot;dev&quot;);
+
+match(ENTORNO) {
+    &quot;dev&quot; =&gt; (function() {
+        ini_set(&quot;display_errors&quot;, &quot;1&quot;);
+        error_reporting(E_ALL);
+    })(),
+    &quot;test&quot; =&gt; (function() {
+        ini_set(&quot;display_errors&quot;, &quot;0&quot;);
+        ini_set(&quot;log_errors&quot;, &quot;1&quot;);
+        ini_set(&quot;error_log&quot;, &quot;/var/log/app-test.log&quot;);
+    })(),
+    &quot;prod&quot; =&gt; (function() {
+        ini_set(&quot;display_errors&quot;, &quot;0&quot;);
+        ini_set(&quot;log_errors&quot;, &quot;1&quot;);
+        ini_set(&quot;error_log&quot;, &quot;/var/log/app.log&quot;);
+    })(),
+};</code></pre>
+</div><aside class="callout callout--danger">
+  <span class="callout__icon" aria-hidden="true">🔒</span>
+  <div class="callout__body"><strong>En producción nunca muestres errores al usuario.</strong><p>Revela rutas, versiones y estructura.</p></div>
+</aside></section><section class="subsection" id="s-i-2"><h3>I.2 Entornos personalizados por usuario</h3><p>Aquí el objetivo es que <strong>cada usuario vea un entorno distinto</strong>: contenido, permisos y datos filtrados según su rol y preferencias.</p></section><section class="subsection" id="s-i-2-1"><h3>I.2.1 Vista distinta según rol</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb48" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb48" class="lang-php">// panel.php
+session_start();
+if (!isset($_SESSION[&quot;usuario&quot;])) {
+    header(&quot;Location: login.php&quot;);
+    exit;
+}
+
+$rol = $_SESSION[&quot;rol&quot;];
+
+echo &quot;&lt;h1&gt;Bienvenido, &quot; . htmlspecialchars($_SESSION[&quot;usuario&quot;]) . &quot;&lt;/h1&gt;&quot;;
+
+if ($rol === &quot;admin&quot;) {
+    echo &quot;&lt;section class=&#x27;admin&#x27;&gt;&quot;;
+    echo &quot;  &lt;h2&gt;🔧 Zona de administración&lt;/h2&gt;&quot;;
+    echo &quot;  &lt;a href=&#x27;usuarios.php&#x27;&gt;Gestionar usuarios&lt;/a&gt;&quot;;
+    echo &quot;  &lt;a href=&#x27;logs.php&#x27;&gt;Ver logs&lt;/a&gt;&quot;;
+    echo &quot;&lt;/section&gt;&quot;;
+} else {
+    echo &quot;&lt;section class=&#x27;user&#x27;&gt;&quot;;
+    echo &quot;  &lt;h2&gt;👤 Mi perfil&lt;/h2&gt;&quot;;
+    echo &quot;  &lt;a href=&#x27;perfil.php&#x27;&gt;Editar datos&lt;/a&gt;&quot;;
+    echo &quot;&lt;/section&gt;&quot;;
+}</code></pre>
+</div></section><section class="subsection" id="s-i-2-2"><h3>I.2.2 Datos filtrados según usuario</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb49" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb49" class="lang-php">// tareas.php
+session_start();
+$usuario = $_SESSION[&#x27;usuario&#x27;];
+$rol     = $_SESSION[&#x27;rol&#x27;];
+
+// Admin ve todas; user solo las suyas
+if ($rol === &#x27;admin&#x27;) {
+    $stmt = $pdo-&gt;query(&quot;SELECT * FROM tareas&quot;);
+} else {
+    $stmt = $pdo-&gt;prepare(&quot;SELECT * FROM tareas WHERE usuario = ?&quot;);
+    $stmt-&gt;execute([$usuario]);
+}
+$tareas = $stmt-&gt;fetchAll();</code></pre>
+</div></section><section class="subsection" id="s-i-2-3"><h3>I.2.3 Preferencias del usuario (tema, idioma)</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb50" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb50" class="lang-php">// preferencias.php
+$tema = $_COOKIE[&#x27;tema&#x27;] ?? &#x27;light&#x27;;
+$idioma = $_COOKIE[&#x27;idioma&#x27;] ?? &#x27;es&#x27;;
+
+$traducciones = [
+    &#x27;es&#x27; =&gt; [&#x27;saludo&#x27; =&gt; &#x27;Hola&#x27;, &#x27;despedida&#x27; =&gt; &#x27;Adiós&#x27;],
+    &#x27;en&#x27; =&gt; [&#x27;saludo&#x27; =&gt; &#x27;Hello&#x27;, &#x27;despedida&#x27; =&gt; &#x27;Bye&#x27;],
+];
+$t = $traducciones[$idioma];</code></pre>
+</div></section><section class="subsection" id="s-i-2-4"><h3>I.2.4 Matriz de permisos por rol</h3><div class="table-wrap"><table><thead><tr><th>Recurso</th><th>Invitado</th><th>User</th><th>Admin</th></tr></thead><tbody><tr><td>Inicio</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Login/Registro</td><td>✅</td><td>❌</td><td>❌</td></tr><tr><td>Panel</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>Mis tareas</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>Todas las tareas</td><td>❌</td><td>❌</td><td>✅</td></tr><tr><td>Gestión usuarios</td><td>❌</td><td>❌</td><td>✅</td></tr><tr><td>Logs</td><td>❌</td><td>❌</td><td>✅</td></tr></tbody></table></div></section><div class="exercise" id="ejercicio-i-1">
+  <div class="exercise__tag">🧩 Ejercicio I.1</div>
+  <h4>Multi-entorno</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Configura tu proyecto para que:</p>
+<ul><li>En <code>dev</code> muestre errores y use <code>usuarios-dev.json</code>.</li>
+<li>En <code>prod</code> no muestre errores y use <code>usuarios.json</code>.</li></ul>
+<p>Detecta el entorno con una variable de entorno <code>APP_ENV</code>.</p></div>
+</div><div class="exercise" id="ejercicio-i-2">
+  <div class="exercise__tag">🧩 Ejercicio I.2</div>
+  <h4>Panel personalizado</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Crea <code>panel.php</code> que:</p>
+<ul><li>Redirija a login si no hay sesión.</li><li>Muestre "Zona admin" si el rol es <code>admin</code>.</li>
+<li>Muestre "Mi perfil" si es <code>user</code>.</li><li>Use un fichero de configuración con la matriz de permisos.</li>
+<li>Registre en <code>logs.txt</code> cada acceso con usuario, fecha e IP.</li></ul></div>
+</div>
+  </div>
+</article><article class="block" id="bloque-j" data-block="bloque-j">
+  <header class="block__head">
+    <span class="block__num">J</span>
+    <h2>🔐 Seguridad transversal</h2>
+  </header>
+  <div class="block__body">
+    <div class="objectives"><span class="objectives__label">🎯 Objetivos</span><ul><li>Reconocer los riesgos más comunes en aplicaciones web.</li><li>Aplicar mitigaciones básicas en PHP.</li></ul></div><section class="subsection" id="s-j-1"><h3>J.1 Los 5 riesgos principales</h3><div class="table-wrap"><table><thead><tr><th>Riesgo</th><th>Descripción</th><th>Ejemplo</th><th>Mitigación</th></tr></thead><tbody><tr><td><strong>XSS</strong></td><td>Inyectar JS en HTML generado</td><td><code>&lt;script&gt;alert(1)&lt;/script&gt;</code> en un comentario</td><td><code>htmlspecialchars()</code> al salir</td></tr><tr><td><strong>CSRF</strong></td><td>Enviar peticiones en nombre del usuario</td><td>Formulario externo a <code>/borrar.php?id=1</code></td><td>Token CSRF + <code>SameSite</code></td></tr><tr><td><strong>Inyección SQL</strong></td><td>Manipular consultas</td><td><code>' OR '1'='1</code> en login</td><td>Consultas preparadas</td></tr><tr><td><strong>Fuerza bruta</strong></td><td>Probar contraseñas</td><td>Script con diccionario</td><td>Bloqueo + captcha + rate limit</td></tr><tr><td><strong>Session fixation</strong></td><td>Robar/fijar ID de sesión</td><td>URL con <code>?PHPSESSID=...</code></td><td><code>session_regenerate_id(true)</code></td></tr></tbody></table></div></section><section class="subsection" id="s-j-2"><h3>J.2 XSS: escapado de salida</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb51" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb51" class="lang-php">// ❌ Mal
+echo &quot;&lt;p&gt;&quot; . $_GET[&#x27;comentario&#x27;] . &quot;&lt;/p&gt;&quot;;
+
+// ✅ Bien
+function e(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES | ENT_HTML5, &#x27;UTF-8&#x27;);
+}
+echo &quot;&lt;p&gt;&quot; . e($_GET[&#x27;comentario&#x27;]) . &quot;&lt;/p&gt;&quot;;</code></pre>
+</div><aside class="callout callout--info">
+  <span class="callout__icon" aria-hidden="true">📌</span>
+  <div class="callout__body"><strong>Regla de oro: escapa al salir, no al entrar.</strong><p>Guarda datos crudos y escapa según contexto (HTML, atributo, URL, JS).</p></div>
+</aside></section><section class="subsection" id="s-j-3"><h3>J.3 CSRF: token</h3><p>Ya visto en F.4. Añadir siempre:</p><div class="codeblock" data-lang="html">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">html</span>
+    <button class="copybtn" data-target="cb52" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb52" class="lang-html">&lt;input type=&quot;hidden&quot; name=&quot;csrf&quot; value=&quot;&lt;?= $_SESSION[&#x27;csrf&#x27;] ?&gt;&quot;&gt;</code></pre>
+</div></section><section class="subsection" id="s-j-4"><h3>J.4 Inyección SQL: consultas preparadas</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb53" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb53" class="lang-php">// ❌ Mal
+$pdo-&gt;query(&quot;SELECT * FROM usuarios WHERE nombre = &#x27;$nombre&#x27;&quot;);
+
+// ✅ Bien
+$stmt = $pdo-&gt;prepare(&quot;SELECT * FROM usuarios WHERE nombre = ?&quot;);
+$stmt-&gt;execute([$nombre]);</code></pre>
+</div></section><section class="subsection" id="s-j-5"><h3>J.5 Cabeceras de seguridad</h3><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb54" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb54" class="lang-php">header(&quot;X-Content-Type-Options: nosniff&quot;);
+header(&quot;X-Frame-Options: DENY&quot;);
+header(&quot;Referrer-Policy: strict-origin-when-cross-origin&quot;);
+header(&quot;Content-Security-Policy: default-src &#x27;self&#x27;&quot;);
+header(&quot;Strict-Transport-Security: max-age=31536000; includeSubDomains&quot;);</code></pre>
+</div></section><section class="subsection" id="s-j-6"><h3>J.6 Checklist de seguridad</h3><ul class="checklist" data-group-list="seg-j6"><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck26">
+    <span>Todas las salidas HTML usan <code>htmlspecialchars()</code></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck27">
+    <span>Todos los formularios POST tienen token CSRF</span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck28">
+    <span>Todas las consultas SQL son preparadas</span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck29">
+    <span>Las contraseñas se hashean con <code>password_hash()</code></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck30">
+    <span>Las sesiones se regeneran al login</span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck31">
+    <span>Las cookies críticas tienen <code>HttpOnly</code> + <code>Secure</code> + <code>SameSite</code></span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck32">
+    <span>Los errores no se muestran en producción</span>
+  </label>
+</li><li class="checkitem">
+  <label>
+    <input type="checkbox" class="track-check" data-group="seg-j6" id="ck33">
+    <span>HTTPS obligatorio en producción</span>
+  </label>
+</li></ul></section><div class="exercise" id="ejercicio-j-1">
+  <div class="exercise__tag">🧩 Ejercicio J.1</div>
+  <h4>Auditoría de código</h4>
+  <div class="exercise__statement"><p><strong>Enunciado:</strong> Analiza este código e identifica <strong>al menos 3 vulnerabilidades</strong> y corrígelas:</p><div class="codeblock" data-lang="php">
+  <div class="codeblock__bar">
+    <span class="codeblock__lang">php</span>
+    <button class="copybtn" data-target="cb55" aria-label="Copiar código al portapapeles">
+      <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M7 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm-3 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1H4z" fill="currentColor"/></svg>
+      <span>Copiar</span>
+    </button>
+  </div>
+  <pre><code id="cb55" class="lang-php">&lt;?php
+$nombre = $_GET[&#x27;nombre&#x27;];
+$pdo-&gt;query(&quot;SELECT * FROM usuarios WHERE nombre = &#x27;$nombre&#x27;&quot;);
+echo &quot;&lt;h1&gt;Bienvenido, $nombre&lt;/h1&gt;&quot;;
+setcookie(&quot;user&quot;, $nombre);
+session_start();
+$_SESSION[&#x27;user&#x27;] = $nombre;</code></pre>
+</div></div>
+<details class="reveal reveal--solution">
+  <summary>💡 Ver solución</summary>
+  <div class="reveal__body"><ol>
+<li><strong>Inyección SQL</strong>: concatenación en <code>query()</code> → usar <code>prepare()</code>.</li>
+<li><strong>XSS</strong>: <code>$nombre</code> sin escapar en <code>echo</code> → usar <code>htmlspecialchars()</code>.</li>
+<li><strong>Cookie insegura</strong>: sin <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code>.</li>
+<li><strong>Session fixation</strong>: no se regenera el ID al iniciar sesión.</li>
+<li><strong>Sin validación</strong> del parámetro <code>nombre</code>.</li>
+</ol></div>
+</details>
+</div>
+  </div>
+</article><article class="block" id="bloque-k" data-block="bloque-k">
+  <header class="block__head">
+    <span class="block__num">K</span>
+    <h2>🚀 Proyecto integrador</h2>
+  </header>
+  <div class="block__body">
+    <section class="subsection" id="s-k-1"><h3>Enunciado</h3><p>Desarrolla un <strong>mini-portal de tareas</strong> con arquitectura cliente-servidor completa.</p></section><section class="subsection" id="s-k-2"><h3>Requisitos funcionales</h3><ol>
+<li><strong>Registro y login</strong> de usuarios (con hash y validación).</li>
+<li><strong>Roles</strong> <code>user</code> y <code>admin</code> con permisos diferenciados.</li>
+<li><strong>CRUD de tareas</strong> por usuario:
+  <ul><li>Añadir (título, descripción, prioridad).</li><li>Listar (con filtros: todas / pendientes / hechas).</li>
+  <li>Marcar como hecha.</li><li>Borrar.</li></ul></li>
+<li><strong>Persistencia</strong> en MySQL (PDO) o JSON.</li>
+<li><strong>Panel de admin</strong>:
+  <ul><li>Ver todas las tareas.</li><li>Gestionar usuarios (cambiar rol, borrar).</li><li>Ver logs de acceso.</li></ul></li>
+<li><strong>Seguridad</strong>:
+  <ul><li>CSRF en todos los formularios.</li><li>Escapado de salida.</li><li>Bloqueo tras 5 intentos fallidos.</li></ul></li>
+<li><strong>Entornos</strong>:
+  <ul><li>Detección <code>APP_ENV</code> (dev/prod).</li><li>Logs en producción.</li></ul></li>
+<li><strong>Interfaz</strong>:
+  <ul><li>HTML semántico + CSS propio.</li><li>Mensajes de éxito/error con clases.</li><li>Responsive básico.</li></ul></li>
+</ol></section><section class="subsection" id="s-k-3"><h3>Requisitos técnicos</h3><ul>
+<li>PHP 8.x con <code>declare(strict_types=1)</code>.</li>
+<li>Separación mínima: <code>config.php</code>, <code>funciones.php</code>, vistas.</li>
+<li>Uso de funciones propias (no todo en línea).</li>
+<li>Comentarios PHPDoc en funciones clave.</li></ul></section><section class="subsection" id="s-k-4"><h3>Rúbrica de evaluación</h3><div class="table-wrap"><table><thead><tr><th>Criterio</th><th>Peso</th><th>Descripción</th></tr></thead><tbody><tr><td>Funcionalidad completa</td><td>25%</td><td>Todos los requisitos funcionan</td></tr><tr><td>Seguridad</td><td>20%</td><td>CSRF, escapado, hash, sesiones</td></tr><tr><td>Uso de roles y permisos</td><td>15%</td><td>Matriz de permisos aplicada</td></tr><tr><td>Estructuras de control y funciones</td><td>15%</td><td>Código limpio y modular</td></tr><tr><td>Entornos dev/prod</td><td>10%</td><td>Detección y configuración</td></tr><tr><td>Interfaz usable</td><td>10%</td><td>HTML semántico, CSS, responsive</td></tr><tr><td>Documentación</td><td>5%</td><td>README con instrucciones</td></tr></tbody></table></div></section><section class="subsection" id="s-k-5"><h3>Entregables</h3><ul>
+<li>Código fuente en repositorio Git.</li>
+<li><code>README.md</code> con: instrucciones de instalación, credenciales de prueba, capturas de pantalla.</li>
+<li>Memoria breve (2–3 páginas) explicando decisiones técnicas.</li></ul></section>
+  </div>
+</article><article class="block" id="bloque-l" data-block="bloque-l">
+  <header class="block__head">
+    <span class="block__num">L</span>
+    <h2>🎓 Evaluación final</h2>
+  </header>
+  <div class="block__body">
+    <section class="subsection" id="s-l-1"><h3>L.1 Test teórico (20 preguntas)</h3><ol class="checklist checklist--numbered" data-group-list="test-l1"><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck34"><span>¿Qué diferencia hay entre un lenguaje de servidor y uno de cliente?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck35"><span>Cita 3 lenguajes de servidor y un caso de uso de cada uno.</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck36"><span>¿Qué método HTTP usarías para login? ¿Por qué?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck37"><span>¿Por qué el código PHP no aparece en “ver código fuente”?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck38"><span>¿Qué hace <code>htmlspecialchars()</code>?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck39"><span>¿Diferencia entre <code>==</code> y <code>===</code>?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck40"><span>¿Qué es un array asociativo? Pon un ejemplo.</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck41"><span>¿Cuándo usarías <code>foreach</code> en lugar de <code>for</code>?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck42"><span>¿Qué es una función recursiva? Pon un ejemplo.</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck43"><span>¿Diferencia entre parámetro por valor y por referencia?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck44"><span>¿Qué es una cookie? ¿Dónde se almacena?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck45"><span>¿Diferencia entre cookie y sesión?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck46"><span>¿Por qué no se deben guardar contraseñas en texto plano?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck47"><span>¿Qué hace <code>password_hash()</code> y por qué es seguro?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck48"><span>¿Qué es CSRF? ¿Cómo se mitiga?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck49"><span>¿Qué es XSS? ¿Cómo se mitiga?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck50"><span>¿Por qué usar consultas preparadas?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck51"><span>¿Qué es <code>session_regenerate_id()</code> y para qué sirve?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck52"><span>¿Diferencia entre entorno de desarrollo y producción?</span></label></li><li><label><input type="checkbox" class="track-check" data-group="test-l1" id="ck53"><span>¿Qué significa “entorno personalizado por usuario”?</span></label></li></ol></section><section class="subsection" id="s-l-2"><h3>L.2 Práctico cronometrado (2 horas)</h3><p><strong>Enunciado:</strong> Implementa desde cero un <strong>mini-blog</strong> con:</p>
+<ul><li>Registro/login.</li><li>Publicar entradas (título, contenido).</li>
+<li>Listar entradas (todas las públicas + las propias privadas).</li>
+<li>Editar/borrar solo las propias.</li><li>Panel admin: ver todas, borrar cualquiera.</li>
+<li>CSRF y validación.</li></ul></section><section class="subsection" id="s-l-3"><h3>L.3 Rúbrica global</h3><div class="table-wrap"><table><thead><tr><th>Bloque</th><th>Peso</th></tr></thead><tbody><tr><td>Test teórico</td><td>20%</td></tr><tr><td>Práctico cronometrado</td><td>30%</td></tr><tr><td>Proyecto integrador</td><td>40%</td></tr><tr><td>Participación y ejercicios</td><td>10%</td></tr></tbody></table></div></section>
+  </div>
+</article><article class="block" id="anexos" data-block="anexos">
+  <header class="block__head">
+    <span class="block__num">§</span>
+    <h2>📎 Anexos</h2>
+  </header>
+  <div class="block__body">
+    <section class="subsection" id="anexo-1"><h3>Anexo 1 — Temporalización (20 sesiones)</h3><div class="table-wrap"><table><thead><tr><th>Sesión</th><th>Bloques</th><th>Contenido</th><th>Horas</th></tr></thead><tbody><tr><td>1</td><td>0 + A</td><td>Contexto, test diagnóstico, lenguajes</td><td>2</td></tr><tr><td>2</td><td>A</td><td>Comparativa, actividad grupal</td><td>2</td></tr><tr><td>3</td><td>B</td><td>Ciclo HTTP, DevTools</td><td>2</td></tr><tr><td>4</td><td>C</td><td>Sintaxis, variables, operadores</td><td>2</td></tr><tr><td>5</td><td>C</td><td>Manejo de errores, ejercicio ficha</td><td>2</td></tr><tr><td>6</td><td>D</td><td>Condicionales, match</td><td>2</td></tr><tr><td>7</td><td>D</td><td>Bucles, ejercicios</td><td>2</td></tr><tr><td>8</td><td>E</td><td>Funciones básicas, ámbito</td><td>2</td></tr><tr><td>9</td><td>E</td><td>Closures, recursividad</td><td>2</td></tr><tr><td>10</td><td>F</td><td>Formularios, validación</td><td>2</td></tr><tr><td>11</td><td>F</td><td>CSRF, subida de ficheros</td><td>2</td></tr><tr><td>12</td><td>G</td><td>Cookies, sesiones</td><td>2</td></tr><tr><td>13</td><td>G</td><td>JSON, introducción a PDO</td><td>2</td></tr><tr><td>14</td><td>H</td><td>Registro y login</td><td>2</td></tr><tr><td>15</td><td>H</td><td>Roles y permisos</td><td>2</td></tr><tr><td>16</td><td>I</td><td>Entornos dev/prod</td><td>2</td></tr><tr><td>17</td><td>I</td><td>Entornos por usuario</td><td>2</td></tr><tr><td>18</td><td>J</td><td>Seguridad transversal</td><td>2</td></tr><tr><td>19</td><td>K</td><td>Proyecto (desarrollo)</td><td>2</td></tr><tr><td>20</td><td>L</td><td>Evaluación final</td><td>2</td></tr></tbody></table></div></section><section class="subsection" id="anexo-2"><h3>Anexo 2 — Soluciones a preguntas de autoevaluación</h3><details class="reveal reveal--solution">
+  <summary>Ver respuestas</summary>
+  <div class="reveal__body"><ol>
+<li><code>include</code> genera warning si falla; <code>require</code> error fatal.</li>
+<li><code>$_GET</code> puede contener código malicioso (XSS, inyección).</li>
+<li><code>password_hash()</code> usa bcrypt/argon2 con salt; <code>md5()</code> es rápido y vulnerable.</li>
+<li>Cookie para datos no sensibles y persistentes; sesión para datos sensibles temporales.</li>
+<li>Comprobando <code>$_SESSION['rol']</code> en <code>admin.php</code> con <code>requerirPermiso()</code>.</li>
+</ol></div>
+</details></section><section class="subsection" id="anexo-3"><h3>Anexo 3 — Recursos recomendados</h3><ul class="resourcelist">
+<li>📘 <a href="https://www.php.net/manual/es/" target="_blank" rel="noopener">PHP Manual (ES)</a></li>
+<li>📘 <a href="https://nodejs.org/docs/" target="_blank" rel="noopener">Node.js Docs</a></li>
+<li>🎓 <a href="https://developer.mozilla.org/es/docs/Learn/Server-side" target="_blank" rel="noopener">MDN — Server-side</a></li>
+<li>🔐 <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10</a></li>
+<li>🧪 <a href="https://onlinephp.io/" target="_blank" rel="noopener">PHP Sandbox</a></li>
+<li>📏 <a href="https://www.php-fig.org/psr/psr-12/" target="_blank" rel="noopener">PSR-12 Coding Standard</a></li>
+<li>🐳 <a href="https://hub.docker.com/_/php" target="_blank" rel="noopener">Docker PHP images</a></li>
+</ul></section>
+  </div>
+</article>
+  </main>
+</div>
+
+<footer class="sitefooter">
+  <p>Guía didáctica generada para el módulo <strong>Desarrollo Web en Entorno Servidor</strong> — 2º DAM. Formateo interactivo de un documento fuente proporcionado por el profesorado.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- THEME ---------- */
+var themeBtn = document.getElementById('theme-toggle');
+var themeIcon = document.getElementById('theme-icon');
+var themeLabel = document.getElementById('theme-label');
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  if(themeIcon) themeIcon.textContent = t === 'dark' ? '☀️' : '🌙';
+  if(themeLabel) themeLabel.textContent = t === 'dark' ? 'Modo claro' : 'Modo oscuro';
+  try{ localStorage.setItem('guia-php-theme', t); }catch(e){}
+}
+var savedTheme = null;
+try{ savedTheme = localStorage.getItem('guia-php-theme'); }catch(e){}
+if(!savedTheme){
+  savedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+applyTheme(savedTheme);
+if(themeBtn){
+  themeBtn.addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    applyTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+}
+
+/* ---------- PRINT ---------- */
+var printBtn = document.getElementById('print-btn');
+if(printBtn) printBtn.addEventListener('click', function(){ window.print(); });
+
+/* ---------- SCROLL PROGRESS ---------- */
+var scrollbar = document.getElementById('scrollbar');
+function updateScrollbar(){
+  var h = document.documentElement;
+  var scrolled = h.scrollTop;
+  var height = h.scrollHeight - h.clientHeight;
+  var pct = height > 0 ? (scrolled / height) * 100 : 0;
+  if(scrollbar){ scrollbar.style.width = pct + '%'; scrollbar.setAttribute('aria-valuenow', Math.round(pct)); }
+}
+document.addEventListener('scroll', updateScrollbar, {passive:true});
+updateScrollbar();
+
+/* ---------- SYNTAX HIGHLIGHT (lightweight, regex-based) ---------- */
+var KEYWORDS = {
+  php: ['declare','strict_types','function','return','if','elseif','else','foreach','as','for','while','do','switch','case','break','default','match','true','false','null','const','define','class','new','try','catch','throw','global','use','fn','void','int','float','string','bool','array','echo','exit','require','include','public','private','static','session_start','isset','empty','unset'],
+  javascript: ['const','let','var','function','return','if','else','for','while','require','app','res','req','fetch','then','console','log','class','new','export','import'],
+  python: ['from','import','def','return','if','else','elif','for','while','class','app','route','request','Flask'],
+  html: [],
+  text: []
+};
+function escHtmlAlready(s){ return s; } // content is already html-escaped text node
+
+function highlightPhp(escaped){
+  var out = escaped;
+  // comments (// ... and /* ... */)
+  out = out.replace(/(\/\/.*$)/gm, '§C§$1§/C§');
+  out = out.replace(/(\/\*[\s\S]*?\*\/)/g, '§C§$1§/C§');
+  // strings
+  out = out.replace(/("(?:[^"\\]|\\.)*")/g, '§S§$1§/S§');
+  out = out.replace(/('(?:[^'\\]|\\.)*')/g, '§S§$1§/S§');
+  // variables
+  out = out.replace(/(\$[a-zA-Z_][a-zA-Z0-9_]*)/g, '§V§$1§/V§');
+  // numbers
+  out = out.replace(/\b(\d+(\.\d+)?)\b/g, '§N§$1§/N§');
+  // function calls fn(
+  out = out.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\()/g, function(m, name){
+    if(KEYWORDS.php.indexOf(name) !== -1) return m;
+    return '§F§'+name+'§/F§';
+  });
+  // keywords
+  KEYWORDS.php.forEach(function(k){
+    var re = new RegExp('\\b('+k+')\\b','g');
+    out = out.replace(re, '§K§$1§/K§');
+  });
+  return finalize(out);
+}
+function highlightGeneric(escaped, lang){
+  var out = escaped;
+  out = out.replace(/(\/\/.*$)/gm, '§C§$1§/C§');
+  out = out.replace(/(#.*$)/gm, function(m){ return lang==='python' ? '§C§'+m+'§/C§' : m; });
+  out = out.replace(/("(?:[^"\\]|\\.)*")/g, '§S§$1§/S§');
+  out = out.replace(/('(?:[^'\\]|\\.)*')/g, '§S§$1§/S§');
+  out = out.replace(/(`(?:[^`\\]|\\.)*`)/g, '§S§$1§/S§');
+  out = out.replace(/\b(\d+(\.\d+)?)\b/g, '§N§$1§/N§');
+  var kws = KEYWORDS[lang] || [];
+  kws.forEach(function(k){
+    var re = new RegExp('\\b('+k+')\\b','g');
+    out = out.replace(re, '§K§$1§/K§');
+  });
+  return finalize(out);
+}
+function highlightHtml(escaped){
+  var out = escaped;
+  out = out.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '§C§$1§/C§');
+  out = out.replace(/(&lt;\/?[a-zA-Z][a-zA-Z0-9]*)/g, '§T§$1§/T§');
+  out = out.replace(/([a-zA-Z-]+)(=)(&quot;.*?&quot;|&#039;.*?&#039;)/g, '§A§$1§/A§$2§S§$3§/S§');
+  return finalize(out);
+}
+function finalize(s){
+  s = s.replace(/§C§/g,'<span class="tok-com">').replace(/§\/C§/g,'</span>');
+  s = s.replace(/§S§/g,'<span class="tok-str">').replace(/§\/S§/g,'</span>');
+  s = s.replace(/§V§/g,'<span class="tok-var">').replace(/§\/V§/g,'</span>');
+  s = s.replace(/§N§/g,'<span class="tok-num">').replace(/§\/N§/g,'</span>');
+  s = s.replace(/§F§/g,'<span class="tok-fn">').replace(/§\/F§/g,'</span>');
+  s = s.replace(/§K§/g,'<span class="tok-kw">').replace(/§\/K§/g,'</span>');
+  s = s.replace(/§T§/g,'<span class="tok-tag">').replace(/§\/T§/g,'</span>');
+  s = s.replace(/§A§/g,'<span class="tok-attr">').replace(/§\/A§/g,'</span>');
+  return s;
+}
+document.querySelectorAll('.codeblock code').forEach(function(el){
+  var lang = (el.className.match(/lang-(\w+)/) || [])[1] || 'text';
+  var escaped = el.innerHTML; // already html-escaped by the generator
+  var result;
+  if(lang === 'php') result = highlightPhp(escaped);
+  else if(lang === 'html') result = highlightHtml(escaped);
+  else if(lang === 'javascript' || lang === 'python') result = highlightGeneric(escaped, lang);
+  else result = escaped;
+  el.innerHTML = result;
+});
+
+/* ---------- COPY BUTTONS ---------- */
+document.querySelectorAll('.copybtn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var targetId = btn.getAttribute('data-target');
+    var codeEl = document.getElementById(targetId);
+    if(!codeEl) return;
+    var text = codeEl.textContent;
+    var done = function(){
+      var span = btn.querySelector('span:last-child');
+      var original = span ? span.textContent : '';
+      btn.classList.add('copied');
+      if(span) span.textContent = '¡Copiado!';
+      setTimeout(function(){ btn.classList.remove('copied'); if(span) span.textContent = original; }, 1500);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text); done();
+    }
+  });
+});
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ---------- SCROLLSPY ---------- */
+var navlinks = Array.prototype.slice.call(document.querySelectorAll('.navlink'));
+var blocks = Array.prototype.slice.call(document.querySelectorAll('.block'));
+function setActive(id){
+  navlinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-navid') === id); });
+}
+if('IntersectionObserver' in window && blocks.length){
+  var io = new IntersectionObserver(function(entries){
+    var visible = entries.filter(function(e){ return e.isIntersecting; });
+    if(visible.length){
+      visible.sort(function(a,b){ return a.boundingClientRect.top - b.boundingClientRect.top; });
+      setActive(visible[0].target.id);
+    }
+  }, {rootMargin:'-10% 0px -70% 0px', threshold:[0,1]});
+  blocks.forEach(function(b){ io.observe(b); });
+}
+
+/* ---------- SEARCH ---------- */
+var searchInput = document.getElementById('search-input');
+var searchResults = document.getElementById('search-results');
+var searchIndex = [];
+document.querySelectorAll('.content h2, .content h3, .content h4').forEach(function(h){
+  searchIndex.push({ el: h, text: h.textContent.trim().toLowerCase(), display: h.textContent.trim() });
+});
+function runSearch(q){
+  q = q.trim().toLowerCase();
+  searchResults.innerHTML = '';
+  if(!q){ searchResults.hidden = true; return; }
+  var matches = searchIndex.filter(function(item){ return item.text.indexOf(q) !== -1; }).slice(0, 12);
+  if(!matches.length){
+    searchResults.innerHTML = '<div class="noresult">Sin resultados para “'+q.replace(/</g,'&lt;')+'”.</div>';
+  } else {
+    matches.forEach(function(m){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = m.display;
+      b.addEventListener('click', function(){
+        m.el.scrollIntoView({behavior:'smooth', block:'start'});
+        m.el.classList.add('search-hit-flash');
+        setTimeout(function(){ m.el.classList.remove('search-hit-flash'); }, 1600);
+        searchResults.hidden = true;
+        searchInput.value = '';
+      });
+      searchResults.appendChild(b);
+    });
+  }
+  searchResults.hidden = false;
+}
+if(searchInput){
+  searchInput.addEventListener('input', function(){ runSearch(searchInput.value); });
+  searchInput.addEventListener('focus', function(){ if(searchInput.value) runSearch(searchInput.value); });
+  document.addEventListener('click', function(e){
+    if(!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.hidden = true;
+  });
+}
+var flashStyle = document.createElement('style');
+flashStyle.textContent = '.search-hit-flash{ animation: searchflash 1.6s ease; } @keyframes searchflash { 0%,100%{ background: transparent; } 20%{ background: var(--accent-soft); } }';
+document.head.appendChild(flashStyle);
+
+/* ---------- CHECKLIST PERSISTENCE + PROGRESS ---------- */
+var STORAGE_KEY = 'guia-php-checks';
+function loadChecks(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch(e){ return {}; }
+}
+function saveChecks(obj){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }catch(e){}
+}
+var checksState = loadChecks();
+var allChecks = Array.prototype.slice.call(document.querySelectorAll('.track-check'));
+allChecks.forEach(function(cb){
+  if(checksState[cb.id]) cb.checked = true;
+  cb.addEventListener('change', function(){
+    checksState[cb.id] = cb.checked;
+    saveChecks(checksState);
+    updateProgress();
+  });
+});
+
+function updateProgress(){
+  // per-block progress
+  blocks.forEach(function(block){
+    var checks = block.querySelectorAll('.track-check');
+    if(!checks.length) return;
+    var checked = Array.prototype.filter.call(checks, function(c){ return c.checked; }).length;
+    var dot = document.querySelector('[data-progress-for="'+block.id+'"]');
+    if(dot){
+      dot.classList.toggle('has-progress', checked > 0);
+      dot.title = checked + '/' + checks.length + ' completado';
+    }
+  });
+  // overall
+  var total = allChecks.length;
+  var done = allChecks.filter(function(c){ return c.checked; }).length;
+  var pct = total > 0 ? Math.round((done/total)*100) : 0;
+  var fill = document.getElementById('overall-progress-fill');
+  var label = document.getElementById('overall-progress-label');
+  if(fill) fill.style.width = pct + '%';
+  if(label) label.textContent = 'Progreso: ' + pct + '% (' + done + '/' + total + ')';
+}
+updateProgress();
+
+/* ---------- HTTP CYCLE DIAGRAM ---------- */
+(function(){
+  var container = document.getElementById('diagrama-http');
+  if(!container) return;
+  var W = 720, H = 260;
+  var lanes = [
+    {x:70, label:'🖥️ Navegador'},
+    {x:270, label:'🗄️ Servidor web'},
+    {x:470, label:'🐘 Intérprete PHP'},
+    {x:650, label:'🛢️ Base de datos'}
+  ];
+  var steps = [
+    {from:0, to:1, label:'GET /saludo.php?nombre=Ana', kind:'req'},
+    {from:1, to:2, label:'Ejecuta saludo.php', kind:'req'},
+    {from:2, to:3, label:'(opcional) consulta datos', kind:'req'},
+    {from:3, to:2, label:'Resultados', kind:'resp'},
+    {from:2, to:1, label:'HTML generado', kind:'resp'},
+    {from:1, to:0, label:'200 OK + HTML', kind:'resp'}
+  ];
+  var stepGap = 34, startY = 56;
+  var svgns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(svgns,'svg');
+  svg.setAttribute('viewBox','0 0 '+W+' '+(startY + steps.length*stepGap + 60));
+  svg.setAttribute('preserveAspectRatio','xMidYMin meet');
+
+  lanes.forEach(function(l){
+    var box = document.createElementNS(svgns,'rect');
+    box.setAttribute('x', l.x-45); box.setAttribute('y', 6); box.setAttribute('width', 90); box.setAttribute('height', 30);
+    box.setAttribute('rx', 6); box.setAttribute('class','node-box');
+    svg.appendChild(box);
+    var txt = document.createElementNS(svgns,'text');
+    txt.setAttribute('x', l.x); txt.setAttribute('y', 25); txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('class','node-label'); txt.textContent = l.label;
+    svg.appendChild(txt);
+    var line = document.createElementNS(svgns,'line');
+    line.setAttribute('x1', l.x); line.setAttribute('y1', 36);
+    line.setAttribute('x2', l.x); line.setAttribute('y2', startY + steps.length*stepGap + 20);
+    line.setAttribute('class','lane-line');
+    svg.appendChild(line);
+  });
+
+  var arrowGroups = [];
+  steps.forEach(function(s, i){
+    var y = startY + i*stepGap;
+    var x1 = lanes[s.from].x, x2 = lanes[s.to].x;
+    var g = document.createElementNS(svgns,'g');
+    g.setAttribute('opacity','0');
+    var line = document.createElementNS(svgns,'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y);
+    line.setAttribute('class', s.kind === 'resp' ? 'msg-line msg-line--resp' : 'msg-line');
+    line.setAttribute('marker-end','url(#arrow-'+i+')');
+    var marker = document.createElementNS(svgns,'marker');
+    marker.setAttribute('id','arrow-'+i);
+    marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','8');
+    marker.setAttribute('refX','6'); marker.setAttribute('refY','3'); marker.setAttribute('orient', x2>x1 ? 'auto':'auto-start-reverse');
+    var mp = document.createElementNS(svgns,'path');
+    mp.setAttribute('d','M0,0 L6,3 L0,6 Z');
+    mp.setAttribute('fill', s.kind === 'resp' ? 'var(--accent-2)' : 'var(--accent)');
+    marker.appendChild(mp);
+    svg.appendChild(marker);
+    g.appendChild(line);
+    var label = document.createElementNS(svgns,'text');
+    label.setAttribute('x', (x1+x2)/2); label.setAttribute('y', y - 6);
+    label.setAttribute('text-anchor','middle'); label.setAttribute('class','msg-label');
+    label.textContent = s.label;
+    g.appendChild(label);
+    svg.appendChild(g);
+    arrowGroups.push(g);
+  });
+
+  container.appendChild(svg);
+  var controls = document.createElement('div');
+  controls.className = 'httpdiagram-controls';
+  var playBtn = document.createElement('button');
+  playBtn.className = 'btn btn--accent'; playBtn.type='button'; playBtn.textContent = '▶ Reproducir secuencia';
+  var resetBtn = document.createElement('button');
+  resetBtn.className = 'btn'; resetBtn.type='button'; resetBtn.textContent = '↺ Reiniciar';
+  controls.appendChild(playBtn); controls.appendChild(resetBtn);
+  container.appendChild(controls);
+
+  function reset(){ arrowGroups.forEach(function(g){ g.setAttribute('opacity','0'); }); }
+  function play(){
+    reset();
+    arrowGroups.forEach(function(g, i){
+      setTimeout(function(){ g.setAttribute('opacity','1'); }, i*550);
+    });
+  }
+  playBtn.addEventListener('click', play);
+  resetBtn.addEventListener('click', reset);
+})();
+
+/* ---------- BORDER SIMULATOR (signature demo) ---------- */
+(function(){
+  var input = document.getElementById('frontera-nombre');
+  var sendBtn = document.getElementById('frontera-send');
+  var output = document.getElementById('frontera-output');
+  var barrier = document.getElementById('frontera-barrier');
+  var packet = document.getElementById('frontera-packet');
+  var stamp = document.getElementById('frontera-stamp');
+  if(!input || !sendBtn) return;
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function render(){
+    var nombre = input.value.trim() || 'invitado';
+    var safe = escapeHtml(nombre);
+    var fecha = new Date();
+    var f = String(fecha.getDate()).padStart(2,'0')+'/'+String(fecha.getMonth()+1).padStart(2,'0')+'/'+fecha.getFullYear()+' '+String(fecha.getHours()).padStart(2,'0')+':'+String(fecha.getMinutes()).padStart(2,'0');
+    var NL = String.fromCharCode(10);
+    var htmlOut = '&lt;!DOCTYPE html&gt;'+NL+'&lt;html&gt;'+NL+'&lt;head&gt;&lt;title&gt;Saludo&lt;/title&gt;&lt;/head&gt;'+NL+'&lt;body&gt;'+NL+'  &lt;h1&gt;Hola, '+safe+' 👋&lt;/h1&gt;'+NL+'  &lt;p&gt;Fecha: '+f+'&lt;/p&gt;'+NL+'&lt;/body&gt;'+NL+'&lt;/html&gt;';
+    output.innerHTML = htmlOut;
+  }
+  render();
+
+  sendBtn.addEventListener('click', function(){
+    sendBtn.disabled = true;
+    barrier.classList.remove('open'); packet.classList.remove('fly'); stamp.classList.remove('show');
+    void packet.offsetWidth;
+    packet.style.opacity = '0';
+    setTimeout(function(){
+      barrier.classList.add('open');
+      packet.classList.add('fly');
+    }, 30);
+    setTimeout(function(){ render(); stamp.classList.add('show'); }, 560);
+    setTimeout(function(){
+      barrier.classList.remove('open');
+      sendBtn.disabled = false;
+    }, 1500);
+  });
+  input.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); sendBtn.click(); } });
+})();
+
+})();
+
+</script>
+</body>
+</html>
