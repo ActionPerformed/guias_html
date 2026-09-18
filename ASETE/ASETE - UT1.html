@@ -93,7 +93,7 @@ code,kbd,pre{font-family:'IBM Plex Mono',ui-monospace,monospace}
 .nav-link .num{font-family:'IBM Plex Mono';font-size:12px;color:var(--muted);flex:none;width:18px}
 .nav-link:hover{background:var(--surface-2);color:var(--ink)}
 .nav-link.active{background:var(--surface);border-left-color:var(--teal);font-weight:700;color:var(--teal-2)}
-main{padding:0 clamp(18px,4vw,56px) 140px;max-width:940px}
+main{padding:0 clamp(18px,4vw,56px) 140px}
 section{padding:46px 0 10px;border-top:1px dashed var(--line)}
 section:first-of-type{border-top:0}
 .section-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
@@ -142,7 +142,7 @@ main p,main li{max-width:72ch}
   padding:14px 8px 14px 0;text-align:right;color:#3E6A63;font-size:13.5px;line-height:1.65;
   font-family:'IBM Plex Mono';user-select:none;border-right:1px solid rgba(255,255,255,.07);overflow:hidden
 }
-.editor-stack{position:relative;overflow:auto;max-height:46vh}
+.editor-stack{position:relative;overflow:auto;max-height:500vh}
 .editor-stack pre,.editor-stack textarea{
   margin:0;padding:14px 16px;font-size:13.5px;line-height:1.65;font-family:'IBM Plex Mono';
   white-space:pre;tab-size:4;border:0
@@ -3722,6 +3722,7 @@ var COMPAT = [
           body.className = "out-body";
           var pre = document.createElement("pre");
           pre.textContent = result.output || "(sin salida)";
+		  body.innerHTML = "";
           body.appendChild(pre);
           appendDiag(body);
         } }
@@ -3793,8 +3794,8 @@ var COMPAT = [
       pre.innerHTML = highlight(code, "php") + "\n";
       var lines = code.split("\n").length;
       var g = "";
-      for (var i = 1; i <= lines; i++) g += i + "\n";
-      gutter.textContent = g;
+      for (var i = 1; i <= lines; i++) g += i + "<br/>";
+      gutter.innerHTML = g;
       gutter.scrollTop = stack.scrollTop;
     }
     function setCode(code, autorun) {

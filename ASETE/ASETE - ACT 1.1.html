@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini-Biblioteca PHP · Actividad evaluable · 2º DAM</title>
+<meta name="description" content="Proyecto guiado de PHP en cinco bloques: arrays, foreach, funciones, switch y login simulado. Actividad evaluable de 4 horas para 2º DAM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7E4D9;
+  --card:#FBF9F3;
+  --card-2:#F2EFE5;
+  --ink:#22201B;
+  --muted:#6B6659;
+  --line:#CBC5B4;
+  --line-soft:#DED9CA;
+  --olive:#3E5233;
+  --olive-2:#2C3B24;
+  --burgundy:#7C2C3E;
+  --burgundy-soft:#F3E2E5;
+  --ochre:#A86F0E;
+  --ochre-soft:#F6EBD2;
+  --olive-soft:#E4EBDB;
+  --code-bg:#23261F;
+  --code-ink:#E7E6DA;
+  --k:#E8B96A;
+  --s:#B7CE92;
+  --v:#93C8D6;
+  --c:#8A8D7C;
+  --n:#E5A3B0;
+  --f:#EFE7BE;
+  --t:#9FD9C4;
+  --shadow:0 12px 30px -22px rgba(34,32,27,.7);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Work Sans',system-ui,sans-serif;font-size:17px;line-height:1.6;
+  background-image:repeating-linear-gradient(to bottom,transparent 0 33px,rgba(62,82,51,.07) 33px 34px);
+}
+h1,h2,h3,h4{margin:0;line-height:1.15}
+h1,h2,.serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.005em}
+h3,h4{font-family:'Work Sans';font-weight:700;letter-spacing:-.01em}
+p{margin:0 0 1em}
+a{color:var(--burgundy);text-underline-offset:3px}
+a:hover{color:var(--olive-2)}
+:focus-visible{outline:3px solid var(--ochre);outline-offset:2px;border-radius:2px}
+code,pre,kbd{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+/* ---------- barra superior ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;background:rgba(251,249,243,.95);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line)
+}
+.topbar-in{max-width:1080px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:14px}
+.sig{font-family:'Instrument Serif';font-size:19px;white-space:nowrap}
+.sig b{font-family:'Work Sans';font-weight:700;font-size:12px;letter-spacing:.04em;background:var(--olive);color:#fff;padding:2px 8px;border-radius:2px;margin-right:8px;vertical-align:2px}
+.topbar .spacer{flex:1}
+.score{font-family:'JetBrains Mono';font-size:13px;color:var(--muted);white-space:nowrap}
+.score b{color:var(--olive-2);font-size:15px}
+.bar{height:8px;background:var(--card-2);border:1px solid var(--line);border-radius:2px;overflow:hidden;width:180px}
+.bar span{display:block;height:100%;width:0;background:var(--olive);transition:width .25s}
+.topnav{border-bottom:1px solid var(--line);background:var(--card-2);overflow-x:auto}
+.topnav-in{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;gap:2px}
+.topnav a{
+  font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none;padding:9px 12px;white-space:nowrap;
+  border-bottom:2px solid transparent
+}
+.topnav a:hover{color:var(--ink)}
+.topnav a.active{color:var(--olive-2);border-bottom-color:var(--olive);background:var(--card)}
+
+/* ---------- estructura ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 120px}
+.hero{padding:52px 0 26px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:'JetBrains Mono';font-size:12.5px;color:var(--burgundy);margin-bottom:16px}
+.hero h1{font-size:clamp(40px,7vw,74px);margin-bottom:14px}
+.hero h1 i{color:var(--olive)}
+.lede{font-size:19px;color:var(--muted);max-width:60ch}
+.facts{display:flex;flex-wrap:wrap;gap:0;margin:28px 0 4px;border:1px solid var(--line);background:var(--card)}
+.fact{padding:13px 18px;border-right:1px solid var(--line);flex:1 1 150px}
+.fact:last-child{border-right:0}
+.fact dt{font-family:'JetBrains Mono';font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.fact dd{margin:0;font-weight:600;font-size:16px}
+section{padding:44px 0 6px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.sec-head h2{font-size:clamp(27px,3.6vw,38px)}
+.sec-num{font-family:'JetBrains Mono';font-size:12px;color:var(--olive);border:1px solid var(--olive);padding:2px 8px;border-radius:2px;flex:none}
+.sec-sub{color:var(--muted);margin-bottom:22px;max-width:62ch}
+p,li{max-width:74ch}
+
+/* ---------- avisos ---------- */
+.banner{
+  display:flex;gap:16px;align-items:flex-start;background:var(--ochre-soft);border:1px solid #DEC48A;
+  border-left:5px solid var(--ochre);padding:16px 18px;margin:26px 0
+}
+.banner h3{font-size:16.5px;margin-bottom:5px}
+.banner p:last-child{margin-bottom:0}
+.banner .ico{font-size:22px;line-height:1}
+.real{
+  background:var(--card-2);border:1px solid var(--line);border-left:5px solid #2E5C86;
+  padding:16px 18px;margin:22px 0
+}
+.real h4{font-size:15.5px;margin-bottom:8px;color:#1E3E5C}
+.real p:last-child{margin-bottom:0}
+.note{border:1px solid var(--line);border-left:5px solid var(--burgundy);background:var(--card);padding:15px 18px;margin:20px 0}
+.note h4{margin-bottom:5px;font-size:16px}
+.note p:last-child{margin-bottom:0}
+
+/* ---------- tablas ---------- */
+.tw{overflow-x:auto;margin:20px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:15.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--card-2);font-weight:700;font-size:14px}
+td.mono,th.mono{font-family:'JetBrains Mono';font-size:13.5px}
+.yes{color:var(--olive);font-weight:700}
+.no{color:var(--burgundy);font-weight:700}
+.warnv{color:var(--ochre);font-weight:700}
+
+/* ---------- bloques (acordeón) ---------- */
+.block{border:1px solid var(--line);background:var(--card);margin:18px 0;box-shadow:var(--shadow)}
+.block.done{border-color:var(--olive)}
+.block-head{
+  width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:transparent;
+  border:0;cursor:pointer;text-align:left;font-family:inherit;color:inherit
+}
+.block-head:hover{background:var(--card-2)}
+.bn{
+  font-family:'Instrument Serif';font-size:26px;width:44px;height:44px;flex:none;border-radius:50%;
+  background:var(--olive);color:#fff;display:grid;place-items:center
+}
+.block.done .bn{background:var(--burgundy)}
+.bh-text{flex:1;min-width:0}
+.bh-text h3{font-size:19px;font-family:'Instrument Serif';font-weight:400;letter-spacing:0}
+.bh-text .covers{font-size:13.5px;color:var(--muted)}
+.bh-meta{display:flex;align-items:center;gap:12px;flex:none}
+.pill{font-family:'JetBrains Mono';font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:2px;background:var(--card-2);color:var(--muted)}
+.pill.count{border-color:var(--olive);color:var(--olive-2)}
+.pill.count.full{background:var(--olive);color:#fff;border-color:var(--olive)}
+.chev{color:var(--olive);transition:transform .2s;font-size:13px}
+.block-head[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.block-body{border-top:1px solid var(--line);padding:4px 18px 22px}
+.block-body[hidden]{display:none}
+
+/* ---------- cronómetro ---------- */
+.timer{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card-2);
+  border:1px solid var(--line);padding:11px 14px;margin:16px 0 4px
+}
+.clock{font-family:'JetBrains Mono';font-size:25px;font-weight:700;letter-spacing:-.02em;min-width:98px}
+.clock.low{color:var(--ochre)}
+.clock.over{color:var(--burgundy)}
+.timer .hint{font-size:13.5px;color:var(--muted);flex:1;min-width:140px}
+.tbtn{
+  font-family:'Work Sans';font-weight:600;font-size:13px;cursor:pointer;background:var(--card);
+  border:1px solid var(--line);padding:6px 12px;border-radius:2px;color:var(--ink)
+}
+.tbtn:hover{border-color:var(--olive);color:var(--olive-2)}
+.tbtn.primary{background:var(--olive);border-color:var(--olive-2);color:#fff}
+.tbtn.primary:hover{background:var(--olive-2);color:#fff}
+
+/* ---------- pestañas ---------- */
+.tabs{display:flex;gap:2px;margin:18px 0 0;border-bottom:1px solid var(--line)}
+.tab{
+  font-family:'Work Sans';font-weight:600;font-size:14px;cursor:pointer;background:transparent;border:0;
+  padding:9px 15px;color:var(--muted);border-bottom:2px solid transparent
+}
+.tab[aria-selected="true"]{color:var(--olive-2);border-bottom-color:var(--olive)}
+.tab:hover{color:var(--ink)}
+.panel{padding-top:16px}
+.panel[hidden]{display:none}
+.panel ol,.panel ul{padding-left:22px}
+.panel li{margin-bottom:7px}
+
+/* ---------- código ---------- */
+.code{margin:16px 0}
+.code-head{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#1A1D17;border:1px solid #11130E;
+  border-bottom:0;padding:7px 12px;font-family:'JetBrains Mono';font-size:12px;color:#B9BCAC
+}
+.code-head .spacer{flex:1}
+.cbtn{
+  font-family:'Work Sans';font-weight:600;font-size:12.5px;cursor:pointer;background:transparent;
+  border:1px solid rgba(255,255,255,.2);color:#D8DACB;padding:4px 11px;border-radius:2px
+}
+.cbtn:hover{background:rgba(255,255,255,.1)}
+.cbtn.copied{color:#B7CE92;border-color:#B7CE92}
+pre.src{
+  margin:0;padding:14px 16px;background:var(--code-bg);color:var(--code-ink);border:1px solid #11130E;
+  overflow-x:auto;font-size:13.5px;line-height:1.62
+}
+.tok-k{color:var(--k)}.tok-s{color:var(--s)}.tok-v{color:var(--v)}.tok-c{color:var(--c);font-style:italic}
+.tok-n{color:var(--n)}.tok-f{color:var(--f)}.tok-t{color:var(--t);font-weight:500}
+pre.ascii{
+  margin:14px 0;padding:14px 16px;background:var(--card-2);border:1px dashed var(--line);
+  overflow-x:auto;font-size:13px;line-height:1.5;color:var(--muted)
+}
+.inline{background:var(--card-2);border:1px solid var(--line-soft);padding:1px 5px;font-family:'JetBrains Mono';font-size:.86em}
+
+/* ---------- criterios ---------- */
+.criteria{border:1px solid var(--line);background:var(--card-2);padding:4px 16px 14px;margin:20px 0 0}
+.criteria h4{margin:16px 0 10px;font-size:15px;display:flex;align-items:center;gap:9px}
+.criteria h4 .of{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);font-weight:400}
+.crit{list-style:none;padding:0;margin:0}
+.crit li{
+  display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line-soft);
+  padding:10px 13px;margin-bottom:7px;cursor:pointer;font-size:15.5px
+}
+.crit li:hover{border-color:var(--olive)}
+.crit li.ok{background:var(--olive-soft);border-color:#BDCDAE}
+.crit .box{
+  width:19px;height:19px;flex:none;margin-top:2px;border:2px solid var(--olive);background:var(--card);
+  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700
+}
+.crit li.ok .box{background:var(--olive)}
+.crit li.ok .box::after{content:"✓"}
+.crit li span.txt{flex:1}
+.opt{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);border:1px solid var(--line);padding:1px 6px;align-self:center}
+
+/* ---------- varios ---------- */
+.reveal{margin:4px 0 0}
+.pika-wrap{border:1px solid var(--line);background:var(--code-bg);padding:18px 20px;margin:14px 0}
+pre.pika{margin:0;color:#F4D658;font-size:12.5px;line-height:1.15;text-align:center;white-space:pre}
+.pika-cap{margin:14px 0 0;color:var(--code-ink);font-size:14px;text-align:center;font-family:'Work Sans';max-width:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:20px 0}
+.mini{border:1px solid var(--line);background:var(--card);padding:15px 17px}
+.mini h4{margin-bottom:6px}
+.mini p{margin:0;font-size:15px;color:var(--muted)}
+.retos{counter-reset:r;list-style:none;padding:0;margin:20px 0}
+.retos li{
+  counter-increment:r;display:flex;gap:13px;align-items:flex-start;background:var(--card);
+  border:1px solid var(--line);padding:13px 15px;margin-bottom:8px
+}
+.retos li::before{
+  content:counter(r);font-family:'Instrument Serif';font-size:22px;color:var(--burgundy);
+  width:28px;flex:none;text-align:center;line-height:1.1
+}
+.foot{border-top:2px solid var(--ink);margin-top:56px;padding-top:22px;color:var(--muted);font-size:14.5px}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);z-index:90;
+  background:var(--ink);color:#F3F1E8;padding:10px 18px;font-size:14px;border-radius:2px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
+}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+.btn{
+  font-family:'Work Sans';font-weight:600;font-size:14.5px;cursor:pointer;background:var(--olive);
+  border:1px solid var(--olive-2);color:#fff;padding:10px 17px;border-radius:2px
+}
+.btn:hover{background:var(--olive-2)}
+.btn.sec{background:var(--card);color:var(--olive-2);border-color:var(--line)}
+.btn.sec:hover{background:var(--card-2);border-color:var(--olive)}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  .bar{display:none}
+  .bh-meta{flex-direction:column;align-items:flex-end;gap:5px}
+  .fact{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .fact:last-child{border-bottom:0}
+  .block-body{padding:4px 13px 18px}
+}
+@media print{
+  .topbar,.topnav,.timer,.cbtn,.btn,.toast,.reveal{display:none}
+  .block-body,.panel{display:block!important}
+  .panel[hidden],.block-body[hidden]{display:block!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="sig"><b>2º DAM</b> Mini-Biblioteca PHP</div>
+    <div class="spacer"></div>
+    <div class="score" id="score">0 / 24 criterios</div>
+    <div class="bar" title="Progreso según los criterios marcados"><span id="barFill"></span></div>
+  </div>
+  <nav class="topnav"><div class="topnav-in" id="topnav">
+    <a href="#inicio">Inicio</a>
+    <a href="#entorno">Entorno</a>
+    <a href="#plan">Plan</a>
+    <a href="#b1">1 · Primer script</a>
+    <a href="#b2">2 · Catálogo</a>
+    <a href="#b3">3 · Funciones</a>
+    <a href="#b4">4 · Formulario</a>
+    <a href="#b5">5 · Login</a>
+    <a href="#cierre">Cierre</a>
+    <a href="#retos">Retos</a>
+  </div></nav>
+</header>
+
+<div class="wrap">
+
+<section class="hero" id="inicio">
+  <div class="eyebrow">Actividad evaluable · Primera práctica de PHP · 4 horas</div>
+  <h1>Proyecto <i>Mini-Biblioteca</i></h1>
+  <p class="lede">Un mismo catálogo de libros que crece en cinco pasos: de un array escrito a mano hasta un panel con usuarios y roles. Cada bloque añade un único concepto nuevo y se entrega funcionando.</p>
+  <dl class="facts">
+    <div class="fact"><dt>Duración</dt><dd>4 horas · 5 bloques</dd></div>
+    <div class="fact"><dt>Entorno</dt><dd>Playground PHP online</dd></div>
+    <div class="fact"><dt>Cobertura</dt><dd>7 de 7 objetivos</dd></div>
+    <div class="fact"><dt>Entrega</dt><dd>Un script por bloque</dd></div>
+  </dl>
+  <div class="actions">
+    <button class="btn" id="dlPlantilla">Descargar plantillas de partida (.php)</button>
+    <button class="btn sec" id="goB1">Empezar por el bloque 1</button>
+  </div>
+  <p style="font-size:15px;color:var(--muted)">Cada bloque trae su cronómetro, sus pistas y sus criterios de evaluación. Marca los criterios conforme los cumplas: la barra de arriba te dice cuánto llevas del proyecto completo.</p>
+</section>
+
+<section id="entorno">
+  <div class="sec-head"><span class="sec-num">00</span><h2>Antes de empezar</h2></div>
+  <p class="sec-sub">Vas a trabajar en un playground online (3v4l.org, onlinephp.io o similar). No es un servidor completo, y conviene saber qué falta.</p>
+
+  <div class="banner">
+    <span class="ico">⚠️</span>
+    <div>
+      <h3>Lo que no funciona, se simula</h3>
+      <p style="margin-bottom:0">Todo lo que el playground no soporta lo sustituimos por variables normales y dejamos un comentario explicando cómo sería en producción. Esa es la regla de la actividad y también un hábito profesional: saber qué estás simulando.</p>
+    </div>
+  </div>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Concepto</th><th>¿Funciona?</th><th>Cómo lo tratamos</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Variables, bucles, funciones</td><td><span class="yes">Sí</span></td><td>Con normalidad</td></tr>
+      <tr><td class="mono">$_GET / $_POST</td><td><span class="warnv">Simulado</span></td><td>Con arrays o variables escritas a mano</td></tr>
+      <tr><td class="mono">$_SESSION / $_COOKIE</td><td><span class="no">No</span></td><td>Se simulan con variables normales</td></tr>
+      <tr><td class="mono">password_hash()</td><td><span class="yes">Sí</span></td><td>Solo se menciona en el bloque 5, como referencia</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="sec-head"><span class="sec-num">01</span><h2>Plan de los cinco bloques</h2></div>
+  <p class="sec-sub">El catálogo es siempre el mismo. Lo que cambia en cada bloque es la herramienta con la que lo manejas.</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th style="width:52px">#</th><th>Bloque</th><th>Concepto nuevo</th><th style="width:96px">Duración</th><th style="width:110px">Cubre</th></tr></thead>
+    <tbody id="planBody"></tbody>
+  </table>
+  </div>
+</section>
+
+<div id="bloques"></div>
+
+<section id="cierre">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Resumen del proyecto</h2></div>
+  <p class="sec-sub">Lo que has construido, bloque a bloque.</p>
+  <div class="grid">
+    <div class="mini"><h4>Bloque 1 · 30 min</h4><p>echo, variables, arrays asociativos y una condición.</p></div>
+    <div class="mini"><h4>Bloque 2 · 45 min</h4><p>foreach sobre un catálogo y un contador con count().</p></div>
+    <div class="mini"><h4>Bloque 3 · 1 h</h4><p>Funciones con parámetros y valor de retorno; acumuladores.</p></div>
+    <div class="mini"><h4>Bloque 4 · 1 h</h4><p>switch, modificación de arrays por índice y simulación de formulario.</p></div>
+    <div class="mini"><h4>Bloque 5 · 45 min</h4><p>Login simulado, roles y contenido diferenciado por usuario.</p></div>
+  </div>
+  <div class="note">
+    <h4>Qué se entrega</h4>
+    <p style="margin-bottom:0">Un script por bloque, ejecutándose sin errores en el playground, con los comentarios que expliquen qué parte está simulada. Los criterios de cada bloque son la rúbrica: si están todos marcados de verdad, el bloque está completo.</p>
+  </div>
+</section>
+
+<section id="retos">
+  <div class="sec-head"><span class="sec-num">08</span><h2>Retos opcionales</h2></div>
+  <p class="sec-sub">Si acabas antes de tiempo, por aquí se sigue. No puntúan como criterio, pero se valoran.</p>
+  <ol class="retos">
+    <li><span>Añade un libro más al catálogo y comprueba que todo lo demás sigue funcionando sin tocar nada.</span></li>
+    <li><span>Filtra por género <em>y</em> por disponibilidad a la vez.</span></li>
+    <li><span>Cuenta cuántos libros están prestados con un contador dentro del <span class="inline">foreach</span>.</span></li>
+    <li><span>Añade un tercer rol, <span class="inline">invitado</span>, que pueda ver el catálogo pero no prestar.</span></li>
+    <li><span>Muestra un mensaje distinto si el usuario que ha entrado es el mismo que tiene el libro prestado.</span></li>
+  </ol>
+
+  <div class="foot">
+    <p><b>Mini-Biblioteca PHP · actividad evaluable de 2º DAM.</b> Archivo único: el CSS y el JavaScript van dentro, así que funciona sin conexión salvo por las tipografías y el botón de 3v4l.</p>
+    <p>Los cronómetros y los criterios marcados no se guardan al cerrar la página: son una ayuda para la sesión de clase, no un registro de entrega.</p>
+  </div>
+</section>
+
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===== Contenido de los cinco bloques ===== */
+var BLOQUES = [
+{
+  n: 1, titulo: "Mi primer script", minutos: 30, cubre: "Objetivo c",
+  objetivo: "Escribir tu primer código PHP: variables, <span class='inline'>echo</span> y HTML generado desde PHP.",
+  enunciado: [
+    "Crea un archivo PHP con un solo libro escrito a mano en el código:",
+    "Muestra por pantalla una tarjeta HTML con el título en <span class='inline'>&lt;h2&gt;</span>, el autor en <span class='inline'>&lt;p&gt;</span>, el año en <span class='inline'>&lt;p&gt;</span> y, si <span class='inline'>disponible</span> es <span class='inline'>true</span>, el texto «✅ Disponible»; si no, «❌ Prestado».",
+    "Todo el HTML debe generarse desde PHP, con <span class='inline'>echo</span> o <span class='inline'>&lt;?= ?&gt;</span>."
+  ],
+  enunciadoCode: "b1-datos",
+  pistas: [
+    "Abre el bloque con <span class='inline'>&lt;?php</span> y ciérralo con <span class='inline'>?&gt;</span>.",
+    "Para concatenar: <span class='inline'>echo \"Hola \" . $nombre;</span>",
+    "Para interpolar: <span class='inline'>echo \"Hola $nombre\";</span>",
+    "Accede a los valores del array con <span class='inline'>$libro[\"titulo\"]</span>.",
+    "Para la condición: <span class='inline'>if ($libro[\"disponible\"]) { echo \"✅\"; } else { echo \"❌\"; }</span>"
+  ],
+  solucion: "b1-sol",
+  salida: "┌─────────────────────────────┐\n│ El Quijote                  │\n│ Autor: Miguel de Cervantes  │\n│ Año: 1605                   │\n│ ✅ Disponible               │\n└─────────────────────────────┘",
+  criterios: [
+    "El script se ejecuta sin errores en el playground",
+    "El array tiene los cuatro campos correctos",
+    "La tarjeta muestra título, autor, año y disponibilidad",
+    "El <span class='inline'>if/else</span> cambia el mensaje según el valor de <span class='inline'>disponible</span>"
+  ]
+},
+{
+  n: 2, titulo: "Catálogo con bucle", minutos: 45, cubre: "Objetivos c, d",
+  objetivo: "Pasar de un libro a un catálogo y recorrerlo con <span class='inline'>foreach</span>, decidiendo la disponibilidad libro a libro.",
+  enunciado: [
+    "Cambia <span class='inline'>$libro</span> por <span class='inline'>$libros</span>, un array de tres libros:",
+    "Recórrelo con <span class='inline'>foreach</span> y muestra cada libro como una tarjeta, igual que en el bloque 1.",
+    "Añade un título <span class='inline'>&lt;h1&gt;Mi Biblioteca&lt;/h1&gt;</span> y un contador al final: «Total: 3 libros»."
+  ],
+  enunciadoCode: "b2-datos",
+  pistas: [
+    "<span class='inline'>foreach ($libros as $libro) { ... }</span> — en cada vuelta, <span class='inline'>$libro</span> es un array asociativo.",
+    "Cuenta los libros con <span class='inline'>count($libros)</span>.",
+    "Puedes reutilizar tal cual el código del bloque 1 dentro del <span class='inline'>foreach</span>."
+  ],
+  solucion: "b2-sol",
+  salida: "📚 Mi Biblioteca\n\n┌───────────────┐  ┌───────────────┐  ┌───────────────┐\n│ El Quijote    │  │ Dune          │  │ Sapiens       │\n│ Cervantes     │  │ F. Herbert    │  │ Y. Harari     │\n│ 1605          │  │ 1965          │  │ 2011          │\n│ ✅ Disponible │  │ ❌ Prestado   │  │ ✅ Disponible │\n└───────────────┘  └───────────────┘  └───────────────┘\n\nTotal: 3 libros",
+  criterios: [
+    "Array con tres libros correctamente estructurado",
+    "El <span class='inline'>foreach</span> recorre todos los libros",
+    "Cada libro se muestra con el mismo formato",
+    "El <span class='inline'>if/else</span> funciona por libro: unos disponibles y otros no",
+    "El contador <span class='inline'>count($libros)</span> muestra 3"
+  ]
+},
+{
+  n: 3, titulo: "Funciones y filtros", minutos: 60, cubre: "Objetivos d, e",
+  objetivo: "Crear tu primera función: recibe el catálogo y un género, y devuelve solo los libros de ese género.",
+  enunciado: [
+    "Añade un campo <span class='inline'>\"genero\"</span> a cada libro: <span class='inline'>\"novela\"</span>, <span class='inline'>\"ciencia ficción\"</span> y <span class='inline'>\"ensayo\"</span>.",
+    "Crea la función <span class='inline'>filtrarPorGenero($libros, $genero)</span>: recorre el catálogo, acumula en un array <span class='inline'>$resultado</span> los libros cuyo género coincida y devuélvelo con <span class='inline'>return</span>.",
+    "Usa la función para mostrar tres listados: todos los libros, solo los de novela y solo los de ciencia ficción.",
+    "En cada listado filtrado, indica en un <span class='inline'>&lt;h2&gt;</span> qué género estás mostrando."
+  ],
+  enunciadoCode: "b3-firma",
+  pistas: [
+    "Empieza con un array vacío: <span class='inline'>$resultado = [];</span>",
+    "Dentro del <span class='inline'>foreach</span>: <span class='inline'>if ($libro[\"genero\"] == $genero) { $resultado[] = $libro; }</span>",
+    "No olvides el <span class='inline'>return $resultado;</span> al final de la función.",
+    "Para no repetir código puedes crear otra función <span class='inline'>mostrarLibros($lista)</span> que pinte las tarjetas. No es obligatorio, pero se valora."
+  ],
+  solucion: "b3-sol",
+  salida: "📚 Mi Biblioteca\n\nTodos los libros\n[Quijote] [Dune] [Sapiens]\n\nNovelas\n[Quijote]\n\nCiencia ficción\n[Dune]",
+  criterios: [
+    "Función <span class='inline'>filtrarPorGenero</span> bien definida: recibe dos parámetros y devuelve un array",
+    "Uso de <span class='inline'>foreach</span> con acumulador (<span class='inline'>$resultado[] = ...</span>)",
+    "<span class='inline'>return</span> al final de la función",
+    { texto: "Función <span class='inline'>mostrarLibros</span> reutilizada", opcional: true },
+    "Se muestran los tres listados: todos, novela y ciencia ficción"
+  ]
+},
+{
+  n: 4, titulo: "Formulario simulado", minutos: 60, cubre: "Objetivo f",
+  objetivo: "Simular la recepción de datos de un formulario y ejecutar una acción distinta según lo recibido.",
+  enunciado: [
+    "Añade un campo <span class='inline'>\"id\"</span> a cada libro (1, 2 y 3).",
+    "Simula la llegada de datos desde un formulario:",
+    "Crea <span class='inline'>prestarLibro($libros, $id)</span>: recorre el catálogo y, si encuentra el libro con ese id y está disponible, lo marca como <span class='inline'>disponible = false</span>. Devuelve el array modificado.",
+    "Usa un <span class='inline'>switch</span> sobre <span class='inline'>$accion</span>: <span class='inline'>\"listar\"</span> muestra todos los libros; <span class='inline'>\"prestados\"</span> muestra solo los no disponibles; <span class='inline'>\"prestar\"</span> llama a la función y muestra el catálogo actualizado; cualquier otro valor muestra «Acción no reconocida»."
+  ],
+  enunciadoCode: "b4-datos",
+  pistas: [
+    "Para que el cambio persista fuera de la función hay que devolver el array y reasignarlo: <span class='inline'>$libros = prestarLibro($libros, $idLibro);</span>",
+    "Para modificar el elemento actual dentro del bucle necesitas el índice: <span class='inline'>foreach ($libros as $i =&gt; $libro)</span> y luego <span class='inline'>$libros[$i][\"disponible\"] = false;</span>",
+    "Para filtrar los prestados: <span class='inline'>if (!$libro[\"disponible\"]) { ... }</span>"
+  ],
+  pistasCode: "b4-pista",
+  solucion: "b4-sol",
+  salida: "📚 Mi Biblioteca\n\nPrestar libro ID 2\n✅ Libro 'Dune' prestado.\n\nCatálogo actualizado\n[Quijote ✅] [Dune ❌] [Sapiens ✅]",
+  salidaNota: "Con <span class='inline'>$accion = \"prestar\"</span> y <span class='inline'>$idLibro = 2</span>.",
+  criterios: [
+    "La función <span class='inline'>prestarLibro</span> modifica el array y lo devuelve",
+    "Uso de <span class='inline'>foreach</span> con índice (<span class='inline'>$i =&gt; $libro</span>)",
+    "<span class='inline'>switch</span> con tres casos más <span class='inline'>default</span>",
+    "Se muestra feedback al usuario: éxito o error",
+    "El catálogo se actualiza correctamente tras el préstamo"
+  ],
+  real: {
+    titulo: "Cómo sería en un entorno real",
+    intro: "En producción, <span class='inline'>$accion</span> y <span class='inline'>$idLibro</span> no se escriben a mano: llegan en la petición.",
+    codes: ["b4-real-php", "b4-real-html"],
+    cierre: "En el playground no se pueden enviar formularios reales, y por eso simulamos los valores."
+  }
+},
+{
+  n: 5, titulo: "Mini-login y roles", minutos: 45, cubre: "Objetivos g, h, i",
+  objetivo: "Simular un login básico y mostrar contenido distinto según el rol del usuario.",
+  enunciado: [
+    "Define dos usuarios con nombre, clave y rol:",
+    "Simula un intento de login con dos variables: <span class='inline'>$usuarioIntentado</span> y <span class='inline'>$claveIntentada</span>.",
+    "Crea <span class='inline'>login($usuarios, $nombre, $clave)</span>: recorre los usuarios y, si coinciden nombre y clave, devuelve el array de ese usuario; si no, devuelve <span class='inline'>null</span>.",
+    "Si el login es correcto, muestra «Bienvenido, [nombre]», el catálogo de libros y, solo cuando el rol sea <span class='inline'>admin</span>, el aviso «🔧 Tienes permisos de administrador».",
+    "Si el login falla, muestra «❌ Usuario o contraseña incorrectos» y nada más."
+  ],
+  enunciadoCode: "b5-datos",
+  pistas: [
+    "En esta primera actividad basta la comparación directa con <span class='inline'>==</span>: todavía no hace falta hash.",
+    "Devuelve <span class='inline'>null</span> cuando no encuentres coincidencia.",
+    "Para comprobar el resultado: <span class='inline'>if ($usuario) { ... } else { ... }</span>",
+    "Para el rol: <span class='inline'>if ($usuario[\"rol\"] == \"admin\") { ... }</span>"
+  ],
+  solucion: "b5-sol",
+  salida: "📚 Mi Biblioteca\n\nBienvenido, admin\n🔧 Tienes permisos de administrador\n\nCatálogo\n✅ [1] El Quijote\n❌ [2] Dune\n✅ [3] Sapiens\n\n· · · con ana / ana123 · · ·\n\nBienvenido, ana\n\nCatálogo\n✅ [1] El Quijote\n❌ [2] Dune\n✅ [3] Sapiens\n\n· · · con credenciales erróneas · · ·\n\n❌ Usuario o contraseña incorrectos",
+  salidaNota: "Prueba los tres casos cambiando las dos variables del login.",
+  criterios: [
+    "Función <span class='inline'>login</span> con <span class='inline'>foreach</span> y <span class='inline'>return</span>: devuelve el usuario o <span class='inline'>null</span>",
+    "Se comparan nombre y clave",
+    "Se muestra el nombre del usuario que ha entrado",
+    "El mensaje de administrador aparece solo con rol <span class='inline'>admin</span>",
+    "El catálogo se muestra solo si el login es correcto"
+  ],
+  real: {
+    titulo: "Cómo sería en un entorno real",
+    intro: "Un login de verdad no compara contraseñas en claro ni guarda la sesión en una variable local.",
+    codes: ["b5-real"],
+    cierre: "Conceptos que ya has practicado aquí sin darte cuenta: <b>persistencia</b> (aquí simulada con <span class='inline'>$usuarioLogueado</span>, en real con <span class='inline'>$_SESSION</span>), <b>gestión de usuarios</b> (login con nombre y clave) y <b>entornos diferenciados</b> (contenido distinto según el rol)."
+  }
+}
+];
+
+/* ===== Fragmentos de código ===== */
+var CODE = {
+
+"b1-datos": { title: "el libro de partida", code: `$libro = [
+    "titulo" => "El Quijote",
+    "autor" => "Miguel de Cervantes",
+    "anio" => 1605,
+    "disponible" => true
+];` },
+
+"b1-sol": { title: "bloque1.php", code: `<?php
+
+$libro = [
+    "titulo" => "El Quijote",
+    "autor" => "Miguel de Cervantes",
+    "anio" => 1605,
+    "disponible" => true
+];
+
+echo "<div style='border:1px solid #333; padding:10px; width:300px;'>";
+echo "<h2>" . $libro["titulo"] . "</h2>";
+echo "<p>Autor: " . $libro["autor"] . "</p>";
+echo "<p>Año: " . $libro["anio"] . "</p>";
+
+if ($libro["disponible"]) {
+    echo "<p>✅ Disponible</p>";
+} else {
+    echo "<p>❌ Prestado</p>";
+}
+
+echo "</div>";
+
+?>` },
+
+"b2-datos": { title: "el catálogo", code: `$libros = [
+    ["titulo" => "El Quijote", "autor" => "Miguel de Cervantes", "anio" => 1605, "disponible" => true],
+    ["titulo" => "Dune", "autor" => "Frank Herbert", "anio" => 1965, "disponible" => false],
+    ["titulo" => "Sapiens", "autor" => "Yuval Noah Harari", "anio" => 2011, "disponible" => true]
+];` },
+
+"b2-sol": { title: "bloque2.php", code: `<?php
+
+$libros = [
+    ["titulo" => "El Quijote", "autor" => "Miguel de Cervantes", "anio" => 1605, "disponible" => true],
+    ["titulo" => "Dune",       "autor" => "Frank Herbert",       "anio" => 1965, "disponible" => false],
+    ["titulo" => "Sapiens",    "autor" => "Yuval Noah Harari",   "anio" => 2011, "disponible" => true]
+];
+
+echo "<h1>📚 Mi Biblioteca</h1>";
+
+foreach ($libros as $libro) {
+    echo "<div style='border:1px solid #333; padding:10px; margin:5px; width:300px;'>";
+    echo "<h2>" . $libro["titulo"] . "</h2>";
+    echo "<p>Autor: " . $libro["autor"] . "</p>";
+    echo "<p>Año: " . $libro["anio"] . "</p>";
+
+    if ($libro["disponible"]) {
+        echo "<p>✅ Disponible</p>";
+    } else {
+        echo "<p>❌ Prestado</p>";
+    }
+
+    echo "</div>";
+}
+
+echo "<p><strong>Total: " . count($libros) . " libros</strong></p>";
+
+?>` },
+
+"b3-firma": { title: "la función que debes completar", code: `function filtrarPorGenero($libros, $genero) {
+    // Recorre $libros con foreach
+    // Si el género coincide, añádelo a un array $resultado
+    // Devuelve $resultado con return
+}` },
+
+"b3-sol": { title: "bloque3.php", code: `<?php
+
+$libros = [
+    ["titulo" => "El Quijote", "autor" => "Miguel de Cervantes", "anio" => 1605, "genero" => "novela",          "disponible" => true],
+    ["titulo" => "Dune",       "autor" => "Frank Herbert",       "anio" => 1965, "genero" => "ciencia ficción", "disponible" => false],
+    ["titulo" => "Sapiens",    "autor" => "Yuval Noah Harari",   "anio" => 2011, "genero" => "ensayo",          "disponible" => true]
+];
+
+// --- Función de filtrado ---
+function filtrarPorGenero($libros, $genero) {
+    $resultado = [];
+    foreach ($libros as $libro) {
+        if ($libro["genero"] == $genero) {
+            $resultado[] = $libro;
+        }
+    }
+    return $resultado;
+}
+
+// --- Función para mostrar una lista de libros ---
+function mostrarLibros($lista) {
+    foreach ($lista as $libro) {
+        echo "<div style='border:1px solid #333; padding:10px; margin:5px; width:300px;'>";
+        echo "<h2>" . $libro["titulo"] . "</h2>";
+        echo "<p>Autor: " . $libro["autor"] . "</p>";
+        echo "<p>Año: " . $libro["anio"] . "</p>";
+        echo "<p>Género: " . $libro["genero"] . "</p>";
+        if ($libro["disponible"]) {
+            echo "<p>✅ Disponible</p>";
+        } else {
+            echo "<p>❌ Prestado</p>";
+        }
+        echo "</div>";
+    }
+}
+
+// --- Script principal ---
+echo "<h1>📚 Mi Biblioteca</h1>";
+
+echo "<h2>Todos los libros</h2>";
+mostrarLibros($libros);
+
+echo "<h2>Novelas</h2>";
+mostrarLibros(filtrarPorGenero($libros, "novela"));
+
+echo "<h2>Ciencia ficción</h2>";
+mostrarLibros(filtrarPorGenero($libros, "ciencia ficción"));
+
+?>` },
+
+"b4-datos": { title: "datos simulados del formulario", code: `// En producción real esto vendría de $_GET
+$accion = "prestar";      // Prueba: "listar", "prestar", "prestados"
+$idLibro = 2;
+$usuario = "Ana";` },
+
+"b4-pista": { title: "modificar dentro del bucle", code: `foreach ($libros as $i => $libro) {
+    if ($libro["id"] == $id) {
+        $libros[$i]["disponible"] = false;
+    }
+}` },
+
+"b4-sol": { title: "bloque4.php", code: `<?php
+
+$libros = [
+    ["id" => 1, "titulo" => "El Quijote", "autor" => "Miguel de Cervantes", "anio" => 1605, "genero" => "novela",          "disponible" => true],
+    ["id" => 2, "titulo" => "Dune",       "autor" => "Frank Herbert",       "anio" => 1965, "genero" => "ciencia ficción", "disponible" => true],
+    ["id" => 3, "titulo" => "Sapiens",    "autor" => "Yuval Noah Harari",   "anio" => 2011, "genero" => "ensayo",          "disponible" => true]
+];
+
+// --- Funciones ---
+function mostrarLibros($lista) {
+    foreach ($lista as $libro) {
+        $estado = $libro["disponible"] ? "✅ Disponible" : "❌ Prestado";
+        echo "<div style='border:1px solid #333; padding:10px; margin:5px; width:300px;'>";
+        echo "<h3>" . $libro["titulo"] . "</h3>";
+        echo "<p>ID: " . $libro["id"] . " | Año: " . $libro["anio"] . "</p>";
+        echo "<p>$estado</p>";
+        echo "</div>";
+    }
+}
+
+function prestarLibro($libros, $id) {
+    foreach ($libros as $i => $libro) {
+        if ($libro["id"] == $id) {
+            if ($libro["disponible"]) {
+                $libros[$i]["disponible"] = false;
+                echo "<p style='color:green'>✅ Libro '" . $libro["titulo"] . "' prestado.</p>";
+            } else {
+                echo "<p style='color:red'>❌ El libro ya estaba prestado.</p>";
+            }
+            return $libros;
+        }
+    }
+    echo "<p style='color:red'>❌ No se encontró el libro con ID $id.</p>";
+    return $libros;
+}
+
+function librosPrestados($libros) {
+    $resultado = [];
+    foreach ($libros as $libro) {
+        if (!$libro["disponible"]) {
+            $resultado[] = $libro;
+        }
+    }
+    return $resultado;
+}
+
+// --- Simulación de formulario ---
+$accion = "prestar";   // Prueba: "listar", "prestados", "prestar"
+$idLibro = 2;
+
+echo "<h1>📚 Mi Biblioteca</h1>";
+
+switch ($accion) {
+    case "listar":
+        echo "<h2>Todos los libros</h2>";
+        mostrarLibros($libros);
+        break;
+
+    case "prestados":
+        echo "<h2>Libros prestados</h2>";
+        mostrarLibros(librosPrestados($libros));
+        break;
+
+    case "prestar":
+        echo "<h2>Prestar libro ID $idLibro</h2>";
+        $libros = prestarLibro($libros, $idLibro);
+        echo "<h2>Catálogo actualizado</h2>";
+        mostrarLibros($libros);
+        break;
+
+    default:
+        echo "<p>❌ Acción no reconocida: $accion</p>";
+}
+
+?>` },
+
+"b4-real-php": { title: "procesar.php · entorno real", code: `$accion = $_GET["accion"] ?? "listar";
+$idLibro = $_GET["id"] ?? 0;` },
+
+"b4-real-html": { title: "formulario.html · entorno real", lang: "html", code: `<form method="get">
+    <input type="hidden" name="accion" value="prestar">
+    <input type="number" name="id" placeholder="ID del libro">
+    <button>Prestar</button>
+</form>` },
+
+"b5-datos": { title: "usuarios y login simulado", code: `$usuarios = [
+    ["nombre" => "ana",   "clave" => "ana123",   "rol" => "usuario"],
+    ["nombre" => "admin", "clave" => "admin123", "rol" => "admin"]
+];
+
+$usuarioIntentado = "ana";
+$claveIntentada = "ana123";` },
+
+"b5-sol": { title: "bloque5.php", code: `<?php
+
+// --- Datos ---
+$usuarios = [
+    ["nombre" => "ana",   "clave" => "ana123",   "rol" => "usuario"],
+    ["nombre" => "admin", "clave" => "admin123", "rol" => "admin"]
+];
+
+$libros = [
+    ["id" => 1, "titulo" => "El Quijote", "disponible" => true],
+    ["id" => 2, "titulo" => "Dune",       "disponible" => false],
+    ["id" => 3, "titulo" => "Sapiens",    "disponible" => true]
+];
+
+// --- Simulación de login ---
+$usuarioIntentado = "admin";    // Prueba: "ana", "admin", "pepe"
+$claveIntentada = "admin123";   // Prueba: "ana123", "admin123", "xxx"
+
+// --- Función de login ---
+function login($usuarios, $nombre, $clave) {
+    foreach ($usuarios as $usuario) {
+        if ($usuario["nombre"] == $nombre && $usuario["clave"] == $clave) {
+            return $usuario;
+        }
+    }
+    return null;
+}
+
+// --- Función de mostrar catálogo ---
+function mostrarCatalogo($libros) {
+    foreach ($libros as $libro) {
+        $estado = $libro["disponible"] ? "✅" : "❌";
+        echo "<p>$estado [{$libro['id']}] {$libro['titulo']}</p>";
+    }
+}
+
+// --- Script principal ---
+echo "<h1>📚 Mi Biblioteca</h1>";
+
+$usuarioLogueado = login($usuarios, $usuarioIntentado, $claveIntentada);
+
+if ($usuarioLogueado) {
+    echo "<h2>Bienvenido, " . $usuarioLogueado["nombre"] . "</h2>";
+
+    if ($usuarioLogueado["rol"] == "admin") {
+        echo "<p>🔧 Tienes permisos de administrador</p>";
+    }
+
+    echo "<h2>Catálogo</h2>";
+    mostrarCatalogo($libros);
+} else {
+    echo "<h2>❌ Usuario o contraseña incorrectos</h2>";
+}
+
+?>` },
+
+"b5-real": { title: "login real · con sesiones y hash", code: `// 1. El usuario envía un formulario POST
+// 2. Recogemos los datos:
+$nombre = $_POST["usuario"] ?? "";
+$clave = $_POST["clave"] ?? "";
+
+// 3. Verificamos con hash (NO con comparación directa)
+if (password_verify($clave, $hashGuardado)) {
+    session_start();
+    $_SESSION["usuario"] = $nombre;
+    $_SESSION["rol"] = $rol;
+    header("Location: panel.php");
+    exit;
+}
+
+// 4. En cada página protegida:
+session_start();
+if (!isset($_SESSION["usuario"])) {
+    header("Location: login.php");
+    exit;
+}` }
+
+};
+
+/* ===== Plantillas de partida (descarga) ===== */
+var PLANTILLA = `<?php
+/* =====================================================
+   Mini-Biblioteca PHP — plantillas de partida
+   Actividad evaluable · 2º DAM · 4 horas
+   Copia cada bloque en el playground por separado.
+   ===================================================== */
+
+
+/* ---------------------------------------------------
+   BLOQUE 1 — Mi primer script (30 min)
+   Muestra una tarjeta HTML con los datos del libro.
+   --------------------------------------------------- */
+
+$libro = [
+    "titulo" => "El Quijote",
+    "autor" => "Miguel de Cervantes",
+    "anio" => 1605,
+    "disponible" => true
+];
+
+// TODO: imprime la tarjeta con echo: h2 con el título, p con autor y año,
+// y un p con "✅ Disponible" o "❌ Prestado" según $libro["disponible"].
+
+
+/* ---------------------------------------------------
+   BLOQUE 2 — Catálogo con bucle (45 min)
+   --------------------------------------------------- */
+
+$libros = [
+    ["titulo" => "El Quijote", "autor" => "Miguel de Cervantes", "anio" => 1605, "disponible" => true],
+    ["titulo" => "Dune",       "autor" => "Frank Herbert",       "anio" => 1965, "disponible" => false],
+    ["titulo" => "Sapiens",    "autor" => "Yuval Noah Harari",   "anio" => 2011, "disponible" => true]
+];
+
+// TODO: h1 con el título de la biblioteca.
+// TODO: foreach sobre $libros imprimiendo una tarjeta por libro.
+// TODO: al final, el total con count($libros).
+
+
+/* ---------------------------------------------------
+   BLOQUE 3 — Funciones y filtros (1 h)
+   Añade "genero" a cada libro antes de empezar.
+   --------------------------------------------------- */
+
+function filtrarPorGenero($libros, $genero) {
+    // TODO: $resultado = [];
+    // TODO: foreach y comparación del género
+    // TODO: return $resultado;
+}
+
+function mostrarLibros($lista) {
+    // TODO: foreach que imprima cada tarjeta (reutilizable en los bloques 4 y 5)
+}
+
+// TODO: muestra los tres listados: todos, novela y ciencia ficción.
+
+
+/* ---------------------------------------------------
+   BLOQUE 4 — Formulario simulado (1 h)
+   Añade "id" (1, 2, 3) a cada libro antes de empezar.
+   --------------------------------------------------- */
+
+// En producción real esto vendría de $_GET
+$accion = "prestar";      // Prueba: "listar", "prestados", "prestar"
+$idLibro = 2;
+
+function prestarLibro($libros, $id) {
+    // TODO: foreach ($libros as $i => $libro)
+    // TODO: si coincide el id y está disponible -> $libros[$i]["disponible"] = false;
+    // TODO: mensaje de éxito o de error
+    // TODO: return $libros;
+}
+
+function librosPrestados($libros) {
+    // TODO: devuelve solo los libros con disponible = false
+}
+
+// TODO: switch ($accion) con los casos "listar", "prestados", "prestar" y default.
+
+
+/* ---------------------------------------------------
+   BLOQUE 5 — Mini-login y roles (45 min)
+   --------------------------------------------------- */
+
+$usuarios = [
+    ["nombre" => "ana",   "clave" => "ana123",   "rol" => "usuario"],
+    ["nombre" => "admin", "clave" => "admin123", "rol" => "admin"]
+];
+
+$usuarioIntentado = "ana";     // Prueba: "ana", "admin", "pepe"
+$claveIntentada = "ana123";    // Prueba: "ana123", "admin123", "xxx"
+
+function login($usuarios, $nombre, $clave) {
+    // TODO: foreach comparando nombre y clave
+    // TODO: return $usuario;  // si coincide
+    // TODO: return null;      // si no coincide
+}
+
+// TODO: si el login es correcto -> bienvenida, aviso de admin solo si rol == "admin", catálogo.
+// TODO: si falla -> mensaje de credenciales incorrectas.
+
+?>
+`;
+
+(function () {
+  "use strict";
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- resaltado ---------- */
+  var KW = ["and","array","as","break","case","catch","class","const","continue","declare","default","do","echo","else","elseif","empty","exit","finally","fn","for","foreach","function","global","if","isset","list","match","new","null","or","print","return","static","switch","throw","try","unset","use","while","true","false","int","float","string","bool"];
+  var RE = new RegExp([
+    "(<\\?php|<\\?=|\\?>)",
+    "(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*|#[^\\n]*)",
+    "('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\")",
+    "(\\$[A-Za-z_][A-Za-z0-9_]*)",
+    "(\\b\\d+\\.?\\d*\\b)",
+    "([A-Za-z_][A-Za-z0-9_]*)"
+  ].join("|"), "g");
+
+  function hlPHP(code) {
+    var out = "", last = 0, m; RE.lastIndex = 0;
+    while ((m = RE.exec(code)) !== null) {
+      out += esc(code.slice(last, m.index));
+      var txt = m[0], cls = null;
+      if (m[1]) cls = "tok-t";
+      else if (m[2]) cls = "tok-c";
+      else if (m[3]) cls = "tok-s";
+      else if (m[4]) cls = "tok-v";
+      else if (m[5]) cls = "tok-n";
+      else if (m[6]) {
+        if (KW.indexOf(txt.toLowerCase()) >= 0) cls = "tok-k";
+        else if (/^\s*\(/.test(code.slice(m.index + txt.length))) cls = "tok-f";
+        else if (/^[A-Z_][A-Z0-9_]*$/.test(txt)) cls = "tok-n";
+      }
+      out += cls ? '<span class="' + cls + '">' + esc(txt) + "</span>" : esc(txt);
+      last = m.index + txt.length;
+    }
+    return out + esc(code.slice(last));
+  }
+  function hlHTML(code) {
+    return esc(code)
+      .replace(/(&lt;\/?[a-zA-Z][\w-]*)/g, '<span class="tok-t">$1</span>')
+      .replace(/([a-zA-Z-]+)=("[^"]*")/g, '<span class="tok-f">$1</span>=<span class="tok-s">$2</span>');
+  }
+  function hl(code, lang) { return lang === "html" ? hlHTML(code) : hlPHP(code); }
+
+  /* ---------- utilidades ---------- */
+  var toastEl = $("#toast"), tt = null;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("show"); }, 2100);
+  }
+  function copyText(text, btn) {
+    function done() {
+      var p = btn.textContent; btn.textContent = "Copiado"; btn.classList.add("copied");
+      setTimeout(function () { btn.textContent = p; btn.classList.remove("copied"); }, 1400);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); });
+    } else { fb(text); done(); }
+    function fb(t) {
+      var ta = document.createElement("textarea");
+      ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+  function open3v4l(code) {
+    var f = document.createElement("form");
+    f.method = "POST"; f.action = "https://3v4l.org/new"; f.target = "_blank"; f.rel = "noopener";
+    f.style.display = "none";
+    var ta = document.createElement("textarea");
+    ta.name = "code"; ta.value = code;
+    f.appendChild(ta); document.body.appendChild(f); f.submit();
+    setTimeout(function () { document.body.removeChild(f); }, 400);
+  }
+  function download(name, text) {
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 300);
+  }
+
+  /* ---------- bloque de código ---------- */
+  function codeBlock(key, opts) {
+    opts = opts || {};
+    var s = CODE[key];
+    var box = document.createElement("div");
+    box.className = "code";
+    if (!s) { box.textContent = "Fragmento no encontrado: " + key; return box; }
+    var head = document.createElement("div");
+    head.className = "code-head";
+    head.innerHTML = "<span>" + esc(s.title) + "</span><span class='spacer'></span>";
+
+    var copy = document.createElement("button");
+    copy.className = "cbtn"; copy.type = "button"; copy.textContent = "Copiar";
+    copy.addEventListener("click", function () { copyText(s.code, copy); });
+    head.appendChild(copy);
+
+    if (opts.ejecutar && s.lang !== "html") {
+      var ext = document.createElement("button");
+      ext.className = "cbtn"; ext.type = "button"; ext.textContent = "Abrir en 3v4l";
+      ext.title = "Se abre en otra pestaña con el código ya cargado";
+      ext.addEventListener("click", function () { open3v4l(s.code); });
+      head.appendChild(ext);
+    }
+
+    var pre = document.createElement("pre");
+    pre.className = "src";
+    pre.innerHTML = hl(s.code, s.lang);
+    box.appendChild(head); box.appendChild(pre);
+    return box;
+  }
+
+  /* ---------- cronómetro ---------- */
+  function timer(minutos) {
+    var wrap = document.createElement("div");
+    wrap.className = "timer";
+    wrap.innerHTML =
+      '<span class="clock">' + minutos + ":00</span>" +
+      '<button class="tbtn primary start" type="button">Iniciar</button>' +
+      '<button class="tbtn reset" type="button">Reiniciar</button>' +
+      '<span class="hint">Tiempo orientativo del bloque: ' + minutos + " minutos.</span>";
+    var clock = $(".clock", wrap), start = $(".start", wrap), reset = $(".reset", wrap), hint = $(".hint", wrap);
+    var total = minutos * 60, left = total, id = null;
+
+    function paint() {
+      var neg = left < 0, v = Math.abs(left);
+      var mm = Math.floor(v / 60), ss = v % 60;
+      clock.textContent = (neg ? "+" : "") + mm + ":" + String(ss).padStart(2, "0");
+      clock.classList.toggle("low", !neg && left <= 300);
+      clock.classList.toggle("over", neg);
+    }
+    function tick() {
+      left--; paint();
+      if (left === 0) { hint.textContent = "Tiempo cumplido. Si te falta poco, remata; si no, pasa al siguiente bloque y vuelve luego."; }
+      if (left === -600) { stop(); hint.textContent = "Diez minutos de más. Pide ayuda antes de seguir atascado."; }
+    }
+    function stop() { clearInterval(id); id = null; start.textContent = "Continuar"; start.classList.add("primary"); }
+    start.addEventListener("click", function () {
+      if (id) { stop(); return; }
+      id = setInterval(tick, 1000);
+      start.textContent = "Pausa"; start.classList.remove("primary");
+      hint.textContent = "En marcha. El cronómetro no se guarda al cerrar la página.";
+    });
+    reset.addEventListener("click", function () {
+      clearInterval(id); id = null; left = total; paint();
+      start.textContent = "Iniciar"; start.classList.add("primary");
+      hint.textContent = "Tiempo orientativo del bloque: " + minutos + " minutos.";
+    });
+    paint();
+    return wrap;
+  }
+
+
+  /* ---------- easter egg: pikachu ---------- */
+  function pikachu() {
+    var wrap = document.createElement("div");
+    wrap.className = "pika-wrap";
+    var art =
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣠⠤⠤⠤⠤⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠶⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠢⣄⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠁⠀⠀⠀⠀⢀⣀⡐⢄⠀⠀⠀⠀⠀⠀⠈⠳⣄⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡞⠁⠀⠀⠀⠀⠀⡜⠁⠀⣿⡌⠀⠀⠀⠀⠀⠀⠀⠀⠈⢆⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡾⠀⠀⠀⠀⠀⠀⣸⣷⣤⣾⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠊⣼⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢤⡀⠀⠀⠀⢰⡇⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⡜⣼⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠉⠲⣄⣀⣼⡇⠀⠀⠀⠀⠀⠀⠻⠿⣿⣟⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠉⠉⠁⠀⡏⠑⠌⠓⢬⣧⠀⠀⠀⠀⠘⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⠿⡀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⠀⠀⠀⠇⠀⠀⠀⠀⠙⣆⠀⠀⠀⠀⠀⠈⠉⠓⠒⠲⠤⢤⣀⠀⠂⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀\n" +
+"⠀⠀⠀⠀⢀⣠⠤⠖⠒⠒⠒⠦⢤⡀⠀⠀⠀⠀⠀⢸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠈⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠲⠤⠤⠒⠋⢉⠟⠀⠀⠀⠀\n" +
+"⠀⠀⢀⡴⠋⠁⠀⠀⠀⠀⠀⠀⠀⠙⢦⠀⠀⠀⢠⡞⠹⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠋⠀⠀⠀⠀⠀\n" +
+"⠀⣠⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢇⠀⢠⡟⠀⠀⠹⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⡏⠈⠑⠢⢤⣀⣀⠀⠀⠀⠀⢀⣀⡤⠖⠯⣀⠀⠀⠀⠀⠀⠀\n" +
+"⢀⡟⠀⠀⠀⠀⠠⠴⠤⣀⠀⠀⠀⠀⠀⢸⣠⡟⠀⠀⠀⠀⢹⣄⠀⠀⠀⠀⠀⠀⢀⣼⡁⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⢻⠀⠀⠀⠀⠀⠉⠢⣄⣀⡀⠀\n" +
+"⢸⡇⠀⠀⠀⠀⠀⠀⠀⠘⡆⠀⠀⠀⠀⢈⣿⡇⠀⠀⠀⠀⢸⠉⢢⣀⡀⢀⣀⣴⠟⠀⠙⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡆⠀⠀⠀⠀⠀⠀⠀⠀⢇⡀\n" +
+"⠘⣇⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⢸⡇⣷⠀⠀⠀⢀⡞⠀⢰⠏⠉⠉⠁⢸⡀⠀⠀⠀⠈⠓⠶⠤⣤⣄⣀⣠⡤⠴⡇⠀⠀⠀⠀⠀⠀⠀⠀⡔⠁\n" +
+"⠀⠹⣆⠀⠀⠀⠀⠀⢀⡼⠁⠀⠀⠀⠀⢸⠁⠸⡆⠀⣠⠞⠀⢀⡞⠀⠀⠀⠀⠘⡇⠀⠀⠀⠀⠀⠀⠀⠀⢸⠃⠀⠀⢰⣧⣀⣀⡀⠀⢀⣀⣠⠴⠃⠀\n" +
+"⠀⠀⠹⡓⠦⠤⠤⠖⠋⠀⠀⠀⠀⠀⠀⢸⠀⠀⠹⡴⠁⠀⢠⠞⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⡞⠀⠀⠀⣸⠀⠀⠉⠉⠉⠉⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠘⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⢸⢁⡠⠴⢧⡀⠀⠀⠀⠀⣀⠔⠳⣄⠀⠀⠀⠀⠀⠀⡼⠁⠀⠀⢠⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⣠⡿⠋⠀⠀⠀⠙⢦⣀⡠⠞⠁⠀⠀⠈⠙⠶⣤⣀⡀⣰⠃⠀⠀⣠⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠙⢦⣀⠀⠀⠀⠀⠀⠀⣸⠏⠀⠀⠀⠀⠀⠀⠈⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣹⠋⠉⠉⣹⠏⠙⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠲⢤⣄⣀⣠⡏⠀⠀⠀⠀⠀⠀⠀⠀⠈⣇⠀⠀⠀⠀⠀⠀⠀⠀⡰⠃⢀⣤⠞⠁⠀⠀⠘⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡽⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⠶⠤⠤⠤⠤⠤⢤⣞⡥⠖⠋⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠟⠒⠀⠀⠒⠒⠺⢯⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠃⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀⠀⠀⠀⢄⣈⠆⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⢄⡀⠀⠀⠀⠀⠀⠀⢀⠞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣄⠀⠀⠀⠀⢀⣠⠴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢇⣀⡤⠖⢄⠀⣰⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⠒⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠈⠙⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+    var pre = document.createElement("pre");
+    pre.className = "pika";
+    pre.textContent = art;
+    var cap = document.createElement("p");
+    cap.className = "pika-cap";
+    cap.textContent = "VAMO A INTENTARLO.";
+    wrap.appendChild(pre);
+    wrap.appendChild(cap);
+    return wrap;
+  }
+
+  /* ---------- progreso global ---------- */
+  var totalCriterios = 0, hechos = 0;
+  BLOQUES.forEach(function (b) { totalCriterios += b.criterios.length; });
+  function updateScore() {
+    $("#score").textContent = hechos + " / " + totalCriterios + " criterios";
+    $("#barFill").style.width = (totalCriterios ? (hechos / totalCriterios) * 100 : 0) + "%";
+  }
+
+  /* ---------- render de bloques ---------- */
+  var host = $("#bloques"), planBody = $("#planBody");
+  var conceptos = ["echo, variables, if, arrays", "foreach y contadores", "funciones con retorno", "switch y simulación de formulario", "login simulado y roles"];
+
+  BLOQUES.forEach(function (b, idx) {
+    /* fila del plan */
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td class='mono'>" + b.n + "</td>" +
+      "<td><a href='#b" + b.n + "'>" + esc(b.titulo) + "</a></td>" +
+      "<td>" + conceptos[idx] + "</td>" +
+      "<td class='mono'>" + b.minutos + " min</td>" +
+      "<td>" + esc(b.cubre) + "</td>";
+    planBody.appendChild(tr);
+
+    /* sección */
+    var sec = document.createElement("section");
+    sec.id = "b" + b.n;
+    var head = document.createElement("div");
+    head.className = "sec-head";
+    head.innerHTML = "<span class='sec-num'>0" + (idx + 2) + "</span><h2>Bloque " + b.n + " · " + esc(b.titulo) + "</h2>";
+    sec.appendChild(head);
+
+    var block = document.createElement("div");
+    block.className = "block";
+    var bodyId = "body-b" + b.n;
+
+    var bhead = document.createElement("button");
+    bhead.className = "block-head"; bhead.type = "button";
+    bhead.setAttribute("aria-expanded", idx === 0 ? "true" : "false");
+    bhead.setAttribute("aria-controls", bodyId);
+    bhead.innerHTML =
+      '<span class="bn">' + b.n + "</span>" +
+      '<span class="bh-text"><h3>' + esc(b.titulo) + '</h3><span class="covers">' + b.objetivo + "</span></span>" +
+      '<span class="bh-meta"><span class="pill">' + b.minutos + ' min</span><span class="pill count">0/' + b.criterios.length + '</span><span class="chev">▶</span></span>';
+
+    var body = document.createElement("div");
+    body.className = "block-body"; body.id = bodyId;
+    body.hidden = idx !== 0;
+
+    body.appendChild(timer(b.minutos));
+
+    /* pestañas */
+    var tabs = document.createElement("div");
+    tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
+    var panels = {};
+
+    /* enunciado */
+    var pE = document.createElement("div");
+    pE.className = "panel";
+    var ol = document.createElement("ol");
+    b.enunciado.forEach(function (paso, i) {
+      var li = document.createElement("li");
+      li.innerHTML = paso;
+      ol.appendChild(li);
+      if (b.enunciadoCode && ((b.n === 1 && i === 0) || (b.n === 2 && i === 0) || (b.n === 3 && i === 1) || (b.n === 4 && i === 1) || (b.n === 5 && i === 0))) {
+        li.appendChild(codeBlock(b.enunciadoCode, { ejecutar: false }));
+      }
+    });
+    pE.appendChild(ol);
+    panels.enunciado = pE;
+
+    /* pistas */
+    var pP = document.createElement("div");
+    pP.className = "panel"; pP.hidden = true;
+    var revealP = document.createElement("button");
+    revealP.className = "btn sec reveal"; revealP.type = "button"; revealP.textContent = "Ver las pistas";
+    var boxP = document.createElement("div"); boxP.hidden = true;
+    var ulP = document.createElement("ul");
+    b.pistas.forEach(function (p) { var li = document.createElement("li"); li.innerHTML = p; ulP.appendChild(li); });
+    boxP.appendChild(ulP);
+    if (b.pistasCode) boxP.appendChild(codeBlock(b.pistasCode, { ejecutar: false }));
+    revealP.addEventListener("click", function () {
+      boxP.hidden = !boxP.hidden;
+      revealP.textContent = boxP.hidden ? "Ver las pistas" : "Ocultar las pistas";
+    });
+    pP.appendChild(revealP); pP.appendChild(boxP);
+    panels.pistas = pP;
+
+    /* solución */
+    var pS = document.createElement("div");
+    pS.className = "panel"; pS.hidden = true;
+    pS.innerHTML = "<p style='color:var(--muted);font-size:15.5px'>Intenta el bloque completo antes de abrir esto. Comparar tu versión con la solución enseña más que copiarla.</p>";
+    var revealS = document.createElement("button");
+    revealS.className = "btn reveal"; revealS.type = "button"; revealS.textContent = "Mostrar la solución";
+    var boxS = document.createElement("div"); boxS.hidden = true;
+    revealS.addEventListener("click", function () {
+      if (!boxS.childElementCount) {
+        boxS.appendChild(pikachu());
+      }
+      boxS.hidden = !boxS.hidden;
+      revealS.textContent = boxS.hidden ? "Mostrar la solución" : "Ocultar la solución";
+    });
+    pS.appendChild(revealS); pS.appendChild(boxS);
+    panels.solucion = pS;
+
+    var orden = ["enunciado", "pistas", "solucion"];
+    var etiquetas = { enunciado: "Enunciado", pistas: "Pistas", solucion: "Solución" };
+    orden.forEach(function (id, i) {
+      var t = document.createElement("button");
+      t.className = "tab"; t.type = "button"; t.setAttribute("role", "tab");
+      t.textContent = etiquetas[id];
+      t.setAttribute("aria-selected", i === 0 ? "true" : "false");
+      t.addEventListener("click", function () {
+        $$(".tab", tabs).forEach(function (x) { x.setAttribute("aria-selected", "false"); });
+        t.setAttribute("aria-selected", "true");
+        orden.forEach(function (o) { panels[o].hidden = o !== id; });
+      });
+      tabs.appendChild(t);
+    });
+    body.appendChild(tabs);
+    orden.forEach(function (o) { body.appendChild(panels[o]); });
+
+    /* nota de entorno real */
+    if (b.real) {
+      var real = document.createElement("div");
+      real.className = "real";
+      real.innerHTML = "<h4>🖥️ " + esc(b.real.titulo) + "</h4><p>" + b.real.intro + "</p>";
+      b.real.codes.forEach(function (k) { real.appendChild(codeBlock(k, { ejecutar: false })); });
+      var cierre = document.createElement("p");
+      cierre.style.margin = "14px 0 0";
+      cierre.innerHTML = b.real.cierre;
+      real.appendChild(cierre);
+      body.appendChild(real);
+    }
+
+    /* criterios */
+    var crit = document.createElement("div");
+    crit.className = "criteria";
+    var ch = document.createElement("h4");
+    ch.innerHTML = "Criterios de evaluación <span class='of'>0 de " + b.criterios.length + " marcados</span>";
+    crit.appendChild(ch);
+    var ul = document.createElement("ul");
+    ul.className = "crit";
+    var pill = $(".pill.count", bhead);
+    var marcados = 0;
+
+    b.criterios.forEach(function (c) {
+      var texto = typeof c === "string" ? c : c.texto;
+      var opcional = typeof c === "object" && c.opcional;
+      var li = document.createElement("li");
+      li.setAttribute("role", "checkbox");
+      li.setAttribute("aria-checked", "false");
+      li.setAttribute("tabindex", "0");
+      li.innerHTML = '<span class="box"></span><span class="txt">' + texto + "</span>" +
+        (opcional ? '<span class="opt">recomendado</span>' : "");
+      function toggle() {
+        var ok = li.classList.toggle("ok");
+        li.setAttribute("aria-checked", ok ? "true" : "false");
+        marcados += ok ? 1 : -1;
+        hechos += ok ? 1 : -1;
+        $(".of", ch).textContent = marcados + " de " + b.criterios.length + " marcados";
+        pill.textContent = marcados + "/" + b.criterios.length;
+        var full = marcados === b.criterios.length;
+        pill.classList.toggle("full", full);
+        block.classList.toggle("done", full);
+        updateScore();
+        if (full && ok) toast("Bloque " + b.n + " completo.");
+      }
+      li.addEventListener("click", toggle);
+      li.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); }
+      });
+      ul.appendChild(li);
+    });
+    crit.appendChild(ul);
+    body.appendChild(crit);
+
+    bhead.addEventListener("click", function () {
+      var open = bhead.getAttribute("aria-expanded") === "true";
+      bhead.setAttribute("aria-expanded", open ? "false" : "true");
+      body.hidden = open;
+    });
+
+    block.appendChild(bhead); block.appendChild(body);
+    sec.appendChild(block);
+    host.appendChild(sec);
+  });
+  updateScore();
+
+  /* ---------- acciones sueltas ---------- */
+  $("#dlPlantilla").addEventListener("click", function () {
+    download("mini-biblioteca-plantillas.php", PLANTILLA);
+    toast("Plantillas descargadas.");
+  });
+  $("#goB1").addEventListener("click", function () {
+    var b1 = $("#b1");
+    if (b1) b1.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  /* ---------- navegación activa ---------- */
+  var links = $$("#topnav a");
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (l) { l.classList.toggle("active", l.getAttribute("href") === "#" + e.target.id); });
+      });
+    }, { rootMargin: "-130px 0px -65% 0px" });
+    secs.forEach(function (s) { io.observe(s); });
+  }
+})();
+
+</script>
+</body>
+</html>

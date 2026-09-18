@@ -54,6 +54,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 |------|-------------|
 | [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Introducción a la seguridad |
 | [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
+| [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de seguridad |
 
 ### IAW (Implantación de Aplicaciones Web)
 
