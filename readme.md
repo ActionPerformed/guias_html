@@ -54,7 +54,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 |------|-------------|
 | [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Introducción a la seguridad |
 | [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
-| [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de seguridad |
+| [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de introducción |
 
 ### IAW (Implantación de Aplicaciones Web)
 
@@ -69,6 +69,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 |------|-------------|
 | [PMDM - UT1 - Kotlin.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) | UT1 — Kotlin para desarrollo Android |
 | [PDMD - UT1 - Android.html](https://actionperformed.github.io/guias_html/PMDM/PDMD%20-%20UT1%20-%20Android.html) | UT1 — Fundamentos de desarrollo Android |
+| [PMDM - ACT 1.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%201.1.html) | Actividad 1.1 — Introducción a Android Studio y Kotlin |
 
 ---
 

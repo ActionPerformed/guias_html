@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi primera app Android — Actividad evaluable PMDM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF3E6;
+  --panel:#FFFDF8;
+  --panel-2:#F3E8D4;
+  --border:#E2D2B0;
+  --border-soft:#ECDFC4;
+  --text:#2B2419;
+  --text-dim:#6E5F4C;
+  --text-faint:#9C8B72;
+  --terracotta:#C1592B;
+  --terracotta-dim:#A04A22;
+  --teal:#276A67;
+  --teal-dim:#1D5250;
+  --gold:#C98A2C;
+  --alert:#AD3B44;
+  --code-bg:#211D16;
+  --code-text:#EDE3CE;
+  --radius:14px;
+  --maxw:900px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle, rgba(43,36,25,0.08) 1px, transparent 1px) 0 0/22px 22px,
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter', sans-serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Fraunces', serif; font-weight:600; line-height:1.2; margin:0 0 .5em; color:#221C13;}
+p{margin:0 0 1em; color:var(--text-dim);}
+a{color:var(--teal);}
+code, pre, .mono{font-family:'Space Mono', monospace;}
+::selection{background:rgba(193,89,43,0.25);}
+.skip-link{position:absolute; left:-999px; top:0; background:var(--terracotta); color:#fff; padding:.6em 1em; border-radius:0 0 8px 0; z-index:999; font-weight:700;}
+.skip-link:focus{left:0;}
+
+/* ===== NAVBAR ===== */
+header.nav{position:sticky; top:0; z-index:100; background:rgba(250,243,230,0.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+.nav-inner{max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:1rem; padding:.6rem 1.1rem;}
+.brand{display:flex; align-items:center; gap:.55rem; flex-shrink:0; text-decoration:none; color:var(--text);}
+.brand-mark{width:26px; height:26px; flex-shrink:0;}
+.brand-text{font-family:'Fraunces'; font-weight:700; font-size:.95rem; color:#221C13;}
+.brand-text .sub{display:block; font-family:'Space Mono'; font-weight:400; font-size:.58rem; color:var(--text-faint); letter-spacing:.3px; margin-top:1px;}
+.navlinks{display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; flex:1;}
+.navlinks::-webkit-scrollbar{display:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--text-dim); font-size:.76rem; font-weight:600; padding:.42rem .68rem; border-radius:7px; transition:.15s; font-family:'Space Mono';}
+.navlinks a:hover{color:var(--text); background:var(--panel-2);}
+.navlinks a.active{color:#fff; background:var(--terracotta);}
+.navtoggle{display:none; background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:8px; width:36px; height:36px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+@media (max-width:980px){
+  .navlinks{display:none; position:fixed; top:52px; left:0; right:0; bottom:0; flex-direction:column; overflow-y:auto; background:var(--bg); padding:1rem; z-index:99;}
+  .navlinks.open{display:flex;}
+  .navlinks a{padding:.8rem 1rem; font-size:.88rem;}
+  .navtoggle{display:flex;}
+}
+
+/* ===== GLOBAL PROGRESS ===== */
+.progress-wrap{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg, var(--terracotta), var(--gold)); z-index:200; width:0%; transition:width .1s;}
+.task-progress-bar{height:10px; background:var(--panel-2); border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:.5rem;}
+.task-progress-fill{height:100%; background:linear-gradient(90deg, var(--terracotta), var(--gold)); width:0%; transition:width .3s;}
+
+/* ===== LAYOUT ===== */
+main{max-width:var(--maxw); margin:0 auto; padding:0 1.2rem 6rem;}
+section.block{padding:3rem 0; border-bottom:1px solid var(--border-soft);}
+section.block:last-of-type{border-bottom:none;}
+.eyebrow-row{display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem;}
+.section-num{font-family:'Space Mono'; font-size:.72rem; color:var(--terracotta); background:rgba(193,89,43,.1); border:1px solid rgba(193,89,43,.3); padding:.15rem .5rem; border-radius:6px;}
+.block h2{font-size:1.55rem; margin:0;}
+.block > .lede{font-size:1rem; margin-top:.5rem;}
+
+/* ===== HERO ===== */
+.hero{padding:2.6rem 0 2rem;}
+.hero-kicker{display:inline-flex; align-items:center; gap:.5rem; font-family:'Space Mono'; font-size:.72rem; color:var(--terracotta); background:rgba(193,89,43,.1); border:1px solid rgba(193,89,43,.35); padding:.32rem .75rem; border-radius:999px; margin-bottom:1.1rem;}
+.hero h1{font-size:clamp(1.9rem, 4.8vw, 2.7rem); margin-bottom:.5rem;}
+.hero p.lede{font-size:1rem; max-width:640px;}
+.hero-meta{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.1rem;}
+.hero-meta span{font-family:'Space Mono'; font-size:.72rem; color:var(--text-dim); background:var(--panel); border:1px solid var(--border); padding:.32rem .65rem; border-radius:7px;}
+.hero-name{margin-top:1.5rem; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem;}
+.hero-name label{display:block; font-family:'Space Mono'; font-size:.72rem; color:var(--text-faint); margin-bottom:.4rem;}
+.hero-name input{width:100%; max-width:340px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:.55rem .8rem; font-family:'Inter'; font-size:.92rem; color:var(--text); outline:none;}
+.hero-name input:focus{border-color:var(--terracotta);}
+.hero-progress{margin-top:1.2rem;}
+.hero-progress .lbl{display:flex; justify-content:space-between; font-family:'Space Mono'; font-size:.72rem; color:var(--text-faint);}
+
+/* ===== TIMELINE (estructura) ===== */
+.timeline{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.3rem;}
+.timeline a{flex:1 1 140px; text-decoration:none; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:.8rem .9rem; color:var(--text); transition:.15s;}
+.timeline a:hover{border-color:var(--terracotta); transform:translateY(-2px);}
+.timeline .tl-num{font-family:'Space Mono'; font-size:.68rem; color:var(--terracotta); font-weight:700;}
+.timeline .tl-name{font-family:'Fraunces'; font-weight:600; font-size:.9rem; margin:.2rem 0 .15rem;}
+.timeline .tl-dur{font-family:'Space Mono'; font-size:.68rem; color:var(--text-faint);}
+
+/* ===== BLOCK CARD ===== */
+.blockcard{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem 1.5rem 1.7rem; margin-top:1.4rem;}
+.blockcard-head{display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:.3rem;}
+.blockcard-title{display:flex; align-items:center; gap:.6rem;}
+.blockcard-title .emoji{font-size:1.3rem;}
+.blockcard-title h3{margin:0; font-size:1.15rem;}
+.blockcard-obj{font-size:.88rem; color:var(--text-dim); margin:.3rem 0 1rem;}
+
+/* ===== TIMER ===== */
+.timer{display:flex; align-items:center; gap:.5rem; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:.4rem .6rem; flex-shrink:0;}
+.timer-display{font-family:'Space Mono'; font-weight:700; font-size:1rem; min-width:52px; text-align:center; color:var(--text);}
+.timer-display.warn{color:var(--alert);}
+.timer-btn{background:var(--panel); border:1px solid var(--border); color:var(--text-dim); width:26px; height:26px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.75rem;}
+.timer-btn:hover{color:var(--text); border-color:var(--terracotta);}
+
+/* ===== TASK LIST (checkboxes) ===== */
+.tasklist{list-style:none; margin:0 0 1rem; padding:0;}
+.task{display:flex; gap:.7rem; align-items:flex-start; padding:.55rem 0; border-bottom:1px solid var(--border-soft);}
+.task:last-child{border-bottom:none;}
+.task input[type=checkbox]{margin-top:.25rem; width:17px; height:17px; accent-color:var(--terracotta); flex-shrink:0; cursor:pointer;}
+.task label{flex:1; font-size:.92rem; color:var(--text); cursor:pointer;}
+.task.done label{color:var(--text-faint); text-decoration:line-through; text-decoration-color:var(--border);}
+.task .task-body{flex:1;}
+.reto-badge{display:inline-block; font-family:'Space Mono'; font-size:.65rem; background:rgba(201,138,44,.15); color:var(--gold); border:1px solid rgba(201,138,44,.4); padding:.12rem .45rem; border-radius:5px; margin-left:.4rem; vertical-align:middle;}
+
+/* ===== CODE BLOCKS ===== */
+.codewrap{position:relative; margin:.7rem 0 1rem;}
+pre.code{background:var(--code-bg); color:var(--code-text); border:1px solid #37312400; border-radius:10px; padding:.9rem 1.05rem; overflow-x:auto; font-size:.79rem; margin:0; line-height:1.6;}
+pre.code code{white-space:pre; font-family:'Space Mono';}
+.copy-btn{position:absolute; top:.5rem; right:.5rem; font-family:'Inter'; font-size:.66rem; font-weight:700; background:#33291A; color:#D8C9AC; border:1px solid #4A3D28; padding:.28rem .55rem; border-radius:6px; cursor:pointer; opacity:.8; transition:.15s;}
+.copy-btn:hover{opacity:1; border-color:var(--gold); color:#fff;}
+.copy-btn.copied{background:rgba(39,106,103,.3); color:#8FE0DB; border-color:var(--teal);}
+.kw{color:#E39A6B;} .str{color:#9FD8A0;} .cmt{color:#8A8070; font-style:italic;} .fn{color:#87B7E8;} .ann{color:#D8A5E8;}
+
+/* ===== REFLECTION TEXTAREAS ===== */
+.reflect{background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:.9rem 1rem; margin:.8rem 0;}
+.reflect .q{font-size:.87rem; font-weight:600; color:var(--text); margin-bottom:.5rem; display:block;}
+.reflect textarea{width:100%; min-height:70px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:.6rem .75rem; font-family:'Inter'; font-size:.86rem; color:var(--text); resize:vertical; outline:none;}
+.reflect textarea:focus{border-color:var(--teal);}
+
+/* ===== CALLOUTS ===== */
+.callout{border-radius:10px; padding:.85rem 1.05rem; margin:1rem 0; font-size:.88rem; border:1px solid;}
+.callout.tip{background:rgba(39,106,103,.08); border-color:rgba(39,106,103,.3); color:#1C4B49;}
+.callout.warn{background:rgba(173,59,68,.08); border-color:rgba(173,59,68,.3); color:#7C2A31;}
+.callout.key{background:rgba(193,89,43,.08); border-color:rgba(193,89,43,.3); color:#7C3A1C;}
+.callout strong{color:#221C13;}
+
+/* ===== TABLES ===== */
+.tblwrap{overflow-x:auto; margin:1rem 0;}
+table{border-collapse:collapse; width:100%; font-size:.83rem;}
+th,td{padding:.55rem .75rem; border:1px solid var(--border); text-align:left; vertical-align:top;}
+th{background:var(--panel-2); color:var(--terracotta-dim); font-family:'Space Mono'; font-weight:700; font-size:.72rem;}
+td{color:var(--text-dim);}
+td code{color:var(--text); background:rgba(39,106,103,.1); padding:.1rem .3rem; border-radius:4px; font-size:.85em;}
+tr:nth-child(even) td{background:rgba(0,0,0,.012);}
+
+/* ===== PILLS ===== */
+.pill{display:inline-block; font-family:'Space Mono'; font-size:.7rem; background:var(--panel-2); border:1px solid var(--border); color:var(--teal-dim); padding:.15rem .5rem; border-radius:6px; margin:0 .25rem .4rem 0;}
+
+/* ===== ADAPT CARDS ===== */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
+@media (max-width:640px){.grid2{grid-template-columns:1fr;}}
+.adaptcard{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:1rem 1.1rem;}
+.adaptcard h4{margin:0 0 .4rem; font-size:.95rem;}
+
+/* ===== MEMORIA GENERATOR ===== */
+.memoria-box{background:var(--panel); border:2px dashed var(--terracotta); border-radius:var(--radius); padding:1.5rem; margin-top:1.4rem;}
+.memoria-actions{display:flex; gap:.7rem; flex-wrap:wrap; margin-top:1rem;}
+.btn-primary{font-family:'Inter'; font-weight:700; font-size:.86rem; background:var(--terracotta); color:#fff; border:none; padding:.65rem 1.2rem; border-radius:9px; cursor:pointer; transition:.15s;}
+.btn-primary:hover{background:var(--terracotta-dim);}
+.btn-secondary{font-family:'Inter'; font-weight:700; font-size:.86rem; background:var(--panel-2); color:var(--text); border:1px solid var(--border); padding:.65rem 1.2rem; border-radius:9px; cursor:pointer; transition:.15s;}
+.btn-secondary:hover{border-color:var(--teal); color:var(--teal-dim);}
+.memoria-preview{margin-top:1rem; background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:1rem 1.1rem; font-family:'Space Mono'; font-size:.76rem; white-space:pre-wrap; max-height:340px; overflow-y:auto; display:none;}
+.memoria-preview.show{display:block;}
+
+/* ===== FOOTER / MISC ===== */
+footer{max-width:var(--maxw); margin:0 auto; padding:2.2rem 1.2rem 3.5rem; color:var(--text-faint); font-size:.82rem; text-align:center; font-family:'Space Mono';}
+.back-top{position:fixed; bottom:1.3rem; right:1.3rem; width:42px; height:42px; border-radius:50%; background:var(--panel); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:90; opacity:0; pointer-events:none; transition:.2s;}
+.back-top.show{opacity:1; pointer-events:auto;}
+ul.plain, ol.plain{padding-left:1.15rem; color:var(--text-dim);}
+ul.plain li, ol.plain li{margin-bottom:.3rem;}
+</style>
+</head>
+<body>
+<a href="#inicio" class="skip-link">Saltar al contenido</a>
+<div class="progress-wrap" id="progressBar"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#inicio" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="4" width="28" height="32" rx="4" stroke="#C1592B" stroke-width="2.5" fill="none"/>
+        <circle cx="20" cy="30" r="1.8" fill="#C1592B"/>
+        <path d="M13 12H27M13 17H27M13 22H21" stroke="#276A67" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">Mi primera app Android<span class="sub">PMDM · 2º DAM</span></span>
+    </a>
+    <button class="navtoggle" id="navToggle" aria-label="Abrir menú">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="navlinks" id="navLinks">
+      <a href="#inicio">Inicio</a>
+      <a href="#bloque1">B1 · Exploración</a>
+      <a href="#bloque2">B2 · Saludo</a>
+      <a href="#bloque3">B3 · Previews</a>
+      <a href="#bloque4">B4 · Interactividad</a>
+      <a href="#bloque5">B5 · Logcat</a>
+      <a href="#bloque6">B6 · Memoria</a>
+      <a href="#rubrica">Rúbrica</a>
+      <a href="#reflexion">Reflexión</a>
+      <a href="#adaptaciones">Adaptaciones</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+  <span class="hero-kicker">🤖 Desarrollo de Aplicaciones Móviles — 2º DAM</span>
+  <h1>Mi primera app Android con Kotlin y Compose</h1>
+  <p class="lede">Actividad introductoria: pierde el miedo al entorno, entiende cómo se conectan las piezas y documenta el camino en tu propia memoria.</p>
+  <div class="hero-meta">
+    <span>⏱ 4 horas</span>
+    <span>👥 Individual</span>
+    <span>🛠 Android Studio + Kotlin + Compose</span>
+    <span>📦 Entrega: memoria</span>
+  </div>
+
+  <div class="hero-name">
+    <label for="studentName">Tu nombre (se usará en la memoria generada)</label>
+    <input type="text" id="studentName" placeholder="Nombre y apellidos...">
+  </div>
+
+  <div class="hero-progress">
+    <div class="lbl"><span>Progreso de tareas completadas</span><span id="progressLabel">0 / 0</span></div>
+    <div class="task-progress-bar"><div class="task-progress-fill" id="taskProgressFill"></div></div>
+  </div>
+
+  <h3 style="margin-top:2rem; font-size:1.05rem;">Estructura de la actividad</h3>
+  <div class="timeline" id="timelineNav">
+    <a href="#bloque1"><div class="tl-num">Bloque 1</div><div class="tl-name">Exploración guiada</div><div class="tl-dur">30 min</div></a>
+    <a href="#bloque2"><div class="tl-num">Bloque 2</div><div class="tl-name">Personalizar saludo</div><div class="tl-dur">45 min</div></a>
+    <a href="#bloque3"><div class="tl-num">Bloque 3</div><div class="tl-name">Previews y layout</div><div class="tl-dur">45 min</div></a>
+    <a href="#bloque4"><div class="tl-num">Bloque 4</div><div class="tl-name">Botón, estado, contador</div><div class="tl-dur">60 min</div></a>
+    <a href="#bloque5"><div class="tl-num">Bloque 5</div><div class="tl-name">Logcat y depuración</div><div class="tl-dur">30 min</div></a>
+    <a href="#bloque6"><div class="tl-num">Bloque 6</div><div class="tl-name">Documentación y entrega</div><div class="tl-dur">30 min</div></a>
+  </div>
+</section>
+
+<!-- ============ CONTEXTO Y OBJETIVOS ============ -->
+<section class="block" id="contexto">
+  <div class="eyebrow-row"><span class="section-num">01</span></div>
+  <h2>Contexto y objetivos</h2>
+  <p class="lede">Esta actividad es tu <strong style="color:#221C13">primer contacto real</strong> con el desarrollo Android. Partiendo del proyecto «Empty Activity», irás modificando la app paso a paso para entender cómo se conecta todo: no se trata de crear algo complejo, sino de perder el miedo al entorno.</p>
+
+  <h3 style="margin-top:1.5rem;">Al terminar serás capaz de...</h3>
+  <ol class="plain">
+    <li>Identificar los elementos principales de la interfaz de Android Studio.</li>
+    <li>Explicar el flujo de arranque de una app Android.</li>
+    <li>Modificar el código de <code>MainActivity.kt</code> para personalizar la interfaz.</li>
+    <li>Usar <code>@Preview</code> para previsualizar composables sin ejecutar la app.</li>
+    <li>Crear y gestionar un AVD para probar la app.</li>
+    <li>Añadir interactividad básica con estado (<code>remember</code> + <code>mutableStateOf</code>).</li>
+    <li>Consultar Logcat para diagnosticar errores.</li>
+    <li>Documentar el proceso seguido.</li>
+  </ol>
+
+  <h3 style="margin-top:1.6rem;">Competencias trabajadas</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Competencia</th><th>Cómo se trabaja</th></tr></thead>
+    <tbody>
+      <tr><td>Configuración de entornos de desarrollo</td><td>Instalación y configuración de Android Studio y AVD</td></tr>
+      <tr><td>Programación en lenguajes de alto nivel</td><td>Kotlin aplicado a Compose</td></tr>
+      <tr><td>Desarrollo de interfaces de usuario</td><td>Composables, <code>Modifier</code>, Material 3</td></tr>
+      <tr><td>Depuración y pruebas</td><td>Logcat, <code>@Preview</code>, ejecución en emulador</td></tr>
+      <tr><td>Documentación técnica</td><td>Memoria de la actividad</td></tr>
+      <tr><td>Autonomía y resolución de problemas</td><td>Resolución de errores comunes</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:1.6rem;">Requisitos previos</h3>
+  <ul class="plain">
+    <li>Android Studio instalado y configurado.</li>
+    <li>JDK configurado (el que trae Android Studio por defecto).</li>
+    <li>Un AVD creado y funcionando.</li>
+    <li>Conocimientos básicos de programación (variables, funciones, condicionales).</li>
+    <li>Nociones básicas de Kotlin (o disposición a aprenderlo sobre la marcha).</li>
+  </ul>
+  <div class="callout tip"><strong>Entrega final:</strong> proyecto Android comprimido (<code>.zip</code>, sin <code>build/</code> ni <code>.gradle/</code>) + archivo <code>MEMORIA.md</code>. El generador del Bloque 6 te ayuda a montar la memoria automáticamente con lo que vayas rellenando aquí.</div>
+</section>
+
+<!-- ============ BLOQUE 1 ============ -->
+<section class="block" id="bloque1">
+  <div class="eyebrow-row"><span class="section-num">Bloque 1</span></div>
+  <h2>🧭 Exploración guiada</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">🧭</span><h3>Familiarízate con el entorno</h3></div>
+      <div class="timer" data-duration="1800">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>30:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: entender qué hay en el proyecto por defecto.</p>
+
+    <ul class="tasklist" data-block="1">
+      <li class="task"><input type="checkbox" id="t1-1"><label for="t1-1">Abre Android Studio y el proyecto <code>MiPrimerAplicacion</code>.</label></li>
+      <li class="task"><input type="checkbox" id="t1-2"><label for="t1-2">Localiza en el panel <strong style="color:#221C13">Project</strong> (vista Android): <code>MainActivity.kt</code>, <code>strings.xml</code>, <code>build.gradle.kts (Module :app)</code> y <code>AndroidManifest.xml</code>.</label></li>
+      <li class="task"><input type="checkbox" id="t1-3"><label for="t1-3">Abre <code>MainActivity.kt</code> y responde las preguntas de abajo.</label></li>
+      <li class="task"><input type="checkbox" id="t1-4"><label for="t1-4">Ejecuta la app en el AVD y comprueba que se ve el saludo por defecto.</label></li>
+    </ul>
+
+    <div class="reflect"><span class="q">¿Qué clase se define en MainActivity.kt y de qué hereda?</span><textarea data-mem-q="B1 — Clase y herencia"></textarea></div>
+    <div class="reflect"><span class="q">¿Qué método se sobrescribe y qué hace?</span><textarea data-mem-q="B1 — Método sobrescrito"></textarea></div>
+    <div class="reflect"><span class="q">¿Qué función se llama dentro de setContent?</span><textarea data-mem-q="B1 — Función en setContent"></textarea></div>
+    <div class="reflect"><span class="q">¿Para qué sirve @Preview?</span><textarea data-mem-q="B1 — Para qué sirve @Preview"></textarea></div>
+
+    <div class="callout key"><strong>Entrega parcial:</strong> respuestas a las preguntas anteriores (ya quedan guardadas para tu memoria).</div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 2 ============ -->
+<section class="block" id="bloque2">
+  <div class="eyebrow-row"><span class="section-num">Bloque 2</span></div>
+  <h2>✏️ Personalización del saludo</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">✏️</span><h3>Modifica el código y ve el efecto inmediato</h3></div>
+      <div class="timer" data-duration="2700">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>45:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: modificar el código y ver el efecto inmediato.</p>
+
+    <ul class="tasklist" data-block="2">
+      <li class="task">
+        <input type="checkbox" id="t2-1">
+        <div class="task-body">
+          <label for="t2-1">Cambia el texto del saludo en la función <code>Greeting</code>:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>text = <span class="str">"¡Hola desde mi primera app!"</span></code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t2-2"><label for="t2-2">Ejecuta la app y comprueba el cambio.</label></li>
+      <li class="task">
+        <input type="checkbox" id="t2-3">
+        <div class="task-body">
+          <label for="t2-3">Cambia el nombre que se pasa desde <code>MainActivity</code>:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Greeting(name = <span class="str">"TuNombre"</span>, ...)</code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t2-4"><label for="t2-4">Observa que el texto ahora es dinámico (usa <code>$name</code>).</label></li>
+      <li class="task"><input type="checkbox" id="t2-5"><label for="t2-5">Añade un segundo <code>Text</code> debajo del primero con un mensaje distinto. Pista: envuelve ambos en una <code>Column</code>.</label></li>
+      <li class="task"><input type="checkbox" id="t2-6"><label for="t2-6">Cambia el color del texto usando <code>color = Color.Blue</code> en el <code>Text</code>.</label></li>
+      <li class="task"><input type="checkbox" id="t2-7"><label for="t2-7">Cambia el color de fondo del tema en <code>ui/theme/Color.kt</code>.</label></li>
+    </ul>
+
+    <div class="callout key"><strong>Entrega parcial:</strong> captura de pantalla del emulador con los cambios (adjúntala junto a tu memoria; este archivo no almacena imágenes).</div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 3 ============ -->
+<section class="block" id="bloque3">
+  <div class="eyebrow-row"><span class="section-num">Bloque 3</span></div>
+  <h2>🎨 Previews y organización</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">🎨</span><h3>Previsualiza sin ejecutar y organiza la interfaz</h3></div>
+      <div class="timer" data-duration="2700">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>45:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: aprender a previsualizar sin ejecutar y organizar la interfaz.</p>
+
+    <ul class="tasklist" data-block="3">
+      <li class="task">
+        <input type="checkbox" id="t3-1">
+        <div class="task-body">
+          <label for="t3-1">Añade una segunda <code>@Preview</code> con otro nombre:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="ann">@Preview</span>(showBackground = <span class="kw">true</span>, name = <span class="str">"Saludo personalizado"</span>)
+<span class="ann">@Composable</span>
+<span class="kw">fun</span> <span class="fn">GreetingPreviewCustom</span>() {
+    MiPrimerAplicacionTheme {
+        Greeting(<span class="str">"TuNombre"</span>)
+    }
+}</code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t3-2"><label for="t3-2">Comprueba que en el panel <strong style="color:#221C13">Design</strong> aparecen las dos previews.</label></li>
+      <li class="task">
+        <input type="checkbox" id="t3-3">
+        <div class="task-body">
+          <label for="t3-3">Añade una tercera preview con <code>Modifier</code> para ver el efecto del padding y el fondo:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Greeting(
+    name = <span class="str">"Android"</span>,
+    modifier = Modifier
+        .padding(16.dp)
+        .background(Color.LightGray)
+)</code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t3-4"><label for="t3-4">Investiga y responde la pregunta de abajo.</label></li>
+      <li class="task">
+        <input type="checkbox" id="t3-5">
+        <div class="task-body">
+          <label for="t3-5">Organiza el contenido en una <code>Column</code> con separación entre elementos:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Column(
+    modifier = Modifier.padding(16.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp)
+) {
+    Text(<span class="str">"Primera línea"</span>)
+    Text(<span class="str">"Segunda línea"</span>)
+}</code></pre></div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="reflect"><span class="q">¿Qué diferencia hay entre padding y background? ¿En qué orden se aplican?</span><textarea data-mem-q="B3 — padding vs background"></textarea></div>
+
+    <div class="callout key"><strong>Entrega parcial:</strong> captura de las tres previews + respuesta a la pregunta.</div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 4 ============ -->
+<section class="block" id="bloque4">
+  <div class="eyebrow-row"><span class="section-num">Bloque 4</span></div>
+  <h2>🎮 Interactividad: botón y contador</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">🎮</span><h3>Introduce el concepto de estado en Compose</h3></div>
+      <div class="timer" data-duration="3600">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>60:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: introducir el concepto de estado en Compose.</p>
+
+    <ul class="tasklist" data-block="4">
+      <li class="task">
+        <input type="checkbox" id="t4-1">
+        <div class="task-body">
+          <label for="t4-1">Añade un botón debajo del saludo:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Button(onClick = { <span class="cmt">/* acción */</span> }) {
+    Text(<span class="str">"Púlsame"</span>)
+}</code></pre></div>
+        </div>
+      </li>
+      <li class="task">
+        <input type="checkbox" id="t4-2">
+        <div class="task-body">
+          <label for="t4-2">Crea una variable de estado para contar pulsaciones:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">var</span> contador by remember { mutableStateOf(0) }</code></pre></div>
+        </div>
+      </li>
+      <li class="task">
+        <input type="checkbox" id="t4-3">
+        <div class="task-body">
+          <label for="t4-3">Muestra el contador en un <code>Text</code> y actualízalo al pulsar el botón:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code>Button(onClick = { contador++ }) {
+    Text(<span class="str">"Pulsado $contador veces"</span>)
+}</code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t4-4"><label for="t4-4">Ejecuta la app y comprueba que el contador aumenta.</label></li>
+      <li class="task"><input type="checkbox" id="t4-5"><label for="t4-5">Añade un segundo botón que reinicie el contador a 0. <span class="reto-badge">RETO EXTRA</span></label></li>
+      <li class="task"><input type="checkbox" id="t4-6"><label for="t4-6">Cambia el color del texto según el número de pulsaciones (rojo si es par, azul si es impar). <span class="reto-badge">RETO EXTRA</span></label></li>
+    </ul>
+
+    <div class="callout key"><strong>Entrega parcial:</strong> código del bloque + captura del emulador.</div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 5 ============ -->
+<section class="block" id="bloque5">
+  <div class="eyebrow-row"><span class="section-num">Bloque 5</span></div>
+  <h2>🐞 Depuración con Logcat</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">🐞</span><h3>Aprende a diagnosticar errores</h3></div>
+      <div class="timer" data-duration="1800">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>30:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: aprender a diagnosticar errores.</p>
+
+    <ul class="tasklist" data-block="5">
+      <li class="task"><input type="checkbox" id="t5-1"><label for="t5-1">Introduce un error deliberado en el código (por ejemplo, escribe <code>Text(text = 42)</code>).</label></li>
+      <li class="task"><input type="checkbox" id="t5-2"><label for="t5-2">Ejecuta la app y observa el error en el panel <strong style="color:#221C13">Build</strong>.</label></li>
+      <li class="task"><input type="checkbox" id="t5-3"><label for="t5-3">Corrige el error y vuelve a ejecutar.</label></li>
+      <li class="task">
+        <input type="checkbox" id="t5-4">
+        <div class="task-body">
+          <label for="t5-4">Añade un log en el <code>onCreate</code>:</label>
+          <div class="codewrap"><button class="copy-btn">Copiar</button><pre class="code"><code><span class="kw">import</span> android.util.Log
+Log.d(<span class="str">"MiApp"</span>, <span class="str">"onCreate ejecutado"</span>)</code></pre></div>
+        </div>
+      </li>
+      <li class="task"><input type="checkbox" id="t5-5"><label for="t5-5">Abre el panel <strong style="color:#221C13">Logcat</strong>, filtra por <code>MiApp</code> y comprueba que aparece el mensaje.</label></li>
+      <li class="task"><input type="checkbox" id="t5-6"><label for="t5-6">Provoca un cierre inesperado (divide entre cero en un <code>onClick</code>) y busca <code>FATAL EXCEPTION</code> en Logcat.</label></li>
+    </ul>
+
+    <div class="callout warn"><strong>Consejo:</strong> cuando algo falla, busca primero <code>FATAL EXCEPTION</code> en Logcat — suele señalar la línea exacta del error.</div>
+    <div class="callout key"><strong>Entrega parcial:</strong> captura de Logcat con el mensaje y con el error provocado.</div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 6 ============ -->
+<section class="block" id="bloque6">
+  <div class="eyebrow-row"><span class="section-num">Bloque 6</span></div>
+  <h2>📝 Documentación y entrega</h2>
+  <div class="blockcard">
+    <div class="blockcard-head">
+      <div class="blockcard-title"><span class="emoji">📝</span><h3>Recopila todo el trabajo realizado</h3></div>
+      <div class="timer" data-duration="1800">
+        <button class="timer-btn" data-action="reset">↺</button>
+        <span class="timer-display" data-display>30:00</span>
+        <button class="timer-btn" data-action="toggle">▶</button>
+      </div>
+    </div>
+    <p class="blockcard-obj">Objetivo: recopilar todo el trabajo realizado en un archivo <code>MEMORIA.md</code>.</p>
+
+    <ul class="tasklist" data-block="6">
+      <li class="task"><input type="checkbox" id="t6-1"><label for="t6-1">Genera y descarga tu <code>MEMORIA.md</code> con el botón de abajo (incluye tus respuestas y el estado de las tareas).</label></li>
+      <li class="task"><input type="checkbox" id="t6-2"><label for="t6-2">Añade a mano las capturas de pantalla de cada bloque al archivo descargado.</label></li>
+      <li class="task"><input type="checkbox" id="t6-3"><label for="t6-3">Comprime el proyecto en un <code>.zip</code> (excluyendo <code>build/</code> y <code>.gradle/</code>).</label></li>
+    </ul>
+
+    <div class="memoria-box" id="memoriaBox">
+      <h3 style="margin:0 0 .3rem; font-size:1.05rem;">📄 Generador de MEMORIA.md</h3>
+      <p style="margin:0;">Recoge automáticamente tu nombre, las tareas marcadas y todas las respuestas que has ido escribiendo (Bloque 1, Bloque 3 y la sección de reflexión final) y las convierte en un archivo Markdown listo para entregar. Las capturas de pantalla debes añadirlas tú a mano.</p>
+      <div class="memoria-actions">
+        <button class="btn-secondary" id="memoriaPreviewBtn">🔄 Generar vista previa</button>
+        <button class="btn-primary" id="memoriaDownloadBtn">⬇ Descargar MEMORIA.md</button>
+      </div>
+      <pre class="memoria-preview" id="memoriaPreview"></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RÚBRICA ============ -->
+<section class="block" id="rubrica">
+  <div class="eyebrow-row"><span class="section-num">Evaluación</span></div>
+  <h2>Rúbrica de evaluación</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Criterio</th><th>Peso</th><th>Excelente (9-10)</th><th>Notable (7-8)</th><th>Aprobado (5-6)</th><th>Insuficiente (0-4)</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:#221C13">Funcionamiento de la app</strong></td><td>30%</td><td>Funciona sin errores y cumple todos los requisitos, incluidos los retos extra</td><td>Funciona y cumple casi todos los requisitos</td><td>Funciona pero con errores menores</td><td>No compila o no se ejecuta</td></tr>
+      <tr><td><strong style="color:#221C13">Personalización</strong></td><td>20%</td><td>Cambios creativos y bien justificados</td><td>Cambios correctos</td><td>Cambios mínimos</td><td>No hay cambios o son triviales</td></tr>
+      <tr><td><strong style="color:#221C13">Uso de previews</strong></td><td>15%</td><td>Tres o más previews bien organizadas</td><td>Dos previews correctas</td><td>Una preview</td><td>No usa previews</td></tr>
+      <tr><td><strong style="color:#221C13">Interactividad</strong></td><td>20%</td><td>Botón, contador y al menos un reto extra resuelto</td><td>Botón y contador funcionando</td><td>Botón o contador, pero no ambos</td><td>No hay interactividad</td></tr>
+      <tr><td><strong style="color:#221C13">Depuración y Logcat</strong></td><td>15%</td><td>Usa Logcat correctamente</td><td></td><td></td><td>No usa Logcat</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout tip"><strong>Nota:</strong> los retos extra pueden subir hasta 1 punto adicional sobre la nota final.</div>
+</section>
+
+<!-- ============ REFLEXIÓN FINAL ============ -->
+<section class="block" id="reflexion">
+  <div class="eyebrow-row"><span class="section-num">Memoria</span></div>
+  <h2>Preguntas de reflexión (opcional)</h2>
+  <p class="lede">Estas respuestas también se incluyen automáticamente en tu <code>MEMORIA.md</code>.</p>
+
+  <div class="reflect"><span class="q">1. ¿Qué diferencia hay entre val y var? ¿Cuándo usarías cada uno?</span><textarea data-mem-q="Reflexión 1 — val vs var"></textarea></div>
+  <div class="reflect"><span class="q">2. ¿Para qué sirve el parámetro modifier en Greeting?</span><textarea data-mem-q="Reflexión 2 — parámetro modifier"></textarea></div>
+  <div class="reflect"><span class="q">3. ¿Qué hace remember { mutableStateOf(0) }? ¿Por qué es necesario?</span><textarea data-mem-q="Reflexión 3 — remember/mutableStateOf"></textarea></div>
+  <div class="reflect"><span class="q">4. ¿Qué diferencia hay entre @Composable y @Preview?</span><textarea data-mem-q="Reflexión 4 — @Composable vs @Preview"></textarea></div>
+  <div class="reflect"><span class="q">5. ¿Qué información aporta Logcat que no da el panel Build?</span><textarea data-mem-q="Reflexión 5 — Logcat vs Build"></textarea></div>
+  <div class="reflect"><span class="q">6. ¿Qué dificultad te has encontrado y cómo la has resuelto?</span><textarea data-mem-q="Reflexión 6 — dificultad encontrada"></textarea></div>
+</section>
+
+<!-- ============ ADAPTACIONES Y RECURSOS ============ -->
+<section class="block" id="adaptaciones">
+  <div class="eyebrow-row"><span class="section-num">Extra</span></div>
+  <h2>Adaptaciones para el aula</h2>
+  <div class="grid2" style="margin-top:1rem;">
+    <div class="adaptcard"><h4>👥 Alumnos con menos base</h4><p style="margin:0;">Trabajar en parejas y centrarse en los bloques 1-3, dejando los retos extra como opcionales.</p></div>
+    <div class="adaptcard"><h4>🚀 Alumnos avanzados</h4><p style="margin:0;">Añadir un tercer botón que cambie el color de fondo de la app, o usar <code>LaunchedEffect</code> para mostrar un mensaje al arrancar.</p></div>
+    <div class="adaptcard"><h4>📵 Sin emulador</h4><p style="margin:0;">Usar un móvil físico por USB (activando depuración USB).</p></div>
+    <div class="adaptcard"><h4>📡 Sin conexión</h4><p style="margin:0;">Usar el USB preparado con el SDK y las dependencias de Gradle.</p></div>
+  </div>
+
+  <h3 style="margin-top:2rem;">Recursos de apoyo</h3>
+  <p>
+    <span class="pill">Guía básica de Android Studio con Kotlin (documento de referencia)</span>
+    <span class="pill"><a href="https://developer.android.com/jetpack/compose" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">developer.android.com/jetpack/compose</a></span>
+    <span class="pill"><a href="https://play.kotlinlang.org" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">play.kotlinlang.org</a></span>
+    <span class="pill"><a href="https://developer.android.com/codelabs" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;">developer.android.com/codelabs</a></span>
+  </p>
+
+  <h3 style="margin-top:1.8rem;">Entregables</h3>
+  <ul class="tasklist" data-block="entregables">
+    <li class="task"><input type="checkbox" id="te-1"><label for="te-1">Enlace github a la actividad (opcional).</label></li>
+    <li class="task"><input type="checkbox" id="te-2"><label for="te-2"><code>MEMORIA.md</code> con capturas, respuestas y reflexión personal.</label></li>
+  </ul>
+</section>
+
+</main>
+<footer>Actividad evaluable «Mi primera app Android» · PMDM · 2º DAM</footer>
+<button class="back-top" id="backTop" aria-label="Volver arriba">↑</button>
+<script id="app-script">
+(function(){
+  "use strict";
+
+  /* ---------- Mobile nav ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  /* ---------- Scroll progress + back to top ---------- */
+  var progressBar = document.getElementById('progressBar');
+  var backTop = document.getElementById('backTop');
+  function onScroll(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = (scrolled || 0) + '%';
+    backTop.classList.toggle('show', window.scrollY > 700);
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  backTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  /* ---------- Scrollspy ---------- */
+  var navA = Array.from(navLinks.querySelectorAll('a'));
+  var idToLink = {};
+  navA.forEach(function(a){ idToLink[a.getAttribute('href').slice(1)] = a; });
+  var allSections = Array.from(document.querySelectorAll('section[id]'));
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        navA.forEach(function(a){ a.classList.remove('active'); });
+        var link = idToLink[entry.target.id];
+        if(link) link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  allSections.forEach(function(s){ spy.observe(s); });
+
+  /* ---------- Copy buttons ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.copy-btn');
+    if(!btn) return;
+    var wrap = btn.closest('.codewrap');
+    var codeEl = wrap.querySelector('pre.code code');
+    var text = codeEl.innerText;
+    var finish = function(){
+      var old = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('copied'); }, 1400);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(finish).catch(function(){ fallbackCopy(text); finish(); });
+    } else { fallbackCopy(text); finish(); }
+  });
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- Task checkboxes + global progress ---------- */
+  var allTasks = Array.from(document.querySelectorAll('.task input[type=checkbox]'));
+  var progressFill = document.getElementById('taskProgressFill');
+  var progressLabel = document.getElementById('progressLabel');
+  function updateProgress(){
+    var total = allTasks.length;
+    var done = allTasks.filter(function(t){ return t.checked; }).length;
+    var pct = total ? Math.round((done/total)*100) : 0;
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = done + ' / ' + total;
+  }
+  allTasks.forEach(function(t){
+    t.addEventListener('change', function(){
+      t.closest('.task').classList.toggle('done', t.checked);
+      updateProgress();
+    });
+  });
+  updateProgress();
+
+  /* ---------- Per-block timers ---------- */
+  document.querySelectorAll('.timer').forEach(function(timer){
+    var duration = parseInt(timer.getAttribute('data-duration'), 10);
+    var remaining = duration;
+    var display = timer.querySelector('[data-display]');
+    var toggleBtn = timer.querySelector('[data-action="toggle"]');
+    var resetBtn = timer.querySelector('[data-action="reset"]');
+    var interval = null;
+
+    function format(s){
+      var m = Math.floor(Math.abs(s) / 60);
+      var sec = Math.abs(s) % 60;
+      return (s < 0 ? '-' : '') + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+    }
+    function render(){
+      display.textContent = format(remaining);
+      display.classList.toggle('warn', remaining <= 0);
+    }
+    function tick(){
+      remaining--;
+      render();
+    }
+    toggleBtn.addEventListener('click', function(){
+      if(interval){
+        clearInterval(interval);
+        interval = null;
+        toggleBtn.textContent = '▶';
+      } else {
+        interval = setInterval(tick, 1000);
+        toggleBtn.textContent = '⏸';
+      }
+    });
+    resetBtn.addEventListener('click', function(){
+      clearInterval(interval);
+      interval = null;
+      toggleBtn.textContent = '▶';
+      remaining = duration;
+      render();
+    });
+    render();
+  });
+
+  /* ---------- MEMORIA.md generator ---------- */
+  var studentName = document.getElementById('studentName');
+  var memoriaPreview = document.getElementById('memoriaPreview');
+  var memoriaPreviewBtn = document.getElementById('memoriaPreviewBtn');
+  var memoriaDownloadBtn = document.getElementById('memoriaDownloadBtn');
+
+  function blockLabel(block){
+    var titles = {
+      '1':'Bloque 1 — Exploración guiada',
+      '2':'Bloque 2 — Personalización del saludo',
+      '3':'Bloque 3 — Previews y organización',
+      '4':'Bloque 4 — Interactividad: botón y contador',
+      '5':'Bloque 5 — Depuración con Logcat',
+      '6':'Bloque 6 — Documentación y entrega',
+      'entregables':'Entregables'
+    };
+    return titles[block] || ('Bloque ' + block);
+  }
+
+  function buildMemoria(){
+    var name = studentName.value.trim() || '(sin especificar)';
+    var lines = [];
+    lines.push('# Memoria — Mi primera app Android con Kotlin y Compose');
+    lines.push('');
+    lines.push('**Alumno/a:** ' + name);
+    lines.push('**Fecha:** ' + new Date().toLocaleDateString('es-ES'));
+    lines.push('');
+    lines.push('## Tareas completadas');
+    lines.push('');
+
+    var blocks = {};
+    allTasks.forEach(function(t){
+      var block = t.closest('.tasklist').getAttribute('data-block');
+      if(!blocks[block]) blocks[block] = [];
+      var label = t.closest('.task').querySelector('label').textContent.trim().replace(/\s+/g, ' ');
+      blocks[block].push({done:t.checked, text:label});
+    });
+    Object.keys(blocks).forEach(function(block){
+      lines.push('### ' + blockLabel(block));
+      blocks[block].forEach(function(item){
+        lines.push('- [' + (item.done ? 'x' : ' ') + '] ' + item.text);
+      });
+      lines.push('');
+    });
+
+    lines.push('## Respuestas y reflexión');
+    lines.push('');
+    document.querySelectorAll('[data-mem-q]').forEach(function(ta){
+      lines.push('**' + ta.getAttribute('data-mem-q') + '**');
+      lines.push('');
+      lines.push(ta.value.trim() || '_(sin responder)_');
+      lines.push('');
+    });
+
+    lines.push('## Capturas de pantalla');
+    lines.push('');
+    lines.push('_(añade aquí tus capturas de cada bloque antes de entregar)_');
+    lines.push('');
+    lines.push('## Dificultades encontradas y cómo se resolvieron');
+    lines.push('');
+    lines.push('_(ya recogido en la pregunta de reflexión 6 de arriba, complétalo si quieres)_');
+    lines.push('');
+
+    return lines.join('\n');
+  }
+
+  memoriaPreviewBtn.addEventListener('click', function(){
+    memoriaPreview.textContent = buildMemoria();
+    memoriaPreview.classList.add('show');
+  });
+
+  memoriaDownloadBtn.addEventListener('click', function(){
+    var content = buildMemoria();
+    var blob = new Blob([content], {type:'text/markdown;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'MEMORIA.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    memoriaPreview.textContent = content;
+    memoriaPreview.classList.add('show');
+  });
+
+})();
+</script>
+</body>
+</html>
