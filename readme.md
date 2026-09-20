@@ -47,6 +47,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [guia_sql.html](https://actionperformed.github.io/guias_html/guia_sql.html) | SQL — consultas, joins, subconsultas y diseño de bases de datos relacionales |
 | [guia_latex.html](https://actionperformed.github.io/guias_html/guia_latex.html) | LaTeX — composición tipográfica, fórmulas matemáticas y documentos técnicos |
 | [guia_php.html](https://actionperformed.github.io/guias_html/guia_php.html) | PHP — programación del lado del servidor, formularios y conexión a bases de datos |
+| [guia_proyecto_asir.html](https://actionperformed.github.io/guias_html/guia_proyecto_asir.html) | Proyecto Fin de Ciclo ASIR — guía orientativa para desarrollar el proyecto |
 
 ### ASETE
 

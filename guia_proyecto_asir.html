@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía de apoyo para el proyecto de 2º ASIR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700;800;900&family=Red+Hat+Text:wght@400;600;700&family=Red+Hat+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EEF5; --paper:#fff; --ink:#0F2440; --ink-2:#3B5170; --mute:#5A6F8C; --rule:#C7D3E2; --soft:#EEF3F9;
+  --exp:#F26A1B; --comp:#1E6BFF; --avz:#8A3FFC;
+  --idea:#F5B400; --idea-soft:#FFF4CF;
+  --warn:#DC3B41; --warn-soft:#FFE7E6;
+  --ok:#0E9F8E; --ok-soft:#D9F3EF;
+  --maxw:1120px;
+  --f-head:"Red Hat Display",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Red Hat Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Red Hat Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;font:400 16px/1.62 var(--f-body);color:var(--ink);background-color:var(--bg);
+  background-image:linear-gradient(rgba(15,36,64,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,36,64,.05) 1px,transparent 1px);
+  background-size:32px 32px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.15;margin:0;color:var(--ink)}
+p{margin:0 0 .85em}
+a{color:#1553CC}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--comp);outline-offset:2px;border-radius:6px}
+.topbar :focus-visible{outline-color:#fff}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+small{color:var(--mute)}
+code{font-family:var(--f-mono);font-size:.88em;background:#E6ECF4;padding:.1em .35em;border-radius:5px}
+
+/* ---------- barra superior ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff}
+.topbar::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:5px;background:linear-gradient(90deg,var(--exp) 0 33.3%,var(--comp) 33.3% 66.6%,var(--avz) 66.6%)}
+.topbar-in{display:flex;align-items:center;gap:14px;height:58px;padding:0 16px;max-width:1320px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font:800 1.02rem var(--f-head);color:#fff;text-decoration:none;white-space:nowrap}
+.brand-mark{display:grid;gap:3px;width:24px}
+.brand-mark i{display:block;height:5px;border-radius:3px}
+.brand-mark i:nth-child(1){background:var(--exp)}
+.brand-mark i:nth-child(2){background:var(--comp)}
+.brand-mark i:nth-child(3){background:var(--avz)}
+.nav{flex:1;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 6px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px 5px;border-radius:9px;color:#C3D2E8;text-decoration:none;font:600 .8rem/1.1 var(--f-body);white-space:nowrap;transition:background .2s,opacity .2s}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav a.active{background:rgba(255,255,255,.16);color:#fff}
+.nav a.off{opacity:.38}
+.nav a.on-route{box-shadow:inset 0 -3px 0 var(--rc,#fff)}
+.nav .mdots{display:flex;gap:3px;height:5px}
+.nav .mdots i{width:5px;height:5px;border-radius:50%;background:var(--c)}
+.prog{display:flex;align-items:center;gap:9px;font:700 .82rem var(--f-head);white-space:nowrap}
+.prog-bar{width:92px;height:9px;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden}
+.prog-bar i{display:block;height:100%;width:0;background:var(--idea);transition:width .4s}
+
+/* ---------- portada ---------- */
+.hero{max-width:var(--maxw);margin:0 auto;padding:40px 20px 6px}
+.hero-top{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center;margin-bottom:26px}
+h1{font-weight:900;font-size:clamp(2.1rem,5.2vw,3.7rem);letter-spacing:-.025em;margin-bottom:14px}
+.lead{font-size:1.15rem;color:var(--ink-2);max-width:54ch;margin:0}
+.aviso0{display:flex;gap:14px;padding:16px 18px;background:#FFF7D6;border:2.5px dashed var(--ink);border-radius:14px}
+.aviso0 .tk{font-size:2rem;line-height:1}
+.aviso0 strong{display:block;font:800 1.1rem var(--f-head);margin-bottom:4px}
+.aviso0 p{margin:0;font-size:.95rem;color:var(--ink-2)}
+.panel{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:20px}
+.pick-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-bottom:12px}
+.pick-row h2{font-size:1.05rem;margin-right:4px}
+.route-btn{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;border:2px solid var(--ink);border-radius:999px;background:#fff;text-align:left;transition:background .2s,color .2s}
+.route-btn .sw{width:24px;height:10px;border-radius:6px;background:var(--c)}
+.route-btn b{font:800 .95rem var(--f-head);display:block;line-height:1.1}
+.route-btn small{display:block;font-size:.75rem;color:inherit;opacity:.78;line-height:1.1;margin-top:2px}
+.route-btn:hover{background:var(--soft)}
+.route-btn[aria-pressed=true]{background:var(--c);color:var(--on)}
+.route-btn[aria-pressed=true] .sw{background:var(--on)}
+.ghost{border:2px solid var(--rule);background:transparent;border-radius:999px;padding:7px 14px;font-weight:700;color:var(--ink-2)}
+.ghost:hover{border-color:var(--ink);color:var(--ink)}
+.seg{display:inline-flex;gap:4px;background:#E6ECF4;padding:4px;border-radius:999px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-weight:700;color:var(--ink-2)}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.legend{font-size:.85rem;color:var(--mute);margin:4px 0 8px}
+.map-scroll{overflow-x:auto;margin:0 -6px;padding:0 6px 6px}
+#metro{display:block;min-width:900px;width:100%;height:auto}
+#metro text{font-family:var(--f-head)}
+#metro .ln{transition:opacity .25s}
+#metro .st{cursor:pointer;transition:opacity .25s}
+#metro .st .cap{transition:stroke-width .15s}
+#metro .st:hover .cap,#metro .st:focus-visible .cap{stroke-width:5}
+#metro .st:focus-visible{outline:none}
+#metro .st:focus-visible .cap{stroke:var(--comp);stroke-width:5}
+body[data-route] #metro .st:not(.on){opacity:.28}
+body[data-route="exp"] #metro .ln:not(.ln-exp),body[data-route="comp"] #metro .ln:not(.ln-comp),body[data-route="avz"] #metro .ln:not(.ln-avz){opacity:.12}
+.route-info{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;border-top:2px dashed var(--rule);margin-top:6px;padding-top:14px}
+.route-info p{margin:0;flex:1 1 320px;color:var(--ink-2)}
+.route-info p b{color:var(--ink)}
+.stopchips{display:flex;flex-wrap:wrap;gap:6px}
+.stopchips button,.chip{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:3px 11px;font:600 .82rem var(--f-body);white-space:nowrap}
+.stopchips button:hover{background:var(--soft)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+/* ---------- cuerpo con carril ---------- */
+main{position:relative;max-width:var(--maxw);margin:0 auto;padding:26px 20px 70px 78px}
+.rail{position:absolute;left:24px;top:0;bottom:60px;width:24px;pointer-events:none}
+.rail i{position:absolute;top:0;bottom:0;width:6px;border-radius:3px;transition:opacity .3s}
+.rail .r1{left:0;background:var(--exp)}
+.rail .r2{left:9px;background:var(--comp)}
+.rail .r3{left:18px;background:var(--avz)}
+body[data-route="exp"] .rail .r2,body[data-route="exp"] .rail .r3,body[data-route="comp"] .rail .r1,body[data-route="comp"] .rail .r3,body[data-route="avz"] .rail .r1,body[data-route="avz"] .rail .r2{opacity:.14}
+.sec{position:relative;margin:0 0 16px}
+.station{position:absolute;left:-60px;top:13px;width:38px;height:38px;border-radius:50%;background:#fff;border:4px solid var(--ink);display:grid;place-items:center;font:800 .82rem var(--f-head);z-index:2;transition:background .25s,color .25s,border-color .25s}
+.sec.on-route .station{background:var(--rc);color:var(--rct,#fff)}
+body[data-route] .sec.off-route .station{opacity:.5}
+.sec-head{width:100%;display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"t d c" "s d c";column-gap:14px;align-items:center;text-align:left;background:var(--ink);color:#fff;border:0;border-radius:12px;padding:12px 18px;min-height:64px}
+.sec-head:hover{background:#17335B}
+.sec.open .sec-head{border-radius:12px 12px 0 0}
+.sec-title{grid-area:t;font:800 1.32rem/1.2 var(--f-head)}
+.sec-sub{grid-area:s;font-size:.9rem;color:#B7C7DE}
+.dots{grid-area:d;display:flex;gap:5px}
+.dots i{width:11px;height:11px;border-radius:50%;background:var(--c);border:2px solid #fff}
+body[data-route] .dots i.dim{opacity:.22}
+.chev{grid-area:c;width:11px;height:11px;border-right:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(45deg) translate(-2px,-2px);transition:transform .25s}
+.sec.open .chev{transform:rotate(225deg) translate(-2px,-2px)}
+.sec-body{display:grid;grid-template-rows:0fr;visibility:hidden;background:#fff;border-radius:0 0 12px 12px;transition:grid-template-rows .38s ease,visibility 0s .38s}
+.sec.open .sec-body{grid-template-rows:1fr;visibility:visible;border:2px solid var(--ink);border-top:0;transition:grid-template-rows .38s ease,visibility 0s 0s}
+.sec-inner{overflow:hidden;min-height:0}
+.pad{padding:24px 26px 28px}
+.pad>h3,.tabpanel>h3{font-size:1.15rem;margin:1.6em 0 .55em}
+.pad>h3:first-child,.tabpanel>h3:first-child{margin-top:0}
+.pad h4{font-size:1rem;margin:0 0 .35em}
+.pad ul,.pad ol{margin:0 0 1em;padding-left:1.25em}
+.pad li{margin:.25em 0}
+.pad li::marker{color:var(--mute)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.box2{border:2px solid var(--rule);border-radius:12px;padding:14px 16px;background:#fff}
+.box2 h4{display:flex;gap:8px;align-items:center}
+.box2 p:last-child,.box2 ul:last-child{margin-bottom:0}
+
+/* etiquetas */
+.note{display:flex;gap:12px;padding:12px 16px 12px 12px;border-radius:12px;border:2px solid;margin:16px 0}
+.note>.ni{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:1.05rem;background:#fff;border:2px solid currentColor}
+.note strong{display:block;font-family:var(--f-head);margin-bottom:1px}
+.note p:last-child,.note ul:last-child{margin-bottom:0}
+.note.idea{background:var(--idea-soft);border-color:var(--idea)}
+.note.aviso{background:var(--warn-soft);border-color:var(--warn)}
+.note.ejemplo{background:var(--ok-soft);border-color:var(--ok)}
+.note.herr{background:var(--ink);border-color:var(--ink);color:#fff}
+.note.herr strong{color:#A9C8FF}
+.note.herr .ni{color:#fff;background:#17335B}
+.note.herr a{color:#A9C8FF}
+
+/* pestañas */
+.tabs{display:inline-flex;flex-wrap:wrap;gap:4px;background:#E6ECF4;padding:4px;border-radius:14px;margin:0 0 18px}
+.tabs button{border:0;background:transparent;padding:8px 15px;border-radius:10px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.tabs button:hover{background:#D9E3F0}
+.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.lv{font:700 .68rem var(--f-body);padding:1px 7px;border-radius:9px;background:var(--idea);color:var(--ink)}
+.lv.a{background:var(--avz);color:#fff}
+.lv.h{background:var(--ok);color:#fff}
+.tabpanel[hidden]{display:none}
+
+/* casillas */
+.chk{display:flex;gap:11px;align-items:flex-start;padding:7px 4px;cursor:pointer;border-radius:8px}
+.chk:hover{background:var(--soft)}
+.chk input{position:absolute;opacity:0;width:1px;height:1px}
+.chk .box{flex:none;width:24px;height:24px;margin-top:1px;border:2.5px solid var(--ink);border-radius:7px;background:#fff;display:grid;place-items:center;transition:background .15s}
+.chk .box::after{content:"";width:6px;height:12px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .15s}
+.chk input:checked+.box{background:var(--ok);border-color:var(--ok)}
+.chk input:checked+.box::after{transform:rotate(45deg) scale(1)}
+.chk input:focus-visible+.box{outline:3px solid var(--comp);outline-offset:2px}
+.chk .lbl{line-height:1.35}
+.chk input:checked~.lbl{color:var(--mute);text-decoration:line-through;text-decoration-thickness:1.5px}
+.chk small{display:block;font-size:.82rem;text-decoration:none}
+
+/* botones */
+.btn{border:2px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:8px 16px;font-weight:700}
+.btn:hover{background:#17335B}
+.btn.sec2{background:#fff;color:var(--ink)}
+.btn.sec2:hover{background:var(--soft)}
+.btn.sm{padding:5px 11px;font-size:.85rem;border-radius:8px}
+.reveal{border:2px dashed var(--ink);background:#fff;border-radius:10px;padding:7px 14px;font-weight:700}
+.reveal:hover{background:var(--soft)}
+.revealed{margin-top:10px;padding:12px 14px;background:var(--ok-soft);border-left:5px solid var(--ok);border-radius:0 10px 10px 0}
+.revealed[hidden]{display:none}
+.revealed p:last-child,.revealed ul:last-child{margin-bottom:0}
+
+/* rutas (sección 1) */
+.rgrid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.rcard{border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.rcard-h{background:var(--c);color:var(--on);padding:12px 16px}
+.rcard-h b{font:800 1.15rem var(--f-head);display:block}
+.rcard-h span{font-size:.85rem}
+.rcard-b{padding:14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.rcard-b p{margin:0}
+.rcard-b .chips{display:flex;flex-wrap:wrap;gap:6px}
+.rcard-b .btn{margin-top:auto;align-self:flex-start}
+.tagleg{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.tagleg .note{margin:0}
+.tagleg .note p{font-size:.9rem}
+
+/* fases */
+.phases{display:flex;justify-content:space-between;position:relative;margin:6px 0 20px;gap:6px}
+.phases::before{content:"";position:absolute;left:8%;right:8%;top:28px;height:8px;border-radius:5px;background:repeating-linear-gradient(90deg,var(--rule) 0 14px,transparent 14px 20px)}
+.pnode{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0;font:700 .9rem var(--f-head);color:var(--ink-2)}
+.pnode .ring{width:58px;height:58px;border-radius:50%;background:conic-gradient(var(--ok) var(--p,0%),#D5DFEC 0);display:grid;place-items:center;transition:transform .2s}
+.pnode .ring b{width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:1.3rem;border:0}
+.pnode:hover .ring{transform:scale(1.06)}
+.pnode[aria-selected=true]{color:var(--ink)}
+.pnode[aria-selected=true] .ring b{background:var(--ink)}
+.pnode[aria-selected=true] .ring b span{filter:none}
+.pnode small{font-weight:600}
+.phase-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;border:2px solid var(--rule);border-radius:14px;padding:18px 20px;background:var(--soft)}
+.phase-panel h3{font-size:1.3rem;margin-bottom:6px}
+.phase-panel h4{margin-bottom:6px}
+
+/* kanban */
+.kb-tools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:12px}
+.switch{display:inline-flex;gap:8px;align-items:center;font-weight:700;cursor:pointer}
+.switch input{width:20px;height:20px;accent-color:var(--ok)}
+.kb-msg{min-height:1.6em;font-weight:700;color:var(--warn);flex:1 1 280px}
+.kb-msg.ok{color:var(--ink-2)}
+.kb{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;overflow-x:auto}
+.col{background:var(--soft);border:2px solid transparent;border-radius:12px;padding:10px;min-height:230px;min-width:150px}
+.col h4{display:flex;justify-content:space-between;align-items:center;font-size:.95rem}
+.col .cnt{font:800 .78rem var(--f-head);background:#fff;border:2px solid var(--ink);border-radius:999px;padding:0 8px}
+.col.atlimit .cnt{background:var(--warn);border-color:var(--warn);color:#fff}
+.col.over{border:2px dashed var(--ink);background:#E1EAF5}
+.col.shake{animation:shake .4s;border-color:var(--warn)}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.kcard{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.88rem;line-height:1.3;cursor:grab}
+.kcard.drag{opacity:.4}
+.kcard .mv{display:flex;justify-content:space-between;margin-top:6px}
+.kcard .mv button{border:2px solid var(--rule);background:#fff;border-radius:7px;width:30px;height:24px;line-height:1;padding:0}
+.kcard .mv button:hover{border-color:var(--ink)}
+.kcard .mv button:disabled{opacity:.3;cursor:default}
+.kb-stats{margin-top:10px;font-weight:700}
+
+/* metodologías */
+.wf{display:grid;gap:6px}
+.wf div{padding:6px 12px;border-radius:8px;color:#fff;font-weight:700;font-size:.85rem}
+.wf div:nth-child(1){background:#5B6C8A;width:52%}
+.wf div:nth-child(2){background:#3F6DB5;width:52%;margin-left:12%}
+.wf div:nth-child(3){background:#1E6BFF;width:52%;margin-left:24%}
+.wf div:nth-child(4){background:#0E9F8E;width:52%;margin-left:36%}
+.wf div:nth-child(5){background:#0F2440;width:52%;margin-left:48%}
+.ag{display:grid;gap:8px}
+.ag div{display:flex;gap:6px}
+.ag span{flex:1;padding:6px 8px;text-align:center;border-radius:8px;background:var(--comp-soft,#DCE8FF);border:2px solid var(--comp);font-weight:700;font-size:.8rem}
+.ag span:nth-child(2){background:#E9DDFF;border-color:var(--avz)}
+.ag span:nth-child(3){background:#DDF4F0;border-color:var(--ok)}
+.scen{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 10px}
+.scen button{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:6px 14px;font-weight:600}
+.scen button[aria-pressed=true]{background:var(--ink);color:#fff}
+.scen-out{min-height:70px}
+.cycle{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:8px 0 14px}
+.cycle button{flex:1 1 130px;border:2px solid var(--ink);background:#fff;border-radius:12px;padding:10px 12px;text-align:left;font-weight:700;position:relative}
+.cycle button span{display:block;font-size:1.3rem}
+.cycle button[aria-pressed=true]{background:var(--avz);color:#fff;border-color:var(--avz)}
+.cycle-detail{border-left:6px solid var(--avz);background:#F3EBFF;padding:12px 16px;border-radius:0 12px 12px 0}
+.layers{display:grid;gap:8px}
+.layers div{padding:12px 16px;border-radius:12px;border:2px solid var(--ink);background:#fff}
+.layers div:nth-child(1){margin-right:0;border-color:var(--comp);background:#E4EDFF}
+.layers div:nth-child(2){margin:0 3% 0 3%;border-color:var(--avz);background:#F0E7FF}
+.layers div:nth-child(3){margin:0 6% 0 6%;border-color:var(--exp);background:#FFEBDD}
+.layers b{font-family:var(--f-head)}
+
+/* árbol y tablas */
+.tree{display:grid;gap:10px;margin:12px 0}
+.tree-q{display:flex;align-items:center;gap:10px;font:800 1.05rem var(--f-head)}
+.tree-q span{background:var(--ink);color:#fff;border-radius:10px;padding:6px 14px}
+.branch{display:grid;grid-template-columns:minmax(150px,230px) 34px 1fr;align-items:stretch}
+.branch>button{border:2px solid var(--ink);background:#fff;border-radius:12px;padding:10px 14px;text-align:left;font-weight:700}
+.branch>button:hover{background:var(--soft)}
+.branch .con{position:relative}
+.branch .con::before{content:"";position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;background:var(--rule);transition:background .2s}
+.branch .res{border:2px solid var(--rule);border-radius:12px;padding:10px 14px;background:#fff;color:var(--mute);transition:all .2s}
+.branch.sel>button{background:var(--ink);color:#fff}
+.branch.sel .con::before{background:var(--c)}
+.branch.sel .res{border-color:var(--c);background:#fff;color:var(--ink);box-shadow:inset 6px 0 0 var(--c)}
+.res b{font-family:var(--f-head)}
+.tree-out{border:2px solid var(--ink);border-radius:12px;padding:14px 16px;background:var(--soft);margin-top:4px}
+.tree-out[hidden]{display:none}
+.tree-out .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.tbl-wrap{overflow-x:auto;border:2px solid var(--ink);border-radius:12px;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem;background:#fff}
+th,td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{background:var(--ink);color:#fff;font:700 .85rem var(--f-head);white-space:nowrap;position:sticky;top:0}
+th button{background:none;border:0;color:#fff;font:inherit;padding:0;display:flex;gap:6px;align-items:center}
+th button::after{content:"↕";opacity:.5;font-size:.8em}
+th[aria-sort=ascending] button::after{content:"↑";opacity:1}
+th[aria-sort=descending] button::after{content:"↓";opacity:1}
+tr.rec td{background:#FFF6D0}
+tr.rec td:first-child{box-shadow:inset 5px 0 0 var(--idea)}
+td:first-child{font-weight:700;white-space:nowrap}
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font:700 .75rem var(--f-body);background:#E6ECF4;white-space:nowrap}
+.pill.g{background:var(--ok-soft);color:#075E54}
+.pill.f{background:#E4EDFF;color:#1042A8}
+.pill.c{background:#F0E7FF;color:#5B1FB8}
+
+/* herramientas */
+.filters{display:grid;gap:10px;margin-bottom:12px}
+.frow{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.frow>b{font:700 .85rem var(--f-head);min-width:72px}
+.fchip{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:3px 12px;font:600 .83rem var(--f-body)}
+.fchip[aria-pressed=true]{background:var(--ink);color:#fff}
+.search{width:100%;max-width:420px;border:2px solid var(--ink);border-radius:10px;padding:8px 12px;background:#fff}
+.tgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.tool{border:2px solid var(--ink);border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px;position:relative}
+.tool.rec{background:#FFF9E0;box-shadow:inset 0 5px 0 var(--idea)}
+.tool h4{display:flex;align-items:center;gap:8px;font-size:1.02rem}
+.tool h4 span{font-size:1.25rem}
+.tool .meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tool p{margin:0;font-size:.88rem;color:var(--ink-2)}
+.tool .alt{font-size:.82rem;color:var(--mute)}
+.tool a{font-weight:700;font-size:.85rem;margin-top:auto}
+.dif{display:inline-flex;gap:3px;vertical-align:middle}
+.dif i{width:9px;height:9px;border-radius:50%;border:2px solid var(--ink);background:#fff}
+.dif i.f{background:var(--ink)}
+.recbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#FFF4CF;border:2px solid var(--idea);border-radius:10px;padding:8px 12px;margin-bottom:10px}
+.recbar[hidden]{display:none}
+.count{font-weight:700;color:var(--ink-2);margin:0 0 8px}
+.empty{padding:22px;border:2px dashed var(--rule);border-radius:12px;text-align:center;color:var(--ink-2)}
+
+/* planificación */
+.poker{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.pcard{width:62px;height:88px;border-radius:10px;border:2.5px solid var(--ink);background:#fff;font:800 1.5rem var(--f-head);display:grid;place-items:center;transition:transform .15s,background .15s}
+.pcard:hover{transform:translateY(-4px)}
+.pcard[aria-pressed=true]{background:var(--comp);color:#fff;transform:translateY(-8px)}
+.pcard.back{background:repeating-linear-gradient(45deg,var(--ink) 0 6px,#17335B 6px 12px);color:transparent;cursor:default}
+.pcard.rev{animation:flip .5s}
+@keyframes flip{from{transform:rotateY(90deg)}to{transform:rotateY(0)}}
+.poker-res{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:8px 0}
+.poker-res figure{margin:0;text-align:center;font-size:.8rem;color:var(--mute)}
+.sizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.sizes div{border:2px solid var(--ink);border-radius:10px;padding:8px 12px;background:#fff}
+.sizes b{font:800 1.3rem var(--f-head);display:block}
+.gantt{overflow-x:auto;margin:10px 0}
+.g-in{min-width:760px;position:relative}
+.g-row{display:grid;grid-template-columns:184px 1fr;align-items:center;min-height:36px;border-bottom:1px dashed var(--rule)}
+.g-row>span{font-size:.85rem;font-weight:600;padding-right:8px;line-height:1.2}
+.g-track{position:relative;height:28px;background-image:repeating-linear-gradient(90deg,transparent 0,transparent calc(100% / 16 - 1px),rgba(15,36,64,.11) calc(100% / 16 - 1px),rgba(15,36,64,.11) calc(100% / 16))}
+.g-head .g-track{height:22px}
+.g-head .g-track b{position:absolute;top:0;width:calc(100% / 16);text-align:center;font:700 .7rem var(--f-head);color:var(--mute)}
+.g-bar{position:absolute;top:4px;height:20px;border-radius:6px;font-size:.72rem;font-weight:700;color:#fff;padding:0 7px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;transition:left .5s ease,width .5s ease}
+.g-buf{background:repeating-linear-gradient(45deg,#B7C8DF 0,#B7C8DF 6px,#E3EBF6 6px,#E3EBF6 12px);color:var(--ink);border:1.5px dashed var(--ink-2)}
+.g-inc{background:repeating-linear-gradient(45deg,var(--warn) 0,var(--warn) 6px,#FF9DA1 6px,#FF9DA1 12px);color:#fff;border-radius:0 6px 6px 0;text-shadow:0 0 3px rgba(0,0,0,.4)}
+.g-doc{background:#5A6F8C;height:10px;top:9px;opacity:.6}
+.g-ms{position:absolute;top:5px;width:18px;height:18px;margin-left:-9px;background:var(--idea);border:2.5px solid var(--ink);transform:rotate(45deg);transition:left .5s ease}
+.g-dead{position:absolute;top:0;bottom:0;width:0;border-left:3px dashed var(--warn);left:calc(184px + (100% - 184px) * .875);pointer-events:none;z-index:2}
+.g-dead::after{content:"Entrega";position:absolute;top:-2px;left:6px;background:var(--warn);color:#fff;border-radius:6px;padding:0 7px;font:700 .72rem var(--f-head)}
+.g-status{display:inline-block;margin-top:8px;padding:6px 14px;border-radius:999px;font-weight:800;font-family:var(--f-head)}
+.g-status.ok{background:var(--ok-soft);color:#075E54;border:2px solid var(--ok)}
+.g-status.late{background:var(--warn-soft);color:#8E1B20;border:2px solid var(--warn)}
+.ph-a{background:#5B6C8A}.ph-b{background:#3F6DB5}.ph-c{background:#1E6BFF}.ph-d{background:#0E9F8E}.ph-e{background:#8A3FFC}.ph-f{background:#0F2440}
+
+/* riesgos */
+.risk-grid{display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:22px;align-items:start}
+.rm{display:grid;grid-template-columns:26px repeat(3,1fr);grid-template-rows:repeat(3,84px) 26px;gap:4px}
+.rm .ax{font:700 .74rem var(--f-head);color:var(--mute);display:grid;place-items:center}
+.rm .ax.y{writing-mode:vertical-rl;transform:rotate(180deg)}
+.rm .cell{border-radius:8px;display:flex;flex-wrap:wrap;gap:4px;align-content:center;justify-content:center;padding:4px}
+.rm .s1{background:#CDEFE0}.rm .s2{background:#FFF0B8}.rm .s3{background:#FFC9C7}
+.bub{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;border:2px solid #fff;font:800 .85rem var(--f-head);display:grid;place-items:center;padding:0;transition:transform .15s}
+.bub:hover{transform:scale(1.12)}
+.bub.sel{background:var(--comp);transform:scale(1.25);outline:3px solid var(--ink)}
+.risk-detail{border:2px solid var(--ink);border-radius:12px;padding:12px 16px;background:var(--soft);margin-top:12px;min-height:110px}
+.risk-add{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:12px 0}
+.risk-add label{display:grid;gap:2px;font-size:.8rem;font-weight:700}
+.risk-add input,.risk-add select{border:2px solid var(--ink);border-radius:8px;padding:6px 9px;background:#fff}
+tr.rsel td{background:#E4EDFF}
+.lvl{font-weight:700}
+.lvl.l1{color:#0A7A4B}.lvl.l2{color:#946200}.lvl.l3{color:#B3262C}
+
+/* materias */
+.subj{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.sub{border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff}
+.sub-h{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--c);color:var(--on)}
+.sub-h b{font:800 1.05rem var(--f-head);flex:1}
+.sub-h .switch{font-weight:600;font-size:.82rem}
+.sub-b{padding:12px 14px}
+.sub-b p{margin:0 0 6px;font-size:.92rem}
+.sub-b ul{margin:4px 0 0;padding-left:1.1em;font-size:.88rem}
+.outline{margin-top:12px}
+.codeblock{position:relative;background:#0B1B33;color:#E3ECF9;border-radius:12px;padding:14px 16px}
+.codeblock pre{margin:0;font:.84rem/1.6 var(--f-mono);white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:420px;padding-right:74px}
+.copy{position:absolute;top:10px;right:10px;border:2px solid #A9C8FF;background:transparent;color:#A9C8FF;border-radius:8px;padding:3px 10px;font:700 .78rem var(--f-body)}
+.copy:hover{background:#A9C8FF;color:var(--ink)}
+.copy.done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* prácticas y faq */
+.signs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.sign{border:2px solid var(--ink);border-radius:12px;padding:0;background:#fff;overflow:hidden}
+.sign header{display:flex;gap:10px;align-items:center;background:var(--warn);color:#fff;padding:9px 13px;font:800 1rem/1.15 var(--f-head)}
+.sign header span{font-size:1.4rem}
+.sign div{padding:10px 14px 12px;font-size:.92rem}
+.sign p{margin:0 0 6px}
+.faq{display:grid;gap:12px}
+.faq-i{border:2px solid var(--ink);border-radius:12px;padding:12px 16px;background:#fff}
+.faq-i h4{font-size:1.05rem;margin-bottom:8px}
+.faq-i h4::before{content:"“";color:var(--comp);margin-right:2px}
+.faq-i h4::after{content:"”";color:var(--comp);margin-left:2px}
+
+/* presentación */
+.slides{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:start}
+.thumbs{display:grid;gap:6px;max-height:430px;overflow:auto;padding-right:4px}
+.thumb{display:flex;gap:8px;align-items:center;border:2px solid var(--ink);border-radius:9px;background:#fff;padding:6px 9px;text-align:left;font-weight:600;font-size:.86rem}
+.thumb b{flex:none;width:24px;height:24px;border-radius:6px;background:var(--ink);color:#fff;display:grid;place-items:center;font:800 .78rem var(--f-head)}
+.thumb[aria-selected=true]{background:var(--ink);color:#fff}
+.thumb[aria-selected=true] b{background:#fff;color:var(--ink)}
+.sview{border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
+.sview-top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:12px 18px}
+.sview-top h3{color:#fff;font-size:1.35rem}
+.sview-top .tm{font:800 1.05rem var(--f-head);background:var(--idea);color:var(--ink);border-radius:999px;padding:2px 12px;white-space:nowrap}
+.sview-b{padding:16px 20px}
+.sview-b ul{margin:0 0 12px;padding-left:1.2em}
+.tipline{background:var(--idea-soft);border-left:5px solid var(--idea);padding:8px 12px;border-radius:0 10px 10px 0;font-size:.92rem}
+.timing{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:12px 0}
+.timing input{width:72px;border:2px solid var(--ink);border-radius:8px;padding:5px 8px;font-weight:700}
+.tbar{display:flex;height:16px;border-radius:8px;overflow:hidden;border:2px solid var(--ink);margin-bottom:12px}
+.tbar i{display:block;height:100%;border-right:1px solid #fff;transition:opacity .2s}
+.qlist{display:grid;gap:8px}
+.qi{border:2px solid var(--rule);border-radius:10px;padding:10px 14px;background:#fff}
+.qi>b{display:block;margin-bottom:6px;font-family:var(--f-head)}
+.steps4{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0 14px;counter-reset:s}
+.steps4 div{border:2px solid var(--ink);border-radius:10px;padding:8px 12px;background:#fff;counter-increment:s;font-size:.9rem}
+.steps4 div::before{content:counter(s);display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--comp);color:#fff;font:800 .8rem var(--f-head);margin-right:8px}
+.steps4 b{font-family:var(--f-head)}
+
+/* checklist final */
+.pre-wrap{display:grid;grid-template-columns:1fr 190px;gap:24px;align-items:center}
+.ring-big{width:170px;height:170px;border-radius:50%;background:conic-gradient(var(--ok) var(--p,0%),#D5DFEC 0);display:grid;place-items:center;position:relative}
+.ring-big div{width:136px;height:136px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font:800 2rem var(--f-head)}
+.ring-big small{display:block;font:600 .75rem var(--f-body)}
+.stamp{display:none;margin-top:12px;border:4px double var(--ok);color:var(--ok);border-radius:12px;padding:8px 16px;font:900 1.2rem var(--f-head);transform:rotate(-3deg);width:max-content;max-width:100%}
+.stamp.show{display:block;animation:pop .45s}
+@keyframes pop{from{transform:scale(1.5) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(-3deg);opacity:1}}
+
+/* plantillas y backlog */
+.bl-scroll{overflow-x:auto;border:2px solid var(--ink);border-radius:12px}
+.bl-scroll table input,.bl-scroll table select{width:100%;border:0;background:transparent;padding:2px 4px;min-width:70px}
+.bl-scroll table input:focus,.bl-scroll table select:focus{background:#EEF3FF;outline:2px solid var(--comp)}
+.bl-scroll td:first-child{white-space:nowrap}
+.bl-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.linklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;list-style:none;padding:0!important}
+.linklist a{display:block;border:2px solid var(--rule);border-radius:10px;padding:8px 12px;text-decoration:none;font-weight:700;color:var(--ink)}
+.linklist a:hover{border-color:var(--ink);background:var(--soft)}
+.linklist small{display:block;font-weight:400}
+
+/* después */
+.star{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.star div{border-radius:12px;padding:12px 14px;color:#fff}
+.star div:nth-child(1){background:#5B6C8A}.star div:nth-child(2){background:#1E6BFF}.star div:nth-child(3){background:#0E9F8E}.star div:nth-child(4){background:#8A3FFC}
+.star b{font:800 1.05rem var(--f-head);display:block}
+.star p{margin:4px 0 0;font-size:.88rem}
+
+/* glosario */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:10px}
+.gl div{border:2px solid var(--rule);border-radius:10px;padding:8px 12px;background:#fff}
+.gl dt{font:800 .98rem var(--f-head)}
+.gl dd{margin:2px 0 0;font-size:.88rem;color:var(--ink-2)}
+.contacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.contacts label{display:grid;gap:4px;font-weight:700}
+.contacts input{border:2px solid var(--ink);border-radius:8px;padding:7px 10px;background:#fff;font-weight:400}
+
+footer{max-width:var(--maxw);margin:0 auto;padding:0 20px 46px 78px;color:var(--mute);font-size:.9rem}
+
+@media (max-width:860px){
+  .hero-top,.two,.phase-panel,.risk-grid,.slides,.pre-wrap{grid-template-columns:1fr}
+  .slides .thumbs{grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);max-height:none;overflow-x:auto;padding-bottom:6px}
+  .ring-big{margin:0 auto}
+  .kb{grid-template-columns:repeat(4,200px)}
+}
+@media (max-width:700px){
+  main{padding:20px 12px 60px}
+  footer{padding:0 14px 40px}
+  .rail,.station{display:none}
+  .hero{padding:24px 12px 0}
+  .pad{padding:18px 15px 22px}
+  .sec-title{font-size:1.15rem}
+  .dots{display:none}
+  .sec-head{grid-template-columns:1fr auto;grid-template-areas:"t c" "s c"}
+  .prog-bar{display:none}
+  .brand span.tx{display:none}
+  .branch{grid-template-columns:1fr}
+  .branch .con{display:none}
+  .branch .res{margin-top:4px}
+  .phases{overflow-x:auto;padding-bottom:6px}
+  .pnode{min-width:82px}
+  .phases::before{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+@media print{
+  .topbar,.hero-actions,.rail,.station,.copy,.reveal{display:none!important}
+  .sec-body{grid-template-rows:1fr!important;visibility:visible!important;border:2px solid #000!important}
+  .revealed[hidden]{display:block!important}
+  body{background:#fff}
+}
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top" aria-label="Ir al inicio de la guía">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="tx">Ruta ASIR</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Secciones de la guía"></nav>
+    <div class="prog" title="Progreso de las casillas que marques en la guía">
+      <span>Mi progreso</span>
+      <span class="prog-bar" aria-hidden="true"><i id="progFill"></i></span>
+      <span id="progTxt" aria-live="polite">0 %</span>
+    </div>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="hero-top">
+    <div>
+      <h1>Guía de apoyo para tu proyecto de 2º ASIR</h1>
+      <p class="lead">Consulta rápida, por secciones y sin obligaciones. Elige una línea, mira por qué paradas pasa y coge solo lo que te sirva.</p>
+    </div>
+    <aside class="aviso0" aria-label="Aviso inicial">
+      <span class="tk" aria-hidden="true">🎫</span>
+      <div>
+        <strong>Guía orientativa y voluntaria</strong>
+        <p>No es obligatoria ni prescriptiva. Está pensada para consultarla por secciones, no de principio a fin: coge lo que te sirva y descarta el resto.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="panel">
+    <div class="pick-row" id="routeBtns">
+      <h2>Elige tu línea</h2>
+    </div>
+    <div class="pick-row">
+      <h2>¿Cómo trabajas?</h2>
+      <div class="seg" id="profileSeg" role="group" aria-label="Forma de trabajo">
+        <button type="button" data-profile="solo" aria-pressed="false">Individual</button>
+        <button type="button" data-profile="team" aria-pressed="false">En equipo</button>
+      </div>
+    </div>
+    <p class="legend">Cada columna del plano es una sección de la guía. Los puntos de colores junto al título de cada sección indican qué líneas paran en ella. Pulsa una parada para ir directamente.</p>
+    <div class="map-scroll"><svg id="metro" role="group" aria-label="Plano de líneas: Exprés, Completa y Avanzada, con sus paradas en las secciones 2 a 13"></svg></div>
+    <div class="route-info" id="routeInfo"></div>
+    <div class="hero-actions">
+      <button class="btn sec2 sm" type="button" id="expandAll">Abrir todas las secciones</button>
+      <button class="btn sec2 sm" type="button" id="collapseAll">Cerrar todas</button>
+      <button class="btn sec2 sm" type="button" id="resetProg">Borrar mi progreso</button>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="rail" aria-hidden="true"><i class="r1"></i><i class="r2"></i><i class="r3"></i></div>
+
+  <!-- 1 -->
+  <section class="sec" id="s1" data-short="Usar">
+    <span class="station" aria-hidden="true">1</span>
+    <button class="sec-head" id="h1" aria-expanded="false" aria-controls="b1" type="button">
+      <span class="sec-title">Cómo usar esta guía</span><span class="sec-sub">Tres líneas según el tiempo que tengas</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b1" role="region" aria-labelledby="h1"><div class="sec-inner"><div class="pad">
+      <p>Puedes recorrer una línea de principio a fin o saltar directamente a la sección que necesites. Al elegir una línea, las secciones por las que pasa se resaltan en el plano y en la barra superior.</p>
+      <div class="grid rgrid" id="routeCards"></div>
+      <h3>Cómo leer las etiquetas</h3>
+      <div class="tagleg">
+        <div class="note idea"><span class="ni">💡</span><div><strong>Idea</strong><p>Un enfoque o truco que puedes aplicar.</p></div></div>
+        <div class="note aviso"><span class="ni">⚠️</span><div><strong>Aviso</strong><p>Un error frecuente o algo a lo que prestar atención.</p></div></div>
+        <div class="note ejemplo"><span class="ni">🧪</span><div><strong>Ejemplo</strong><p>Un caso concreto para verlo aplicado.</p></div></div>
+        <div class="note herr"><span class="ni">🛠️</span><div><strong>Herramienta</strong><p>Un programa o servicio que puede ayudarte.</p></div></div>
+      </div>
+      <div class="note idea"><span class="ni">💡</span><div><strong>Todo es opcional</strong><p>Coge lo que te sirva y descarta el resto. Las casillas que marques se guardan en este navegador y alimentan la barra de progreso de arriba, por si quieres usar la guía como lista de trabajo.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="s2" data-short="Fases">
+    <span class="station" aria-hidden="true">2</span>
+    <button class="sec-head" id="h2" aria-expanded="false" aria-controls="b2" type="button">
+      <span class="sec-title">Fases del proyecto</span><span class="sec-sub">Un marco mental para no perderte</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b2" role="region" aria-labelledby="h2"><div class="sec-inner"><div class="pad">
+      <p>Un proyecto avanza por etapas aunque no las nombres. Solo es una referencia: adáptala a tu caso. Pulsa una fase para ver qué suele pasar en ella y marca lo que ya tengas hecho; el anillo de cada fase se va llenando.</p>
+      <div id="phaseMount"></div>
+      <div class="note idea"><span class="ni">💡</span><div><strong>Las fases se solapan</strong><p>Es normal volver atrás: al ejecutar puedes descubrir que tu alcance era demasiado grande y toca replanificar. Esa vuelta es el seguimiento funcionando, no un fracaso.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="s3" data-short="Equipo">
+    <span class="station" aria-hidden="true">3</span>
+    <button class="sec-head" id="h3" aria-expanded="false" aria-controls="b3" type="button">
+      <span class="sec-title">Organización del equipo</span><span class="sec-sub">Si trabajas con más gente (o si trabajas solo)</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b3" role="region" aria-labelledby="h3"><div class="sec-inner"><div class="pad">
+      <p>Individual y en equipo no necesitan lo mismo: cambian los roles, las reuniones y las herramientas. Elige tu caso (también puedes fijarlo arriba, en «¿Cómo trabajas?»).</p>
+      <div class="tabgroup" id="tg3">
+        <div class="tabs" role="tablist" aria-label="Individual o equipo">
+          <button role="tab" data-tab="team" aria-selected="true" type="button">👥 En equipo</button>
+          <button role="tab" data-tab="solo" aria-selected="false" type="button">🧍 Individual</button>
+        </div>
+        <div class="tabpanel" data-panel="team" role="tabpanel">
+          <h3>Roles posibles</h3>
+          <p>Pulsa un rol para ver qué suele incluir. No son parcelas cerradas: todo el mundo configura, prueba y documenta algo.</p>
+          <div class="cycle" id="rolePick"></div>
+          <div class="cycle-detail" id="roleOut" style="border-left-color:var(--comp);background:#E9F0FF"></div>
+          <div class="two" style="margin-top:18px">
+            <div>
+              <h3 style="margin-top:0">Reuniones breves y actas simples</h3>
+              <p>Con 15 minutos, dos o tres veces por semana, suele bastar. Una estructura sencilla:</p>
+              <ul>
+                <li><b>¿Qué hice?</b> (2 min por persona)</li>
+                <li><b>¿Qué haré hasta la próxima?</b></li>
+                <li><b>¿Qué me bloquea?</b> Lo que no se resuelva en 2 minutos se aparca.</li>
+              </ul>
+              <p>Anota acuerdos y tareas en un acta de cinco líneas: hay una plantilla en la sección 14.</p>
+            </div>
+            <div>
+              <h3 style="margin-top:0">Reparto de tareas y visibilidad</h3>
+              <ul>
+                <li>Cada tarea tiene <b>una</b> persona responsable (puede recibir ayuda).</li>
+                <li>El tablero es visible para todos y se actualiza al terminar, no al final de la semana.</li>
+                <li>Repartid también lo aburrido: documentar, probar, revisar.</li>
+              </ul>
+            </div>
+          </div>
+          <h3>Ideas para evitar conflictos y malentendidos</h3>
+          <div class="grid">
+            <div class="box2"><h4>📜 Reglas al empezar</h4><p>Acordad por escrito cómo os comunicáis, cuándo respondéis y qué pasa si alguien no llega a una fecha.</p></div>
+            <div class="box2"><h4>🗣️ Hablar pronto</h4><p>Un problema pequeño dicho a tiempo se arregla en una conversación; a tres semanas de la entrega, no.</p></div>
+            <div class="box2"><h4>🧾 Hechos, no personas</h4><p>«La tarea X lleva dos semanas en curso» es mejor que «nunca haces nada».</p></div>
+            <div class="box2"><h4>✍️ Decisiones por escrito</h4><p>Un mensaje corto con lo acordado evita el «yo entendí otra cosa».</p></div>
+          </div>
+        </div>
+        <div class="tabpanel" data-panel="solo" role="tabpanel" hidden>
+          <h3>Llevas todos los sombreros</h3>
+          <p>Trabajando solo eres coordinación, infraestructura, documentación y QA a la vez. Es más flexible, pero el riesgo principal es el cuello de botella: todo pasa por ti.</p>
+          <div class="grid">
+            <div class="box2"><h4>🎩 Bloques por rol</h4><p>Reserva franjas temáticas: hoy configuro, mañana documento, el viernes pruebo. Cambiar de sombrero cada hora cansa.</p></div>
+            <div class="box2"><h4>🔍 Un par de ojos externos</h4><p>Pide a tu tutor/a o a un compañero/a que revise tu avance de vez en cuando. Se ven errores que tú ya no ves.</p></div>
+            <div class="box2"><h4>🗓️ Revisión semanal de 10 minutos</h4><p>Mira el tablero, mueve lo terminado, decide qué recortas si vas justo.</p></div>
+            <div class="box2"><h4>🧰 Herramientas ligeras</h4><p>Kanban simple, Git y documentación en Markdown suelen ser suficientes. Menos herramientas, menos mantenimiento.</p></div>
+          </div>
+          <div class="note aviso"><span class="ni">⚠️</span><div><strong>Cuidado con el alcance</strong><p>Un proyecto pensado «para tres» y hecho por una persona se atasca. Ajusta desde el principio lo que cabe en tus horas reales.</p></div></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="sec" id="s4" data-short="Métodos">
+    <span class="station" aria-hidden="true">4</span>
+    <button class="sec-head" id="h4" aria-expanded="false" aria-controls="b4" type="button">
+      <span class="sec-title">Metodologías de gestión</span><span class="sec-sub">Por si te ayudan a ordenar el trabajo</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b4" role="region" aria-labelledby="h4"><div class="sec-inner"><div class="pad">
+      <div class="tabgroup" id="tg4">
+        <div class="tabs" role="tablist" aria-label="Metodologías">
+          <button role="tab" data-tab="cas" aria-selected="true" type="button">Cascada vs. Ágil</button>
+          <button role="tab" data-tab="kan" aria-selected="false" type="button">Kanban <span class="lv h">Básico</span></button>
+          <button role="tab" data-tab="scr" aria-selected="false" type="button">Scrum ligero <span class="lv a">Avanzado</span></button>
+          <button role="tab" data-tab="hib" aria-selected="false" type="button">Híbridos <span class="lv">Lo más habitual</span></button>
+        </div>
+
+        <div class="tabpanel" data-panel="cas" role="tabpanel">
+          <div class="two">
+            <div class="box2">
+              <h4>💧 Cascada</h4>
+              <div class="wf" aria-hidden="true"><div>Requisitos</div><div>Diseño</div><div>Implementación</div><div>Pruebas</div><div>Entrega</div></div>
+              <p style="margin-top:10px">Cada fase termina antes de empezar la siguiente. Encaja cuando lo que tienes que construir está claro desde el principio y cambia poco.</p>
+            </div>
+            <div class="box2">
+              <h4>🔁 Ágil</h4>
+              <div class="ag" aria-hidden="true"><div><span>Planear</span><span>Hacer</span><span>Probar</span></div><div><span>Planear</span><span>Hacer</span><span>Probar</span></div><div><span>Planear</span><span>Hacer</span><span>Probar</span></div></div>
+              <p style="margin-top:10px">Ciclos cortos que entregan algo funcional y se ajustan con lo aprendido. Encaja cuando vas descubriendo sobre la marcha.</p>
+            </div>
+          </div>
+          <h3>¿Cuál encaja con tu situación?</h3>
+          <div class="scen" id="scenBtns"></div>
+          <div class="note idea scen-out" id="scenOut"><span class="ni">💡</span><div><strong>Elige un escenario</strong><p>Verás qué enfoque suele encajar mejor y por qué.</p></div></div>
+        </div>
+
+        <div class="tabpanel" data-panel="kan" role="tabpanel" hidden>
+          <p>Un tablero con columnas que representan el estado del trabajo: por hacer, en curso, en revisión, hecho. La regla que marca la diferencia es el <b>límite de WIP</b> (work in progress): un máximo de tareas a medias por columna. El flujo es continuo, sin sprints.</p>
+          <div class="note herr"><span class="ni">🛠️</span><div><strong>Pruébalo aquí</strong><p>Mueve las tarjetas con las flechas o arrástralas. Intenta pasar una cuarta tarea a «En curso» con el límite activado, y luego desactívalo para ver la diferencia.</p></div></div>
+          <div class="kb-tools">
+            <label class="switch"><input type="checkbox" id="wipOn" checked> Límite de WIP activado</label>
+            <button class="btn sec2 sm" type="button" id="kbReset">Reiniciar tablero</button>
+            <div class="kb-msg ok" id="kbMsg" aria-live="polite"></div>
+          </div>
+          <div class="kb" id="kb"></div>
+          <div class="kb-stats" id="kbStats"></div>
+        </div>
+
+        <div class="tabpanel" data-panel="scr" role="tabpanel" hidden>
+          <p>Scrum «ligero» conserva lo esencial y descarta el ceremonial: una lista priorizada, ciclos de una o dos semanas y reuniones muy cortas. Recorre el ciclo:</p>
+          <div class="cycle" id="scrumPick"></div>
+          <div class="cycle-detail" id="scrumOut"></div>
+          <div class="note ejemplo"><span class="ni">🧪</span><div><strong>Sprint de dos semanas en un proyecto ASIR</strong><p>Objetivo: «un cliente puede entrar por HTTPS a la aplicación». Tareas del sprint: instalar Nginx, emitir el certificado, desplegar la app, probar desde otra máquina. Al cierre lo demuestras al tutor/a y anotas qué cambiarías.</p></div></div>
+        </div>
+
+        <div class="tabpanel" data-panel="hib" role="tabpanel" hidden>
+          <p>En un proyecto de ASIR lo más habitual es mezclar: las fechas del curso imponen un marco tipo cascada y, dentro, trabajas con ritmo ágil.</p>
+          <div class="layers">
+            <div><b>Marco (cascada ligera):</b> fases, hitos y entregas parciales que marca el calendario del curso.</div>
+            <div><b>Ritmo (ágil):</b> revisiones semanales o sprints cortos para ajustar el rumbo.</div>
+            <div><b>Día a día (Kanban):</b> un tablero con límite de WIP para saber qué está en marcha.</div>
+          </div>
+          <div class="note idea"><span class="ni">💡</span><div><strong>No hace falta ponerle nombre</strong><p>Lo importante es que puedas responder tres preguntas: qué toca hacer, qué está en marcha y qué me bloquea.</p></div></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="sec" id="s5" data-short="Elegir">
+    <span class="station" aria-hidden="true">5</span>
+    <button class="sec-head" id="h5" aria-expanded="false" aria-controls="b5" type="button">
+      <span class="sec-title">Cómo elegir tus herramientas</span><span class="sec-sub">Un árbol de decisión y una tabla comparativa</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b5" role="region" aria-labelledby="h5"><div class="sec-inner"><div class="pad">
+      <div class="note idea"><span class="ni">💡</span><div><strong>No hace falta usarlas todas, ni siquiera una</strong><p>Una herramienta se justifica si te ahorra más trabajo del que te da. Empieza por lo mínimo y añade solo si notas que te falta algo.</p></div></div>
+      <h3>Árbol de decisión</h3>
+      <div class="tree" id="tree"></div>
+      <div class="tree-out" id="treeOut" hidden></div>
+      <h3>Tabla comparativa</h3>
+      <p>Pulsa una cabecera para ordenar. Las filas resaltadas son las de la pila que te sugiera el árbol.</p>
+      <div class="tbl-wrap"><table id="toolTable"><caption class="sr">Comparativa de herramientas</caption></table></div>
+      <div class="note aviso"><span class="ni">⚠️</span><div><strong>Planes y precios cambian</strong><p>Los datos de coste son orientativos. Comprueba el plan gratuito vigente y los límites antes de depender de una herramienta.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 6 -->
+  <section class="sec" id="s6" data-short="Herramientas">
+    <span class="station" aria-hidden="true">6</span>
+    <button class="sec-head" id="h6" aria-expanded="false" aria-controls="b6" type="button">
+      <span class="sec-title">Herramientas recomendadas</span><span class="sec-sub">Catálogo con buscador y filtros</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b6" role="region" aria-labelledby="h6"><div class="sec-inner"><div class="pad">
+      <p>Busca por nombre o filtra por tipo, coste y dificultad. Los filtros de una misma fila se suman (tipo A o tipo B) y las filas se combinan entre sí.</p>
+      <div class="filters" id="toolFilters"></div>
+      <div class="recbar" id="recBar" hidden></div>
+      <p class="count" id="toolCount" aria-live="polite"></p>
+      <div class="tgrid" id="toolGrid"></div>
+      <div class="note herr"><span class="ni">🛠️</span><div><strong>Git también sirve para scripts y documentos</strong><p>No es solo para código: versionar tus scripts de instalación, ficheros de configuración y la documentación te da historial, copia de seguridad y trabajo colaborativo.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 7 -->
+  <section class="sec" id="s7" data-short="Tiempo">
+    <span class="station" aria-hidden="true">7</span>
+    <button class="sec-head" id="h7" aria-expanded="false" aria-controls="b7" type="button">
+      <span class="sec-title">Planificación temporal</span><span class="sec-sub">Estimar, montar un Gantt realista y reservar colchón</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b7" role="region" aria-labelledby="h7"><div class="sec-inner"><div class="pad">
+      <h3>Cómo estimar tareas</h3>
+      <div class="tabgroup" id="tg7">
+        <div class="tabs" role="tablist" aria-label="Métodos de estimación">
+          <button role="tab" data-tab="hor" aria-selected="true" type="button">Horas</button>
+          <button role="tab" data-tab="tal" aria-selected="false" type="button">Tallas</button>
+          <button role="tab" data-tab="pok" aria-selected="false" type="button">Póker</button>
+        </div>
+        <div class="tabpanel" data-panel="hor" role="tabpanel">
+          <p>Divide hasta que cada tarea quepa en una jornada (4-8 horas), estima en horas y añade un margen para imprevistos y pruebas.</p>
+          <div class="note ejemplo"><span class="ni">🧪</span><div><strong>Regla práctica</strong><p>Configurar VLANs y firewall: estimas 6 h de trabajo. Con un margen del 50 % para pruebas y fallos, planifica 9 h. Si tu primera cifra supera una jornada, trocéala: «crear VLANs», «reglas entre VLANs», «pruebas de aislamiento».</p></div></div>
+          <div class="note aviso"><span class="ni">⚠️</span><div><strong>Solemos ser optimistas</strong><p>Casi siempre tardamos más de lo que pensamos. Lo desconocido (una tecnología nueva) merece un margen mayor que lo que ya has hecho antes.</p></div></div>
+        </div>
+        <div class="tabpanel" data-panel="tal" role="tabpanel" hidden>
+          <p>Cuando no puedes afinar en horas, usa tallas de camiseta y asócialas a un rango que revisarás con la experiencia.</p>
+          <div class="sizes" id="sizes"></div>
+          <div class="note idea"><span class="ni">💡</span><div><strong>Una XL no se planifica: se divide</strong><p>Si algo es XL, todavía no lo entiendes lo suficiente. Trocéalo hasta que sean tareas S o M.</p></div></div>
+        </div>
+        <div class="tabpanel" data-panel="pok" role="tabpanel" hidden>
+          <p>Cada persona elige en secreto una carta y todas se destapan a la vez. Si hay mucha diferencia, se habla: casi siempre es porque cada una imagina una tarea distinta. Tarea de ejemplo: <b>«Configurar copias de seguridad automáticas de la base de datos»</b>.</p>
+          <div class="poker" id="pokerCards" role="group" aria-label="Cartas de póker de planificación"></div>
+          <button class="btn sm" type="button" id="pokerGo" disabled>Destapar cartas</button>
+          <div class="poker-res" id="pokerOut" aria-live="polite"></div>
+          <p><small>Las cartas de «tus compañeros» son simuladas. Trabajando solo, puedes usar el póker contra ti mismo: estima hoy y vuelve a estimar mañana.</small></p>
+        </div>
+      </div>
+
+      <h3>Un Gantt realista: ejemplo de cuatrimestre</h3>
+      <p>Un cronograma tipo de 16 semanas con entrega en la semana 14. Cambia entre un plan ajustado y uno con colchón, y simula un imprevisto: <b>se te rompe el entorno y pierdes dos semanas en la implementación</b>.</p>
+      <div class="kb-tools">
+        <div class="seg" id="ganttSeg" role="group" aria-label="Tipo de plan">
+          <button type="button" data-plan="tight" aria-pressed="true">Plan ajustado</button>
+          <button type="button" data-plan="buffer" aria-pressed="false">Plan con colchón</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="incOn"> Simular imprevisto</label>
+      </div>
+      <div class="gantt"><div class="g-in" id="gantt"></div></div>
+      <div id="ganttStatus" aria-live="polite"></div>
+      <div class="note idea"><span class="ni">💡</span><div><strong>El colchón se reserva, no «te sobra»</strong><p>En el plan con colchón se recorta alcance (implementación de 6 a 4 semanas) para reservar dos semanas de contingencia. Es la misma idea que «recortar alcance antes que calidad».</p></div></div>
+
+      <div class="two">
+        <div>
+          <h3>Hitos y entregables intermedios</h3>
+          <ul>
+            <li>Un hito es un punto de control con fecha, no una tarea: «alcance cerrado», «entorno funcionando».</li>
+            <li>Cada hito debería tener un entregable comprobable: un documento, una demo, un repositorio.</li>
+            <li>Marca un momento para <b>congelar funcionalidades</b> y dedicar el final a pruebas y documentación.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Alineación con el calendario del curso</h3>
+          <ul>
+            <li>Empieza por las fechas fijas: entregas parciales, tutorías y defensa.</li>
+            <li>Réstales unos días de margen antes de fijar tus propios hitos.</li>
+            <li>Consulta con tu tutor/a las fechas exactas de tu centro y anótalas en tu tablero.</li>
+          </ul>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 8 -->
+  <section class="sec" id="s8" data-short="Riesgos">
+    <span class="station" aria-hidden="true">8</span>
+    <button class="sec-head" id="h8" aria-expanded="false" aria-controls="b8" type="button">
+      <span class="sec-title">Gestión de riesgos</span><span class="sec-sub">Anticipa lo que puede salir mal y ten un plan B</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b8" role="region" aria-labelledby="h8"><div class="sec-inner"><div class="pad">
+      <p>Un riesgo se valora por su <b>probabilidad</b> y su <b>impacto</b>. Los de arriba a la derecha del mapa necesitan un plan antes de empezar. Pulsa un número para ver su plan de contingencia.</p>
+      <div class="risk-grid">
+        <div>
+          <div class="rm" id="rm"></div>
+        </div>
+        <div>
+          <div class="risk-detail" id="riskDetail"></div>
+        </div>
+      </div>
+      <h3>Tabla de riesgos</h3>
+      <div class="tbl-wrap"><table id="riskTable"></table></div>
+      <h3>Añade tus propios riesgos</h3>
+      <form class="risk-add" id="riskForm" onsubmit="return false">
+        <label>Riesgo<input id="rkName" type="text" placeholder="Ej.: se rompe el portátil" maxlength="80"></label>
+        <label>Probabilidad<select id="rkP"><option value="1">Baja</option><option value="2" selected>Media</option><option value="3">Alta</option></select></label>
+        <label>Impacto<select id="rkI"><option value="1">Bajo</option><option value="2" selected>Medio</option><option value="3">Alto</option></select></label>
+        <label>Plan B<input id="rkPlan" type="text" placeholder="Qué harás si ocurre" maxlength="140"></label>
+        <button class="btn sm" type="button" id="rkAdd">Añadir</button>
+        <button class="btn sec2 sm" type="button" id="rkCopy">Copiar tabla en Markdown</button>
+      </form>
+      <div class="note idea"><span class="ni">💡</span><div><strong>Un plan B por cada riesgo relevante</strong><p>No hace falta prever todo: basta con los cuatro o cinco riesgos que más te preocupan y una acción concreta para cada uno.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 9 -->
+  <section class="sec" id="s9" data-short="Materias">
+    <span class="station" aria-hidden="true">9</span>
+    <button class="sec-head" id="h9" aria-expanded="false" aria-controls="b9" type="button">
+      <span class="sec-title">Vínculo con las materias del ciclo</span><span class="sec-sub">Qué puede mostrar tu proyecto de cada módulo</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b9" role="region" aria-labelledby="h9"><div class="sec-inner"><div class="pad">
+      <p>Tu proyecto puede tocar varios módulos del ciclo. Marca los que tocas y la guía te propone un índice de documentación para reflejarlos.</p>
+      <div class="subj" id="subjMount"></div>
+      <h3>Tu índice de documentación sugerido</h3>
+      <div class="codeblock outline"><button class="copy" type="button" data-copy="outlinePre">Copiar</button><pre id="outlinePre"></pre></div>
+      <div class="note aviso"><span class="ni">⚠️</span><div><strong>Que se vea en la documentación</strong><p>Si has configurado algo pero no está documentado, para quien evalúa es como si no existiera. Cada bloque técnico debería tener diagrama, pasos y una prueba que demuestre que funciona.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 10 -->
+  <section class="sec" id="s10" data-short="Prácticas">
+    <span class="station" aria-hidden="true">10</span>
+    <button class="sec-head" id="h10" aria-expanded="false" aria-controls="b10" type="button">
+      <span class="sec-title">Buenas prácticas y errores comunes</span><span class="sec-sub">Cinco señales de tráfico</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b10" role="region" aria-labelledby="h10"><div class="sec-inner"><div class="pad">
+      <div class="signs">
+        <article class="sign"><header><span aria-hidden="true">📝</span>No dejes la documentación para el final</header><div><p>Lo que no anotas se olvida: comandos, decisiones, pruebas.</p><p><b>Cómo:</b> captura y copia el comando mientras lo haces; dedica 10 minutos al cerrar cada sesión.</p></div></article>
+        <article class="sign"><header><span aria-hidden="true">🌿</span>Versiona todo</header><div><p>Código, scripts, configuraciones y documentos.</p><p><b>Cómo:</b> repositorio desde el primer día, commits pequeños y mensajes claros.</p></div></article>
+        <article class="sign"><header><span aria-hidden="true">🧼</span>Prueba en entornos limpios</header><div><p>«En mi máquina funciona» no demuestra nada.</p><p><b>Cómo:</b> reconstruye desde cero con tus scripts o instrucciones y comprueba que sale igual.</p></div></article>
+        <article class="sign"><header><span aria-hidden="true">📏</span>No sobredimensiones el alcance</header><div><p>Un proyecto pequeño y bien acabado vale más que uno enorme a medias.</p><p><b>Cómo:</b> separa «imprescindible» de «si sobra tiempo» y empieza por lo primero.</p></div></article>
+        <article class="sign"><header><span aria-hidden="true">🎬</span>Prepara la demo con antelación</header><div><p>Las demos fallan en el peor momento.</p><p><b>Cómo:</b> escribe un guion, ensáyalo y ten un plan B (capturas o vídeo).</p></div></article>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 11 -->
+  <section class="sec" id="s11" data-short="FAQ">
+    <span class="station" aria-hidden="true">11</span>
+    <button class="sec-head" id="h11" aria-expanded="false" aria-controls="b11" type="button">
+      <span class="sec-title">Problemillas típicos y cómo salir</span><span class="sec-sub">Mini FAQ para cuando algo se tuerce</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b11" role="region" aria-labelledby="h11"><div class="sec-inner"><div class="pad">
+      <p>Piensa primero qué harías tú y luego pulsa para comparar.</p>
+      <div class="faq">
+        <div class="faq-i"><h4>Mi compañero no aporta</h4><button class="reveal" type="button" data-reveal>¿Qué puedo hacer?</button>
+          <div class="revealed" hidden><ul><li><b>Habla pronto</b> y con hechos: «esta tarea lleva dos semanas sin moverse».</li><li><b>Registra las tareas</b> en el tablero y en los commits; así el avance de cada persona es visible.</li><li><b>Avisa al tutor/a</b> a tiempo, no la semana de la entrega.</li></ul></div></div>
+        <div class="faq-i"><h4>Voy con retraso</h4><button class="reveal" type="button" data-reveal>¿Qué puedo hacer?</button>
+          <div class="revealed" hidden><ul><li><b>Recorta alcance antes que calidad.</b> Una función menos y bien probada vale más que tres a medias.</li><li>Pasa lo que no llegas a hacer a «trabajo futuro» y déjalo escrito.</li><li>Comunícalo y replanifica con lo que queda.</li></ul></div></div>
+        <div class="faq-i"><h4>Se me ha roto el entorno</h4><button class="reveal" type="button" data-reveal>¿Qué puedo hacer?</button>
+          <div class="revealed" hidden><ul><li><b>Snapshots</b> de las máquinas virtuales antes de cambios grandes.</li><li><b>Backups</b> de datos y configuraciones fuera de la máquina.</li><li><b>Infraestructura como código (IaC):</b> si tu entorno se describe en scripts o ficheros, reconstruirlo es cuestión de minutos.</li></ul></div></div>
+        <div class="faq-i"><h4>No me da tiempo a documentar</h4><button class="reveal" type="button" data-reveal>¿Qué puedo hacer?</button>
+          <div class="revealed" hidden><ul><li><b>Documenta mientras lo haces</b>, no al final: pega el comando y la captura en el momento.</li><li>Usa una plantilla por bloque (objetivo, pasos, prueba) para no partir de cero.</li><li>Reserva una franja fija cada semana solo para documentar.</li></ul></div></div>
+        <div class="faq-i"><h4>La demo falla en la presentación</h4><button class="reveal" type="button" data-reveal>¿Qué puedo hacer?</button>
+          <div class="revealed" hidden><ul><li><b>Ensaya con un entorno limpio</b> el día anterior.</li><li><b>Ten un plan B:</b> capturas o un vídeo corto grabado de antemano.</li><li>Cuenta con calma lo que iba a pasar; un fallo bien gestionado se valora.</li></ul></div></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 12 -->
+  <section class="sec" id="s12" data-short="Defensa">
+    <span class="station" aria-hidden="true">12</span>
+    <button class="sec-head" id="h12" aria-expanded="false" aria-controls="b12" type="button">
+      <span class="sec-title">Presentación y defensa</span><span class="sec-sub">Estructura, comunicación y demo</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b12" role="region" aria-labelledby="h12"><div class="sec-inner"><div class="pad">
+      <h3>Estructura tipo: 10-12 diapositivas</h3>
+      <p>Pulsa una diapositiva para ver qué suele ir en ella. Indica cuántos minutos tienes y verás un reparto orientativo. Si tu proyecto lo pide, añade una o dos más (planificación, seguridad o costes).</p>
+      <div class="timing"><label for="minTotal"><b>Tiempo de exposición:</b></label><input id="minTotal" type="number" min="3" max="60" value="10"> <span>minutos</span></div>
+      <div class="tbar" id="tbar" aria-hidden="true"></div>
+      <div class="slides"><div class="thumbs" id="thumbs" role="tablist" aria-label="Diapositivas"></div><div class="sview" id="sview"></div></div>
+
+      <h3>Tips de comunicación</h3>
+      <div class="grid">
+        <div class="box2"><h4>🥁 Ritmo</h4><p>Habla más despacio de lo que crees necesario y respeta las pausas. No leas las diapositivas: úsalas de apoyo.</p></div>
+        <div class="box2"><h4>🗨️ Lenguaje</h4><p>Explica las siglas la primera vez y evita jerga que no aporta. Di «decidí» y «hice» para que quede claro qué es tuyo.</p></div>
+        <div class="box2"><h4>🌬️ Nervios</h4><p>Memoriza tu primera frase, ensaya en voz alta y respira hondo antes de empezar. Los nervios se notan menos de lo que crees.</p></div>
+      </div>
+
+      <h3>Cómo responder a preguntas difíciles</h3>
+      <div class="steps4">
+        <div><b>Pausa</b><br>Respira y deja que termine la pregunta.</div>
+        <div><b>Reformula</b><br>«Si lo he entendido bien, me preguntas…».</div>
+        <div><b>Responde corto</b><br>Primero la respuesta, luego el detalle.</div>
+        <div><b>Cierra</b><br>Pregunta si queda claro o sigue.</div>
+      </div>
+      <div class="qlist" id="qlist"></div>
+      <div class="note idea"><span class="ni">💡</span><div><strong>«No lo sé» tiene un final digno</strong><p>Reconócelo con calma y explica cómo lo averiguarías. Inventar una respuesta es peor que admitir el límite.</p></div></div>
+
+      <h3>Demo en vivo</h3>
+      <p>Prepárala con antelación y ten un plan B. Marca lo que ya tienes listo:</p>
+      <div>
+        <label class="chk"><input type="checkbox" data-key="demo1"><span class="box"></span><span class="lbl">Guion de la demo escrito, con tiempos</span></label>
+        <label class="chk"><input type="checkbox" data-key="demo2"><span class="box"></span><span class="lbl">Probada desde cero en un entorno limpio</span></label>
+        <label class="chk"><input type="checkbox" data-key="demo3"><span class="box"></span><span class="lbl">Plan B preparado (capturas o vídeo de respaldo)</span></label>
+        <label class="chk"><input type="checkbox" data-key="demo4"><span class="box"></span><span class="lbl">Snapshot de respaldo de las máquinas</span></label>
+        <label class="chk"><input type="checkbox" data-key="demo5"><span class="box"></span><span class="lbl">Cables, adaptadores y acceso a red comprobados en el aula</span></label>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 13 -->
+  <section class="sec" id="s13" data-short="Entrega">
+    <span class="station" aria-hidden="true">13</span>
+    <button class="sec-head" id="h13" aria-expanded="false" aria-controls="b13" type="button">
+      <span class="sec-title">Antes de entregar</span><span class="sec-sub">La checklist final</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b13" role="region" aria-labelledby="h13"><div class="sec-inner"><div class="pad">
+      <div class="pre-wrap">
+        <div>
+          <label class="chk"><input type="checkbox" data-key="pre1"><span class="box"></span><span class="lbl">Documentación completa y revisada<small>Índice, numeración, capturas legibles, faltas de ortografía repasadas.</small></span></label>
+          <label class="chk"><input type="checkbox" data-key="pre2"><span class="box"></span><span class="lbl">Repositorio ordenado y con README<small>Qué es, cómo se instala, cómo se prueba y quién lo ha hecho.</small></span></label>
+          <label class="chk"><input type="checkbox" data-key="pre3"><span class="box"></span><span class="lbl">Entorno reproducible (scripts, IaC, instrucciones)<small>Otra persona puede levantarlo siguiendo tus pasos.</small></span></label>
+          <label class="chk"><input type="checkbox" data-key="pre4"><span class="box"></span><span class="lbl">Demo probada en limpio<small>Desde cero, con el guion delante y cronometrada.</small></span></label>
+          <label class="chk"><input type="checkbox" data-key="pre5"><span class="box"></span><span class="lbl">Presentación ensayada<small>En voz alta, con tiempo y, si puedes, con público.</small></span></label>
+          <label class="chk"><input type="checkbox" data-key="pre6"><span class="box"></span><span class="lbl">Entregables subidos en plazo y formato correcto<small>Comprueba nombres de archivo, formato y que el enlace se abre sin tu sesión.</small></span></label>
+          <div class="stamp" id="stamp" role="status">¡Todo listo para entregar!</div>
+        </div>
+        <div class="ring-big" id="preRing" style="--p:0%"><div><span id="preTxt">0/6</span><small>revisado</small></div></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 14 -->
+  <section class="sec" id="s14" data-short="Plantillas">
+    <span class="station" aria-hidden="true">14</span>
+    <button class="sec-head" id="h14" aria-expanded="false" aria-controls="b14" type="button">
+      <span class="sec-title">Recursos y plantillas</span><span class="sec-sub">Actas, backlog y checklist listos para copiar</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b14" role="region" aria-labelledby="h14"><div class="sec-inner"><div class="pad">
+      <h3>Acta de reunión</h3>
+      <div class="codeblock"><button class="copy" type="button" data-copy="tplActa">Copiar</button><pre id="tplActa">## Acta de reunión
+
+- **Fecha:** 
+- **Asistentes:** 
+- **Temas tratados:**
+  1. 
+  2. 
+- **Acuerdos:**
+  - 
+- **Tareas:**
+  | Tarea | Responsable | Fecha límite |
+  |-------|-------------|--------------|
+  |       |             |              |
+- **Próxima reunión:** </pre></div>
+
+      <h3>Backlog</h3>
+      <p>Edita las celdas directamente, añade filas y descarga o copia el resultado.</p>
+      <div class="bl-scroll"><table id="blTable"></table></div>
+      <div class="bl-actions">
+        <button class="btn sm" type="button" id="blAdd">Añadir fila</button>
+        <button class="btn sec2 sm" type="button" id="blCopy">Copiar en Markdown</button>
+        <button class="btn sec2 sm" type="button" id="blCsv">Descargar CSV</button>
+      </div>
+
+      <h3>Checklist de entrega</h3>
+      <div class="codeblock"><button class="copy" type="button" data-copy="tplCheck">Copiar</button><pre id="tplCheck">## Checklist de entrega — Hito: ______  Fecha: ______
+
+- [ ] Documentación completa y revisada
+- [ ] Repositorio ordenado y con README
+- [ ] Entorno reproducible (scripts, IaC, instrucciones)
+- [ ] Demo probada en limpio
+- [ ] Presentación ensayada
+- [ ] Entregables subidos en plazo y formato correcto</pre></div>
+
+      <h3>Tutoriales oficiales y lecturas</h3>
+      <ul class="linklist">
+        <li><a href="https://git-scm.com/doc" target="_blank" rel="noopener">Git: documentación<small>Referencia y libro Pro Git</small></a></li>
+        <li><a href="https://docs.github.com" target="_blank" rel="noopener">GitHub Docs<small>Repositorios, Projects y Actions</small></a></li>
+        <li><a href="https://docs.gitlab.com" target="_blank" rel="noopener">GitLab Docs<small>Repositorios y CI/CD</small></a></li>
+        <li><a href="https://trello.com/guide" target="_blank" rel="noopener">Guía de Trello<small>Tableros Kanban</small></a></li>
+        <li><a href="https://www.markdownguide.org" target="_blank" rel="noopener">Markdown Guide<small>Sintaxis y ejemplos</small></a></li>
+        <li><a href="https://docs.docker.com" target="_blank" rel="noopener">Docker Docs<small>Contenedores y Compose</small></a></li>
+        <li><a href="https://letsencrypt.org/getting-started/" target="_blank" rel="noopener">Let's Encrypt<small>Certificados HTTPS gratuitos</small></a></li>
+        <li><a href="https://scrumguides.org" target="_blank" rel="noopener">Scrum Guide<small>Referencia oficial de Scrum</small></a></li>
+        <li><a href="https://kanbanguides.org" target="_blank" rel="noopener">Kanban Guide<small>Referencia oficial de Kanban</small></a></li>
+      </ul>
+      <div class="note idea"><span class="ni">💡</span><div><strong>Ejemplos de proyectos anteriores</strong><p>Si existen y hay permiso de sus autores, pide a tu tutor/a que te enseñe alguno para ver el nivel esperado y cómo se estructura la documentación. Pide también la bibliografía de referencia del módulo.</p></div></div>
+    </div></div></div>
+  </section>
+
+  <!-- 15 -->
+  <section class="sec" id="s15" data-short="Después">
+    <span class="station" aria-hidden="true">15</span>
+    <button class="sec-head" id="h15" aria-expanded="false" aria-controls="b15" type="button">
+      <span class="sec-title">Después del proyecto</span><span class="sec-sub">Que el trabajo siga sirviendo</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b15" role="region" aria-labelledby="h15"><div class="sec-inner"><div class="pad">
+      <h3>Qué hacer con lo aprendido</h3>
+      <div class="grid">
+        <div class="box2"><h4>🗂️ Portfolio</h4><p>Reúne el proyecto en una página o repositorio con descripción, diagrama y capturas. Es lo primero que mirará quien quiera conocerte.</p></div>
+        <div class="box2"><h4>🐙 GitHub</h4><p>Repositorio limpio, README cuidado y sin credenciales ni datos personales en el historial.</p></div>
+        <div class="box2"><h4>💼 LinkedIn</h4><p>Añádelo como proyecto con enlace y las tecnologías usadas.</p></div>
+      </div>
+      <h3>Cómo contarlo en una entrevista</h3>
+      <p>El método STAR ayuda a explicar tu proyecto en un minuto y medio:</p>
+      <div class="star">
+        <div><b>Situación</b><p>¿Qué problema o contexto había?</p></div>
+        <div><b>Tarea</b><p>¿Cuál era tu objetivo y tu parte?</p></div>
+        <div><b>Acción</b><p>¿Qué decidiste y qué hiciste, y por qué?</p></div>
+        <div><b>Resultado</b><p>¿Qué funcionó y qué aprendiste?</p></div>
+      </div>
+      <h3>Ideas para seguir mejorándolo</h3>
+      <ul>
+        <li>Automatizar pruebas y despliegue con CI/CD.</li>
+        <li>Describir la infraestructura como código para reconstruirla en minutos.</li>
+        <li>Añadir monitorización y alertas.</li>
+        <li>Reforzar la seguridad (copias verificadas, mínimo privilegio, revisión periódica).</li>
+        <li>Traducir el README al inglés para ampliar su alcance.</li>
+      </ul>
+    </div></div></div>
+  </section>
+
+  <!-- 16 -->
+  <section class="sec" id="s16" data-short="Anexos">
+    <span class="station" aria-hidden="true">16</span>
+    <button class="sec-head" id="h16" aria-expanded="false" aria-controls="b16" type="button">
+      <span class="sec-title">Anexos</span><span class="sec-sub">Glosario, checklists por fase y recursos del centro</span><span class="dots"></span><span class="chev"></span>
+    </button>
+    <div class="sec-body" id="b16" role="region" aria-labelledby="h16"><div class="sec-inner"><div class="pad">
+      <h3>Glosario breve</h3>
+      <input class="search" id="glSearch" type="search" placeholder="Busca un término (sprint, CI/CD, hito…)" aria-label="Buscar en el glosario">
+      <dl class="gl" id="glist"></dl>
+      <h3>Checklists rápidas por fase</h3>
+      <p>Son las mismas casillas de la sección 2: si marcas una aquí, se marca allí.</p>
+      <div class="grid" id="phaseAnnex"></div>
+      <h3>Recursos del centro</h3>
+      <p>Anota tus contactos y horarios. Se guardan solo en este navegador.</p>
+      <div class="contacts">
+        <label>👩‍🏫 Tutor/a de proyecto<input type="text" data-contact="tutor" placeholder="Nombre, correo y horario de tutoría"></label>
+        <label>🏫 Aula / horario de aula<input type="text" data-contact="aula" placeholder="Aula y franjas disponibles"></label>
+        <label>🧪 Laboratorio / equipos<input type="text" data-contact="lab" placeholder="Quién gestiona la reserva de equipos y red"></label>
+      </div>
+    </div></div></div>
+  </section>
+</main>
+<footer>Guía de apoyo orientativa y voluntaria. Tu progreso y tus notas se guardan solo en este navegador.</footer>
+
+<script>
+(function(){
+'use strict';
+/* ============ utilidades ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={
+  get(k,d){try{const v=localStorage.getItem('asirGuia:'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('asirGuia:'+k,JSON.stringify(v))}catch(e){}}
+};
+async function copyText(txt){
+  try{await navigator.clipboard.writeText(txt);return true}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);ta.select();let ok=false;
+    try{ok=document.execCommand('copy')}catch(_){}
+    ta.remove();return ok;
+  }
+}
+function download(name,text,mime){
+  const blob=new Blob([text],{type:mime||'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function flash(btn,txt){
+  const old=btn.textContent;btn.textContent=txt;btn.classList.add('done');
+  setTimeout(()=>{btn.textContent=old;btn.classList.remove('done')},1400);
+}
+
+/* ============ estado ============ */
+const S={
+  route:store.get('route',null),
+  profile:store.get('profile',null),
+  checks:store.get('checks',{}),
+  tree:null,
+  recOnly:false
+};
+
+/* ============ datos ============ */
+const ROUTES={
+  exp:{name:'Línea Exprés',short:'Exprés',tag:'Poco tiempo',hex:'#F26A1B',txt:'#C2410C',on:'#0F2440',
+    desc:'Lo mínimo que más rinde: un tablero Kanban, Git desde el primer día y la checklist de entrega.',
+    includes:['Kanban','Git','Checklist de entrega'],stops:[4,6,13]},
+  comp:{name:'Línea Completa',short:'Completa',tag:'Recomendada',hex:'#1E6BFF',txt:'#1553CC',on:'#fff',
+    desc:'Kanban, Gantt, Git, documentación y presentación: el recorrido equilibrado para un proyecto bien acabado.',
+    includes:['Kanban','Gantt','Git','Documentación','Presentación'],stops:[2,4,5,6,7,8,9,10,12,13]},
+  avz:{name:'Línea Avanzada',short:'Avanzada',tag:'Si te sobra tiempo',hex:'#8A3FFC',txt:'#6D28D9',on:'#fff',
+    desc:'Todo lo de la línea Completa y, además, Scrum, CI/CD e infraestructura como código.',
+    includes:['Scrum','CI/CD','IaC'],stops:[2,3,4,5,6,7,8,9,10,11,12,13]}
+};
+const ORDER=['exp','comp','avz'];
+const linesFor=n=>ORDER.filter(k=>ROUTES[k].stops.includes(n));
+
+const MAPLABELS={2:'Fases',3:'Equipo',4:'Metodologías',5:'Elegir herramientas',6:'Herramientas',7:'Planificación',8:'Riesgos',9:'Materias del ciclo',10:'Buenas prácticas',11:'Mini FAQ',12:'Presentación',13:'Checklist de entrega'};
+
+const TYPES={kan:'Tableros',gan:'Planificación',dia:'Diagramas',doc:'Documentación',vcs:'Control de versiones',com:'Comunicación',ci:'Automatización / CI'};
+const TYPEICON={kan:'🗂️',gan:'📅',dia:'🧩',doc:'📝',vcs:'🌿',com:'💬',ci:'⚙️'};
+const DIFF=['Baja','Media','Alta'];
+const TOOLS=[
+  {n:'Trello',t:'kan',c:'Freemium',d:1,ideal:'Kanban sencillo, en solitario o en equipo pequeño.',alt:'GitHub Projects',url:'https://trello.com'},
+  {n:'Jira',t:'kan',c:'Freemium',d:3,ideal:'Scrum con backlog, sprints e informes.',alt:'GitHub Projects',url:'https://www.atlassian.com/software/jira'},
+  {n:'GitHub Projects',t:'kan',c:'Gratis',d:2,ideal:'Tareas enlazadas a issues y al código del repositorio.',alt:'Trello',url:'https://github.com'},
+  {n:'Nextcloud Deck',t:'kan',c:'Gratis',d:1,ideal:'Kanban autoalojado, o si ya tienes un Nextcloud a mano.',alt:'Trello',url:'https://nextcloud.com'},
+  {n:'GanttProject',t:'gan',c:'Gratis',d:2,ideal:'Gantt de escritorio con dependencias e hitos.',alt:'ProjectLibre',url:'https://www.ganttproject.biz'},
+  {n:'ProjectLibre',t:'gan',c:'Gratis',d:2,ideal:'Planificación de estilo clásico de gestión de proyectos.',alt:'GanttProject',url:'https://www.projectlibre.com'},
+  {n:'Excel / Sheets',t:'gan',c:'Freemium',d:1,ideal:'Gantt básico, estimaciones y tabla de riesgos.',alt:'GanttProject',url:'https://workspace.google.com/products/sheets/'},
+  {n:'Draw.io',t:'dia',c:'Gratis',d:1,ideal:'Topologías de red, arquitectura y diagramas técnicos.',alt:'Excalidraw',url:'https://www.diagrams.net'},
+  {n:'Excalidraw',t:'dia',c:'Gratis',d:1,ideal:'Bocetos rápidos con aspecto de pizarra.',alt:'Draw.io',url:'https://excalidraw.com'},
+  {n:'Miro',t:'dia',c:'Freemium',d:1,ideal:'Lluvia de ideas y pizarra colaborativa en equipo.',alt:'Excalidraw',url:'https://miro.com'},
+  {n:'Markdown',t:'doc',c:'Gratis',d:1,ideal:'README y documentación que viaja con el repositorio.',alt:'Google Docs',url:'https://www.markdownguide.org'},
+  {n:'Notion',t:'doc',c:'Freemium',d:2,ideal:'Wiki de proyecto con tablas y bases de datos.',alt:'Obsidian',url:'https://www.notion.so'},
+  {n:'Obsidian',t:'doc',c:'Gratis',d:2,ideal:'Notas enlazadas en Markdown, guardadas en local.',alt:'Notion',url:'https://obsidian.md'},
+  {n:'Google Docs',t:'doc',c:'Gratis',d:1,ideal:'Redactar la memoria entre varias personas a la vez.',alt:'Markdown',url:'https://docs.google.com'},
+  {n:'Git + GitHub / GitLab',t:'vcs',c:'Gratis',d:2,ideal:'Código, scripts y documentos con historial y copia remota.',alt:'Forgejo / Gitea (autoalojado)',url:'https://git-scm.com'},
+  {n:'Discord',t:'com',c:'Gratis',d:1,ideal:'Canales del equipo con voz y pantalla compartida.',alt:'Matrix',url:'https://discord.com'},
+  {n:'Slack',t:'com',c:'Freemium',d:1,ideal:'Canales por tema e integraciones con otras herramientas.',alt:'Discord',url:'https://slack.com'},
+  {n:'Microsoft Teams',t:'com',c:'Según centro',d:1,ideal:'Reuniones y archivos si tu centro ya lo tiene disponible.',alt:'Discord',url:'https://www.microsoft.com/microsoft-teams'},
+  {n:'Matrix',t:'com',c:'Gratis',d:2,ideal:'Mensajería abierta y federada, también autoalojable.',alt:'Discord / Slack',url:'https://matrix.org'},
+  {n:'GitHub Actions',t:'ci',c:'Freemium',d:3,ideal:'Probar y desplegar automáticamente al hacer push en GitHub.',alt:'GitLab CI',url:'https://github.com/features/actions',adv:true},
+  {n:'GitLab CI',t:'ci',c:'Freemium',d:3,ideal:'Pipelines de integración y despliegue si usas GitLab.',alt:'GitHub Actions',url:'https://docs.gitlab.com/ee/ci/',adv:true}
+];
+const TREE=[
+  {k:'solo',q:'¿Trabajas solo?',c:'#F26A1B',stack:'Kanban simple + Git + documentación ligera',
+    expl:'Con una sola persona, cuanto menos mantenimiento, mejor: un tablero sencillo, control de versiones y documentación en Markdown.',
+    recs:['Trello','GitHub Projects','Nextcloud Deck','Git + GitHub / GitLab','Markdown','Obsidian']},
+  {k:'small',q:'¿Equipo pequeño?',c:'#1E6BFF',stack:'Kanban compartido + Gantt básico + Git',
+    expl:'El tablero compartido da visibilidad, el Gantt ordena las fechas y Git evita pisarse el trabajo.',
+    recs:['Trello','GitHub Projects','GanttProject','Excel / Sheets','Git + GitHub / GitLab','Discord','Draw.io','Google Docs']},
+  {k:'big',q:'¿Equipo grande o proyecto ambicioso?',c:'#8A3FFC',stack:'Scrum + Gantt + Git + CI',
+    expl:'A mayor tamaño, más coordinación: sprints con backlog, planificación temporal y automatización de pruebas y despliegues.',
+    recs:['Jira','GitHub Projects','GanttProject','ProjectLibre','Git + GitHub / GitLab','GitHub Actions','GitLab CI','Slack','Matrix','Draw.io']}
+];
+const PHASES=[
+  {id:'ini',ico:'🌱',name:'Inicio',sub:'Idea, alcance, objetivos',
+    desc:'Decides qué vas a hacer y hasta dónde. Cuanto más claro sea aquí, menos correcciones dolorosas después.',
+    q:['¿Qué problema resuelve tu proyecto y para quién?','¿Qué queda dentro y qué queda fuera del alcance?','¿Cómo sabrás que has terminado?'],
+    checks:['Puedo explicar la idea en dos frases','He escrito el alcance: qué entra y qué no','Tengo entre tres y cinco objetivos comprobables','He comentado la idea con mi tutor/a']},
+  {id:'pla',ico:'🗺️',name:'Planificación',sub:'Entregables, hitos, riesgos',
+    desc:'Conviertes la idea en un plan: qué se entrega, cuándo y qué podría torcerse.',
+    q:['¿Cuáles son los entregables y sus fechas?','¿Qué hitos marcan el avance?','¿Qué riesgos son los más probables y qué harías?'],
+    checks:['Lista de entregables definida','Hitos con fecha en mi calendario','Riesgos principales identificados (sección 8)','Tablero o backlog creado']},
+  {id:'eje',ico:'🛠️',name:'Ejecución',sub:'SO, redes, BBDD, IAW…',
+    desc:'Construyes por áreas: sistemas, redes, bases de datos, aplicaciones web. Es la fase más larga.',
+    q:['¿Cada área tiene su parte funcionando y probada?','¿Estás documentando a la vez que construyes?','¿Tu entorno se puede reconstruir?'],
+    checks:['Repositorio creado y con commits frecuentes','Documento mientras avanzo, no al final','Cada área tiene su parte probada','Tengo snapshots o backups del entorno']},
+  {id:'seg',ico:'🔎',name:'Seguimiento',sub:'Revisiones y ajustes',
+    desc:'Compruebas cómo vas frente al plan y ajustas: recortar alcance, replanificar, pedir ayuda.',
+    q:['¿Voy al ritmo previsto?','¿Ha cambiado algún riesgo?','¿Qué recorto o reordeno esta semana?'],
+    checks:['Reviso el tablero cada semana','Ajusto el alcance si voy con retraso','Anoto decisiones y cambios importantes','Pruebo en un entorno limpio de vez en cuando']},
+  {id:'cie',ico:'🏁',name:'Cierre',sub:'Presentación y retrospectiva',
+    desc:'Entregas, defiendes y miras atrás: qué salió bien, qué cambiarías y qué has aprendido.',
+    q:['¿Está todo entregado en plazo y formato?','¿Está la presentación ensayada?','¿Qué harías distinto la próxima vez?'],
+    checks:['Documentación final revisada','Presentación y demo ensayadas','He hecho una retrospectiva: qué mantener y qué cambiar','Entregables subidos en plazo y formato']}
+];
+const ROLES=[
+  {k:'coord',ico:'🧭',n:'Coordinación',items:['Mantiene el tablero al día y convoca las reuniones breves.','Detecta bloqueos y retrasos pronto.','Es el punto de contacto con el tutor/a.']},
+  {k:'doc',ico:'📝',n:'Documentación',items:['Cuida la estructura y el estilo de la memoria.','Recuerda a los demás anotar comandos, capturas y decisiones.','Revisa que lo documentado coincide con lo construido.']},
+  {k:'infra',ico:'🖥️',n:'Infraestructura',items:['Monta y mantiene servidores, redes y servicios.','Gestiona copias de seguridad, snapshots y accesos.','Mantiene los scripts que reconstruyen el entorno.']},
+  {k:'qa',ico:'✅',n:'QA (pruebas)',items:['Diseña y ejecuta las pruebas de cada bloque.','Prueba en entornos limpios y reporta fallos.','Prepara la demo y su plan B con el resto.']}
+];
+const SCEN=[
+  {q:'Los requisitos están claros y no van a cambiar',a:'Cascada',why:'Si sabes qué construir y cambia poco, planificar por fases es directo y fácil de explicar.'},
+  {q:'Voy descubriendo qué hacer sobre la marcha',a:'Ágil',why:'Los ciclos cortos te dejan aprender, probar y corregir sin rehacer todo el plan.'},
+  {q:'Hay fechas fijas del curso, pero quiero flexibilidad',a:'Híbrido',why:'Las fechas del curso marcan el marco tipo cascada y, dentro, trabajas con ritmo ágil. Es lo más habitual en ASIR.'},
+  {q:'Trabajo solo y quiero ver mi avance',a:'Kanban',why:'Un tablero con límite de WIP te muestra en qué estás y evita abrir demasiados frentes.'},
+  {q:'Somos un equipo grande con un proyecto ambicioso',a:'Scrum ligero',why:'Backlog priorizado, sprints cortos y reuniones breves ayudan a coordinar a varias personas.'}
+];
+const SCRUM=[
+  {ico:'📋',n:'Backlog',t:'La lista priorizada de todo lo que podrías hacer. Lo más importante, arriba. Se revisa y se reordena con frecuencia.'},
+  {ico:'🎯',n:'Planificación',t:'Eliges del backlog lo que cabe en el sprint (una o dos semanas) y fijas un objetivo claro para ese periodo.'},
+  {ico:'🏃',n:'Sprint',t:'Trabajas en lo elegido. Cada día (o cada pocos días) hay una reunión de 5-10 minutos: qué hice, qué haré y qué me bloquea.'},
+  {ico:'👀',n:'Revisión',t:'Enseñas lo terminado al tutor/a o al equipo, funcionando. Vale más una demo pequeña que un informe largo.'},
+  {ico:'🔄',n:'Retrospectiva',t:'Miráis cómo habéis trabajado: qué mantener, qué cambiar, qué probar el próximo sprint. Y vuelta a empezar.'}
+];
+const KB0=[
+  {id:1,t:'Instalar Ubuntu Server',c:0},
+  {id:2,t:'Diseñar el plan de direccionamiento',c:0},
+  {id:3,t:'Configurar el firewall',c:0},
+  {id:4,t:'Script de backup de la BBDD',c:0},
+  {id:5,t:'Emitir el certificado Let\'s Encrypt',c:0},
+  {id:6,t:'Montar el servidor Nginx',c:1},
+  {id:7,t:'Crear las VLANs',c:1},
+  {id:8,t:'Redactar la introducción de la memoria',c:2}
+];
+const KBCOLS=[{n:'Por hacer',lim:null},{n:'En curso',lim:3},{n:'Revisión',lim:2},{n:'Hecho',lim:null}];
+const SIZES=[
+  {n:'XS',h:'Hasta 2 h',t:'Un cambio pequeño y conocido.'},
+  {n:'S',h:'Media jornada',t:'Algo que ya has hecho antes.'},
+  {n:'M',h:'1 jornada',t:'Tarea normal con alguna incógnita.'},
+  {n:'L',h:'2-3 jornadas',t:'Varias piezas o algo nuevo para ti.'},
+  {n:'XL',h:'Una semana o más',t:'Demasiado grande: divídela.'}
+];
+const FIB=[1,2,3,5,8,13,21,'?'];
+const PLANS={
+  tight:[
+    {k:'A',n:'Idea y alcance',len:2,ph:'a'},
+    {k:'B',n:'Planificación y riesgos',len:1,ph:'b'},
+    {k:'C',n:'Diseño y arquitectura',len:2,ph:'c'},
+    {k:'D',n:'Implementación por áreas',len:6,ph:'d'},
+    {k:'F',n:'Pruebas y ajustes',len:2,ph:'e'},
+    {k:'G',n:'Documentación final y demo',len:1,ph:'f'}
+  ],
+  buffer:[
+    {k:'A',n:'Idea y alcance',len:2,ph:'a'},
+    {k:'B',n:'Planificación y riesgos',len:1,ph:'b'},
+    {k:'C',n:'Diseño y arquitectura',len:2,ph:'c'},
+    {k:'D',n:'Implementación por áreas',len:4,ph:'d'},
+    {buf:true,n:'Colchón 1',len:1},
+    {k:'F',n:'Pruebas y ajustes',len:2,ph:'e'},
+    {k:'G',n:'Documentación final y demo',len:1,ph:'f'},
+    {buf:true,n:'Colchón 2',len:1}
+  ]
+};
+const RISKS0=[
+  {n:'Alcance excesivo',p:3,i:2,plan:'Recorta a un producto mínimo funcional; pasa lo «deseable» a trabajo futuro y avisa al tutor/a.',pre:'Separa «imprescindible», «deseable» y «si sobra tiempo» desde el inicio.'},
+  {n:'Dependencia de un miembro',p:2,i:3,plan:'Reasigna tareas, usa la documentación para que otra persona continúe y avisa al tutor/a.',pre:'Documenta y comparte conocimiento; rota tareas críticas.'},
+  {n:'Pérdida de datos',p:1,i:3,plan:'Restaura desde el repositorio remoto, el último backup o los scripts de reconstrucción.',pre:'Git con copia remota, backups fuera de la máquina y snapshots periódicos.'},
+  {n:'Fallos de red',p:2,i:2,plan:'Trabaja con máquinas virtuales locales, o usa el aula o la conexión del móvil como alternativa.',pre:'Ten en local las imágenes, paquetes y documentación necesarios.'},
+  {n:'Cambios de última hora',p:2,i:3,plan:'Aplica solo cambios pequeños y documentados; si no caben, van a trabajo futuro.',pre:'Congela funcionalidades unas semanas antes de la entrega.'}
+];
+const SUBJ=[
+  {k:'so',ico:'🖥️',n:'Sistemas Operativos',c:'#1E6BFF',on:'#fff',topic:'Virtualización, contenedores y despliegue.',ex:'VM con Ubuntu Server + Docker',
+   ev:['Diagrama de máquinas o contenedores','Pasos de instalación y configuración','Usuarios, permisos y servicios'],
+   ch:['Diseño de las máquinas virtuales y contenedores','Instalación y configuración de los sistemas','Usuarios, permisos y servicios']},
+  {k:'red',ico:'🌐',n:'Redes',c:'#0E9F8E',on:'#fff',topic:'Topología, direccionamiento, servicios y seguridad.',ex:'Red segmentada con VLANs y firewall',
+   ev:['Topología de red','Tabla de direccionamiento','Reglas del firewall y pruebas de aislamiento'],
+   ch:['Topología de red','Plan de direccionamiento y VLANs','Servicios de red y reglas de firewall']},
+  {k:'bd',ico:'🗄️',n:'Bases de Datos',c:'#8A3FFC',on:'#fff',topic:'Modelado, scripts, copias de seguridad y permisos.',ex:'Esquema relacional + script de creación + backup automático',
+   ev:['Modelo entidad-relación','Script de creación y carga de datos','Política de backups y usuarios con permisos'],
+   ch:['Modelo entidad-relación y esquema relacional','Script de creación y carga de datos','Copias de seguridad y gestión de permisos']},
+  {k:'iaw',ico:'🚀',n:'Implantación de Aplicaciones Web',c:'#F26A1B',on:'#0F2440',topic:'Servidores web, HTTPS, dominios y despliegue.',ex:'Nginx + certificado Let\'s Encrypt + despliegue de una app',
+   ev:['Configuración del servidor web','HTTPS y renovación del certificado','Pasos de despliegue y prueba'],
+   ch:['Servidor web y dominio','HTTPS y certificados','Despliegue de la aplicación']},
+  {k:'seg',ico:'🛡️',n:'Seguridad y normativa',c:'#DC3B41',on:'#fff',topic:'RGPD y buenas prácticas de seguridad.',ex:'Registro de datos personales y medidas aplicadas',
+   ev:['Qué datos personales tratas y por qué','Medidas técnicas aplicadas','Hardening y revisión de accesos'],
+   ch:['Análisis de riesgos de seguridad','Medidas de seguridad aplicadas','Cumplimiento del RGPD (datos personales y base legal)']}
+];
+const SLIDES=[
+  {n:'Portada',w:3,put:['Título del proyecto, tu nombre, ciclo, centro y curso.','Nombre del tutor/a.','Una imagen o esquema que diga de qué va.'],tip:'Si la portada explica el proyecto en cinco segundos, ya tienes la atención.'},
+  {n:'Objetivo y alcance',w:8,put:['El problema o necesidad que resuelves.','Objetivo general y tres o cuatro objetivos concretos.','Qué queda fuera, para acotar expectativas.'],tip:'Empieza por el «para qué» y deja el «cómo» para las siguientes.'},
+  {n:'Arquitectura / diseño',w:15,put:['Un diagrama claro (topología, servicios, flujo de datos).','Cómo se relacionan las piezas.'],tip:'Menos cajas y más claridad: un diagrama que se entiende en 20 segundos.'},
+  {n:'Tecnologías usadas',w:7,put:['Las tecnologías principales y por qué las elegiste.','Alguna alternativa que descartaste, con el motivo.'],tip:'Una razón por tecnología es mejor que una pared de logotipos.'},
+  {n:'Desarrollo (bloques clave)',w:20,put:['Tres o cuatro bloques (sistemas, red, BBDD, aplicación…).','Qué hiciste tú y qué decisiones importantes tomaste.'],tip:'Céntrate en decisiones y resultados, no en cada comando.'},
+  {n:'Problemas y soluciones',w:10,put:['Dos o tres problemas reales que encontraste.','Cómo los diagnosticaste y resolviste.'],tip:'Aquí demuestras criterio: un problema bien resuelto luce más que un proyecto sin fallos.'},
+  {n:'Resultados / demo',w:20,put:['Demostración corta siguiendo un guion.','Capturas o vídeo de respaldo.','Pruebas o datos que muestren que funciona.'],tip:'Ensaya la demo cronometrada y ten a mano el plan B.'},
+  {n:'Conclusiones',w:7,put:['Qué objetivos se cumplieron y cuáles no.','Qué has aprendido.'],tip:'Sé honesto con lo que no llegaste a hacer: se valora la autocrítica.'},
+  {n:'Trabajo futuro',w:5,put:['Mejoras realistas y priorizadas.','Lo que recortaste por falta de tiempo.'],tip:'Convierte lo que no cabió en un plan, no en una excusa.'},
+  {n:'Agradecimientos / cierre',w:5,put:['Agradecimientos.','Enlace o código QR del repositorio.','Invitación a las preguntas.'],tip:'Termina con una frase preparada, no con «pues ya está».'}
+];
+const QUESTIONS=[
+  {q:'¿Por qué elegiste X y no Y?',a:'Explica el criterio (coste, curva de aprendizaje, requisitos) y reconoce alguna ventaja de la alternativa. Una decisión razonada vale más que una «perfecta».'},
+  {q:'¿Qué harías distinto si empezaras hoy?',a:'Cita un aprendizaje concreto y honesto: acotar antes el alcance, documentar sobre la marcha, probar antes en limpio.'},
+  {q:'¿Qué pasa si esto falla o se cae?',a:'Habla de copias de seguridad, monitorización, restauración y del tiempo que tardarías en recuperar el servicio.'},
+  {q:'¿Cómo has cuidado la seguridad y el RGPD?',a:'Menciona medidas concretas: mínimo privilegio, cifrado, actualización, datos personales reducidos al mínimo y copias protegidas.'},
+  {q:'¿Esto escalaría a más usuarios?',a:'Identifica los límites actuales (un servidor, sin balanceo) y qué cambiarías para crecer. Conocer tus límites es un buen resultado.'}
+];
+const GLOSS=[
+  ['Backlog','Lista priorizada de tareas pendientes del proyecto.'],
+  ['Branch (rama)','Línea de desarrollo paralela en Git para trabajar sin afectar a la principal.'],
+  ['CI/CD','Integración y entrega continuas: automatizar pruebas y despliegue al cambiar el código.'],
+  ['Commit','Instantánea guardada en Git con un mensaje que describe el cambio.'],
+  ['Daily','Reunión muy breve (5-10 min) para compartir avance y bloqueos.'],
+  ['Entregable','Producto concreto que debes presentar: documento, demo, repositorio.'],
+  ['Gantt','Diagrama de barras que muestra tareas, duración y dependencias en el tiempo.'],
+  ['Hito','Punto de control con fecha que marca un avance importante.'],
+  ['IaC','Infraestructura como código: describir servidores y redes en ficheros reproducibles.'],
+  ['Issue','Tarea, error o idea registrada en una plataforma como GitHub o GitLab.'],
+  ['Kanban','Método visual con un tablero de columnas y límites de trabajo en curso.'],
+  ['Milestone','Término inglés de hito; en GitHub agrupa issues hacia una meta.'],
+  ['MVP','Producto mínimo viable: la versión más pequeña que ya aporta valor.'],
+  ['PR (Pull Request)','Propuesta para integrar cambios de una rama en otra, con revisión.'],
+  ['QA','Aseguramiento de la calidad: probar y verificar que todo funciona.'],
+  ['README','Fichero de presentación del repositorio: qué es, cómo instalarlo y usarlo.'],
+  ['Retrospectiva','Reunión para analizar cómo se ha trabajado y qué mejorar.'],
+  ['RGPD','Reglamento europeo de protección de datos personales.'],
+  ['Snapshot','Instantánea de una máquina virtual para poder volver a ese estado.'],
+  ['Sprint','Ciclo corto de trabajo (una o dos semanas) con un objetivo definido.'],
+  ['WIP','Work in progress: tareas empezadas y sin terminar. Se limita para mantener el flujo.']
+];
+
+/* ============ casillas y progreso ============ */
+const chkHtml=(key,label)=>'<label class="chk"><input type="checkbox" data-key="'+key+'"><span class="box"></span><span class="lbl">'+esc(label)+'</span></label>';
+function syncChecks(){
+  $$('input[data-key]').forEach(i=>{i.checked=!!S.checks[i.dataset.key]});
+  const ks=Array.from(new Set($$('input[data-key]').map(i=>i.dataset.key)));
+  const done=ks.filter(k=>S.checks[k]).length;
+  const pct=ks.length?Math.round(done/ks.length*100):0;
+  $('#progFill').style.width=pct+'%';
+  $('#progTxt').textContent=pct+' %';
+  PHASES.forEach(ph=>{
+    const d=ph.checks.filter((_,i)=>S.checks[ph.id+(i+1)]).length;
+    $$('.pnode[data-ph="'+ph.id+'"] .ring').forEach(r=>r.style.setProperty('--p',Math.round(d/ph.checks.length*100)+'%'));
+  });
+  const pre=['pre1','pre2','pre3','pre4','pre5','pre6'].filter(k=>S.checks[k]).length;
+  $('#preRing').style.setProperty('--p',Math.round(pre/6*100)+'%');
+  $('#preTxt').textContent=pre+'/6';
+  $('#stamp').classList.toggle('show',pre===6);
+}
+document.addEventListener('change',e=>{
+  const i=e.target.closest('input[data-key]');
+  if(!i)return;
+  S.checks[i.dataset.key]=i.checked;
+  store.set('checks',S.checks);
+  syncChecks();
+});
+
+/* ============ secciones, navegación y líneas ============ */
+const secs=$$('.sec');
+function setOpen(sec,open){
+  sec.classList.toggle('open',open);
+  sec.querySelector('.sec-head').setAttribute('aria-expanded',open?'true':'false');
+}
+function goTo(n){
+  const sec=$('#s'+n);if(!sec)return;
+  setOpen(sec,true);
+  setTimeout(()=>sec.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'}),60);
+  try{history.replaceState(null,'','#s'+n)}catch(e){}
+}
+function buildNav(){
+  const nav=$('#nav');
+  secs.forEach(sec=>{
+    const n=+sec.id.slice(1);
+    const lines=linesFor(n);
+    const a=document.createElement('a');
+    a.href='#s'+n;a.dataset.n=n;
+    a.innerHTML='<span>'+n+' '+esc(sec.dataset.short)+'</span><span class="mdots">'+lines.map(k=>'<i style="--c:'+ROUTES[k].hex+'"></i>').join('')+'</span>';
+    a.addEventListener('click',e=>{e.preventDefault();goTo(n)});
+    nav.appendChild(a);
+    sec.querySelector('.dots').innerHTML=lines.map(k=>'<i data-r="'+k+'" style="--c:'+ROUTES[k].hex+'" title="'+esc(ROUTES[k].name)+'"></i>').join('');
+    sec.querySelector('.sec-head').addEventListener('click',()=>setOpen(sec,!sec.classList.contains('open')));
+  });
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(en=>{
+        if(en.isIntersecting){
+          const n=en.target.id.slice(1);
+          $$('#nav a').forEach(a=>{
+            const on=a.dataset.n===n;
+            a.classList.toggle('active',on);
+            if(on){
+              const nv=$('#nav'),l=a.offsetLeft-nv.offsetLeft-40;
+              if(Math.abs(nv.scrollLeft-l)>120)nv.scrollTo({left:l,behavior:reduced?'auto':'smooth'});
+            }
+          });
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    secs.forEach(s=>io.observe(s));
+  }
+}
+function buildRouteUI(){
+  const box=$('#routeBtns');
+  ORDER.forEach(k=>{
+    const R=ROUTES[k];
+    const b=document.createElement('button');
+    b.type='button';b.className='route-btn';b.dataset.route=k;b.setAttribute('aria-pressed','false');
+    b.style.cssText='--c:'+R.hex+';--on:'+R.on;
+    b.innerHTML='<span class="sw"></span><span><b>'+R.name+'</b><small>'+R.tag+'</small></span>';
+    box.appendChild(b);
+  });
+  const all=document.createElement('button');
+  all.type='button';all.className='ghost';all.dataset.route='';all.textContent='Ver todas';
+  box.appendChild(all);
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('[data-route]');if(!b)return;
+    setRoute(b.dataset.route&&S.route!==b.dataset.route?b.dataset.route:null);
+  });
+  $('#routeCards').innerHTML=ORDER.map(k=>{
+    const R=ROUTES[k];
+    return '<article class="rcard" style="--c:'+R.hex+';--on:'+R.on+'"><div class="rcard-h"><b>'+R.name+'</b><span>'+R.tag+'</span></div><div class="rcard-b"><p>'+R.desc+'</p><div class="chips">'+R.includes.map(x=>'<span class="chip">'+x+'</span>').join('')+'</div><p><small>Pasa por '+R.stops.length+' secciones</small></p><button class="btn sm" type="button" data-pick="'+k+'">Elegir esta línea</button></div></article>';
+  }).join('');
+  $('#routeCards').addEventListener('click',e=>{
+    const b=e.target.closest('[data-pick]');if(!b)return;
+    setRoute(S.route===b.dataset.pick?null:b.dataset.pick);
+  });
+}
+function setRoute(k){S.route=k||null;store.set('route',S.route);applyRoute()}
+function applyRoute(){
+  const R=S.route?ROUTES[S.route]:null;
+  if(R){document.body.dataset.route=S.route;document.body.style.setProperty('--rc',R.hex);document.body.style.setProperty('--rct',R.on)}
+  else{document.body.removeAttribute('data-route');document.body.style.removeProperty('--rc');document.body.style.removeProperty('--rct')}
+  $$('[data-route]',$('#routeBtns')).forEach(b=>{if(b.classList.contains('route-btn'))b.setAttribute('aria-pressed',String(b.dataset.route===S.route))});
+  $$('[data-pick]').forEach(b=>{const on=b.dataset.pick===S.route;b.textContent=on?'Quitar esta línea':'Elegir esta línea'});
+  secs.forEach(sec=>{
+    const n=+sec.id.slice(1);
+    const inAny=linesFor(n).length>0;
+    const on=!!R&&R.stops.includes(n);
+    sec.classList.toggle('on-route',on);
+    sec.classList.toggle('off-route',!!R&&inAny&&!on);
+    $$('.dots i',sec).forEach(d=>d.classList.toggle('dim',!!R&&d.dataset.r!==S.route));
+  });
+  $$('#nav a').forEach(a=>{
+    const n=+a.dataset.n;
+    const inAny=linesFor(n).length>0;
+    const on=!!R&&R.stops.includes(n);
+    a.classList.toggle('on-route',on);
+    a.classList.toggle('off',!!R&&inAny&&!on);
+  });
+  $$('#metro .st').forEach(g=>g.classList.toggle('on',!!R&&R.stops.includes(+g.dataset.n)));
+  const info=$('#routeInfo');
+  if(!R){
+    info.innerHTML='<p><b>Sin línea elegida.</b> Estás viendo todo el plano. Pulsa una línea para ver por qué paradas pasa y resaltarlas en la guía.</p>';
+  }else{
+    info.innerHTML='<p><b>'+R.name+'.</b> '+R.desc+'</p><div class="stopchips">'+R.stops.map(n=>'<button type="button" data-go="'+n+'">'+n+' '+esc(MAPLABELS[n])+'</button>').join('')+'</div>';
+  }
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g)goTo(+g.dataset.go);
+});
+function setProfile(p){
+  S.profile=p||null;store.set('profile',S.profile);applyProfile();
+  if(S.profile)selectTree(S.profile==='solo'?'solo':'small');
+}
+function applyProfile(){
+  $$('#profileSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.profile===S.profile)));
+  const g=$('#tg3');
+  if(S.profile&&g&&g.selectTab)g.selectTab(S.profile);
+}
+
+/* ============ plano de metro ============ */
+function buildMap(){
+  const svg=$('#metro');
+  const cols=[2,3,4,5,6,7,8,9,10,11,12,13];
+  const colW=74,x0=104,top=150,gap=46;
+  const lane={exp:top,comp:top+gap,avz:top+2*gap};
+  const W=x0+(cols.length-1)*colW+130,H=top+2*gap+52;
+  const xOf=n=>x0+cols.indexOf(n)*colW;
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  let h='';
+  cols.forEach(n=>{
+    const ls=linesFor(n);
+    const y1=lane[ls[0]];
+    h+='<line x1="'+xOf(n)+'" x2="'+xOf(n)+'" y1="'+(top-18)+'" y2="'+(y1-10)+'" stroke="#C7D3E2" stroke-width="2" stroke-dasharray="3 4"/>';
+  });
+  ORDER.forEach(k=>{
+    const xs=ROUTES[k].stops.map(xOf);
+    const a=Math.min.apply(null,xs),b=Math.max.apply(null,xs);
+    h+='<line class="ln ln-'+k+'" x1="'+a+'" x2="'+b+'" y1="'+lane[k]+'" y2="'+lane[k]+'" stroke="'+ROUTES[k].hex+'" stroke-width="10" stroke-linecap="round"/>';
+    h+='<text class="ln ln-'+k+'" x="'+(a-22)+'" y="'+(lane[k]+4.5)+'" text-anchor="end" font-size="12.5" font-weight="800" fill="'+ROUTES[k].txt+'">'+ROUTES[k].short+'</text>';
+  });
+  cols.forEach(n=>{
+    const ls=linesFor(n);
+    const x=xOf(n),y1=lane[ls[0]],y2=lane[ls[ls.length-1]];
+    const names=ls.map(k=>ROUTES[k].short).join(', ');
+    h+='<g class="st" data-n="'+n+'" tabindex="0" role="link" aria-label="Ir a la sección '+n+': '+MAPLABELS[n]+'. Líneas: '+names+'">';
+    h+='<title>'+n+'. '+MAPLABELS[n]+' — '+names+'</title>';
+    h+='<rect x="'+(x-30)+'" y="'+(top-30)+'" width="60" height="'+(2*gap+60)+'" fill="transparent"/>';
+    h+='<rect class="cap" x="'+(x-12)+'" y="'+(y1-12)+'" width="24" height="'+(y2-y1+24)+'" rx="12" fill="#fff" stroke="#0F2440" stroke-width="3.5"/>';
+    ls.forEach(k=>{h+='<circle cx="'+x+'" cy="'+lane[k]+'" r="4.5" fill="'+ROUTES[k].hex+'"/>'});
+    h+='<text transform="translate('+(x-3)+','+(top-26)+') rotate(-38)" font-size="13" font-weight="700" fill="#0F2440">'+esc(MAPLABELS[n])+'</text>';
+    h+='<text x="'+x+'" y="'+(lane.avz+36)+'" text-anchor="middle" font-size="12.5" font-weight="800" fill="#5A6F8C">'+n+'</text>';
+    h+='</g>';
+  });
+  svg.innerHTML=h;
+  svg.addEventListener('click',e=>{const g=e.target.closest('.st');if(g)goTo(+g.dataset.n)});
+  svg.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.st');if(g){e.preventDefault();goTo(+g.dataset.n)}}
+  });
+}
+
+/* ============ pestañas, revelar, copiar ============ */
+function initTabs(){
+  $$('.tabgroup').forEach(g=>{
+    const tabs=$$(':scope > .tabs [role=tab]',g);
+    const panels=$$(':scope > .tabpanel',g);
+    g.selectTab=id=>{
+      tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
+      panels.forEach(p=>{p.hidden=p.dataset.panel!==id});
+    };
+    tabs.forEach((t,i)=>{
+      t.addEventListener('click',()=>g.selectTab(t.dataset.tab));
+      t.addEventListener('keydown',e=>{
+        if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+        const j=(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+        tabs[j].focus();g.selectTab(tabs[j].dataset.tab);
+      });
+    });
+  });
+}
+document.addEventListener('click',e=>{
+  const r=e.target.closest('[data-reveal]');
+  if(r){
+    const out=r.nextElementSibling;
+    if(!r.dataset.txt)r.dataset.txt=r.textContent;
+    out.hidden=!out.hidden;
+    r.textContent=out.hidden?r.dataset.txt:'Ocultar';
+    return;
+  }
+  const c=e.target.closest('[data-copy]');
+  if(c){
+    const el=document.getElementById(c.dataset.copy);
+    copyText(el.textContent).then(ok=>flash(c,ok?'¡Copiado!':'No se pudo'));
+  }
+});
+
+/* ============ fases ============ */
+function buildPhases(){
+  const m=$('#phaseMount');
+  m.innerHTML='<div class="phases" role="tablist" aria-label="Fases del proyecto">'+PHASES.map((p,i)=>'<button class="pnode" role="tab" data-ph="'+p.id+'" aria-selected="'+(i===0)+'" type="button"><span class="ring"><b><span>'+p.ico+'</span></b></span>'+p.name+'<small>'+p.sub+'</small></button>').join('')+'</div><div class="phase-panel" id="phasePanel"></div>';
+  function show(id){
+    const p=PHASES.find(x=>x.id===id);
+    $$('.pnode',m).forEach(b=>b.setAttribute('aria-selected',String(b.dataset.ph===id)));
+    $('#phasePanel').innerHTML='<div><h3>'+p.ico+' '+p.name+'</h3><p>'+p.desc+'</p><h4>Preguntas para orientarte</h4><ul>'+p.q.map(x=>'<li>'+x+'</li>').join('')+'</ul></div><div><h4>Marca lo que ya tienes</h4>'+p.checks.map((c,i)=>chkHtml(p.id+(i+1),c)).join('')+'</div>';
+    syncChecks();
+  }
+  m.addEventListener('click',e=>{const b=e.target.closest('.pnode');if(b)show(b.dataset.ph)});
+  show('ini');
+  $('#phaseAnnex').innerHTML=PHASES.map(p=>'<div class="box2"><h4>'+p.ico+' '+p.name+'</h4>'+p.checks.map((c,i)=>chkHtml(p.id+(i+1),c)).join('')+'</div>').join('');
+}
+
+/* ============ roles, escenarios, scrum ============ */
+function buildPickers(){
+  const rp=$('#rolePick'),ro=$('#roleOut');
+  rp.innerHTML=ROLES.map((r,i)=>'<button type="button" data-k="'+r.k+'" aria-pressed="'+(i===0)+'"><span>'+r.ico+'</span>'+r.n+'</button>').join('');
+  function showRole(k){
+    const r=ROLES.find(x=>x.k===k);
+    $$('button',rp).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));
+    ro.innerHTML='<h4>'+r.ico+' '+r.n+'</h4><ul>'+r.items.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  }
+  rp.addEventListener('click',e=>{const b=e.target.closest('button');if(b)showRole(b.dataset.k)});
+  showRole('coord');
+  // los botones de rol usan el estilo de las etapas; se recolorean en azul
+  rp.querySelectorAll('button').forEach(b=>b.style.setProperty('--sel','1'));
+
+  const sb=$('#scenBtns'),so=$('#scenOut');
+  sb.innerHTML=SCEN.map((s,i)=>'<button type="button" data-i="'+i+'" aria-pressed="false">'+s.q+'</button>').join('');
+  sb.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const s=SCEN[+b.dataset.i];
+    $$('button',sb).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    so.innerHTML='<span class="ni">💡</span><div><strong>Encaja mejor: '+s.a+'</strong><p>'+s.why+'</p></div>';
+  });
+
+  const cp=$('#scrumPick'),co=$('#scrumOut');
+  cp.innerHTML=SCRUM.map((s,i)=>'<button type="button" data-i="'+i+'" aria-pressed="'+(i===0)+'"><span>'+s.ico+'</span>'+s.n+'</button>').join('');
+  function showScrum(i){
+    $$('button',cp).forEach((b,j)=>b.setAttribute('aria-pressed',String(j===i)));
+    const s=SCRUM[i];
+    co.innerHTML='<b>'+s.ico+' '+s.n+'.</b> '+s.t+(i===SCRUM.length-1?' <i>Y el ciclo se repite.</i>':'');
+  }
+  cp.addEventListener('click',e=>{const b=e.target.closest('button');if(b)showScrum(+b.dataset.i)});
+  showScrum(0);
+}
+
+/* ============ kanban con límite de WIP ============ */
+let kb=[];
+function kbReset(){kb=KB0.map(c=>Object.assign({},c));renderKb();$('#kbMsg').textContent='';}
+function kbSay(t,warn){const m=$('#kbMsg');m.textContent=t;m.classList.toggle('ok',!warn)}
+function renderKb(){
+  const wip=$('#wipOn').checked;
+  $('#kb').innerHTML=KBCOLS.map((col,ci)=>{
+    const cards=kb.filter(c=>c.c===ci);
+    const at=wip&&col.lim&&cards.length>=col.lim;
+    return '<div class="col'+(at?' atlimit':'')+'" data-col="'+ci+'"><h4>'+col.n+'<span class="cnt">'+cards.length+(col.lim&&wip?'/'+col.lim:'')+'</span></h4>'+
+      cards.map(c=>'<div class="kcard" draggable="true" data-id="'+c.id+'">'+esc(c.t)+'<div class="mv"><button type="button" data-mv="-1" aria-label="Mover a la izquierda"'+(ci===0?' disabled':'')+'>◀</button><button type="button" data-mv="1" aria-label="Mover a la derecha"'+(ci===3?' disabled':'')+'>▶</button></div></div>').join('')+'</div>';
+  }).join('');
+  const half=kb.filter(c=>c.c===1||c.c===2).length,done=kb.filter(c=>c.c===3).length;
+  $('#kbStats').textContent='Tareas a medias (En curso + Revisión): '+half+' · Hechas: '+done+' de '+kb.length;
+}
+function kbMove(id,to){
+  const c=kb.find(x=>x.id===id);
+  if(!c||to<0||to>3||c.c===to)return;
+  const lim=KBCOLS[to].lim,wip=$('#wipOn').checked;
+  const n=kb.filter(x=>x.c===to).length;
+  if(wip&&lim&&n>=lim){
+    kbSay('Límite de WIP en «'+KBCOLS[to].n+'»: '+lim+'. Termina algo antes de empezar más.',true);
+    const el=$('.col[data-col="'+to+'"]');
+    if(el){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),450)}
+    return;
+  }
+  c.c=to;renderKb();
+  const half=kb.filter(x=>x.c===1||x.c===2).length;
+  if(!wip&&half>4)kbSay('Sin límite, ya tienes '+half+' tareas a medias. ¿Cuál terminarías primero?',true);
+  else kbSay('',false);
+}
+function initKb(){
+  const box=$('#kb');
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('[data-mv]');if(!b)return;
+    const card=b.closest('.kcard'),c=kb.find(x=>x.id===+card.dataset.id);
+    kbMove(c.id,c.c+Number(b.dataset.mv));
+  });
+  let dragId=null;
+  box.addEventListener('dragstart',e=>{
+    const k=e.target.closest('.kcard');if(!k)return;
+    dragId=+k.dataset.id;k.classList.add('drag');
+    try{e.dataTransfer.setData('text/plain',String(dragId));e.dataTransfer.effectAllowed='move'}catch(_){}
+  });
+  box.addEventListener('dragend',()=>{dragId=null;$$('.kcard.drag,.col.over',box).forEach(x=>x.classList.remove('drag','over'))});
+  box.addEventListener('dragover',e=>{const c=e.target.closest('.col');if(c){e.preventDefault();c.classList.add('over')}});
+  box.addEventListener('dragleave',e=>{const c=e.target.closest('.col');if(c&&!c.contains(e.relatedTarget))c.classList.remove('over')});
+  box.addEventListener('drop',e=>{
+    const c=e.target.closest('.col');if(!c||dragId==null)return;
+    e.preventDefault();kbMove(dragId,+c.dataset.col);dragId=null;
+  });
+  $('#kbReset').addEventListener('click',kbReset);
+  $('#wipOn').addEventListener('change',()=>{renderKb();kbSay($('#wipOn').checked?'Límite de WIP activado.':'Sin límite: fíjate en cuántas cosas acabas teniendo a medias.',!$('#wipOn').checked)});
+  kbReset();
+}
+
+/* ============ árbol, tabla y catálogo de herramientas ============ */
+const recSet=()=>S.tree?new Set(TREE.find(x=>x.k===S.tree).recs):new Set();
+const costCls=c=>c==='Gratis'?'g':c==='Freemium'?'f':'c';
+function buildTree(){
+  const t=$('#tree');
+  t.innerHTML='<div class="tree-q"><span>¿Con quién trabajas?</span></div>'+TREE.map(b=>'<div class="branch" data-k="'+b.k+'" style="--c:'+b.c+'"><button type="button" aria-pressed="false">'+b.q+'</button><div class="con"></div><div class="res"><b>'+b.stack+'</b></div></div>').join('');
+  t.addEventListener('click',e=>{
+    const b=e.target.closest('.branch>button');if(!b)return;
+    const k=b.parentElement.dataset.k;
+    selectTree(S.tree===k?null:k);
+  });
+  $('#treeOut').addEventListener('click',e=>{
+    if(e.target.closest('[data-tree-go]')){S.recOnly=true;renderTools();goTo(6)}
+  });
+}
+function selectTree(k){
+  S.tree=k;
+  if(!k)S.recOnly=false;
+  $$('.branch').forEach(b=>{
+    const on=b.dataset.k===k;
+    b.classList.toggle('sel',on);
+    b.querySelector('button').setAttribute('aria-pressed',String(on));
+  });
+  const out=$('#treeOut');
+  if(!k){out.hidden=true;out.innerHTML=''}
+  else{
+    const b=TREE.find(x=>x.k===k);
+    out.hidden=false;
+    out.innerHTML='<h4>Tu pila sugerida: '+esc(b.stack)+'</h4><p>'+b.expl+'</p><div class="chips">'+b.recs.map(n=>'<span class="chip">'+esc(n)+'</span>').join('')+'</div><button class="btn sm" data-tree-go type="button">Ver estas herramientas en el catálogo</button>';
+  }
+  renderTable();renderTools();
+}
+let sortK='n',sortD=1;
+const COLS=[['n','Herramienta'],['t','Tipo'],['c','Coste'],['d','Curva de aprendizaje'],['ideal','Ideal para'],['alt','Alternativa']];
+function renderTable(){
+  const rec=recSet();
+  const val=(o,k)=>k==='t'?TYPES[o.t]:o[k];
+  const rows=TOOLS.slice().sort((a,b)=>{
+    const x=val(a,sortK),y=val(b,sortK);
+    return (typeof x==='number'?x-y:String(x).localeCompare(String(y),'es'))*sortD;
+  });
+  $('#toolTable').innerHTML='<caption class="sr">Comparativa de herramientas</caption><thead><tr>'+COLS.map(c=>'<th scope="col" aria-sort="'+(sortK===c[0]?(sortD===1?'ascending':'descending'):'none')+'"><button type="button" data-sort="'+c[0]+'">'+c[1]+'</button></th>').join('')+'</tr></thead><tbody>'+
+    rows.map(o=>'<tr'+(rec.has(o.n)?' class="rec"':'')+'><td>'+esc(o.n)+'</td><td>'+TYPES[o.t]+'</td><td><span class="pill '+costCls(o.c)+'">'+o.c+'</span></td><td>'+DIFF[o.d-1]+'</td><td>'+esc(o.ideal)+'</td><td>'+esc(o.alt)+'</td></tr>').join('')+'</tbody>';
+}
+const F={q:'',type:new Set(),cost:new Set(),diff:new Set()};
+function buildFilters(){
+  const f=$('#toolFilters');
+  const chips=(grp,items)=>items.map(i=>'<button type="button" class="fchip" data-g="'+grp+'" data-v="'+i[0]+'" aria-pressed="false">'+i[1]+'</button>').join('');
+  f.innerHTML='<input class="search" id="toolQ" type="search" placeholder="Busca por nombre o uso (Kanban, diagramas, CI…)" aria-label="Buscar herramientas">'+
+    '<div class="frow"><b>Tipo</b>'+chips('type',Object.keys(TYPES).map(k=>[k,TYPEICON[k]+' '+TYPES[k]]))+'</div>'+
+    '<div class="frow"><b>Coste</b>'+chips('cost',['Gratis','Freemium','Según centro'].map(c=>[c,c]))+'</div>'+
+    '<div class="frow"><b>Dificultad</b>'+chips('diff',DIFF.map((d,i)=>[String(i+1),d]))+'<button type="button" class="ghost" id="fClear">Quitar filtros</button></div>';
+  f.addEventListener('click',e=>{
+    const c=e.target.closest('.fchip');
+    if(c){
+      const set=F[c.dataset.g],v=c.dataset.v;
+      if(set.has(v))set.delete(v);else set.add(v);
+      c.setAttribute('aria-pressed',String(set.has(v)));
+      renderTools();return;
+    }
+    if(e.target.closest('#fClear')){
+      F.q='';F.type.clear();F.cost.clear();F.diff.clear();
+      $('#toolQ').value='';$$('.fchip',f).forEach(x=>x.setAttribute('aria-pressed','false'));
+      renderTools();
+    }
+  });
+  $('#toolQ').addEventListener('input',e=>{F.q=e.target.value.trim().toLowerCase();renderTools()});
+  $('#recBar').addEventListener('click',e=>{if(e.target.closest('[data-recoff]')){S.recOnly=false;renderTools()}});
+}
+function renderTools(){
+  const rec=recSet();
+  const only=S.recOnly&&S.tree;
+  const list=TOOLS.filter(o=>{
+    if(only&&!rec.has(o.n))return false;
+    if(F.type.size&&!F.type.has(o.t))return false;
+    if(F.cost.size&&!F.cost.has(o.c))return false;
+    if(F.diff.size&&!F.diff.has(String(o.d)))return false;
+    if(F.q){const hay=(o.n+' '+o.ideal+' '+TYPES[o.t]+' '+o.alt).toLowerCase();if(hay.indexOf(F.q)<0)return false}
+    return true;
+  });
+  const bar=$('#recBar');
+  if(only){bar.hidden=false;bar.innerHTML='<span>Mostrando solo tu pila sugerida: <b>'+esc(TREE.find(x=>x.k===S.tree).stack)+'</b>.</span><button class="ghost" type="button" data-recoff>Ver todo el catálogo</button>'}
+  else{bar.hidden=true;bar.innerHTML=''}
+  $('#toolCount').textContent='Mostrando '+list.length+' de '+TOOLS.length+' herramientas';
+  $('#toolGrid').innerHTML=list.length?list.map(o=>{
+    const dots=[1,2,3].map(i=>'<i class="'+(i<=o.d?'f':'')+'"></i>').join('');
+    return '<article class="tool'+(rec.has(o.n)&&S.tree?' rec':'')+'"><h4><span aria-hidden="true">'+TYPEICON[o.t]+'</span>'+esc(o.n)+'</h4><div class="meta"><span class="pill">'+TYPES[o.t]+'</span><span class="pill '+costCls(o.c)+'">'+o.c+'</span>'+(o.adv?'<span class="lv a">Avanzado</span>':'')+'<span class="dif" title="Curva de aprendizaje: '+DIFF[o.d-1]+'" aria-label="Curva de aprendizaje: '+DIFF[o.d-1]+'">'+dots+'</span></div><p>'+esc(o.ideal)+'</p><p class="alt">Alternativa: '+esc(o.alt)+'</p><a href="'+o.url+'" target="_blank" rel="noopener">Ir al sitio ↗</a></article>';
+  }).join(''):'<div class="empty" style="grid-column:1/-1"><b>Ninguna herramienta coincide.</b><br>Prueba con menos filtros o con otra palabra.</div>';
+}
+function initTableSort(){
+  $('#toolTable').addEventListener('click',e=>{
+    const b=e.target.closest('[data-sort]');if(!b)return;
+    if(sortK===b.dataset.sort)sortD=-sortD;else{sortK=b.dataset.sort;sortD=1}
+    renderTable();
+  });
+}
+
+/* ============ estimación y Gantt ============ */
+function buildEstimation(){
+  $('#sizes').innerHTML=SIZES.map(s=>'<div><b>'+s.n+'</b>'+s.h+'<br><small>'+s.t+'</small></div>').join('');
+  const box=$('#pokerCards');let mine=null;
+  box.innerHTML=FIB.map(v=>'<button class="pcard" type="button" data-v="'+v+'" aria-pressed="false" aria-label="Carta '+v+'">'+v+'</button>').join('');
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('.pcard');if(!b)return;
+    mine=b.dataset.v;
+    $$('.pcard',box).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    $('#pokerGo').disabled=false;$('#pokerOut').innerHTML='';
+  });
+  $('#pokerGo').addEventListener('click',()=>{
+    if(mine==null)return;
+    const mv=mine==='?'?'?':Number(mine);
+    const idx=mv==='?'?3:FIB.indexOf(mv);
+    const mates=[0,1,2].map(()=>FIB[Math.max(0,Math.min(6,idx+Math.floor(Math.random()*5)-2))]);
+    const all=[mv].concat(mates);
+    const names=['Tú','Compañero A','Compañero B','Compañero C'];
+    const nums=all.filter(v=>typeof v==='number').sort((a,b)=>a-b);
+    let msg='';
+    if(nums.length>=2){
+      const lo=nums[0],hi=nums[nums.length-1];
+      msg=hi/lo>=3?'Hay mucha diferencia (de '+lo+' a '+hi+'). Hablad de qué supone la tarea para cada uno antes de repetir la ronda.':'Estimaciones parecidas (de '+lo+' a '+hi+'): buena señal. Podéis quedaros con un valor cercano a '+nums[Math.floor(nums.length/2)]+'.';
+    }else msg='Muchas dudas: falta información. Aclarad la tarea y repetid.';
+    $('#pokerOut').innerHTML=all.map((v,i)=>'<figure><div class="pcard rev">'+v+'</div><figcaption>'+names[i]+'</figcaption></figure>').join('')+'<p style="flex:1 1 260px;margin:0"><b>'+msg+'</b></p>';
+  });
+  $('#pokerCards').setAttribute('aria-label','Cartas de póker de planificación');
+}
+let plan='tight';
+function renderGantt(){
+  const inc=$('#incOn').checked,W=16;
+  let t=1,delay=0;
+  const tasks=[],bufs=[],ms=[];
+  PLANS[plan].forEach(it=>{
+    if(it.buf){
+      const actual=Math.max(0,it.len-delay);
+      delay=Math.max(0,delay-it.len);
+      if(actual>0)bufs.push({start:t,len:actual});
+      t+=actual;return;
+    }
+    let extra=0;
+    if(inc&&it.k==='D'){extra=2;delay+=2}
+    tasks.push({n:it.n,ph:it.ph,start:t,len:it.len,extra:extra});
+    t+=it.len+extra;
+    if(['A','C','D','F'].indexOf(it.k)>=0)ms.push(t);
+  });
+  const L=a=>((a-1)/W*100)+'%',Wd=l=>(l/W*100)+'%';
+  let h='<div class="g-row g-head"><span></span><div class="g-track">'+Array.from({length:W},(_,i)=>'<b style="left:'+(i/W*100)+'%">'+(i+1)+'</b>').join('')+'</div></div>';
+  tasks.forEach(k=>{
+    h+='<div class="g-row"><span>'+k.n+'</span><div class="g-track"><div class="g-bar ph-'+k.ph+'" style="left:'+L(k.start)+';width:'+Wd(k.len)+'">'+k.len+(k.len>1?' sem':'')+'</div>'+
+      (k.extra?'<div class="g-bar g-inc" style="left:'+L(k.start+k.len)+';width:'+Wd(k.extra)+'">+'+k.extra+' imprevisto</div>':'')+'</div></div>';
+  });
+  h+='<div class="g-row"><span>Colchón de contingencia</span><div class="g-track">'+
+    (bufs.length?bufs.map(b=>'<div class="g-bar g-buf" style="left:'+L(b.start)+';width:'+Wd(b.len)+'">'+b.len+' sem</div>').join(''):'<small style="position:absolute;left:6px;top:3px">'+(plan==='tight'?'Ninguno en este plan':'Consumido por el imprevisto')+'</small>')+'</div></div>';
+  h+='<div class="g-row"><span>Hitos</span><div class="g-track">'+ms.map(m=>'<div class="g-ms" style="left:'+L(m)+'"></div>').join('')+'</div></div>';
+  h+='<div class="g-row"><span>Documentación (continua)</span><div class="g-track"><div class="g-bar g-doc" style="left:0;width:'+Wd(t-1)+'"></div></div></div>';
+  h+='<div class="g-dead"></div>';
+  $('#gantt').innerHTML=h;
+  const late=t>15,last=t-1;
+  let s;
+  if(late)s='<span class="g-status late">✖ Entrega en la semana '+last+': '+(t-15)+' semanas tarde</span> <p style="margin-top:8px">Sin colchón, el imprevisto empuja todo lo que viene después.</p>';
+  else s='<span class="g-status ok">✔ Entrega en la semana '+last+': en plazo</span> <p style="margin-top:8px">'+(inc?'El colchón absorbió el imprevisto: por eso se reserva.':'Todo cuadra… mientras nada falle. Prueba a simular un imprevisto.')+'</p>';
+  $('#ganttStatus').innerHTML=s+'<p><small>◆ Hitos: alcance cerrado, diseño aprobado, entorno funcionando y pruebas superadas.</small></p>';
+}
+function initGantt(){
+  $('#ganttSeg').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    plan=b.dataset.plan;
+    $$('#ganttSeg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    renderGantt();
+  });
+  $('#incOn').addEventListener('change',renderGantt);
+  renderGantt();
+}
+
+/* ============ riesgos ============ */
+let risks=RISKS0.map((r,i)=>Object.assign({id:i+1},r)),riskSel=1;
+const PL=['','Baja','Media','Alta'],IL=['','Bajo','Medio','Alto'];
+function renderRisks(){
+  let m='<div class="ax y" style="grid-row:1/4;grid-column:1">Probabilidad (baja a alta)</div>';
+  for(let p=3;p>=1;p--){
+    for(let i=1;i<=3;i++){
+      const sc=p*i,cls=sc<=2?'s1':sc<=4?'s2':'s3';
+      m+='<div class="cell '+cls+'">'+risks.filter(r=>r.p===p&&r.i===i).map(r=>'<button class="bub'+(r.id===riskSel?' sel':'')+'" type="button" data-id="'+r.id+'" aria-label="Riesgo '+r.id+': '+esc(r.n)+'">'+r.id+'</button>').join('')+'</div>';
+    }
+  }
+  m+='<div class="ax"></div><div class="ax">Impacto bajo</div><div class="ax">Impacto medio</div><div class="ax">Impacto alto</div>';
+  $('#rm').innerHTML=m;
+  $('#riskTable').innerHTML='<thead><tr><th>Nº</th><th>Riesgo</th><th>Probabilidad</th><th>Impacto</th><th>Plan de contingencia (plan B)</th></tr></thead><tbody>'+
+    risks.map(r=>'<tr data-id="'+r.id+'"'+(r.id===riskSel?' class="rsel"':'')+'><td>'+r.id+'</td><td>'+esc(r.n)+'</td><td><span class="lvl l'+r.p+'">'+PL[r.p]+'</span></td><td><span class="lvl l'+r.i+'">'+IL[r.i]+'</span></td><td>'+esc(r.plan)+'</td></tr>').join('')+'</tbody>';
+  const r=risks.find(x=>x.id===riskSel);
+  $('#riskDetail').innerHTML=r?'<h4>'+r.id+'. '+esc(r.n)+'</h4><p><b>Probabilidad:</b> <span class="lvl l'+r.p+'">'+PL[r.p]+'</span> · <b>Impacto:</b> <span class="lvl l'+r.i+'">'+IL[r.i]+'</span></p>'+(r.pre?'<p><b>Cómo reducirlo:</b> '+esc(r.pre)+'</p>':'')+'<p><b>Plan B:</b> '+esc(r.plan)+'</p>':'<p>Pulsa un número del mapa para ver su plan de contingencia.</p>';
+}
+function initRisks(){
+  const pick=e=>{const el=e.target.closest('[data-id]');if(!el)return;riskSel=+el.dataset.id;renderRisks()};
+  $('#rm').addEventListener('click',pick);
+  $('#riskTable').addEventListener('click',pick);
+  $('#rkAdd').addEventListener('click',()=>{
+    const n=$('#rkName').value.trim();
+    if(!n){$('#rkName').focus();return}
+    const id=risks.length?Math.max.apply(null,risks.map(r=>r.id))+1:1;
+    risks.push({id:id,n:n,p:+$('#rkP').value,i:+$('#rkI').value,plan:$('#rkPlan').value.trim()||'Por definir',pre:''});
+    riskSel=id;$('#rkName').value='';$('#rkPlan').value='';renderRisks();
+  });
+  $('#rkCopy').addEventListener('click',ev=>{
+    const c=s=>String(s).replace(/\|/g,'\\|');
+    const md='| Riesgo | Probabilidad | Impacto | Plan de contingencia |\n|---|---|---|---|\n'+risks.map(r=>'| '+c(r.n)+' | '+PL[r.p]+' | '+IL[r.i]+' | '+c(r.plan)+' |').join('\n');
+    copyText(md).then(ok=>flash(ev.currentTarget,ok?'¡Copiado!':'No se pudo'));
+  });
+  renderRisks();
+}
+
+/* ============ materias e índice de documentación ============ */
+function buildSubjects(){
+  $('#subjMount').innerHTML=SUBJ.map(s=>'<article class="sub"><div class="sub-h" style="--c:'+s.c+';--on:'+s.on+'"><span aria-hidden="true">'+s.ico+'</span><b>'+s.n+'</b><label class="switch"><input type="checkbox" data-subj="'+s.k+'"> La toco</label></div><div class="sub-b"><p>'+s.topic+'</p><p><b>Ejemplo:</b> '+esc(s.ex)+'</p><p><b>Qué mostrar:</b></p><ul>'+s.ev.map(x=>'<li>'+x+'</li>').join('')+'</ul></div></article>').join('');
+  $('#subjMount').addEventListener('change',updateOutline);
+  updateOutline();
+}
+function updateOutline(){
+  const on=$$('[data-subj]:checked').map(i=>SUBJ.find(s=>s.k===i.dataset.subj));
+  let n=1,t='Índice sugerido de la documentación\n\n';
+  t+=(n++)+'. Introducción, objetivos y alcance\n';
+  t+=(n++)+'. Planificación: fases, hitos y riesgos\n';
+  t+=(n++)+'. Arquitectura general del proyecto\n';
+  on.forEach(s=>{t+=(n++)+'. '+s.n+'\n'+s.ch.map(c=>'   - '+c).join('\n')+'\n'});
+  t+=(n++)+'. Pruebas y validación\n';
+  t+=(n++)+'. Conclusiones y trabajo futuro\n';
+  t+=(n++)+'. Anexos: actas, backlog y manuales';
+  if(!on.length)t+='\n\n(Marca arriba las materias que toca tu proyecto y aparecerán sus capítulos.)';
+  $('#outlinePre').textContent=t;
+}
+
+/* ============ presentación ============ */
+const SCOL=['#5B6C8A','#3F6DB5','#1E6BFF','#0E9F8E','#8A3FFC','#F26A1B','#DC3B41','#C79300','#0F2440','#5A6F8C'];
+let slideSel=0;
+const fmt=s=>{s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function renderSlides(){
+  const tot=Math.max(1,Number($('#minTotal').value)||10)*60;
+  $('#thumbs').innerHTML=SLIDES.map((s,i)=>'<button class="thumb" role="tab" type="button" data-i="'+i+'" aria-selected="'+(i===slideSel)+'"><b>'+(i+1)+'</b>'+s.n+'</button>').join('');
+  $('#tbar').innerHTML=SLIDES.map((s,i)=>'<i style="width:'+s.w+'%;background:'+SCOL[i]+';opacity:'+(i===slideSel?1:.4)+'"></i>').join('');
+  const s=SLIDES[slideSel];
+  $('#sview').innerHTML='<div class="sview-top"><h3>'+(slideSel+1)+'. '+s.n+'</h3><span class="tm" title="Tiempo orientativo">'+fmt(tot*s.w/100)+' min</span></div><div class="sview-b"><h4>Qué suele ir aquí</h4><ul>'+s.put.map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="tipline"><b>Consejo:</b> '+s.tip+'</div></div>';
+}
+function initSlides(){
+  $('#thumbs').addEventListener('click',e=>{const b=e.target.closest('.thumb');if(b){slideSel=+b.dataset.i;renderSlides()}});
+  $('#minTotal').addEventListener('input',renderSlides);
+  renderSlides();
+  $('#qlist').innerHTML=QUESTIONS.map(q=>'<div class="qi"><b>«'+q.q+'»</b><button class="reveal" type="button" data-reveal>Ver enfoque</button><div class="revealed" hidden><p>'+q.a+'</p></div></div>').join('');
+}
+
+/* ============ backlog, glosario, contactos ============ */
+let bl=store.get('backlog',[
+  {t:'Definir alcance y objetivos',p:'Alta',e:'S',s:'Por hacer',r:''},
+  {t:'Montar el repositorio con README',p:'Alta',e:'XS',s:'Por hacer',r:''},
+  {t:'Diseñar el diagrama de arquitectura',p:'Media',e:'M',s:'Por hacer',r:''}
+]);
+const pad=i=>'T-'+String(i+1).padStart(2,'0');
+const sel=(cls,f,opts,cur,i)=>'<select data-i="'+i+'" data-f="'+f+'" aria-label="'+f+'">'+opts.map(o=>'<option'+(o===cur?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+function renderBl(){
+  $('#blTable').innerHTML='<thead><tr><th>ID</th><th>Tarea</th><th>Prioridad</th><th>Estimación</th><th>Estado</th><th>Responsable</th><th><span class="sr">Borrar</span></th></tr></thead><tbody>'+
+    bl.map((r,i)=>'<tr><td>'+pad(i)+'</td><td><input data-i="'+i+'" data-f="t" value="'+esc(r.t)+'" aria-label="Tarea"></td><td>'+sel('','p',['Alta','Media','Baja'],r.p,i)+'</td><td>'+sel('','e',['XS','S','M','L','XL'],r.e,i)+'</td><td>'+sel('','s',['Por hacer','En curso','Revisión','Hecho'],r.s,i)+'</td><td><input data-i="'+i+'" data-f="r" value="'+esc(r.r)+'" aria-label="Responsable"></td><td><button class="btn sec2 sm" type="button" data-del="'+i+'" aria-label="Borrar fila">✕</button></td></tr>').join('')+'</tbody>';
+}
+function initBl(){
+  const t=$('#blTable');
+  const upd=e=>{const el=e.target.closest('[data-f]');if(!el)return;bl[+el.dataset.i][el.dataset.f]=el.value;store.set('backlog',bl)};
+  t.addEventListener('input',upd);t.addEventListener('change',upd);
+  t.addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){bl.splice(+d.dataset.del,1);store.set('backlog',bl);renderBl()}});
+  $('#blAdd').addEventListener('click',()=>{bl.push({t:'',p:'Media',e:'S',s:'Por hacer',r:''});store.set('backlog',bl);renderBl();const ins=$$('[data-f="t"]',t);ins[ins.length-1].focus()});
+  $('#blCopy').addEventListener('click',ev=>{
+    const c=s=>String(s).replace(/\|/g,'\\|');
+    const md='| ID | Tarea | Prioridad | Estimación | Estado | Responsable |\n|---|---|---|---|---|---|\n'+bl.map((r,i)=>'| '+pad(i)+' | '+c(r.t)+' | '+r.p+' | '+r.e+' | '+r.s+' | '+c(r.r)+' |').join('\n');
+    copyText(md).then(ok=>flash(ev.currentTarget,ok?'¡Copiado!':'No se pudo'));
+  });
+  $('#blCsv').addEventListener('click',()=>{
+    const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+    const csv='\ufeffID;Tarea;Prioridad;Estimación;Estado;Responsable\n'+bl.map((r,i)=>[pad(i),q(r.t),r.p,r.e,r.s,q(r.r)].join(';')).join('\n');
+    download('backlog.csv',csv,'text/csv;charset=utf-8');
+  });
+  renderBl();
+}
+function initGlossary(){
+  const render=q=>{
+    const l=GLOSS.filter(g=>!q||(g[0]+' '+g[1]).toLowerCase().indexOf(q)>=0);
+    $('#glist').innerHTML=l.length?l.map(g=>'<div><dt>'+esc(g[0])+'</dt><dd>'+esc(g[1])+'</dd></div>').join(''):'<div><dd>Ningún término coincide.</dd></div>';
+  };
+  $('#glSearch').addEventListener('input',e=>render(e.target.value.trim().toLowerCase()));
+  render('');
+}
+function initContacts(){
+  const saved=store.get('contacts',{});
+  $$('[data-contact]').forEach(i=>{
+    i.value=saved[i.dataset.contact]||'';
+    i.addEventListener('input',()=>{saved[i.dataset.contact]=i.value;store.set('contacts',saved)});
+  });
+}
+
+/* ============ arranque ============ */
+function init(){
+  buildNav();buildRouteUI();buildMap();
+  buildPhases();buildPickers();initKb();
+  buildTree();buildFilters();renderTable();initTableSort();renderTools();
+  buildEstimation();initGantt();initRisks();buildSubjects();initSlides();initBl();initGlossary();initContacts();
+  initTabs();
+  $$('#profileSeg button').forEach(b=>b.addEventListener('click',()=>setProfile(S.profile===b.dataset.profile?null:b.dataset.profile)));
+  $('#expandAll').addEventListener('click',()=>secs.forEach(s=>setOpen(s,true)));
+  $('#collapseAll').addEventListener('click',()=>secs.forEach(s=>setOpen(s,false)));
+  $('#resetProg').addEventListener('click',()=>{
+    if(!confirm('¿Borrar todas las casillas marcadas?'))return;
+    S.checks={};store.set('checks',S.checks);syncChecks();
+  });
+  syncChecks();applyRoute();applyProfile();
+  if(S.profile)selectTree(S.profile==='solo'?'solo':'small');
+  const m=/^#s(\d+)$/.exec(location.hash);
+  const first=m&&$('#s'+m[1])?$('#s'+m[1]):$('#s1');
+  setOpen($('#s1'),true);
+  if(m&&first){setOpen(first,true);setTimeout(()=>first.scrollIntoView(),120)}
+}
+init();
+})();
+
+</script>
+</body>
+</html>
