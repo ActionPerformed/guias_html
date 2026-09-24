@@ -542,8 +542,10 @@ Log.d(<span class="str">"MiApp"</span>, <span class="str">"onCreate ejecutado"</
     <div class="memoria-box" id="memoriaBox">
       <h3 style="margin:0 0 .3rem; font-size:1.05rem;">📄 Generador de MEMORIA.md</h3>
       <p style="margin:0;">Recoge automáticamente tu nombre, las tareas marcadas y todas las respuestas que has ido escribiendo (Bloque 1, Bloque 3 y la sección de reflexión final) y las convierte en un archivo Markdown listo para entregar. Las capturas de pantalla debes añadirlas tú a mano.</p>
+      <p id="memoriaSaveStatus" style="margin:.3rem 0; font-size:.85rem; color:#4a7c59; min-height:1.2em;"></p>
       <div class="memoria-actions">
         <button class="btn-secondary" id="memoriaPreviewBtn">🔄 Generar vista previa</button>
+        <button class="btn-secondary" id="memoriaSaveBtn">💾 Guardar ahora</button>
         <button class="btn-primary" id="memoriaDownloadBtn">⬇ Descargar MEMORIA.md</button>
       </div>
       <pre class="memoria-preview" id="memoriaPreview"></pre>
@@ -743,6 +745,79 @@ Log.d(<span class="str">"MiApp"</span>, <span class="str">"onCreate ejecutado"</
   var memoriaPreview = document.getElementById('memoriaPreview');
   var memoriaPreviewBtn = document.getElementById('memoriaPreviewBtn');
   var memoriaDownloadBtn = document.getElementById('memoriaDownloadBtn');
+  var memoriaSaveBtn = document.getElementById('memoriaSaveBtn');
+  var memoriaSaveStatus = document.getElementById('memoriaSaveStatus');
+
+  var AUTOSAVE_KEY = 'PMDM_ACT11_DRAFT';
+  var AUTOSAVE_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  var autosaveTimer = null;
+  var lastSaveTime = null;
+
+  function getMemoriaState(){
+    return {
+      studentName: studentName.value,
+      tasks: Array.from(document.querySelectorAll('.task input[type="checkbox"]')).map(function(cb){
+        return {id: cb.id, checked: cb.checked};
+      }),
+      reflections: Array.from(document.querySelectorAll('[data-mem-q]')).map(function(ta){
+        return {q: ta.getAttribute('data-mem-q'), value: ta.value};
+      }),
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  function restoreMemoriaState(state){
+    if(!state) return;
+    if(state.studentName) studentName.value = state.studentName;
+    state.tasks.forEach(function(t){
+      var cb = document.getElementById(t.id);
+      if(cb) cb.checked = t.checked;
+    });
+    state.reflections.forEach(function(r){
+      var ta = document.querySelector('[data-mem-q="' + r.q + '"]');
+      if(ta) ta.value = r.value;
+    });
+    if(state.savedAt){
+      lastSaveTime = new Date(state.savedAt);
+      updateSaveStatus();
+    }
+  }
+
+  function saveToLocal(){
+    var state = getMemoriaState();
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state));
+    lastSaveTime = new Date();
+    updateSaveStatus();
+  }
+
+  function updateSaveStatus(){
+    if(!lastSaveTime){
+      memoriaSaveStatus.textContent = '';
+      return;
+    }
+    var mins = Math.floor((Date.now() - lastSaveTime.getTime()) / 60000);
+    if(mins < 1){
+      memoriaSaveStatus.textContent = '✔ Guardado hace menos de un minuto';
+    } else if(mins === 1){
+      memoriaSaveStatus.textContent = '✔ Guardado hace 1 minuto';
+    } else {
+      memoriaSaveStatus.textContent = '✔ Guardado hace ' + mins + ' minutos';
+    }
+  }
+
+  // Restore on load
+  try {
+    var saved = localStorage.getItem(AUTOSAVE_KEY);
+    if(saved) restoreMemoriaState(JSON.parse(saved));
+  } catch(e){}
+
+  // Auto-save every 5 minutes
+  autosaveTimer = setInterval(saveToLocal, AUTOSAVE_INTERVAL);
+
+  memoriaSaveBtn.addEventListener('click', function(){
+    saveToLocal();
+    memoriaSaveStatus.textContent = '✔ Guardado manual realizado';
+  });
 
   function blockLabel(block){
     var titles = {
@@ -810,6 +885,7 @@ Log.d(<span class="str">"MiApp"</span>, <span class="str">"onCreate ejecutado"</
   });
 
   memoriaDownloadBtn.addEventListener('click', function(){
+    saveToLocal(); // Save before download
     var content = buildMemoria();
     var blob = new Blob([content], {type:'text/markdown;charset=utf-8'});
     var url = URL.createObjectURL(blob);
@@ -822,6 +898,12 @@ Log.d(<span class="str">"MiApp"</span>, <span class="str">"onCreate ejecutado"</
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     memoriaPreview.textContent = content;
     memoriaPreview.classList.add('show');
+    memoriaSaveStatus.textContent = '✔ Guardado y descargado';
+  });
+
+  // Save on page unload
+  window.addEventListener('beforeunload', function(){
+    saveToLocal();
   });
 
 })();
