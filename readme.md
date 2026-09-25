@@ -62,7 +62,8 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | Guía | Descripción |
 |------|-------------|
 | [IAW - UT1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT1.html) | UT1 — Implantación de aplicaciones web |
-| [Actividad 1.1.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.1.html) | Actividad 1.1 — Instalación y configuración de servidores |
+| [Actividad 1.1.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
+| [Actividad 1.2.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP (Apache + PHP + MariaDB) con Docker |
 
 ### PMDM (Programación Multimedia y Dispositivos Móviles)
 

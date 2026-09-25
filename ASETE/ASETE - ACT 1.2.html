@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Despliegue de un stack LAMP con Docker · v1.0 · DAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f14; --bg-panel:#111823; --bg-panel-2:#161f2b; --bg-raised:#1b2532;
+  --border:#223042; --border-soft:#1a2431; --grid-line:rgba(120,170,220,0.055);
+  --text:#e7edf3; --text-dim:#93a6ba; --text-faint:#5b6b7d;
+  --docker:#2496ed; --docker-dim:#12365a;
+  --apache:#e05c3a; --apache-dim:#4a1f12;
+  --php:#8b5cf6; --php-dim:#2c1a4a;
+  --mariadb:#e0a23a; --mariadb-dim:#4a3212;
+  --volume:#b28cf5; --volume-dim:#2c2148;
+  --danger:#f2555a; --danger-dim:#4a1618;
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --font-head:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.65;
+  background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:34px 34px;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} html{scroll-behavior:auto;}}
+::selection{background:var(--docker-dim); color:#fff;}
+h1,h2,h3,h4{font-family:var(--font-head); font-weight:600; letter-spacing:-0.01em; margin:0 0 .5em;}
+p{margin:0 0 1em; color:var(--text-dim); max-width:72ch;}
+code, pre, .mono{font-family:var(--font-mono);}
+code{background:var(--bg-raised); padding:1.5px 6px; border-radius:4px; color:var(--php); font-size:.88em;}
+a{color:var(--docker);}
+:focus-visible{outline:2px solid var(--docker); outline-offset:2px; border-radius:3px;}
+
+.topbar{position:sticky; top:0; z-index:60; display:flex; align-items:center; gap:14px; padding:0 18px; height:56px;
+  background:rgba(11,15,20,0.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+.topbar .brand{display:flex; align-items:center; gap:9px; font-family:var(--font-head); font-weight:600; font-size:15px; color:var(--text); white-space:nowrap;}
+.brand-dot{width:9px;height:9px;border-radius:2px; background:var(--docker); box-shadow:0 0 10px var(--docker); flex:none;}
+.topbar .sep{color:var(--text-faint); font-weight:400;}
+.topbar .subject{color:var(--text-dim); font-size:13px; font-family:var(--font-mono); display:none;}
+@media(min-width:720px){.topbar .subject{display:inline;}}
+.ver-pill{font-family:var(--font-mono); font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--apache-dim); color:var(--apache); border:1px solid var(--apache); flex:none;}
+.menu-btn{margin-left:auto; display:flex; align-items:center; gap:6px; background:var(--bg-raised); border:1px solid var(--border); color:var(--text);
+  font-family:var(--font-mono); font-size:12px; padding:7px 11px; border-radius:var(--radius-s); cursor:pointer;}
+@media(min-width:960px){.menu-btn{display:none;}}
+.progress-track{position:absolute; left:0; bottom:-1px; height:2px; width:100%;}
+.progress-bar{height:100%; width:0%; background:linear-gradient(90deg,var(--docker),var(--apache)); transition:width .1s linear;}
+
+.shell{display:flex; max-width:1180px; margin:0 auto; align-items:flex-start;}
+.toc{width:250px; flex:none; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; padding:26px 14px 40px 18px; border-right:1px solid var(--border-soft); display:none;}
+@media(min-width:960px){.toc{display:block;}}
+.toc-title{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:var(--text-faint); margin:0 0 10px 8px; text-transform:uppercase;}
+.toc a{display:block; padding:5px 8px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:12.6px; border-left:2px solid transparent; margin-bottom:1px;}
+.toc a:hover{color:var(--text); background:var(--bg-panel);}
+.toc a.active{color:var(--text); border-left-color:var(--docker); background:var(--bg-panel); font-weight:500;}
+.toc .num{color:var(--text-faint); font-family:var(--font-mono); font-size:10.5px; margin-right:6px;}
+
+.toc-drawer{position:fixed; inset:0; z-index:80; display:none;}
+.toc-drawer.open{display:block;}
+.toc-drawer .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55);}
+.toc-drawer .panel{position:absolute; top:0; left:0; bottom:0; width:78%; max-width:320px; background:var(--bg-panel); border-right:1px solid var(--border); padding:20px 16px; overflow-y:auto;}
+.toc-drawer .panel a{display:block; padding:9px 10px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:14px;}
+.toc-drawer .panel a:hover, .toc-drawer .panel a.active{background:var(--bg-raised); color:var(--text);}
+
+main{flex:1; min-width:0; padding:0 18px;}
+.content{max-width:760px; margin:0 auto; padding:0 0 80px;}
+
+.titleblock{margin:40px 0 40px; border:1px solid var(--border); border-radius:var(--radius-l); background:var(--bg-panel); overflow:hidden;}
+.tb-top{padding:26px 26px 18px; border-bottom:1px solid var(--border-soft);}
+.tb-top .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--apache); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.tb-top .eyebrow .blink{width:6px;height:6px;border-radius:50%;background:var(--apache); animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.tb-top h1{font-size:clamp(24px,3.6vw,34px); line-height:1.2; margin:0;}
+.tb-meta{display:grid; grid-template-columns:repeat(2,1fr);}
+@media(min-width:600px){.tb-meta{grid-template-columns:repeat(4,1fr);}}
+.tb-cell{padding:14px 18px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft);}
+.tb-cell:last-child{border-right:none;}
+.tb-cell .k{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; color:var(--text-faint); text-transform:uppercase; margin-bottom:3px;}
+.tb-cell .v{font-family:var(--font-mono); font-size:13px; color:var(--text); font-weight:600;}
+
+section.block{scroll-margin-top:72px; margin-bottom:52px;}
+.block-head{display:flex; align-items:baseline; gap:12px; margin-bottom:16px;}
+.block-head .idx{font-family:var(--font-mono); font-size:13px; color:var(--text-faint); flex:none;}
+.block-head h2{font-size:22px; margin:0;}
+.panel{background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius-l); padding:22px 24px;}
+.panel + .panel{margin-top:14px;}
+.panel h3{font-size:15.5px; margin-bottom:8px;}
+.panel h4{font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); margin-bottom:8px;}
+
+.tbl-wrap{overflow-x:auto; margin:16px 0; border:1px solid var(--border-soft); border-radius:var(--radius-m);}
+table{width:100%; border-collapse:collapse; font-size:13.4px;}
+thead th{text-align:left; font-family:var(--font-mono); font-weight:500; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; padding:9px 13px; background:var(--bg-raised); border-bottom:1px solid var(--border);}
+tbody td{padding:9px 13px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody td strong{color:var(--text); font-weight:600;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+td.yes{color:var(--php); font-family:var(--font-mono);}
+td.no{color:var(--danger); font-family:var(--font-mono);}
+
+.code-block{position:relative; margin:16px 0; border-radius:var(--radius-m); border:1px solid var(--border); background:#0a0e13; overflow:hidden;}
+.code-block .cb-head{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--bg-raised); border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+.code-block pre{margin:0; padding:15px; overflow-x:auto; font-size:12.8px; line-height:1.6; color:#d3e0ec;}
+.code-block .cmt{color:#5b6b7d;}
+.copy-btn{background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-mono); font-size:10.5px; padding:3px 9px; border-radius:5px; cursor:pointer;}
+.copy-btn:hover{color:var(--text); border-color:var(--text-dim);}
+.copy-btn.copied{color:var(--php); border-color:var(--php);}
+
+.tabs{border:1px solid var(--border); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.tab-nav{display:flex; background:var(--bg-raised); border-bottom:1px solid var(--border); overflow-x:auto;}
+.tab-nav button{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); background:transparent; border:none; padding:10px 15px; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent;}
+.tab-nav button.active{color:var(--text); border-bottom-color:var(--docker); background:var(--bg-panel);}
+.tab-panel{display:none; padding:16px;}
+.tab-panel.active{display:block;}
+.tab-panel .code-block{margin:0;}
+
+.accordion{border:1px solid var(--border-soft); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.acc-item + .acc-item{border-top:1px solid var(--border-soft);}
+.acc-trigger{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--bg-panel-2); border:none; color:var(--text); text-align:left; padding:13px 16px; font-family:var(--font-body); font-size:14px; font-weight:500; cursor:pointer;}
+.acc-trigger:hover{background:var(--bg-raised);}
+.acc-trigger .chev{transition:transform .2s ease; color:var(--text-faint); flex:none;}
+.acc-item.open .acc-trigger .chev{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.acc-panel-inner{padding:4px 16px 16px;}
+
+.question{display:flex; gap:12px; align-items:flex-start; border:1px dashed var(--docker); background:var(--docker-dim); border-radius:var(--radius-m); padding:13px 16px; margin:14px 0;}
+.question .q-mark{font-family:var(--font-head); font-weight:700; font-size:15px; color:var(--docker); width:22px; height:22px; border-radius:50%; border:1.5px solid var(--docker); display:flex; align-items:center; justify-content:center; flex:none;}
+.question p{margin:0; color:#cfe4fb; font-size:13.8px;}
+
+.tip{border-left:3px solid var(--mariadb); background:var(--mariadb-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.4px;}
+.tip strong{color:var(--mariadb); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.tip p{margin:0; color:#e9d9b8;}
+.important{border-left:3px solid var(--danger); background:var(--danger-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.4px;}
+.important strong{color:var(--danger); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.important p{margin:0; color:#f7d7d8;}
+
+.topology-wrap{border:1px solid var(--border-soft); border-radius:var(--radius-l); background:var(--bg-panel-2); padding:20px; margin:16px 0;}
+.topology-svg{width:100%; height:auto; display:block;}
+.topo-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
+.topo-node-label{font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:600; fill:#fff;}
+
+.step-list{margin:0 0 12px; padding-left:22px; color:var(--text-dim); font-size:14px;}
+.step-list li{margin-bottom:5px;}
+ul.plain, ol.plain{margin:12px 0; padding-left:22px; color:var(--text-dim); font-size:14px;}
+ul.plain li, ol.plain li{margin-bottom:6px;}
+
+.check-row{display:flex; align-items:flex-start; gap:9px; padding:6px 0;}
+.check-row input[type=checkbox]{appearance:none; width:17px; height:17px; border:1.5px solid var(--border); border-radius:4px; background:var(--bg-panel); cursor:pointer; flex:none; margin-top:2px; position:relative;}
+.check-row input[type=checkbox]:checked{background:var(--php); border-color:var(--php);}
+.check-row input[type=checkbox]:checked::after{content:''; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid #2c1a4a; border-width:0 2px 2px 0; transform:rotate(45deg);}
+.check-row label{font-size:13.6px; color:var(--text-dim); cursor:pointer;}
+.check-row input[type=checkbox]:checked ~ label{color:var(--text-faint); text-decoration:line-through;}
+
+/* SIMULATOR: persistence lifecycle */
+.sim-wrap{border:1px solid var(--border); border-radius:var(--radius-l); background:radial-gradient(circle at 20% 0%, rgba(36,150,237,0.08), transparent 55%), var(--bg-panel); padding:22px; margin:18px 0;}
+.sim-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:6px;}
+.sim-title{display:flex; align-items:center; gap:9px;}
+.sim-title .dot{width:8px;height:8px;border-radius:50%; background:var(--php); box-shadow:0 0 8px var(--php); animation:blink 2s infinite;}
+.sim-title span{font-family:var(--font-mono); font-size:12px; color:var(--text-dim);}
+.sim-state{font-family:var(--font-mono); font-size:11px; padding:4px 10px; border-radius:999px; border:1px solid var(--border); color:var(--text-dim);}
+.sim-state.state-up{color:var(--php); border-color:var(--php);}
+.sim-state.state-down{color:var(--text-faint);}
+.sim-state.state-empty{color:var(--danger); border-color:var(--danger);}
+.sim-stage{position:relative; min-height:260px; border:1px solid var(--border-soft); border-radius:var(--radius-m); background:#0a0e13; margin:14px 0; overflow:hidden;}
+.net-boundary{position:absolute; left:6%; right:6%; top:14%; bottom:22%; border:1.5px dashed var(--border); border-radius:var(--radius-l); opacity:0; transition:opacity .5s ease;}
+.net-boundary.show{opacity:1;}
+.net-label{position:absolute; top:-11px; left:16px; background:#0a0e13; padding:0 8px; font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+.sim-node{position:absolute; width:100px; padding:11px 9px; border-radius:var(--radius-m); border:1.5px solid var(--border); background:var(--bg-panel-2); text-align:center; opacity:0; transform:translateY(14px) scale(.92); transition:opacity .45s ease, transform .45s ease;}
+.sim-node.show{opacity:1; transform:translateY(0) scale(1);}
+.sim-node .n-icon{font-size:19px; margin-bottom:3px;}
+.sim-node .n-name{font-family:var(--font-mono); font-size:11px; color:var(--text); font-weight:600;}
+.sim-node .n-port{font-family:var(--font-mono); font-size:9px; color:var(--text-faint); margin-top:2px;}
+#node-apache{left:5%; top:28%; border-color:var(--apache);}
+#node-php{left:38%; top:28%; border-color:var(--php);}
+#node-mariadb{right:5%; top:28%; border-color:var(--mariadb);}
+.sim-volume{position:absolute; left:38%; bottom:6%; width:100px; text-align:center; opacity:0; transform:scale(.9); transition:opacity .4s ease, transform .4s ease;}
+.sim-volume.show{opacity:1; transform:scale(1);}
+.sim-volume .v-cyl{width:56px; height:40px; margin:0 auto 5px; border-radius:10px/8px; background:linear-gradient(var(--volume-dim), #171225); border:1.5px solid var(--volume); position:relative;}
+.sim-volume.wiped .v-cyl{border-color:var(--danger); background:linear-gradient(var(--danger-dim), #1a0e10);}
+.sim-volume .v-name{font-family:var(--font-mono); font-size:9.5px; color:var(--volume);}
+.sim-volume.wiped .v-name{color:var(--danger);}
+.sim-volume .v-data{font-family:var(--font-mono); font-size:9px; color:var(--text-dim); margin-top:2px; min-height:11px;}
+.sim-link{position:absolute; height:1.5px; background:var(--border); opacity:0; transition:opacity .4s ease .1s;}
+.sim-link.show{opacity:1;}
+.sim-link.data-flow::after{content:''; position:absolute; top:-1.5px; left:0; width:8px; height:4.5px; border-radius:2px; background:var(--apache); animation:flow 1.8s linear infinite;}
+@keyframes flow{0%{left:0;}100%{left:calc(100% - 8px);}}
+.sim-controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.sim-btn{font-family:var(--font-mono); font-size:12px; padding:9px 14px; border-radius:var(--radius-s); border:1px solid var(--border); background:var(--bg-raised); color:var(--text); cursor:pointer;}
+.sim-btn:hover{border-color:var(--docker);}
+.sim-btn.primary{background:var(--php-dim); border-color:var(--php); color:var(--php);}
+.sim-btn.danger{background:var(--danger-dim); border-color:var(--danger); color:var(--danger);}
+.sim-btn.add-data{background:var(--volume-dim); border-color:var(--volume); color:var(--volume);}
+.sim-btn:disabled{opacity:.35; cursor:not-allowed;}
+.sim-log{margin-top:12px; background:#070a0e; border:1px solid var(--border-soft); border-radius:var(--radius-s); padding:10px 14px; font-family:var(--font-mono); font-size:11.6px; color:var(--text-dim); min-height:52px; max-height:110px; overflow-y:auto;}
+.sim-log .log-line{margin-bottom:3px;}
+.sim-log .log-line.ok{color:var(--php);}
+.sim-log .log-line.warn{color:var(--danger);}
+.sim-log .log-line.sys{color:var(--text-faint);}
+
+footer{border-top:1px solid var(--border-soft); padding:34px 18px 60px; text-align:center;}
+footer p{margin:0 auto; max-width:60ch; font-size:13px; color:var(--text-faint);}
+
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-dot"></span>LAMP<span class="sep">/</span>Docker</div>
+  <span class="ver-pill">v1.0</span>
+  <span class="subject">ASETE · 2º DAM · Guía práctica</span>
+  <button class="menu-btn" id="menuBtn">☰ Índice</button>
+  <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<div class="toc-drawer" id="tocDrawer">
+  <div class="backdrop" id="tocBackdrop"></div>
+  <div class="panel" id="tocDrawerPanel"></div>
+</div>
+
+<div class="shell">
+  <nav class="toc" id="tocDesktop"><p class="toc-title">Contenidos</p></nav>
+
+  <main>
+    <div class="content">
+
+      <div class="titleblock">
+        <div class="tb-top">
+          <div class="eyebrow"><span class="blink"></span>GUÍA PRÁCTICA · V1.0</div>
+          <h1>Despliegue de un stack LAMP con Docker</h1>
+        </div>
+        <div class="tb-meta">
+          <div class="tb-cell"><div class="k">Módulo</div><div class="v">ASETE</div></div>
+          <div class="tb-cell"><div class="k">Curso</div><div class="v">2º DAM</div></div>
+          <div class="tb-cell"><div class="k">Duración</div><div class="v">1 h trabajo</div></div>
+          <div class="tb-cell"><div class="k">Versión</div><div class="v">1.0 (25/09/2026)</div></div>
+        </div>
+      </div>
+
+      <!-- 1 INTRODUCCIÓN -->
+      <section class="block" id="introduccion" data-title="Introducción">
+        <div class="block-head"><span class="idx">01</span><h2>Introducción</h2></div>
+        <div class="panel">
+          <p>Esta guía práctica te llevará a desplegar un <strong style="color:var(--text)">stack LAMP completo</strong> usando Docker: un servidor web Apache, un contenedor PHP-FPM que ejecuta código PHP, y una base de datos MariaDB. Todo ello orquestado con Docker Compose.</p>
+          <p><strong style="color:var(--text)">LAMP</strong> son las siglas de <strong style="color:var(--text)">Linux + Apache + MySQL/MariaDB + PHP</strong>. Es el stack clásico para aplicaciones web en PHP. Usaremos MariaDB (compatible con MySQL y de código abierto).</p>
+          <p>Se trabajan los conceptos desarrollados en la Unidad de Trabajo 1. Si algo no te suena (qué es un volumen, qué diferencia hay entre imagen y contenedor, qué es FastCGI), consulta la guía teórica de la unidad antes de continuar.</p>
+          <p>El objetivo es que, al terminar, no solo tengas el stack funcionando sino que también entiendas cómo se comunican los contenedores entre sí (Apache ↔ PHP-FPM ↔ MariaDB), cómo persiste la base de datos y cómo verificar que todo funciona correctamente.</p>
+        </div>
+      </section>
+
+      <!-- 2 OBJETIVOS -->
+      <section class="block" id="objetivos" data-title="Objetivos de aprendizaje">
+        <div class="block-head"><span class="idx">02</span><h2>Objetivos de aprendizaje</h2></div>
+        <div class="panel">
+          <ul class="plain">
+            <li>Preparar un entorno de trabajo con Docker en Windows 11.</li>
+            <li>Definir un stack multi-contenedor con Docker Compose.</li>
+            <li>Crear un Dockerfile personalizado para PHP-FPM con las extensiones necesarias.</li>
+            <li>Configurar Apache como servidor web delegando PHP a PHP-FPM via FastCGI.</li>
+            <li>Desplegar MariaDB con persistencia de datos mediante volúmenes.</li>
+            <li>Verificar el correcto funcionamiento de cada componente.</li>
+            <li>Diagnosticar y resolver problemas frecuentes (Error 500, conexión BD, etc.).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3 PRERREQUISITOS -->
+      <section class="block" id="prerrequisitos" data-title="Prerrequisitos">
+        <div class="block-head"><span class="idx">03</span><h2>Prerrequisitos</h2></div>
+        <div class="panel">
+          <p>Antes de empezar, asegúrate de que tienes:</p>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">Windows 11</strong> con Docker Desktop instalado y funcionando.</li>
+            <li>Una terminal (PowerShell o Windows Terminal).</li>
+            <li>Un editor de texto (VS Code, Notepad++...).</li>
+          </ul>
+          <h4>Verificación rápida de Docker</h4>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-verdocker">Copiar</button></div><pre id="c-verdocker">docker --version
+docker compose version</pre></div>
+          <p style="font-size:13.4px;">Ambos comandos deben devolver una versión. Si alguno falla, revisa la instalación de Docker antes de continuar.</p>
+        </div>
+      </section>
+
+      <!-- 4 PREPARACIÓN SO -->
+      <section class="block" id="preparacion" data-title="Preparación del sistema">
+        <div class="block-head"><span class="idx">04</span><h2>Preparación del sistema operativo del servidor</h2></div>
+        <div class="panel">
+          <h3>Paso 1 · Crear la estructura de carpetas</h3>
+          <p>Vamos a crear la estructura de carpetas del proyecto:</p>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-mkdir">Copiar</button></div><pre id="c-mkdir">mkdir lamp-docker\apache
+mkdir lamp-docker\php
+mkdir lamp-docker\mariadb
+mkdir lamp-docker\src
+cd lamp-docker</pre></div>
+          <div class="code-block"><div class="cb-head"><span>árbol de directorios</span><button class="copy-btn" data-copy="c-tree">Copiar</button></div><pre id="c-tree">lamp-docker/
+├── docker-compose.yml
+├── apache/
+│   ├── Dockerfile
+│   └── vhost.conf
+├── php/
+│   └── Dockerfile
+├── mariadb/
+│   └── init.sql
+└── src/
+    └── index.php</pre></div>
+          <div class="tip"><strong>Consejo</strong><p>Evita rutas con espacios o caracteres especiales. Docker y algunos comandos pueden dar problemas.</p></div>
+        </div>
+        <div class="panel">
+          <h3>Paso 2 · Verificar recursos asignados a Docker</h3>
+          <p style="font-size:13.6px;">Docker Desktop permite limitar la CPU, RAM y disco que puede usar el motor de Docker. Para esta práctica, con <strong style="color:var(--text)">2&nbsp;GB de RAM y 2&nbsp;CPU</strong> es suficiente. Puedes comprobarlo en Docker Desktop → Settings → Resources.</p>
+          <h3>Paso 3 · Verificar que los puertos están libres</h3>
+          <p style="font-size:13.6px;">Vamos a usar los puertos <strong style="color:var(--text)">8080</strong> (Apache) y <strong style="color:var(--text)">3306</strong> (MariaDB).</p>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-netstat">Copiar</button></div><pre id="c-netstat">netstat -ano | findstr :8080
+netstat -ano | findstr :3306</pre></div>
+          <p style="font-size:13.4px;">Si no devuelven nada, están libres. Si devuelven algo, cambia el puerto en el <code>docker-compose.yml</code> más adelante.</p>
+        </div>
+      </section>
+
+      <!-- 5 ARQUITECTURA -->
+      <section class="block" id="arquitectura" data-title="Arquitectura del stack">
+        <div class="block-head"><span class="idx">05</span><h2>Arquitectura del stack a desplegar</h2></div>
+        <div class="panel">
+          <p>En esta práctica desplegaremos la siguiente arquitectura de 3 contenedores:</p>
+          <div class="topology-wrap">
+            <svg class="topology-svg" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+              <!-- Equipo host -->
+              <rect x="10" y="10" width="880" height="240" rx="10" fill="none" stroke="#5b6b7d" stroke-width="1.3"/>
+              <text x="26" y="30" class="topo-label">TU EQUIPO (Windows 11)</text>
+
+              <!-- Red Docker -->
+              <rect x="26" y="42" width="848" height="190" rx="10" fill="none" stroke="#2496ed" stroke-width="1.3"/>
+              <text x="40" y="60" class="topo-label" fill="#2496ed">Docker · red: lamp-network</text>
+
+              <!-- Apache -->
+              <rect x="50" y="80" width="150" height="52" rx="8" fill="#4a1f12" stroke="#e05c3a" stroke-width="1.4"/>
+              <text x="125" y="102" text-anchor="middle" class="topo-node-label">Apache</text>
+              <text x="125" y="118" text-anchor="middle" class="topo-label" fill="#e05c3a">:8080→80</text>
+
+              <!-- PHP-FPM -->
+              <rect x="375" y="80" width="150" height="52" rx="8" fill="#2c1a4a" stroke="#8b5cf6" stroke-width="1.4"/>
+              <text x="450" y="102" text-anchor="middle" class="topo-node-label">PHP-FPM</text>
+              <text x="450" y="118" text-anchor="middle" class="topo-label" fill="#8b5cf6">:9000 (FastCGI)</text>
+
+              <!-- MariaDB -->
+              <rect x="700" y="80" width="150" height="52" rx="8" fill="#4a3212" stroke="#e0a23a" stroke-width="1.4"/>
+              <text x="775" y="102" text-anchor="middle" class="topo-node-label">MariaDB</text>
+              <text x="775" y="118" text-anchor="middle" class="topo-label" fill="#e0a23a">:3306 (interno)</text>
+
+              <!-- Flecha Apache -> PHP-FPM -->
+              <line x1="200" y1="106" x2="373" y2="106" stroke="#e05c3a" stroke-width="1.4"/>
+              <text x="286" y="98" text-anchor="middle" class="topo-label" fill="#e05c3a" font-size="9">FastCGI</text>
+
+              <!-- Flecha PHP-FPM -> MariaDB -->
+              <line x1="525" y1="106" x2="698" y2="106" stroke="#8b5cf6" stroke-width="1.4"/>
+              <text x="611" y="98" text-anchor="middle" class="topo-label" fill="#8b5cf6" font-size="9">PDO / mysqli</text>
+
+              <!-- Volumen mariadb_data (cilindro) -->
+              <g transform="translate(700, 175)">
+                <ellipse cx="75" cy="15" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+                <rect x="0" y="15" width="150" height="55" fill="#2a1d4a" stroke="none"/>
+                <line x1="0" y1="15" x2="0" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+                <line x1="150" y1="15" x2="150" y2="70" stroke="#b28cf5" stroke-width="1.4"/>
+                <ellipse cx="75" cy="70" rx="75" ry="12" fill="#2a1d4a" stroke="#b28cf5" stroke-width="1.4"/>
+                <ellipse cx="75" cy="15" rx="75" ry="12" fill="none" stroke="#b28cf5" stroke-width="1.4"/>
+                <text x="75" y="42" text-anchor="middle" class="topo-node-label" font-size="12">mariadb_data</text>
+                <text x="75" y="58" text-anchor="middle" class="topo-label" fill="#b28cf5" font-size="10">(volumen)</text>
+              </g>
+
+              <!-- Mount MariaDB -> volumen (línea punteada) -->
+              <line x1="775" y1="132" x2="775" y2="175" stroke="#b28cf5" stroke-width="1.2" stroke-dasharray="3 2"/>
+              <text x="783" y="158" class="topo-label" fill="#b28cf5" font-size="9">mount</text>
+
+              <!-- Puerto hacia el host -->
+              <line x1="125" y1="210" x2="125" y2="240" stroke="#5b6b7d" stroke-width="1.3"/>
+              <text x="125" y="258" text-anchor="middle" class="topo-label">localhost:8080</text>
+            </svg>
+          </div>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">Apache</strong> recibe las peticiones HTTP en el puerto 8080 y sirve archivos estáticos.</li>
+            <li><strong style="color:var(--text)">PHP-FPM</strong> ejecuta el código PHP, conectado a Apache por el protocolo FastCGI.</li>
+            <li><strong style="color:var(--text)">MariaDB</strong> almacena los datos de la aplicación. PHP se conecta via PDO o mysqli.</li>
+            <li><strong style="color:var(--text)">Volumen <code>mariadb_data</code></strong> persiste los datos de la base de datos entre arranques.</li>
+            <li>Los tres contenedores comparten la red <code>lamp-network</code>, lo que permite que se resuelvan por nombre de servicio.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 6 CREACIÓN PASO A PASO -->
+      <section class="block" id="creacion" data-title="Creación del stack">
+        <div class="block-head"><span class="idx">06</span><h2>Creación del stack paso a paso con Docker Compose</h2></div>
+        <div class="panel">
+          <h3>Paso 1 · Crear el Dockerfile de PHP y Apache</h3>
+          <p>Crea el archivo <code>php/Dockerfile</code> para PHP-FPM:</p>
+          <div class="code-block"><div class="cb-head"><span>dockerfile</span><button class="copy-btn" data-copy="c-phpdockerfile">Copiar</button></div><pre id="c-phpdockerfile">FROM php:8.2-fpm-alpine
+
+# Instalar las extensiones PHP necesarias
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mysqli
+
+WORKDIR /var/www/html</pre></div>
+
+          <p>Crea el archivo <code>apache/Dockerfile</code> para Apache (con los módulos de proxy pre-cargados):</p>
+          <div class="code-block"><div class="cb-head"><span>apache/Dockerfile</span><button class="copy-btn" data-copy="c-apachedockerfile">Copiar</button></div><pre id="c-apachedockerfile">FROM httpd:2.4-alpine
+
+# Habilitar módulos de proxy para FastCGI
+RUN sed -i '/^#LoadModule proxy_module/s/^#//' conf/httpd.conf \
+    && sed -i '/^#LoadModule proxy_fcgi_module/s/^#//' conf/httpd.conf \
+    && sed -i '/^#LoadModule socache_shmcb_module/s/^#//' conf/httpd.conf</pre></div>
+          <div class="tip"><strong>Explicación</strong><p>Por defecto, la imagen <code>httpd:2.4-alpine</code> tiene los módulos <code>mod_proxy</code> y <code>mod_proxy_fcgi</code> comentados. Este Dockerfile los activa.</p></div>
+          <div class="code-block"><div class="cb-head"><span>dockerfile</span><button class="copy-btn" data-copy="c-phpdockerfile">Copiar</button></div><pre id="c-phpdockerfile">FROM php:8.2-fpm-alpine
+
+# Instalar las extensiones PHP necesarias
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mysqli
+
+WORKDIR /var/www/html</pre></div>
+          <div class="tip"><strong>Explicación</strong><p><code>FROM php:8.2-fpm-alpine</code> parte de la imagen oficial de PHP 8.2 con FPM (FastCGI Process Manager), en su versión Alpine (ligera). <code>docker-php-ext-install pdo pdo_mysql mysqli</code> instala las extensiones para conectar con MariaDB. <code>WORKDIR /var/www/html</code> establece el directorio de trabajo dentro del contenedor.</p></div>
+        </div>
+
+        <div class="panel">
+          <h3>Paso 2 · Configurar Apache (VirtualHost)</h3>
+          <p>Crea el archivo <code>apache/vhost.conf</code>. Apache delegará los archivos <code>.php</code> a PHP-FPM via FastCGI:</p>
+          <div class="code-block"><div class="cb-head"><span>apache</span><button class="copy-btn" data-copy="c-vhost">Copiar</button></div><pre id="c-vhost">&lt;VirtualHost *:80&gt;
+    ServerName localhost
+    DocumentRoot /var/www/html
+
+    &lt;Directory /var/www/html&gt;
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        DirectoryIndex index.php index.html
+    &lt;/Directory&gt;
+
+    # Delegar los archivos .php a PHP-FPM
+    &lt;FilesMatch \.php$&gt;
+        SetHandler "proxy:fcgi://php-fpm:9000"
+    &lt;/FilesMatch&gt;
+
+    ErrorLog /proc/self/fd/2
+    CustomLog /proc/self/fd/1 combined
+&lt;/VirtualHost&gt;</pre></div>
+          <div class="tip"><strong>Puntos clave</strong><p><code>SetHandler "proxy:fcgi://php-fpm:9000"</code> delega todos los archivos <code>.php</code> al contenedor llamado <code>php-fpm</code> en el puerto 9000. El nombre <code>php-fpm</code> debe coincidir con el nombre del servicio en <code>docker-compose.yml</code>.</p></div>
+        </div>
+
+        <div class="panel">
+          <h3>Paso 3 · Configurar MariaDB (init.sql)</h3>
+          <p>Crea el archivo <code>mariadb/init.sql</code>. Este script se ejecuta <strong>automáticamente la primera vez</strong> que arranque MariaDB:</p>
+          <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="c-initsql">Copiar</button></div><pre id="c-initsql">-- Crear una tabla de prueba
+CREATE TABLE IF NOT EXISTS test_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mensaje VARCHAR(255) NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insertar un par de filas
+INSERT INTO test_table (mensaje) VALUES
+    ('Hola desde MariaDB'),
+    ('¡LAMP funcionando en Docker!');</pre></div>
+          <div class="tip"><strong>Nota</strong><p>Este script solo se ejecuta la primera vez que se crea el volumen de datos de MariaDB. Si más adelante modificas este archivo y quieres que se vuelva a ejecutar, tienes que borrar el volumen con <code>docker compose down -v</code>.</p></div>
+        </div>
+
+        <div class="panel">
+          <h3>Paso 4 · Crear docker-compose.yml</h3>
+          <div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="compose-yml">Copiar</button></div><pre id="compose-yml">services:
+  # ---- Apache ----
+  apache:
+    build: ./apache
+    container_name: lamp-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./apache/vhost.conf:/usr/local/apache2/conf/extra/vhost.conf:ro
+    command: >
+      sh -c "echo 'Include conf/extra/vhost.conf' >> conf/httpd.conf && httpd-foreground"
+    networks:
+      - lamp-network
+    depends_on:
+      - php-fpm
+    restart: unless-stopped
+
+  # ---- PHP-FPM ----
+  php-fpm:
+    build: ./php
+    container_name: lamp-php
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - lamp-network
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---- MariaDB ----
+  mariadb:
+    image: mariadb:11
+    container_name: lamp-mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: lamp_db
+      MARIADB_USER: lamp_user
+      MARIADB_PASSWORD: lamp_pass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - lamp-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+networks:
+  lamp-network:
+    driver: bridge
+
+volumes:
+  mariadb_data:</pre></div>
+        </div>
+
+        <div class="panel">
+          <h3>Paso 5 · Crear index.php de prueba</h3>
+          <p>Crea el archivo <code>src/index.php</code>. Esta página verificará que PHP funciona y se conecta a MariaDB:</p>
+          <div class="code-block"><div class="cb-head"><span>php</span><button class="copy-btn" data-copy="c-indexphp">Copiar</button></div><pre id="c-indexphp">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Prueba LAMP en Docker&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        h1 { color: #333; }
+        .ok { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Prueba funcional del stack LAMP&lt;/h1&gt;
+
+    &lt;h2&gt;1. Comprobación de PHP&lt;/h2&gt;
+    &lt;?php
+    echo "&lt;p class='ok'&gt;PHP funciona correctamente. Versión: " . phpversion() . "&lt;/p&gt;";
+    ?&gt;
+
+    &lt;h2&gt;2. Conexión a MariaDB&lt;/h2&gt;
+    &lt;?php
+    $host = 'mariadb';
+    $db   = 'lamp_db';
+    $user = 'lamp_user';
+    $pass = 'lamp_pass';
+
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+        $pdo-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo "&lt;p class='ok'&gt;Conexión a MariaDB establecida correctamente.&lt;/p&gt;";
+
+        $stmt = $pdo-&gt;query("SELECT id, mensaje, fecha FROM test_table ORDER BY id");
+        $filas = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($filas) &gt; 0) {
+            echo "&lt;h2&gt;3. Datos leídos de la base de datos&lt;/h2&gt;";
+            echo "&lt;table&gt;";
+            echo "&lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Mensaje&lt;/th&gt;&lt;th&gt;Fecha&lt;/th&gt;&lt;/tr&gt;";
+            foreach ($filas as $fila) {
+                echo "&lt;tr&gt;";
+                echo "&lt;td&gt;" . htmlspecialchars($fila['id']) . "&lt;/td&gt;";
+                echo "&lt;td&gt;" . htmlspecialchars($fila['mensaje']) . "&lt;/td&gt;";
+                echo "&lt;td&gt;" . htmlspecialchars($fila['fecha']) . "&lt;/td&gt;";
+                echo "&lt;/tr&gt;";
+            }
+            echo "&lt;/table&gt;";
+        } else {
+            echo "&lt;p&gt;La tabla existe pero está vacía.&lt;/p&gt;";
+        }
+    } catch (PDOException $e) {
+        echo "&lt;p class='error'&gt;Error de conexión: " . htmlspecialchars($e-&gt;getMessage()) . "&lt;/p&gt;";
+    }
+    ?&gt;
+
+    &lt;h2&gt;4. Información del entorno&lt;/h2&gt;
+    &lt;p&gt;Si ves esta página, Apache y PHP-FPM están trabajando juntos correctamente.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+        </div>
+
+        <div class="panel">
+          <h3>Paso 6 · Levantar y verificar</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell · levantar</span><button class="copy-btn" data-copy="c-up">Copiar</button></div><pre id="c-up">docker compose up -d --build</pre></div>
+          <p style="font-size:13.4px;">La primera ejecución puede tardar unos minutos porque descarga las imágenes de Apache, PHP y MariaDB.</p>
+          <div class="code-block"><div class="cb-head"><span>powershell · verificar</span><button class="copy-btn" data-copy="c-ps">Copiar</button></div><pre id="c-ps">docker compose ps</pre></div>
+          <p style="font-size:13.4px;">Deberías ver los tres contenedores en estado <code>Up</code>.</p>
+          <div class="code-block"><div class="cb-head"><span>powershell · verificar (opcional)</span><button class="copy-btn" data-copy="c-phpv">Copiar</button></div><pre id="c-phpv">docker compose exec php-fpm php -v
+docker compose exec php-fpm php -m | findstr pdo</pre></div>
+        </div>
+      </section>
+
+      <!-- 7 COMPROBACIÓN -->
+      <section class="block" id="comprobacion" data-title="Comprobación del sistema">
+        <div class="block-head"><span class="idx">07</span><h2>Comprobación del sistema</h2></div>
+        <div class="panel">
+          <h3>Paso 1 · Abrir en el navegador</h3>
+          <p>Abre tu navegador y accede a:</p>
+          <div class="code-block"><div class="cb-head"><span>url</span><button class="copy-btn" data-copy="c-url">Copiar</button></div><pre id="c-url">http://localhost:8080</pre></div>
+          <p>Deberías ver:</p>
+          <ul class="plain">
+            <li><strong>Comprobación de PHP</strong>: la versión de PHP que está corriendo.</li>
+            <li><strong>Conexión a MariaDB</strong>: mensaje en verde confirmando la conexión.</li>
+            <li><strong>Tabla con datos</strong>: las dos filas que insertamos en <code>init.sql</code>.</li>
+          </ul>
+          <p>Si todo aparece correctamente, <strong>tu LAMP está funcionando</strong>.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Pasos adicionales de verificación</h3>
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>1 · Ver los logs de cada servicio</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-logs">Copiar</button></div><pre id="c-logs">docker compose logs apache
+docker compose logs php-fpm
+docker compose logs mariadb</pre></div>
+                <div class="tip"><strong>Consejo</strong><p>Si algo no funciona, los logs suelen contener la pista. Busca líneas con <code>error</code>, <code>failed</code> o <code>warning</code>.</p></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>2 · Entrar dentro de un contenedor</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-exec">Copiar</button></div><pre id="c-exec">docker exec -it lamp-php sh</pre></div>
+                <div class="code-block"><div class="cb-head"><span>sh</span><button class="copy-btn" data-copy="c-inside">Copiar</button></div><pre id="c-inside">hostname -i          <span class="cmt"># IP del contenedor</span>
+ping mariadb         <span class="cmt"># Resolución por nombre</span>
+exit                 <span class="cmt"># Salir</span></pre></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>3 · Conectar a MariaDB por consola</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-mariadb">Copiar</button></div><pre id="c-mariadb">docker exec -it lamp-mariadb mariadb -u lamp_user -p</pre></div>
+                <p style="font-size:13px;">Contraseña: <code>lamp_pass</code>. Dentro puedes ejecutar <code>USE lamp_db;</code> y <code>SELECT * FROM test_table;</code></p>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>4 · Inspeccionar la configuración real</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-inspect">Copiar</button></div><pre id="c-inspect">docker inspect lamp-apache --format "{{json .NetworkSettings.Networks}}"
+docker inspect lamp-mariadb --format "{{json .Mounts}}"</pre></div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 COMANDOS ÚTILES -->
+      <section class="block" id="comandos" data-title="Comandos útiles">
+        <div class="block-head"><span class="idx">08</span><h2>Comandos útiles del día a día</h2></div>
+        <div class="panel">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Acción</th><th>Comando</th></tr></thead>
+            <tbody>
+              <tr><td>Ver logs en tiempo real</td><td><code>docker compose logs -f</code></td></tr>
+              <tr><td>Ver logs solo de un contenedor</td><td><code>docker compose logs -f apache</code></td></tr>
+              <tr><td>Parar los contenedores</td><td><code>docker compose down</code></td></tr>
+              <tr><td>Parar y borrar volúmenes (¡pierdes los datos!)</td><td><code>docker compose down -v</code></td></tr>
+              <tr><td>Reconstruir tras cambiar la configuración</td><td><code>docker compose up -d --build</code></td></tr>
+              <tr><td>Entrar en el contenedor PHP</td><td><code>docker exec -it lamp-php sh</code></td></tr>
+              <tr><td>Ver la versión de PHP</td><td><code>docker compose exec php-fpm php -v</code></td></tr>
+              <tr><td>Listar las extensiones PHP instaladas</td><td><code>docker compose exec php-fpm php -m</code></td></tr>
+              <tr><td>Conectar a MariaDB por consola</td><td><code>docker exec -it lamp-mariadb mariadb -u lamp_user -p</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- 9 SOLUCIÓN DE PROBLEMAS -->
+      <section class="block" id="problemas" data-title="Solución de problemas">
+        <div class="block-head"><span class="idx">09</span><h2>Solución de problemas frecuentes</h2></div>
+        <div class="panel">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Problema</th><th>Causa probable</th><th>Solución</th></tr></thead>
+            <tbody>
+              <tr><td>Error 500 o "Internal Server Error"</td><td>Apache no puede contactar con PHP-FPM</td><td>Revisar que el nombre <code>php-fpm</code> coincide en vhost.conf y docker-compose.yml</td></tr>
+              <tr><td>La página muestra el código PHP como texto plano</td><td>Apache no está delegando correctamente a PHP-FPM</td><td>Verificar que vhost.conf está bien montado y que se ejecuta el comando Include</td></tr>
+              <tr><td>"could not find driver" al conectar con la base de datos</td><td>Faltan las extensiones PDO</td><td>Verificar que <code>docker-php-ext-install pdo pdo_mysql mysqli</code> está en el Dockerfile</td></tr>
+              <tr><td>Error de conexión a MariaDB</td><td>El host en PHP es <code>localhost</code> en lugar de <code>mariadb</code></td><td>En Docker, usar el nombre del servicio como host: <code>mariadb</code></td></tr>
+              <tr><td>El puerto 8080 ya está en uso</td><td>Otro servicio ocupa el puerto</td><td>Cambiar el mapeo en docker-compose.yml a <code>"8081:80"</code></td></tr>
+              <tr><td>Modifico init.sql y no se aplica</td><td>Solo se ejecuta la primera vez que se crea el volumen</td><td><code>docker compose down -v</code> y volver a levantar</td></tr>
+              <tr><td>Contenedor no arranca</td><td>Error de configuración</td><td><code>docker compose logs &lt;servicio&gt;</code></td></tr>
+            </tbody>
+          </table></div>
+          <div class="tip"><strong>Consejo</strong><p>Ante cualquier error, empieza siempre por <code>docker compose logs &lt;servicio&gt;</code> y <code>docker compose ps</code>.</p></div>
+        </div>
+      </section>
+
+      <!-- 10 CONCEPTOS Y SIGUIENTES PASOS -->
+      <section class="block" id="conceptos" data-title="Conceptos aprendidos y siguientes pasos">
+        <div class="block-head"><span class="idx">10</span><h2>Conceptos aprendidos y siguientes pasos</h2></div>
+        <div class="panel">
+          <h3>Conceptos aprendidos</h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Concepto</th><th>Dónde lo has usado</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Contenedores separados por responsabilidad</strong></td><td>Apache sirve, PHP ejecuta, MariaDB almacena</td></tr>
+              <tr><td><strong>Red interna de Docker</strong></td><td>Los contenedores se comunican por nombre de servicio (<code>php-fpm</code>, <code>mariadb</code>)</td></tr>
+              <tr><td><strong>Volúmenes</strong></td><td>El código local se sincroniza con el contenedor; los datos de MariaDB persisten</td></tr>
+              <tr><td><strong>Variables de entorno</strong></td><td>Configuración de MariaDB sin tocar archivos</td></tr>
+              <tr><td><strong>Orquestación con Compose</strong></td><td>Un solo comando levanta todo el stack</td></tr>
+              <tr><td><strong>FastCGI</strong></td><td>Protocolo de comunicación entre Apache y PHP-FPM</td></tr>
+              <tr><td><strong>Dockerfile personalizado</strong></td><td>Añadir extensiones PHP a la imagen oficial</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="panel">
+          <h3>Siguientes pasos</h3>
+          <p>Una vez domines este stack, puedes:</p>
+          <ul class="plain">
+            <li><strong>Añadir phpMyAdmin</strong> para gestionar MariaDB desde el navegador.</li>
+            <li><strong>Instalar Composer</strong> dentro del contenedor PHP-FPM para gestionar dependencias.</li>
+            <li><strong>Migrar a Nginx</strong> si necesitas mejor rendimiento con archivos estáticos.</li>
+            <li><strong>Añadir Redis</strong> para caché y sesiones.</li>
+            <li><strong>Usar este entorno como base para Laravel o Symfony</strong>.</li>
+          </ul>
+          <p>La estructura de tres contenedores que has montado es la base de prácticamente cualquier aplicación PHP moderna en producción.</p>
+        </div>
+      </section>
+
+      <!-- SIMULADOR -->
+      <section class="block" id="simulador" data-title="Simulador del ciclo de vida">
+        <div class="block-head"><span class="idx">11</span><h2>Simulador del ciclo de vida del stack</h2></div>
+        <div class="panel">
+          <p>Usa este simulador para visualizar qué ocurre con los contenedores y los datos al ejecutar los comandos de Docker Compose.</p>
+        </div>
+
+        <div class="sim-wrap">
+          <div class="sim-head">
+            <div class="sim-title"><span class="dot"></span><span>SIMULADOR · ciclo de vida del stack LAMP</span></div>
+            <span class="sim-state state-empty" id="simStateBadge">sin desplegar</span>
+          </div>
+
+          <div class="sim-stage" id="simStage">
+            <div class="net-boundary" id="netBoundary"><span class="net-label">red: lamp-network</span></div>
+            <div class="sim-link" id="link1"></div>
+            <div class="sim-link" id="link2"></div>
+            <div class="sim-node" id="node-apache"><div class="n-icon">🌐</div><div class="n-name">apache</div><div class="n-port">:8080</div></div>
+            <div class="sim-node" id="node-php"><div class="n-icon">⚡</div><div class="n-name">php-fpm</div><div class="n-port">:9000</div></div>
+            <div class="sim-node" id="node-mariadb"><div class="n-icon">🗄️</div><div class="n-name">mariadb</div><div class="n-port">interno</div></div>
+            <div class="sim-volume" id="simVolume"><div class="v-cyl"></div><div class="v-name">vol: mariadb_data</div><div class="v-data" id="volData"></div></div>
+          </div>
+
+          <div class="sim-controls">
+            <button class="sim-btn primary" id="btnUp">▸ docker compose up -d</button>
+            <button class="sim-btn add-data" id="btnAddData" disabled>+ crear registro en BD</button>
+            <button class="sim-btn" id="btnDown" disabled>■ docker compose down</button>
+            <button class="sim-btn danger" id="btnDownVol" disabled>⨯ docker compose down -v</button>
+          </div>
+          <div class="sim-log" id="simLog"><div class="log-line sys">$ esperando acción…</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Ejercicio demostrativo</h3>
+          <ol class="step-list">
+            <li><code>docker compose up -d --build</code></li>
+            <li>Abre <code>http://localhost:8080</code> y verifica que ves la tabla con datos.</li>
+            <li><code>docker compose down</code></li>
+            <li><code>docker compose up -d</code></li>
+            <li>Comprueba que los datos siguen en la base de datos.</li>
+            <li><code>docker compose down -v</code></li>
+            <li><code>docker compose up -d --build</code></li>
+            <li>Comprueba que los datos han desaparecido (la base de datos se recrea).</li>
+          </ol>
+          <div class="question"><p>¿Dónde vivían los datos para sobrevivir al primer <code>down</code>? ¿Qué los eliminó en el segundo caso?</p></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>Guía práctica v1.0 · ASETE · 2º DAM — despliegue de un stack LAMP con Docker.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* TOC */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.block[id]'));
+  var tocDesktop = document.getElementById('tocDesktop');
+  var tocDrawerPanel = document.getElementById('tocDrawerPanel');
+  sections.forEach(function(sec, i){
+    var title = sec.getAttribute('data-title') || sec.id;
+    var num = String(i+1).padStart(2,'0');
+    var a1 = document.createElement('a');
+    a1.href = '#' + sec.id; a1.dataset.target = sec.id;
+    a1.innerHTML = '<span class="num">'+num+'</span>' + title;
+    tocDesktop.appendChild(a1);
+    tocDrawerPanel.appendChild(a1.cloneNode(true));
+  });
+
+  var menuBtn = document.getElementById('menuBtn');
+  var drawer = document.getElementById('tocDrawer');
+  var backdrop = document.getElementById('tocBackdrop');
+  function closeDrawer(){ drawer.classList.remove('open'); }
+  menuBtn.addEventListener('click', function(){ drawer.classList.add('open'); });
+  backdrop.addEventListener('click', closeDrawer);
+  tocDrawerPanel.addEventListener('click', function(e){ if(e.target.closest('a')) closeDrawer(); });
+
+  var allTocLinks = document.querySelectorAll('.toc a, .toc-drawer a');
+  var progressBar = document.getElementById('progressBar');
+  function onScroll(){
+    var scrollY = window.scrollY;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollY/docH*100) : 0) + '%';
+    var current = sections[0] ? sections[0].id : null;
+    for(var i=0;i<sections.length;i++){
+      var rect = sections[i].getBoundingClientRect();
+      if(rect.top <= 110){ current = sections[i].id; }
+    }
+    allTocLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.target === current); });
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if(!el) return;
+      navigator.clipboard.writeText(el.innerText).then(function(){
+        var orig = btn.textContent;
+        btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  document.querySelectorAll('.acc-trigger').forEach(function(trigger){
+    trigger.addEventListener('click', function(){
+      var item = trigger.closest('.acc-item');
+      var panel = item.querySelector('.acc-panel');
+      var isOpen = item.classList.contains('open');
+      if(isOpen){ panel.style.maxHeight = null; item.classList.remove('open'); }
+      else { item.classList.add('open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+    if(trigger.closest('.acc-item').classList.contains('open')){
+      var panel = trigger.closest('.acc-item').querySelector('.acc-panel');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    }
+  });
+
+  /* SIMULATOR: persistence lifecycle */
+  var stage = document.getElementById('simStage');
+  var netBoundary = document.getElementById('netBoundary');
+  var nodeApache = document.getElementById('node-apache');
+  var nodePhp = document.getElementById('node-php');
+  var nodeMariadb = document.getElementById('node-mariadb');
+  var simVolume = document.getElementById('simVolume');
+  var volData = document.getElementById('volData');
+  var link1 = document.getElementById('link1');
+  var link2 = document.getElementById('link2');
+  var stateBadge = document.getElementById('simStateBadge');
+  var log = document.getElementById('simLog');
+  var btnUp = document.getElementById('btnUp');
+  var btnAddData = document.getElementById('btnAddData');
+  var btnDown = document.getElementById('btnDown');
+  var btnDownVol = document.getElementById('btnDownVol');
+  var state = 'stopped';
+  var volumeExists = false;
+  var hasData = false;
+
+  function logLine(text, cls){
+    var d = document.createElement('div');
+    d.className = 'log-line ' + (cls||'sys');
+    d.textContent = '$ ' + text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function positionLinks(){
+    var stageRect = stage.getBoundingClientRect();
+    var a = nodeApache.getBoundingClientRect();
+    var p = nodePhp.getBoundingClientRect();
+    var m = nodeMariadb.getBoundingClientRect();
+
+    // Apache -> PHP
+    var a2 = { x: a.left - stageRect.left + a.width, y: a.top - stageRect.top + a.height/2 };
+    var p2 = { x: p.left - stageRect.left, y: p.top - stageRect.top + p.height/2 };
+    link1.style.left = a2.x + 'px';
+    link1.style.top = a2.y + 'px';
+    link1.style.width = (p2.x - a2.x) + 'px';
+    link1.style.height = '1.5px';
+
+    // PHP -> MariaDB
+    var p2b = { x: p.left - stageRect.left + p.width, y: p.top - stageRect.top + p.height/2 };
+    var m2 = { x: m.left - stageRect.left, y: m.top - stageRect.top + m.height/2 };
+    link2.style.left = p2b.x + 'px';
+    link2.style.top = p2b.y + 'px';
+    link2.style.width = (m2.x - p2b.x) + 'px';
+    link2.style.height = '1.5px';
+  }
+
+  function render(){
+    stateBadge.className = 'sim-state ' + (state==='up' ? 'state-up' : (state==='down-soft' ? 'state-down' : 'state-empty'));
+    stateBadge.textContent = state==='up' ? 'en ejecución' : (state==='down-soft' ? 'detenido (red y contenedores fuera)' : 'sin desplegar');
+    var running = state === 'up';
+    netBoundary.classList.toggle('show', running);
+    [nodeApache, nodePhp, nodeMariadb].forEach(function(n){ n.classList.toggle('show', running); });
+    link1.classList.toggle('show', running);
+    link1.classList.toggle('data-flow', running);
+    link2.classList.toggle('show', running);
+    link2.classList.toggle('data-flow', running);
+    simVolume.classList.toggle('show', volumeExists);
+    simVolume.classList.toggle('wiped', !volumeExists && state !== 'stopped');
+    volData.textContent = hasData ? '📄 2 registros' : (volumeExists ? '(vacío)' : '');
+    btnUp.disabled = running;
+    btnAddData.disabled = !running;
+    btnDown.disabled = !running;
+    btnDownVol.disabled = !running;
+    if(running){ requestAnimationFrame(positionLinks); }
+  }
+
+  btnUp.addEventListener('click', function(){
+    state = 'up';
+    if(!volumeExists){
+      volumeExists = true;
+      logLine('docker compose up -d --build', 'ok');
+      logLine('creando red lamp-network, contenedores y volumen mariadb_data…', 'sys');
+    } else {
+      logLine('docker compose up -d', 'ok');
+      logLine('volumen mariadb_data ya existía → se reutiliza', 'sys');
+    }
+    render();
+  });
+
+  btnAddData.addEventListener('click', function(){
+    hasData = true;
+    logLine('INSERT INTO test_table… → escrito en mariadb_data', 'ok');
+    render();
+  });
+
+  btnDown.addEventListener('click', function(){
+    state = 'down-soft';
+    logLine('docker compose down', 'warn');
+    logLine('contenedores y red eliminados — el volumen se conserva', 'ok');
+    render();
+  });
+
+  btnDownVol.addEventListener('click', function(){
+    state = 'down-soft';
+    volumeExists = false;
+    hasData = false;
+    logLine('docker compose down -v', 'warn');
+    logLine('contenedores, red y volumen eliminados — datos perdidos', 'warn');
+    render();
+  });
+
+  window.addEventListener('resize', function(){ if(state==='up') positionLinks(); });
+  render();
+
+})();
+</script>
+</body>
+</html>
