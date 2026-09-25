@@ -56,6 +56,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Introducción a la seguridad |
 | [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
 | [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de introducción |
+| [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP (Apache + PHP + MariaDB) con Docker |
 
 ### IAW (Implantación de Aplicaciones Web)
 
@@ -63,7 +64,6 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 |------|-------------|
 | [IAW - UT1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT1.html) | UT1 — Implantación de aplicaciones web |
 | [Actividad 1.1.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
-| [Actividad 1.2.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP (Apache + PHP + MariaDB) con Docker |
 
 ### PMDM (Programación Multimedia y Dispositivos Móviles)
 
