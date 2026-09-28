@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 1.1 · Pantalla de Login y Navegación Básica (Jetpack Compose) · PMDM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f4fb;
+  --surface:#ffffff;
+  --ink:#1b1d2e;
+  --muted:#5c5f78;
+  --primary:#3f51b5;
+  --primary-dark:#2c3899;
+  --primary-light:#e8eaf9;
+  --accent:#00bfa5;
+  --accent-dark:#009884;
+  --warn:#ff9800;
+  --error:#e5484d;
+  --success:#2e9e5b;
+  --border:#e2e3f2;
+  --code-bg:#1c1e2e;
+  --code-ink:#e7e8f5;
+  --radius:16px;
+  --shadow:0 6px 24px rgba(63,81,181,.10);
+  --shadow-sm:0 2px 10px rgba(63,81,181,.08);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:90px;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Inter',sans-serif; line-height:1.65;
+  background-image:radial-gradient(circle,#dcdef2 1px, transparent 1px);
+  background-size:22px 22px;
+}
+h1,h2,h3,h4{font-family:'Sora',sans-serif; color:var(--ink); line-height:1.25;}
+code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+a{color:var(--primary);}
+p{color:var(--ink);}
+.small{font-size:.85rem;color:var(--muted);}
+
+/* progress bar */
+#progressBar{position:fixed; top:0; left:0; height:4px; background:linear-gradient(90deg,var(--primary),var(--accent)); width:0%; z-index:9999; transition:width .1s;}
+
+/* HERO */
+.hero{
+  background:linear-gradient(160deg,var(--primary) 0%, #5c6bc0 55%, var(--accent) 130%);
+  color:#fff; padding:70px 24px 100px; text-align:center; position:relative; overflow:hidden;
+}
+.hero::before,.hero::after{
+  content:""; position:absolute; border-radius:50%; background:rgba(255,255,255,.08);
+}
+.hero::before{width:340px;height:340px; top:-140px; left:-100px;}
+.hero::after{width:260px;height:260px; bottom:-120px; right:-60px;}
+.hero .eyebrow{
+  display:inline-block; background:rgba(255,255,255,.18); padding:6px 16px; border-radius:999px;
+  font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:18px; font-weight:600;
+}
+.hero h1{color:#fff; font-size:2.3rem; margin:0 0 10px; max-width:760px; margin-inline:auto;}
+.hero p.lead{max-width:620px; margin:0 auto 26px; color:rgba(255,255,255,.92); font-size:1.05rem;}
+.hero-meta{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; position:relative; z-index:2;}
+.chip{
+  background:rgba(255,255,255,.16); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.3);
+  padding:8px 16px; border-radius:999px; font-size:.85rem; font-weight:600;
+}
+.hero-phone{
+  position:relative; z-index:2; margin:34px auto 0; width:150px; height:290px;
+  background:#101223; border-radius:28px; border:6px solid #101223; box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.hero-phone .screen{background:#fff; border-radius:20px; height:100%; padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+.hero-phone .logo-dot{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent)); margin-top:8px;}
+.hero-phone .bar{width:100%; height:9px; border-radius:5px; background:#eef;}
+.hero-phone .bar.short{width:65%;}
+.hero-phone .btn-fake{width:100%; height:16px; border-radius:8px; background:var(--primary); margin-top:6px;}
+
+/* NAV */
+.navbar{
+  position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border); box-shadow:var(--shadow-sm);
+}
+.navbar-inner{max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:6px; padding:10px 18px; overflow-x:auto;}
+.navbar-inner::-webkit-scrollbar{height:5px;}
+.navbar-inner::-webkit-scrollbar-thumb{background:var(--border); border-radius:5px;}
+.nav-brand{font-family:'Sora'; font-weight:700; color:var(--primary); white-space:nowrap; margin-right:10px; font-size:.95rem;}
+.nav-link{
+  white-space:nowrap; padding:7px 12px; border-radius:8px; font-size:.82rem; font-weight:600;
+  color:var(--muted); text-decoration:none; transition:.15s;
+}
+.nav-link:hover{background:var(--primary-light); color:var(--primary-dark);}
+.nav-link.active{background:var(--primary); color:#fff;}
+
+main{max-width:980px; margin:0 auto; padding:40px 20px 90px;}
+
+/* section cards */
+.section{margin-bottom:26px;}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow-sm); overflow:hidden;
+}
+.card-head{
+  display:flex; align-items:center; gap:14px; padding:20px 24px; cursor:pointer; user-select:none;
+}
+.card-head .num{
+  min-width:38px;height:38px;border-radius:11px;background:var(--primary-light); color:var(--primary-dark);
+  display:flex;align-items:center;justify-content:center; font-family:'Sora'; font-weight:700;
+}
+.card-head h2{margin:0; font-size:1.15rem; flex:1;}
+.chev{transition:transform .25s; color:var(--muted); font-size:1.1rem;}
+.card.open .chev{transform:rotate(180deg);}
+.card-body{padding:0 24px 26px; display:none;}
+.card.open .card-body{display:block;}
+.card-body h3{font-size:1rem; margin-top:26px;}
+.card-body h4{font-size:.92rem; color:var(--primary-dark);}
+
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+th,td{padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
+th{background:var(--primary-light); color:var(--primary-dark); font-family:'Sora'; font-size:.82rem;}
+tr:hover td{background:#fafbff;}
+
+.callout{
+  border-left:4px solid var(--primary); background:var(--primary-light); padding:14px 16px;
+  border-radius:0 10px 10px 0; margin:16px 0; font-size:.92rem;
+}
+.callout.warn{border-color:var(--warn); background:#fff4e0;}
+.callout strong{color:var(--primary-dark);}
+.callout.warn strong{color:#a86400;}
+
+/* code blocks */
+.code-wrap{position:relative; margin:16px 0; border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm);}
+.code-wrap .code-label{
+  background:#141626; color:#9fa3c9; font-size:.75rem; padding:8px 14px; font-family:'JetBrains Mono';
+  display:flex; justify-content:space-between; align-items:center;
+}
+.copy-btn{
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:#e7e8f5;
+  font-size:.7rem; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:'Inter';
+}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.copy-btn.copied{background:var(--success); border-color:var(--success);}
+pre{margin:0; background:var(--code-bg); color:var(--code-ink); padding:16px; overflow-x:auto; font-size:.83rem; line-height:1.55;}
+.tok-kw{color:#ff9d76;} .tok-str{color:#a5e07a;} .tok-com{color:#7d8199; font-style:italic;} .tok-type{color:#7ec8ff;} .tok-tag{color:#ff8fc7;} .tok-attr{color:#ffd479;}
+
+/* tabs */
+.tabs{display:flex; gap:6px; margin-top:14px; flex-wrap:wrap;}
+.tab-btn{
+  border:1px solid var(--border); background:#fff; padding:8px 14px; border-radius:9px 9px 0 0;
+  cursor:pointer; font-family:'JetBrains Mono'; font-size:.78rem; font-weight:600; color:var(--muted);
+}
+.tab-btn.active{background:var(--code-bg); color:#fff; border-color:var(--code-bg);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* glossary flip cards */
+.glossary-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-top:16px;}
+.flip-card{perspective:1000px; height:120px; cursor:pointer;}
+.flip-inner{position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-front,.flip-back{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.flip-front{background:var(--primary-light); color:var(--primary-dark); font-family:'Sora'; font-weight:700; font-size:.95rem;}
+.flip-back{background:var(--primary); color:#fff; transform:rotateY(180deg); font-size:.8rem;}
+
+/* file tree */
+.tree{font-family:'JetBrains Mono'; font-size:.83rem; background:#fbfbff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px;}
+.tree ul{list-style:none; margin:0; padding-left:20px; border-left:1px dashed #c6c9e6;}
+.tree>ul{padding-left:0; border-left:none;}
+.tree li{margin:5px 0; position:relative;}
+.tree .fname{cursor:pointer; padding:2px 6px; border-radius:5px;}
+.tree .fname:hover{background:var(--primary-light);}
+.tree .fdesc{display:none; color:var(--muted); font-family:'Inter'; font-size:.78rem; margin-top:3px; padding-left:6px;}
+.tree .fname.open + .fdesc{display:block;}
+.tree .folder::before{content:"📁 ";} .tree .file::before{content:"📄 ";}
+
+/* lifecycle diagram */
+.lifecycle{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+.lc-step{
+  flex:1; min-width:130px; background:#fbfbff; border:1px solid var(--border); border-radius:12px; padding:12px;
+  text-align:center; cursor:pointer; transition:.15s;
+}
+.lc-step:hover{border-color:var(--primary); transform:translateY(-2px);}
+.lc-step.key{border-color:var(--accent); background:#e6fbf7;}
+.lc-step .lc-name{font-family:'JetBrains Mono'; font-weight:700; color:var(--primary-dark); font-size:.85rem;}
+.lc-detail{display:none; font-size:.78rem; color:var(--muted); margin-top:8px;}
+.lc-step.open .lc-detail{display:block;}
+
+/* layout comparison */
+.layout-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:14px;}
+.layout-card{border:1px solid var(--border); border-radius:12px; padding:14px; background:#fbfbff;}
+.layout-card.reco{border-color:var(--accent); background:#e6fbf7;}
+.layout-card h4{margin:0 0 6px;}
+
+/* SIGNATURE DEMO */
+.demo-section{
+  background:linear-gradient(155deg,#1c1e2e,#232748); border-radius:22px; padding:34px 22px; color:#fff; margin:36px 0;
+  box-shadow:0 20px 50px rgba(28,30,46,.35);
+}
+.demo-title{text-align:center; margin-bottom:6px;}
+.demo-title h2{color:#fff; font-size:1.4rem; margin:0;}
+.demo-title p{color:#aeb2d6; margin:6px 0 0;}
+.demo-grid{display:flex; gap:26px; flex-wrap:wrap; justify-content:center; margin-top:26px;}
+.phone-frame{
+  width:290px; background:#0d0f1c; border-radius:34px; padding:14px 12px; box-shadow:0 15px 40px rgba(0,0,0,.5); flex-shrink:0;
+}
+.phone-notch{width:60px;height:6px;background:#2a2d45; border-radius:4px; margin:0 auto 8px;}
+.phone-screen{background:#fff; border-radius:20px; padding:18px 16px; min-height:430px; color:var(--ink); position:relative;}
+.phone-statusbar{display:flex; justify-content:space-between; font-size:.65rem; color:#888; margin-bottom:10px;}
+.app-logo{width:56px;height:56px;border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); margin:6px auto 10px;}
+.app-title{text-align:center; font-family:'Sora'; font-weight:700; margin-bottom:16px;}
+.field{margin-bottom:14px; position:relative;}
+.field label{
+  position:absolute; left:12px; top:13px; font-size:.85rem; color:#8a8ea8; pointer-events:none; transition:.15s; background:#fff; padding:0 4px;
+}
+.field input{
+  width:100%; padding:14px 12px; border:1.5px solid #d3d5ea; border-radius:8px; font-family:'Inter'; font-size:.88rem; outline:none;
+}
+.field input:focus{border-color:var(--primary);}
+.field input:focus + label, .field.filled label{top:-8px; font-size:.68rem; color:var(--primary);}
+.field.error input{border-color:var(--error);}
+.field.error label{color:var(--error);}
+.field-error-msg{color:var(--error); font-size:.72rem; margin-top:4px; display:none;}
+.field.error .field-error-msg{display:block;}
+.eye-toggle{position:absolute; right:10px; top:14px; cursor:pointer; font-size:.9rem; color:#8a8ea8; user-select:none;}
+.remember-row{display:flex; align-items:center; gap:8px; font-size:.8rem; color:#555; margin-bottom:16px;}
+.login-btn{
+  width:100%; padding:13px; background:#c9cbe0; color:#fff; border:none; border-radius:8px; font-weight:700;
+  letter-spacing:.03em; cursor:not-allowed; transition:.2s; font-family:'Inter';
+}
+.login-btn.enabled{background:var(--primary); cursor:pointer;}
+.login-btn.enabled:hover{background:var(--primary-dark);}
+.forgot-link{display:block; text-align:center; font-size:.78rem; color:var(--primary); margin-top:14px; cursor:pointer;}
+.toast{
+  position:absolute; bottom:16px; left:16px; right:16px; background:#333; color:#fff; padding:10px; border-radius:8px;
+  text-align:center; font-size:.78rem; opacity:0; transform:translateY(10px); transition:.25s; pointer-events:none;
+}
+.toast.show{opacity:1; transform:translateY(0);}
+.home-overlay{
+  position:absolute; inset:14px; background:linear-gradient(160deg,var(--primary),var(--accent)); border-radius:16px;
+  display:none; align-items:center; justify-content:center; flex-direction:column; color:#fff; text-align:center; padding:20px;
+}
+.home-overlay.show{display:flex;}
+.home-overlay button{margin-top:16px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4); color:#fff; padding:8px 18px; border-radius:8px; cursor:pointer;}
+
+.logcat-panel{flex:1; min-width:290px; background:#111324; border-radius:16px; padding:16px; max-height:470px; display:flex; flex-direction:column;}
+.logcat-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.logcat-head span{font-family:'JetBrains Mono'; font-size:.8rem; color:#8a8ea8;}
+.logcat-body{flex:1; overflow-y:auto; font-family:'JetBrains Mono'; font-size:.72rem; line-height:1.7; max-height:340px;}
+.logcat-body div{padding:2px 6px; border-radius:4px;}
+.log-info{color:#7ec8ff;} .log-ok{color:#7be495;} .log-err{color:#ff8b8b;} .log-sys{color:#c9a8ff;}
+.demo-controls{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.demo-btn{
+  flex:1; min-width:110px; background:var(--primary); color:#fff; border:none; padding:9px 10px; border-radius:8px;
+  font-size:.78rem; cursor:pointer; font-weight:600;
+}
+.demo-btn.secondary{background:#2a2d45;}
+.demo-btn:hover{opacity:.88;}
+.demo-hint{color:#aeb2d6; font-size:.75rem; margin-top:14px; text-align:center; max-width:600px; margin-inline:auto;}
+
+/* timeline chart */
+.timeline{margin-top:16px;}
+.tl-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:.82rem;}
+.tl-label{width:190px; flex-shrink:0; color:var(--muted);}
+.tl-bar-bg{flex:1; background:#eef; border-radius:6px; height:20px; overflow:hidden;}
+.tl-bar{height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:6px; display:flex; align-items:center; justify-content:flex-end; color:#fff; font-size:.68rem; padding-right:6px; font-weight:600;}
+
+/* checklist */
+.checklist{list-style:none; padding:0; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:10px; margin-bottom:6px; cursor:pointer;
+  border:1px solid transparent;
+}
+.checklist li:hover{background:#fafbff; border-color:var(--border);}
+.checklist input{margin-top:3px; width:17px; height:17px; accent-color:var(--primary); cursor:pointer;}
+.checklist li.checked span{text-decoration:line-through; color:var(--muted);}
+.progress-track{background:#eef; border-radius:20px; height:14px; overflow:hidden; margin:14px 0 6px;}
+.progress-fill{background:linear-gradient(90deg,var(--primary),var(--accent)); height:100%; width:0%; transition:.3s; border-radius:20px;}
+.progress-label{font-size:.8rem; color:var(--muted); text-align:right;}
+
+/* rubric bars */
+.rubric-row{margin-bottom:12px;}
+.rubric-top{display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:4px;}
+.rubric-track{background:#eef; height:12px; border-radius:8px; overflow:hidden;}
+.rubric-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--primary));}
+
+/* resources */
+.resource-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:14px;}
+.resource-card{border:1px solid var(--border); border-radius:12px; padding:14px; background:#fbfbff; text-decoration:none; display:block; transition:.15s;}
+.resource-card:hover{border-color:var(--primary); transform:translateY(-2px);}
+.resource-card h4{margin:0 0 4px; color:var(--primary-dark); font-size:.9rem;}
+.resource-card span{font-size:.76rem; color:var(--muted);}
+
+/* retos */
+.reto-card{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden;}
+.reto-head{padding:14px 18px; display:flex; align-items:center; gap:12px; cursor:pointer; background:#fbfbff;}
+.reto-head:hover{background:var(--primary-light);}
+.reto-stars{color:var(--warn); font-size:.9rem; white-space:nowrap;}
+.reto-head h4{margin:0; flex:1; font-size:.95rem;}
+.reto-body{display:none; padding:0 18px 18px;}
+.reto-card.open .reto-body{display:block;}
+.reveal-btn{
+  background:var(--primary-light); color:var(--primary-dark); border:1px dashed var(--primary); padding:8px 14px;
+  border-radius:8px; cursor:pointer; font-size:.8rem; font-weight:600; margin-top:8px;
+}
+.hint-box{display:none; margin-top:10px; background:#fffbe8; border-left:3px solid var(--warn); padding:10px 12px; border-radius:0 8px 8px 0; font-size:.85rem;}
+.hint-box.show{display:block;}
+.badge{display:inline-block; background:var(--primary-light); color:var(--primary-dark); font-size:.72rem; padding:2px 9px; border-radius:999px; margin-right:6px; font-weight:600;}
+
+footer{text-align:center; padding:34px 20px; color:var(--muted); font-size:.82rem;}
+
+@media(max-width:640px){
+  .hero h1{font-size:1.6rem;}
+  .card-head h2{font-size:1rem;}
+  .demo-grid{flex-direction:column; align-items:center;}
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+
+<header class="hero">
+  <span class="eyebrow">PMDM · 2º DAM</span>
+  <h1>Actividad 1.1 · Pantalla de Login y Navegación Básica (Jetpack Compose)</h1>
+  <p class="lead">Diseña e implementa la interfaz de acceso de una app Android: maquetación responsiva con Column y Modifier, validación de campos, gestión del foco y navegación con Intent.</p>
+  <div class="hero-meta">
+    <span class="chip">⏱5 horas + retos</span>
+    <span class="chip">📱 Column · Modifier · Material 3</span>
+    <span class="chip">🎯 CE.a · CE.b · CE.g · CE.i</span>
+  </div>
+  <div class="hero-phone">
+    <div class="screen">
+      <div class="logo-dot"></div>
+      <div class="bar short"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="btn-fake"></div>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="navbar-inner" id="navInner">
+    <span class="nav-brand">🔑 Login PMDM</span>
+    <a class="nav-link" href="#s1">1·Intro</a>
+    <a class="nav-link" href="#s2">2·Glosario</a>
+    <a class="nav-link" href="#s3">3·Estructura</a>
+    <a class="nav-link" href="#s4">4·Conceptos</a>
+    <a class="nav-link" href="#s5">5·Interfaz</a>
+    <a class="nav-link" href="#s6">6·Lógica</a>
+    <a class="nav-link" href="#demo">🧪 Demo</a>
+    <a class="nav-link" href="#s7">7·Foco</a>
+    <a class="nav-link" href="#s8">8·Pruebas</a>
+    <a class="nav-link" href="#s9">9·Errores</a>
+    <a class="nav-link" href="#s10">10·Accesib.</a>
+    <a class="nav-link" href="#s11">11·Entregables</a>
+    <a class="nav-link" href="#s12">12·Checklist</a>
+    <a class="nav-link" href="#s13">13·Rúbrica</a>
+    <a class="nav-link" href="#s14">14·Tiempos</a>
+    <a class="nav-link" href="#s15">15·Recursos</a>
+    <a class="nav-link" href="#s16">16·Retos</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- 1 -->
+<div class="section card open" id="s1">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">1</div><h2>¿Qué vamos a construir?</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p>Vamos a construir la <strong>pantalla de acceso (Login)</strong> de una aplicación Android: la primera pantalla que ve el usuario y, por tanto, la más determinante a nivel de UX.</p>
+    <div class="callout"><strong>Nota previa:</strong> se asume que ya sabes crear un proyecto en Android Studio, la sintaxis básica de Kotlin y cómo ejecutar la app en un emulador.</div>
+    <h3>Mockup objetivo</h3>
+    <div class="phone-frame" style="margin:16px auto;">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="min-height:340px;">
+        <div class="app-logo"></div>
+        <div class="app-title">Bienvenido/a</div>
+        <div class="field"><input disabled placeholder="Email"></div>
+        <div class="field"><input disabled placeholder="Contraseña" type="password"></div>
+        <div class="remember-row"><input type="checkbox" disabled> Recordar sesión</div>
+        <button class="login-btn enabled" disabled>ENTRAR</button>
+        <span class="forgot-link">¿Olvidaste tu contraseña?</span>
+      </div>
+    </div>
+    <h3>Objetivos específicos</h3>
+    <ul>
+      <li>Implementar una UI responsiva con <code>Column</code> y <code>Modifier</code>.</li>
+      <li>Usar componentes de Material 3 (<code>OutlinedTextField</code>, <code>Button</code>, <code>Checkbox</code>).</li>
+      <li>Programar la validación de Email y Contraseña.</li>
+      <li>Gestionar el foco y el teclado.</li>
+      <li>Navegar a otra pantalla (con <code>NavController</code> o <code>Intent</code>).</li>
+    </ul>
+    <h3>Competencias trabajadas</h3>
+    <table>
+      <tr><th>CE</th><th>Descripción</th></tr>
+      <tr><td><strong>CE.a</strong></td><td>Estrategia y estructura de clases de la aplicación.</td></tr>
+      <tr><td><strong>CE.b</strong></td><td>Clases de interfaz gráfica (ventanas, menús, controles).</td></tr>
+      <tr><td><strong>CE.g</strong></td><td>Pruebas de interacción y optimización en emuladores.</td></tr>
+      <tr><td><strong>CE.i</strong></td><td>Documentación de los procesos de desarrollo.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="section card" id="s2">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">2</div><h2>Glosario mínimo</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p class="small">Toca cada tarjeta para ver la definición.</p>
+    <div class="glossary-grid" id="glossaryGrid"></div>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="section card" id="s3">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">3</div><h2>Estructura del proyecto</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p>Antes de escribir código, es importante saber <strong>dónde va cada cosa</strong>. Toca cada archivo para ver su función.</p>
+    <div class="tree">
+      <ul>
+        <li><span class="fname folder">app/</span>
+          <ul>
+            <li><span class="fname folder">manifests/</span>
+              <ul><li><span class="fname file" onclick="toggleTree(this)">AndroidManifest.xml</span><div class="fdesc">Declara Activities, permisos y tema de la app.</div></li></ul>
+            </li>
+            <li><span class="fname folder">java/com/ejemplo/login/</span>
+              <ul>
+                <li><span class="fname file" onclick="toggleTree(this)">MainActivity.kt</span><div class="fdesc">Activity que carga Compose.</div></li>
+                <li><span class="fname file" onclick="toggleTree(this)">LoginScreen.kt</span><div class="fdesc">Composable con la UI del login.</div></li>
+                <li><span class="fname file" onclick="toggleTree(this)">HomeScreen.kt</span><div class="fdesc">Pantalla destino (la crearemos vacía).</div></li>
+              </ul>
+            </li>
+            <li><span class="fname folder">res/</span>
+              <ul>
+                <li><span class="fname folder">values/</span>
+                  <ul>
+                    <li><span class="fname file" onclick="toggleTree(this)">strings.xml</span><div class="fdesc">TODOS los textos. Nada hardcoded.</div></li>
+                    <li><span class="fname file" onclick="toggleTree(this)">colors.xml</span><div class="fdesc">Colores de la app.</div></li>
+                    <li><span class="fname file" onclick="toggleTree(this)">themes.xml</span><div class="fdesc">Tema global de la app.</div></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="callout"><strong>Regla de oro:</strong> los textos <u>nunca</u> se escriben directamente en el XML del layout. Siempre van en <code>strings.xml</code> y se referencian con <code>@string/mi_texto</code>.</div>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="section card" id="s4">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">4</div><h2>Conceptos fundamentales</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <h3>4.1. ¿Qué es Compose?</h3>
+    <p>Jetpack Compose es el <strong>toolkit moderno de Google</strong> para construir UIs nativas. A diferencia de XML, donde el diseño se describe en un archivo separado, en Compose <strong>la UI se describe con funciones Kotlin</strong> que se ejecutan y se recomponen cuando cambia el estado.</p>
+    <div class="layout-cards">
+      <div class="layout-card"><h4>XML / Views</h4><p class="small">Layout en archivo XML separado. UI inflada al arrancar.</p></div>
+      <div class="layout-card reco"><h4>✅Compose</h4><p class="small">UI descrita con funciones Kotlin. <strong>Lo usaremos hoy.</strong></p></div>
+    </div>
+    <h3>4.2. Composables y estado</h3>
+    <p>Un <strong>Composable</strong> es una función anotada con <code>@Composable</code>. El <strong>estado</strong> es un valor que, cuando cambia, provoca que la UI se redibuje (se <em>recompone</em>). Usa <code>remember</code> y <code>mutableStateOf</code>.</p>
+    <div class="lifecycle" id="lifecycleDiagram"></div>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="section card" id="s5">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">5</div><h2>Diseñando la interfaz (LoginScreen.kt)</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <h3>5.1. Column, Row y Box</h3>
+    <p>En Compose no hay <code>ConstraintLayout</code> como tal. Los contenedores básicos son <code>Column</code> (vertical), <code>Row</code> (horizontal) y <code>Box</code> (superponer). Usaremos <code>Column</code> porque todos los elementos van uno debajo de otro.</p>
+    <ul>
+      <li><code>Modifier.fillMaxWidth()</code>: ocupa todo el ancho disponible.</li>
+      <li><code>Modifier.padding(16.dp)</code>: añade espacio interior.</li>
+      <li><code>Modifier.verticalScroll()</code>: permite scroll vertical.</li>
+    </ul>
+    <h3>5.2. Componentes Material 3</h3>
+    <p><code>OutlinedTextField</code> es el campo de texto de Material 3. Soporta hint flotante, errores con <code>isError</code>, <code>supportingText</code> e iconos opcionales.</p>
+    <div class="callout warn"><strong>Importante:</strong> en Compose, el error se muestra con <code>isError = true</code> y <code>supportingText = { Text(...) }</code>.</div>
+    <p><code>Button</code> es el botón de Material 3: se ve mejor y respeta el tema.</p>
+    
+	
+	<h3>5.3. Dependencias: libs.versions.toml</h3>
+    <p>Los iconos que vamos a usar en <code>LoginScreen.kt</code> deben ser referenciados en <code>libs.versions.toml</code>:</p>
+    <div class="code-wrap">
+      <div class="code-label"><span>strings.xml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-xml" data-lang="xml">[libraries]
+	  androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+	  </pre>
+    </div>
+	
+	
+	<h3>5.4. Dependencias: build.gradle.kts</h3>
+    <p>Y tambi¨¦n en <code>build.gradle.kts</code>:</p>
+    <div class="code-wrap">
+      <div class="code-label"><span>strings.xml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-xml" data-lang="xml">dependencies {
+    implementation(libs.androidx.compose.material.icons.extended)
+}</pre>
+    </div>
+	
+	
+	<h3>5.5. LoginScreen.kt completo</h3>
+    <div class="code-wrap">
+      <div class="code-label"><span>LoginScreen.kt</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-kt" data-lang="kt">package com.ejemplo.login
+
+import android.util.Patterns
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun LoginScreen(
+    onLoginSuccess: () -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf&lt;String?&gt;(null) }
+    var passwordError by remember { mutableStateOf&lt;String?&gt;(null) }
+    var showPassword by remember { mutableStateOf(false) }
+
+    val focusManager = LocalFocusManager.current
+    val emailFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        emailFocusRequester.requestFocus()
+    }
+
+    fun validarEmail(): Boolean {
+        val emailValido = email.isNotBlank() &amp;&amp;
+                Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+        emailError = if (!emailValido) "Introduce un email válido" else null
+        return emailValido
+    }
+
+    fun validarPassword(): Boolean {
+        val regex = "^(?=.*[A-Z])(?=.*[0-9]).{8,}$".toRegex()
+        val passValida = regex.matches(password)
+        passwordError = if (!passValida) {
+            "Mínimo 8 caracteres, una mayúscula y un número"
+        } else null
+        return passValida
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = stringResource(R.string.logo_desc),
+            modifier = Modifier.size(120.dp)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = stringResource(R.string.titulo_bienvenida),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = {
+                email = it
+                if (it.isNotEmpty()) validarEmail()
+            },
+            label = { Text(stringResource(R.string.hint_email)) },
+            isError = emailError != null,
+            supportingText = emailError?.let { { Text(it) } },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(emailFocusRequester)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+                if (it.isNotEmpty()) validarPassword()
+            },
+            label = { Text(stringResource(R.string.hint_password)) },
+            isError = passwordError != null,
+            supportingText = passwordError?.let { { Text(it) } },
+            visualTransformation = if (showPassword) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            trailingIcon = {
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Icon(
+                        imageVector = if (showPassword) {
+                            Icons.Filled.Visibility
+                        } else {
+                            Icons.Filled.VisibilityOff
+                        },
+                        contentDescription = stringResource(R.string.toggle_password)
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Checkbox(
+                checked = false,
+                onCheckedChange = { /* Estado local */ }
+            )
+            Text(stringResource(R.string.recordar_sesion))
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                val emailOk = validarEmail()
+                val passOk = validarPassword()
+                if (emailOk &amp;&amp; passOk) {
+                    focusManager.clearFocus()
+                    onLoginSuccess()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.boton_entrar))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = { /* Acción */ }) {
+            Text(stringResource(R.string.olvidaste_password))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    MaterialTheme {
+        LoginScreen(onLoginSuccess = {})
+    }
+}</pre>
+    </div>
+    <h3>5.6. Recursos: strings.xml</h3>
+    <p>Todos los textos del layout anterior deben ir en <code>res/values/strings.xml</code>:</p>
+    <div class="code-wrap">
+      <div class="code-label"><span>strings.xml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-xml" data-lang="xml">&lt;resources&gt;
+    &lt;string name="app_name"&gt;MiApp&lt;/string&gt;
+
+    &lt;string name="logo_desc"&gt;Logo de la aplicación&lt;/string&gt;
+    &lt;string name="titulo_bienvenida"&gt;Bienvenido/a&lt;/string&gt;
+    &lt;string name="hint_email"&gt;Email&lt;/string&gt;
+    &lt;string name="hint_password"&gt;Contraseña&lt;/string&gt;
+    &lt;string name="recordar_sesion"&gt;Recordar sesión&lt;/string&gt;
+    &lt;string name="boton_entrar"&gt;ENTRAR&lt;/string&gt;
+    &lt;string name="olvidaste_password"&gt;¿Olvidaste tu contraseña?&lt;/string&gt;
+    &lt;string name="toggle_password"&gt;Mostrar u ocultar contraseña&lt;/string&gt;
+
+    &lt;string name="error_email"&gt;Introduce un email válido&lt;/string&gt;
+    &lt;string name="error_password"&gt;Mínimo 8 caracteres, una mayúscula y un número&lt;/string&gt;
+    &lt;string name="login_correcto"&gt;Login correcto&lt;/string&gt;
+    &lt;string name="titulo_home"&gt;Â¡Bienvenido a Home!&lt;/string&gt;
+&lt;/resources&gt;</pre>
+    </div>
+    <div class="callout"><strong>¿Por qué?</strong> Si mañana quieres traducir la app al inglés, solo tienes que crear <code>res/values-en/strings.xml</code> con los mismos nombres. El código no cambia.</div>
+    <h3>5.7. Vista previa con @Preview</h3>
+    <p class="small">💡 En Android Studio, verás el <strong>@Preview</strong> en la pestaña <strong>Split</strong> o <strong>Design</strong>. Es el equivalente al Design View de XML, pero más rápido y fiable.</p>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="section card" id="s6">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">6</div><h2>Lógica de la pantalla (MainActivity.kt + LoginScreen.kt + HomeActivity.kt)</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <h3>6.1. Kotlin mínimo necesario</h3>
+    <table>
+      <tr><th>Elemento</th><th>Uso en esta actividad</th></tr>
+      <tr><td><code>val</code></td><td>Variable inmutable (no cambia).</td></tr>
+      <tr><td><code>var</code></td><td>Variable mutable.</td></tr>
+      <tr><td><code>by</code></td><td>Delegación de propiedades. Permite escribir <code>count</code> en lugar de <code>count.value</code>.</td></tr>
+      <tr><td><code>remember { }</code></td><td>Guarda un valor entre recomposiciones.</td></tr>
+      <tr><td><code>mutableStateOf(...)</code></td><td>Crea un estado observable.</td></tr>
+      <tr><td>Lambdas <code>{ }</code></td><td>Se usan en <code>onClick</code>, <code>onValueChange</code>, etc.</td></tr>
+      <tr><td><code>?</code> (safe call)</td><td><code>emailError?.let { ... }</code>: si no es null, ejecuta el bloque.</td></tr>
+    </table>
+    <h3>6.2. MainActivity en Compose</h3>
+    <p>La <code>MainActivity</code> en Compose es simple: hereda de <code>ComponentActivity</code> y usa <code>setContent { }</code> para cargar el composable.</p>
+    <h3>6.3. MainActivity.kt completo</h3>
+    <div class="code-wrap">
+      <div class="code-label"><span>MainActivity.kt</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-kt" data-lang="kt">package com.ejemplo.login
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MaterialTheme {
+                LoginScreen(
+                    onLoginSuccess = {
+						// Navegacion clasica con Intent.
+                        // NOTA: En proyectos reales con Compose se usaria NavHost.
+                        // Aqu¨ª usamos Intent para simplificar.
+                        startActivity(Intent(this, HomeActivity::class.java))
+                    }
+                )
+            }
+        }
+    }
+}</pre>
+    </div>
+    <h3>6.4. Explicación línea a línea</h3>
+    <div id="explainAccordion"></div>
+    <h3>6.5. HomeScreen.kt (pantalla destino)</h3>
+    <div class="code-wrap">
+      <div class="code-label"><span>HomeScreen.kt</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-kt" data-lang="kt">package com.ejemplo.login
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+
+@Composable
+fun HomeScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(R.string.titulo_home),
+            style = MaterialTheme.typography.headlineMedium
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    MaterialTheme {
+        HomeScreen()
+    }
+}</pre>
+    </div>
+	<h3>6.6. HomeActivity.kt (pantalla destino)</h3>
+    <div class="code-wrap">
+      <div class="code-label"><span>HomeActivity.kt</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-kt" data-lang="kt">package com.ejemplo.login
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+
+class HomeActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MaterialTheme {
+                HomeScreen()
+            }
+        }
+    }
+}</pre>
+    </div>
+    <h3>6.7. Registrar HomeActivity en el Manifest</h3>
+    <p>Añade dentro de <code>&lt;application&gt;</code>:</p>
+    <div class="code-wrap">
+      <div class="code-label"><span>AndroidManifest.xml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="code-xml" data-lang="xml">&lt;activity
+            android:name=".HomeActivity"
+            android:exported="false" /&gt;</pre>
+    </div>
+    <div class="callout warn"><strong>No lo olvides:</strong> sin <code>android:windowSoftInputMode="adjustResize"</code> el teclado tapará los campos inferiores.</div>
+  </div>
+</div>
+
+<!-- SIGNATURE DEMO -->
+<div class="demo-section" id="demo">
+  <div class="demo-title">
+    <h2>🧪 Simulador interactivo de la pantalla de Login</h2>
+    <p>Prueba en vivo la lógica exacta de <code>LoginScreen.kt</code>: validación de email, de contraseña, foco inicial, IME y navegación — con Logcat en directo.</p>
+  </div>
+  <div class="demo-grid">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-statusbar"><span>9:41</span><span>▲ ▲ ▮▮▮</span></div>
+        <div class="app-logo"></div>
+        <div class="app-title">Bienvenido/a</div>
+        <div class="field" id="fieldEmail">
+          <input type="text" id="inputEmail" placeholder=" " autocomplete="off">
+          <label>Email</label>
+          <div class="field-error-msg">Introduce un email válido</div>
+        </div>
+        <div class="field" id="fieldPassword">
+          <input type="password" id="inputPassword" placeholder=" " autocomplete="off">
+          <label>Contraseña</label>
+          <span class="eye-toggle" id="eyeToggle" onclick="togglePassword()">👁</span>
+          <div class="field-error-msg">Mínimo 8 caracteres, una mayúscula y un número</div>
+        </div>
+        <div class="remember-row"><input type="checkbox" id="rememberBox"> Recordar sesión</div>
+        <button class="login-btn" id="loginBtn" onclick="attemptLogin()">ENTRAR</button>
+        <span class="forgot-link">¿Olvidaste tu contraseña?</span>
+        <div class="toast" id="toastMsg">Login correcto</div>
+        <div class="home-overlay" id="homeOverlay">
+          <div style="font-size:2rem;">🏠</div>
+          <div style="font-family:'Sora'; font-weight:700; margin-top:6px;">¡Bienvenido a Home!</div>
+          <button onclick="volverALogin()">↩ Volver (onResume)</button>
+        </div>
+      </div>
+    </div>
+    <div class="logcat-panel">
+      <div class="logcat-head"><span>▾<Logcat</span><span id="logcatCount">0 eventos</span></div>
+      <div class="logcat-body" id="logcatBody"></div>
+      <div class="demo-controls">
+        <button class="demo-btn secondary" onclick="restartDemo()">→ Reiniciar (nueva instancia)</button>
+      </div>
+    </div>
+  </div>
+  <p class="demo-hint">Prueba: escribe un email inválido y sal del campo (Tab) · escribe una contraseña débil y pulsa ENTRAR · usa Intro para simular <code>actionNext</code>/<code>actionDone</code> · entra a Home y vuelve para ver <code>onResume()</code> limpiando errores.</p>
+</div>
+
+<!-- 7 -->
+<div class="section card" id="s7">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">7</div><h2>Gestión del foco y del teclado</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <ul>
+      <li><code>KeyboardOptions(imeAction = ImeAction.Next)</code> en el email → el teclado muestra "Siguiente".</li>
+      <li><code>KeyboardOptions(imeAction = ImeAction.Done)</code> en la contraseña → el teclado muestra "Listo".</li>
+      <li><code>LaunchedEffect(Unit) { emailFocusRequester.requestFocus() }</code> → el foco inicial va al email.</li>
+      <li><code>KeyboardActions(onNext = { focusManager.moveFocus(...) })</code> → navegación entre campos.</li>
+      <li><code>focusManager.clearFocus()</code> → cierra el teclado al hacer login.</li>
+    </ul>
+    <p>Esto mejora mucho la experiencia de usuario porque permite navegar entre campos sin tocar la pantalla. Pruébalo tú mismo en el <a href="#demo">simulador de arriba ↑</a>.</p>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="section card" id="s8">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">8</div><h2>Pruebas en el emulador</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p>Ejecuta la app y comprueba los siguientes casos. Márcalos según los vayas verificando:</p>
+    <ul class="checklist" id="testCasesList"></ul>
+    <div class="progress-track"><div class="progress-fill" id="testProgressFill"></div></div>
+    <div class="progress-label" id="testProgressLabel">0 / 7 casos verificados</div>
+    <p class="small">📸 Haz capturas de pantalla de los casos 2, 4 y 5 para el informe.</p>
+  </div>
+</div>
+
+<!-- 9 -->
+<div class="section card" id="s9">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">9</div><h2>Errores comunes y soluciones</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <table>
+      <tr><th>Error</th><th>Causa probable</th><th>Solución</th></tr>
+      <tr><td class="mono">@Composable invocations can only happen from the context of a @Composable function</td><td>Llamas a un composable desde fuera de otro composable.</td><td>Asegúrate de que la llamada está dentro de <code>setContent { }</code>.</td></tr>
+      <tr><td class="mono">Unresolved reference: stringResource</td><td>Falta el import.</td><td>Añade <code>import androidx.compose.ui.res.stringResource</code>.</td></tr>
+      <tr><td>El @Preview no se renderiza</td><td>El editor se ha quedado colgado.</td><td><code>Build &gt; Rebuild Project</code> o reinicia Android Studio.</td></tr>
+      <tr><td>La UI no se actualiza al cambiar el estado</td><td>Te falta <code>remember</code> o <code>mutableStateOf</code>.</td><td><code>var x by remember { mutableStateOf(0) }</code>.</td></tr>
+      <tr><td class="mono">HomeActivity not found</td><td>No la has registrado en el Manifest.</td><td>Añade <code>&lt;activity android:name=".HomeActivity"/&gt;</code>.</td></tr>
+      <tr><td>El teclado tapa el botón</td><td>Falta <code>windowSoftInputMode</code>.</td><td>Añade <code>android:windowSoftInputMode="adjustResize"</code>.</td></tr>
+      <tr><td>La app se ve en blanco</td><td><code>setContent { }</code> no tiene contenido.</td><td>Revisa que <code>LoginScreen()</code> se llama dentro de <code>setContent</code>.</td></tr>
+      <tr><td class="mono">Cannot access 'Column': it is internal</td><td>Import incorrecto.</td><td>Usa <code>import androidx.compose.foundation.layout.Column</code>.</td></tr>
+      <tr><td>Textos aparecen como @string/...</td><td>No has usado <code>stringResource(...)</code>.</td><td>Cambia <code>"@string/xxx"</code> por <code>stringResource(R.string.xxx)</code>.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 10 -->
+<div class="section card" id="s10">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">10</div><h2>Accesibilidad</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p>No basta con que se vea bonito. La app debe ser usable por todos:</p>
+    <ul>
+      <li>✅Todo <code>ImageView</code> debe tener <code>contentDescription</code> (para TalkBack).</li>
+      <li>✅Botones: tamaño mínimo táctil de <strong>48dp × 48dp</strong>.</li>
+      <li>✅Contraste de texto: debe cumplir <strong>WCAG AA (4.5:1)</strong>.</li>
+      <li>✅Errores: no comunicar solo con color — icono + texto (Material lo hace automáticamente con <code>setError</code>).</li>
+      <li>✅Prueba con TalkBack: <code>Settings &gt; Accessibility &gt; TalkBack</code>, navega con el teclado.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 11 -->
+<div class="section card" id="s11">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">11</div><h2>Entregables</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <ol>
+      <li><strong>Proyecto Android</strong> comprimido (ZIP) o enlace al repositorio Git. Debe compilar y ejecutarse.</li>
+      <li><strong>Informe UI/UX</strong> (PDF o Markdown, máx. 2 páginas) con:
+        <ul>
+          <li>Wireframe: captura o dibujo de la pantalla diseñada.</li>
+          <li>Decisiones de diseño: colores, tipografía, márgenes, por qué.</li>
+          <li>Estrategia de validación: reglas aplicadas al email y a la contraseña.</li>
+          <li>Capturas de pruebas: estado normal, error de email, error de contraseña, navegación a Home.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<!-- 12 -->
+<div class="section card" id="s12">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">12</div><h2>Checklist de autoevaluación</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <p>Antes de entregar, marca cada casilla. Si alguna no la puedes marcar, <strong>no entregues todavía</strong>.</p>
+    <ul class="checklist" id="selfChecklist"></ul>
+    <div class="progress-track"><div class="progress-fill" id="checklistFill"></div></div>
+    <div class="progress-label" id="checklistLabel">0 / 14 completado</div>
+  </div>
+</div>
+
+<!-- 13 -->
+<div class="section card" id="s13">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">13</div><h2>Rúbrica de evaluación</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <div id="rubricBars"></div>
+    <table style="margin-top:18px;">
+      <tr><th>Total</th><td><strong>10.0 puntos</strong></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 14 -->
+<div class="section card" id="s14">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">14</div><h2>Estimación de tiempos</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <div class="timeline" id="timelineChart"></div>
+    <p class="small"><strong>Total estimado: 5 horas</strong></p>
+  </div>
+</div>
+
+<!-- 15 -->
+<div class="section card" id="s15">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">15</div><h2>Recursos adicionales</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <div class="resource-grid">
+      <a class="resource-card" href="https://developer.android.com/jetpack/compose" target="_blank"><h4>Jetpack Compose</h4><span>developer.android.com</span></a>
+      <a class="resource-card" href="https://developer.android.com/jetpack/compose/state" target="_blank"><h4>State and Jetpack Compose</h4><span>developer.android.com</span></a>
+      <a class="resource-card" href="https://developer.android.com/jetpack/compose/designsystems/material3" target="_blank"><h4>Material 3 in Compose</h4><span>developer.android.com</span></a>
+      <a class="resource-card" href="https://developer.android.com/jetpack/compose/text" target="_blank"><h4>Text fields (Material 3)</h4><span>developer.android.com</span></a>
+      <a class="resource-card" href="https://material.io/resources/color/" target="_blank"><h4>Material Design Color Tool</h4><span>material.io</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- 16 -->
+<div class="section card" id="s16">
+  <div class="card-head" onclick="toggleCard(this)">
+    <div class="num">16</div><h2>Retos adicionales (opcionales)</h2><div class="chev">▾</div>
+  </div>
+  <div class="card-body">
+    <div class="callout warn"><strong>Regla del reto:</strong> antes de empezar cada uno, haz una copia de seguridad del archivo que vas a modificar (o usa Git).</div>
+    <p class="small">Voluntarios · +0.25 puntos cada uno (máx. +1.0) si funciona en el emulador, se explica en el informe (5-10 líneas) y se incluye captura.</p>
+    <div id="retosContainer"></div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Actividad 1.1 · PMDM · 2º DAM — Guía interactiva autocontenida (HTML/CSS/JS, sin dependencias externas salvo tipografías de Google Fonts).
+</footer>
+
+<script>
+/* ---------- ACCORDION SECTIONS ---------- */
+function toggleCard(head){
+  const card = head.parentElement;
+  card.classList.toggle('open');
+}
+
+/* ---------- SCROLLSPY + PROGRESS BAR ---------- */
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('main .section, .demo-section');
+function onScroll(){
+  const doc = document.documentElement;
+  const scrollTop = doc.scrollTop || document.body.scrollTop;
+  const scrollHeight = doc.scrollHeight - doc.clientHeight;
+  document.getElementById('progressBar').style.width = (scrollHeight>0 ? (scrollTop/scrollHeight*100) : 0) + '%';
+  let current = '';
+  sections.forEach(sec=>{
+    const rect = sec.getBoundingClientRect();
+    if(rect.top < 140) current = sec.id;
+  });
+  navLinks.forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('href') === '#'+current);
+  });
+}
+document.addEventListener('scroll', onScroll);
+onScroll();
+
+/* ---------- COPY TO CLIPBOARD ---------- */
+function copyCode(btn){
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const original = btn.textContent;
+    btn.textContent = '✅Copiado';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1600);
+  });
+}
+
+/* ---------- LIGHTWEIGHT SYNTAX HIGHLIGHT ---------- */
+function highlightXml(code){
+  let tmp = code
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="tok-com">$1</span>')
+    .replace(/<span[^>]*>/g, m => m.replace(/=/g, '\x01'))
+    .replace(/([\w:]+)(=)(")([^"\x01]*)(\3)/g, '<span class="tok-attr">$1</span>$2$3<span class="tok-str">$4</span>$3')
+    .replace(/(&lt;\/?)([\w.:]+)/g, '$1<span class="tok-tag">$2</span>')
+    .replace(/\x01/g, '=');
+  return tmp;
+}
+function highlightKt(code){
+  const kw = /\b(package|import|class|private|val|var|lateinit|fun|override|return|if|else|true|false|null|this|as|in)\b/g;
+  const types = /\b(AppCompatActivity|Bundle|Intent|Toast|TextInputEditText|TextInputLayout|MaterialButton|InputMethodManager|Boolean|String)\b/g;
+  let escaped = code;
+  escaped = escaped.replace(/(\/\/.*)/g, 'Â§COMÂ§$1Â§ENDCOMÂ§');
+  escaped = escaped.replace(/("(?:[^"\\]|\\.)*")/g, 'Â§STRÂ§$1Â§ENDSTRÂ§');
+  escaped = escaped.replace(kw, '<span class="tok-kw">$1</span>');
+  escaped = escaped.replace(types, '<span class="tok-type">$1</span>');
+  escaped = escaped.replace(/Â§COMÂ§([\s\S]*?)Â§ENDCOMÂ§/g, '<span class="tok-com">$1</span>');
+  escaped = escaped.replace(/Â§STRÂ§([\s\S]*?)Â§ENDSTRÂ§/g, '<span class="tok-str">$1</span>');
+  return escaped;
+}
+document.querySelectorAll('pre.code-xml').forEach(p=> p.innerHTML = highlightXml(p.innerHTML));
+document.querySelectorAll('pre.code-kt').forEach(p=> p.innerHTML = highlightKt(p.innerHTML));
+
+/* ---------- GLOSSARY ---------- */
+const glossary = [
+  ["Activity","Una \"pantalla\" de la app. Tiene un ciclo de vida."],
+  ["Composable","Función anotada con @Composable que describe parte de la UI."],
+  ["setContent { }","Punto de entrada de Compose dentro de una Activity."],
+  ["Recomposición","Volver a ejecutar un composable cuando cambia su estado."],
+  ["Estado (State)","Un valor que, cuando cambia, provoca que la UI se redibuje."],
+  ["remember","Guarda un valor entre recomposiciones."],
+  ["mutableStateOf","Crea un estado observable."],
+  ["Modifier","Cadena de modificadores que aplican propiedades visuales (padding, tamaño, etc.)."],
+  ["@Preview","Anotación que permite ver un composable en el editor sin ejecutar la app."],
+  ["Material 3","Sistema de diseño actual de Google."],
+  ["AVD","Android Virtual Device. El emulador."]
+];
+const glossaryGrid = document.getElementById('glossaryGrid');
+glossary.forEach(([term,def])=>{
+  const card = document.createElement('div');
+  card.className='flip-card';
+  card.innerHTML = `<div class="flip-inner"><div class="flip-front">${term}</div><div class="flip-back">${def}</div></div>`;
+  card.onclick = ()=> card.classList.toggle('flipped');
+  glossaryGrid.appendChild(card);
+});
+
+/* ---------- TREE ---------- */
+function toggleTree(el){ el.classList.toggle('open'); }
+
+/* ---------- LIFECYCLE DIAGRAM ---------- */
+const lifecycle = [
+  ["Composable","Función que describe la UI. Se recompone cuando cambia su estado.",true],
+  ["remember { }","Guarda un valor entre recomposiciones. Sin esto, el valor se reinicia.",true],
+  ["mutableStateOf","Crea un estado observable. Si cambia, la UI se redibuja.",true],
+  ["LaunchedEffect","Se ejecuta al entrar en la composición, y de nuevo si la key cambia.",true],
+  ["Modifier","Cadena de modificadores para padding, tamaño, color, etc.",false],
+  ["@Preview","Permite ver un composable en el editor sin ejecutar la app.",false]
+];
+const lcWrap = document.getElementById('lifecycleDiagram');
+lifecycle.forEach(([name,detail,key])=>{
+  const step = document.createElement('div');
+  step.className = 'lc-step' + (key ? ' key' : '');
+  step.innerHTML = `<div class="lc-name">${name}</div><div class="lc-detail">${detail}</div>` + (key ? '<div class="small" style="color:var(--accent-dark);margin-top:6px;">★ Clave hoy</div>' : '');
+  step.onclick = ()=> step.classList.toggle('open');
+  lcWrap.appendChild(step);
+});
+
+/* BINDING TABS removed for Compose */
+
+/* ---------- EXPLAIN ACCORDION (6.4) ---------- */
+const explains = [
+  ["setContent { ... }","Punto de entrada de Compose. Todo lo que hay dentro se compone."],
+  ["MaterialTheme { ... }","Aplica el tema (colores, tipografías) a todos los composables hijos."],
+  ["var email by remember { mutableStateOf('') }","Crea un estado observable con valor inicial vacío. Cada vez que email cambia, el composable se recompone."],
+  ["LaunchedEffect(Unit) { emailFocusRequester.requestFocus() }","Al entrar en la composición, pide foco al campo de email."],
+  ["KeyboardOptions(imeAction = ImeAction.Next)","Configura el botón del teclado como Siguiente."],
+  ["KeyboardActions(onNext = { ... })","Qué hacer cuando se pulsa Siguiente. Movemos el foco al siguiente campo."],
+  ["focusManager.clearFocus()","Quita el foco y oculta el teclado."],
+  ["visualTransformation = PasswordVisualTransformation()","Oculta el texto de la contraseña con puntos."],
+  ["trailingIcon = { IconButton { ... } }","Añade un icono a la derecha del campo (el ojo)."],
+  ["onLoginSuccess()","Callback que ejecuta MainActivity cuando el login es correcto."]
+];
+const explainWrap = document.getElementById('explainAccordion');
+explains.forEach(([code,desc])=>{
+  const row = document.createElement('div');
+  row.style.cssText='border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;background:#fbfbff;';
+  row.innerHTML = `<code style="color:var(--primary-dark);">${code}</code><p class="small" style="margin:6px 0 0;">${desc}</p>`;
+  explainWrap.appendChild(row);
+});
+
+/* ---------- TEST CASES CHECKLIST (section 8) ---------- */
+const testCases = [
+  "Abrir la app → el foco está en el email y el teclado aparece.",
+  "Escribir \"abc\" en email y salir del campo → aparece error \"Introduce un email válido\".",
+  "Escribir un email válido y salir del campo → el error desaparece.",
+  "Pulsar Login con contraseña \"123\" → aparece error de contraseña débil.",
+  "Pulsar Login con datos válidos → se navega a HomeActivity.",
+  "Rotar la pantalla a horizontal → el contenido se ve completo, sin cortes.",
+  "Pulsar el icono del ojo de la contraseña → se muestra/oculta el texto."
+];
+buildChecklist('testCasesList', testCases, 'testProgressFill', 'testProgressLabel', 'casos verificados');
+
+/* ---------- SELF-ASSESSMENT CHECKLIST (section 12) ---------- */
+const selfItems = [
+  "El proyecto compila sin errores.",
+  "La app arranca en el emulador.",
+  "El foco inicial está en el campo Email.",
+  "El teclado muestra \"Siguiente\" en Email y \"Listo\" en Contraseña.",
+  "Al introducir un email inválido, se muestra el error en rojo.",
+  "Al introducir una contraseña débil, se muestra el error.",
+  "Al pulsar Login con datos válidos, se navega a Home.",
+  "Los textos están en strings.xml, no hardcoded en el XML.",
+  "He probado en vertical y horizontal.",
+  "He probado con TalkBack activado.",
+  "He hecho capturas para el informe.",
+  "El informe explica las decisiones de diseño.",
+  "HomeActivity está registrada en el Manifest."
+];
+buildChecklist('selfChecklist', selfItems, 'checklistFill', 'checklistLabel', 'completado');
+
+function buildChecklist(listId, items, fillId, labelId, suffix){
+  const list = document.getElementById(listId);
+  items.forEach((text,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<input type="checkbox" id="${listId}_${i}"><span>${text}</span>`;
+    li.onclick = (e)=>{
+      if(e.target.tagName !== 'INPUT'){
+        const cb = li.querySelector('input');
+        cb.checked = !cb.checked;
+      }
+      li.classList.toggle('checked', li.querySelector('input').checked);
+      updateProgress();
+    };
+    list.appendChild(li);
+  });
+  function updateProgress(){
+    const total = items.length;
+    const done = list.querySelectorAll('input:checked').length;
+    document.getElementById(fillId).style.width = (done/total*100)+'%';
+    document.getElementById(labelId).textContent = `${done} / ${total} ${suffix}`;
+  }
+}
+
+/* ---------- RUBRIC BARS (section 13) ---------- */
+const rubric = [
+  ["Maquetación (CE.b)","Usa Column + Modifier correctamente. UI responsiva (no se corta en horizontal).",2.0],
+  ["Validación (CE.a)","Implementa validación de Email y Password. Muestra errores visuales claros.",2.0],
+  ["Gestión de foco (CE.g)","Foco inicial correcto. Navegación con teclado (Next/Done) funcional.",1.5],
+  ["Estado y recomposición (CE.g)","Usa remember y mutableStateOf correctamente. La UI se actualiza sola.",1.5],
+  ["Documentación (CE.i)","El informe explica el diseño UI/UX y muestra capturas de las pruebas.",2.0],
+  ["Calidad del código","Código limpio, comentado, siguiendo convenciones de Compose. Textos en strings.xml.",1.0]
+];
+const rubricWrap = document.getElementById('rubricBars');
+rubric.forEach(([name,desc,pts])=>{
+  const row = document.createElement('div');
+  row.className='rubric-row';
+  row.innerHTML = `<div class="rubric-top"><strong>${name}</strong><span>${pts.toFixed(1)} pts</span></div>
+    <div class="rubric-track"><div class="rubric-fill" style="width:${pts/2*100}%"></div></div>
+    <p class="small" style="margin:4px 0 0;">${desc}</p>`;
+  rubricWrap.appendChild(row);
+});
+
+/* ---------- TIMELINE (section 14) ---------- */
+const timeline = [
+  ["Lectura de conceptos y glosario",30],
+  ["Diseño del composable",60],
+  ["Recursos (strings.xml)",15],
+  ["Lógica de estado y validaciones",90],
+  ["Navegación a Home y Manifest",30],
+  ["Pruebas y depuración",45],
+  ["Documentación UI/UX",30]
+];
+const maxT = Math.max(...timeline.map(t=>t[1]));
+const tlWrap = document.getElementById('timelineChart');
+timeline.forEach(([name,min])=>{
+  const row = document.createElement('div');
+  row.className='tl-row';
+  row.innerHTML = `<div class="tl-label">${name}</div><div class="tl-bar-bg"><div class="tl-bar" style="width:${min/maxT*100}%">${min} min</div></div>`;
+  tlWrap.appendChild(row);
+});
+
+/* ---------- RETOS (section 16) ---------- */
+const retos = [
+  {n:1, titulo:'Mover el botón "¿Olvidaste tu contraseña?"', nivel:1, archivo:'LoginScreen.kt', tiempo:'10-15 min',
+   enunciado:'El enlace está centrado debajo del botón. Queremos que se coloque alineado a la derecha, justo debajo del botón, y que siga viéndose en horizontal.',
+   pistas:['Repasa cómo funciona layout_constraintEnd_toEndOf. ¿A qué elemento debería "pegarse" por la derecha?','layout_width="wrap_content" hace que la View ocupe solo lo necesario. ¿Es eso lo que quieres?','Si en horizontal no se ve, ¿qué contenedor con scroll podría resolverlo? (sección 4.1)'],
+   aprende:'A alinear elementos con constraintEnd y a detectar problemas de desbordamiento en horizontal.'},
+  {n:2, titulo:'Validación en tiempo real (mientras se escribe)', nivel:2, archivo:'LoginScreen.kt', tiempo:'20-30 min',
+   enunciado:'El email solo se valida al salir del campo. Queremos que se valide mientras se escribe, pero el error solo debe aparecer tras al menos 3 caracteres. Si se borra todo, el error desaparece.',
+   pistas:['¿Conoces algún listener que se dispare con cada cambio en un EditText? Busca TextWatcher o doAfterTextChanged.','Comprueba la longitud del texto antes de decidir si validar.','Patterns.EMAIL_ADDRESS.matcher("").matches() devuelve false. ¿Qué pasa si el usuario borra todo el texto?','¿Puedes reutilizar validarEmail() o necesitas adaptarla?'],
+   aprende:'A usar TextWatcher / doAfterTextChanged y a gestionar estados intermedios de validación.'},
+  {n:3, titulo:'Añadir un icono personalizado en la contraseña', nivel:2, archivo:'LoginScreen.kt', tiempo:'15-20 min',
+   enunciado:'Ahora mismo el icono del ojo usa Icons.Filled.Visibility. Queremos cambiarlo por otros iconos de material-icons-extended, por ejemplo un candado.',
+   pistas:['Para usar iconos extendidos, necesitas añadir la dependencia material-icons-extended en build.gradle.kts.','Busca en la documentación los nombres de los iconos disponibles.','¿Dónde se cambia el icono? En el bloque trailingIcon = { Icon(...) }.','Cuidado con el contentDescription: debe seguir siendo descriptivo.'],
+   aprende:'A añadir dependencias al proyecto y a usar la librería de iconos extendidos.'},
+  {n:4, titulo:'Bloquear el botón hasta que el formulario sea válido', nivel:3, archivo:'LoginScreen.kt', tiempo:'30-40 min',
+   enunciado:'El botón ENTRAR debe estar deshabilitado hasta que tanto el email como la contraseña sean válidos. Combina con el Reto 2.',
+   pistas:['boton.isEnabled = false lo deshabilita.','Necesitas escuchar los cambios de ambos campos.','Crea actualizarEstadoBoton(): lee ambos campos, comprueba validez sin mostrar errores, habilita/deshabilita.','Llama a esa función en cada cambio de texto de cualquiera de los dos campos.','¿Dónde inicializas el estado deshabilitado? ¿En onCreate?'],
+   aprende:'A gestionar estado derivado y a separar validación (mostrar errores) de comprobación (habilitar botón).'},
+  {n:5, titulo:'Añadir un tercer campo "Confirmar contraseña"', nivel:3, archivo:'LoginScreen.kt, strings.xml', tiempo:'30-45 min',
+   enunciado:'Añade un campo "Confirmar contraseña" que compruebe que es idéntico al de contraseña, mostrando error en el campo de confirmación si no coincide.',
+   pistas:['Añade un nuevo TextInputLayout + TextInputEditText en el XML. ¿Entre qué elementos?','Añade el hint en strings.xml.','Añade confirmPasswordInputLayout y confirmPasswordEditText en Kotlin y enlázalas en onCreate.','Crea validarConfirmPassword() comparando ambos textos.','¿Debería revalidarse la confirmación si se cambia la contraseña original después? Piensa en la UX.'],
+   aprende:'A extender un formulario existente y a comparar valores entre campos.'},
+  {n:6, titulo:'Traducir la pantalla al inglés', nivel:3, archivo:'res/values-en/strings.xml (nuevo)', tiempo:'20-30 min',
+   enunciado:'La app debe mostrarse en inglés cuando el móvil esté en inglés, sin tocar layout ni Kotlin, solo recursos.',
+   pistas:['Busca cómo se llama la carpeta de recursos alternativa para inglés (empieza por values-).','Crea un strings.xml con los mismos nombres de string, en inglés.','Si falta una traducción, Android usa el idioma por defecto.','Prueba cambiando el idioma del emulador en Settings > System > Languages & input.'],
+   aprende:'Cómo funciona la internacionalización (i18n) en Android y por qué importa strings.xml.'},
+  {n:7, titulo:'Tema claro / oscuro', nivel:4, archivo:'Theme.kt, Color.kt, LoginScreen.kt', tiempo:'45-60 min',
+   enunciado:'La app debe soportar modo oscuro automáticamente: fondos oscuros y textos claros en modo oscuro, y al revés en modo claro.',
+   pistas:['Existe una carpeta especial para temas oscuros (empieza por values- pero no es idioma).','Usa referencias a atributos del tema como ?attr/colorOnSurface o ?attr/colorSurface en vez de colores hardcoded.','Revisa tu LoginScreen.kt: ¿hay colores hardcoded?','Prueba cambiando el modo oscuro en Settings > Display > Dark theme.'],
+   aprende:'A usar temas y atributos Material 3 en lugar de colores hardcoded, y cómo funciona el modo oscuro.'},
+  {n:8, titulo:'Navegación con NavHost', nivel:4, archivo:'MainActivity.kt, Navigation.kt', tiempo:'60-90 min',
+   enunciado:'Ahora la navegación se hace con Intent. Queremos migrar a NavHost (navigation-compose), la forma recomendada en proyectos Compose modernos.',
+   pistas:['Añade la dependencia androidx.navigation:navigation-compose en build.gradle.kts.','Crea un NavHost con dos rutas: "login" y "home".','En LoginScreen, en lugar de llamar a onLoginSuccess(), navega con navController.navigate("home").','El NavController se obtiene con rememberNavController().'],
+   aprende:'A usar NavHost y NavController. A estructurar una app Compose con múltiples pantallas.'}
+];
+const retosContainer = document.getElementById('retosContainer');
+retos.forEach(r=>{
+  const card = document.createElement('div');
+  card.className='reto-card';
+  const stars = '⭐'?.repeat(r.nivel);
+  card.innerHTML = `
+    <div class="reto-head" onclick="this.parentElement.classList.toggle('open')">
+      <span class="reto-stars">${stars}</span>
+      <h4>Reto ${r.n}: ${r.titulo}</h4>
+      <div class="chev">▾</div>
+    </div>
+    <div class="reto-body">
+      <p><span class="badge">📄 ${r.archivo}</span><span class="badge">⏱{r.tiempo}</span></p>
+      <p>${r.enunciado}</p>
+      <button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
+      <div class="hint-box"><ul>${r.pistas.map(p=>'<li>'+p+'</li>').join('')}</ul></div>
+      <p class="small" style="margin-top:10px;"><strong>¿Qué aprenderás?</strong> ${r.aprende}</p>
+    </div>`;
+  retosContainer.appendChild(card);
+});
+function toggleHint(btn){
+  const box = btn.nextElementSibling;
+  box.classList.toggle('show');
+  btn.textContent = box.classList.contains('show') ? '🙈 Ocultar pistas' : '💡 Ver pistas (no soluciones)';
+}
+
+/* ================= SIGNATURE DEMO LOGIC ================= */
+const inputEmail = document.getElementById('inputEmail');
+const inputPassword = document.getElementById('inputPassword');
+const fieldEmail = document.getElementById('fieldEmail');
+const fieldPassword = document.getElementById('fieldPassword');
+const loginBtn = document.getElementById('loginBtn');
+const logcatBody = document.getElementById('logcatBody');
+const logcatCount = document.getElementById('logcatCount');
+let logCounter = 0;
+
+function log(type, msg){
+  logCounter++;
+  const div = document.createElement('div');
+  div.className = 'log-'+type;
+  div.textContent = msg;
+  logcatBody.appendChild(div);
+  logcatBody.scrollTop = logcatBody.scrollHeight;
+  logcatCount.textContent = logCounter + ' eventos';
+}
+
+function validarEmailDemo(showError){
+  const email = inputEmail.value.trim();
+  const regex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+  const valido = email.length>0 && regex.test(email);
+  fieldEmail.classList.toggle('error', !valido && showError);
+  fieldEmail.classList.toggle('filled', email.length>0);
+  return valido;
+}
+function validarPasswordDemo(showError){
+  const pass = inputPassword.value;
+  const regex = /^(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+  const valido = regex.test(pass);
+  fieldPassword.classList.toggle('error', !valido && showError);
+  fieldPassword.classList.toggle('filled', pass.length>0);
+  return valido;
+}
+
+inputEmail.addEventListener('blur', ()=>{
+  const ok = validarEmailDemo(true);
+  log(ok ? 'ok':'err', `validarEmail() → ${ok}` + (ok?'':'  (emailInputLayout.error = "Introduce un email válido")'));
+});
+inputEmail.addEventListener('input', ()=>{ fieldEmail.classList.toggle('filled', inputEmail.value.length>0); });
+inputPassword.addEventListener('input', ()=>{ fieldPassword.classList.toggle('filled', inputPassword.value.length>0); });
+
+inputEmail.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === 'Tab'){
+    e.preventDefault();
+    log('sys','IME actionNext → foco pasa a Contraseña');
+    inputPassword.focus();
+  }
+});
+inputPassword.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    log('sys','IME actionDone → loginButton.performClick()');
+    attemptLogin();
+  }
+});
+
+function togglePassword(){
+  const isPwd = inputPassword.type === 'password';
+  inputPassword.type = isPwd ? 'text' : 'password';
+  document.getElementById('eyeToggle').textContent = isPwd ? '👁' : '🙈';
+}
+
+function attemptLogin(){
+  const okEmail = validarEmailDemo(true);
+  const okPass = validarPasswordDemo(true);
+  log('info', `validarEmail() → ${okEmail}`);
+  log('info', `validarPassword() → ${okPass}`);
+  if(okEmail && okPass){
+    log('sys','ocultarTeclado()');
+    log('ok','Toast: "Login correcto"');
+    const toast = document.getElementById('toastMsg');
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1400);
+    setTimeout(()=>{
+      log('sys','startActivity(Intent(this, HomeActivity::class.java))');
+      document.getElementById('homeOverlay').classList.add('show');
+    }, 500);
+  } else {
+    log('err','loginButton click → validación fallida, no se navega');
+  }
+}
+
+function volverALogin(){
+  document.getElementById('homeOverlay').classList.remove('show');
+  log('sys','onResume() → limpiando errores previos');
+  fieldEmail.classList.remove('error');
+  fieldPassword.classList.remove('error');
+}
+
+function restartDemo(){
+  inputEmail.value=''; inputPassword.value='';
+  fieldEmail.classList.remove('error','filled');
+  fieldPassword.classList.remove('error','filled');
+  document.getElementById('homeOverlay').classList.remove('show');
+  logcatBody.innerHTML=''; logCounter=0; logcatCount.textContent='0 eventos';
+  log('sys','onCreate() → setContent { LoginScreen() }');
+  log('sys','emailEditText.requestFocus()');
+  inputEmail.focus();
+}
+restartDemo();
+</script>
+</body>
+</html>

@@ -72,6 +72,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [PMDM - UT1 - Kotlin.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) | UT1 — Kotlin para desarrollo Android |
 | [PDMD - UT1 - Android.html](https://actionperformed.github.io/guias_html/PMDM/PDMD%20-%20UT1%20-%20Android.html) | UT1 — Fundamentos de desarrollo Android |
 | [PMDM - ACT 1.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%201.1.html) | Actividad 1.1 — Introducción a Android Studio y Kotlin |
+| [PMDM - ACT 2.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.1.html) | Actividad 2.1 — Pantalla de Login con Jetpack Compose — simulación interactiva en el navegador |
 
 ---
 
