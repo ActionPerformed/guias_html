@@ -406,6 +406,7 @@ RUN docker-php-ext-install \
 
 WORKDIR /var/www/html</pre></div>
 
+          <div class="tip"><strong>Explicación</strong><p><code>FROM php:8.2-fpm-alpine</code> parte de la imagen oficial de PHP 8.2 con FPM (FastCGI Process Manager), en su versión Alpine (ligera). <code>docker-php-ext-install pdo pdo_mysql mysqli</code> instala las extensiones para conectar con MariaDB. <code>WORKDIR /var/www/html</code> establece el directorio de trabajo dentro del contenedor.</p></div>
           <p>Crea el archivo <code>apache/Dockerfile</code> para Apache (con los módulos de proxy pre-cargados):</p>
           <div class="code-block"><div class="cb-head"><span>apache/Dockerfile</span><button class="copy-btn" data-copy="c-apachedockerfile">Copiar</button></div><pre id="c-apachedockerfile">FROM httpd:2.4-alpine
 
@@ -414,16 +415,6 @@ RUN sed -i '/^#LoadModule proxy_module/s/^#//' conf/httpd.conf \
     && sed -i '/^#LoadModule proxy_fcgi_module/s/^#//' conf/httpd.conf \
     && sed -i '/^#LoadModule socache_shmcb_module/s/^#//' conf/httpd.conf</pre></div>
           <div class="tip"><strong>Explicación</strong><p>Por defecto, la imagen <code>httpd:2.4-alpine</code> tiene los módulos <code>mod_proxy</code> y <code>mod_proxy_fcgi</code> comentados. Este Dockerfile los activa.</p></div>
-          <div class="code-block"><div class="cb-head"><span>dockerfile</span><button class="copy-btn" data-copy="c-phpdockerfile">Copiar</button></div><pre id="c-phpdockerfile">FROM php:8.2-fpm-alpine
-
-# Instalar las extensiones PHP necesarias
-RUN docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    mysqli
-
-WORKDIR /var/www/html</pre></div>
-          <div class="tip"><strong>Explicación</strong><p><code>FROM php:8.2-fpm-alpine</code> parte de la imagen oficial de PHP 8.2 con FPM (FastCGI Process Manager), en su versión Alpine (ligera). <code>docker-php-ext-install pdo pdo_mysql mysqli</code> instala las extensiones para conectar con MariaDB. <code>WORKDIR /var/www/html</code> establece el directorio de trabajo dentro del contenedor.</p></div>
         </div>
 
         <div class="panel">

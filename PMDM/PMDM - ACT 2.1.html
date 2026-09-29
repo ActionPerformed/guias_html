@@ -358,10 +358,8 @@ footer{text-align:center; padding:34px 20px; color:var(--muted); font-size:.82re
     <a class="nav-link" href="#s10">10·Accesib.</a>
     <a class="nav-link" href="#s11">11·Entregables</a>
     <a class="nav-link" href="#s12">12·Checklist</a>
-    <a class="nav-link" href="#s13">13·Rúbrica</a>
-    <a class="nav-link" href="#s14">14·Tiempos</a>
-    <a class="nav-link" href="#s15">15·Recursos</a>
-    <a class="nav-link" href="#s16">16·Retos</a>
+    <a class="nav-link" href="#s13">13·Recursos</a>
+    <a class="nav-link" href="#s14">14·Retos</a>
   </div>
 </nav>
 
@@ -434,17 +432,18 @@ footer{text-align:center; padding:34px 20px; color:var(--muted); font-size:.82re
             </li>
             <li><span class="fname folder">java/com/ejemplo/login/</span>
               <ul>
-                <li><span class="fname file" onclick="toggleTree(this)">MainActivity.kt</span><div class="fdesc">Activity que carga Compose.</div></li>
+                <li><span class="fname file" onclick="toggleTree(this)">HomeActivity.kt</span><div class="fdesc">Activity que carga tras un login correcto</div></li>
+                <li><span class="fname file" onclick="toggleTree(this)">HomeScreen.kt</span><div class="fdesc">Composable con la UI de AomeActivity</div></li>
                 <li><span class="fname file" onclick="toggleTree(this)">LoginScreen.kt</span><div class="fdesc">Composable con la UI del login.</div></li>
-                <li><span class="fname file" onclick="toggleTree(this)">HomeScreen.kt</span><div class="fdesc">Pantalla destino (la crearemos vacía).</div></li>
+                <li><span class="fname file" onclick="toggleTree(this)">MainActivity.kt</span><div class="fdesc">Activity que carga Compose.</div></li>
               </ul>
             </li>
             <li><span class="fname folder">res/</span>
               <ul>
                 <li><span class="fname folder">values/</span>
                   <ul>
+                  <li><span class="fname file" onclick="toggleTree(this)">colors.xml</span><div class="fdesc">Colores de la app.</div></li>
                     <li><span class="fname file" onclick="toggleTree(this)">strings.xml</span><div class="fdesc">TODOS los textos. Nada hardcoded.</div></li>
-                    <li><span class="fname file" onclick="toggleTree(this)">colors.xml</span><div class="fdesc">Colores de la app.</div></li>
                     <li><span class="fname file" onclick="toggleTree(this)">themes.xml</span><div class="fdesc">Tema global de la app.</div></li>
                   </ul>
                 </li>
@@ -454,7 +453,7 @@ footer{text-align:center; padding:34px 20px; color:var(--muted); font-size:.82re
         </li>
       </ul>
     </div>
-    <div class="callout"><strong>Regla de oro:</strong> los textos <u>nunca</u> se escriben directamente en el XML del layout. Siempre van en <code>strings.xml</code> y se referencian con <code>@string/mi_texto</code>.</div>
+    <div class="callout"><strong>Regla de oro:</strong> los textos <u>nunca</u> se escriben directamente en el código. Siempre van en <code>strings.xml</code> y se referencian con <code>stringResource(R.string.mi_texto_en_el_xml)</code>.</div>
   </div>
 </div>
 
@@ -712,7 +711,7 @@ fun LoginScreenPreview() {
 }</pre>
     </div>
     <h3>5.6. Recursos: strings.xml</h3>
-    <p>Todos los textos del layout anterior deben ir en <code>res/values/strings.xml</code>:</p>
+    <p>Todos los textos del compose deben ir en <code>res/values/strings.xml</code>:</p>
     <div class="code-wrap">
       <div class="code-label"><span>strings.xml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
       <pre class="code-xml" data-lang="xml">&lt;resources&gt;
@@ -730,7 +729,7 @@ fun LoginScreenPreview() {
     &lt;string name="error_email"&gt;Introduce un email válido&lt;/string&gt;
     &lt;string name="error_password"&gt;Mínimo 8 caracteres, una mayúscula y un número&lt;/string&gt;
     &lt;string name="login_correcto"&gt;Login correcto&lt;/string&gt;
-    &lt;string name="titulo_home"&gt;Â¡Bienvenido a Home!&lt;/string&gt;
+    &lt;string name="titulo_home"&gt;¡Bienvenido a Home!&lt;/string&gt;
 &lt;/resources&gt;</pre>
     </div>
     <div class="callout"><strong>¿Por qué?</strong> Si mañana quieres traducir la app al inglés, solo tienes que crear <code>res/values-en/strings.xml</code> con los mismos nombres. El código no cambia.</div>
@@ -931,7 +930,6 @@ class HomeActivity : ComponentActivity() {
     <ul class="checklist" id="testCasesList"></ul>
     <div class="progress-track"><div class="progress-fill" id="testProgressFill"></div></div>
     <div class="progress-label" id="testProgressLabel">0 / 7 casos verificados</div>
-    <p class="small">📸 Haz capturas de pantalla de los casos 2, 4 y 5 para el informe.</p>
   </div>
 </div>
 
@@ -980,13 +978,11 @@ class HomeActivity : ComponentActivity() {
   </div>
   <div class="card-body">
     <ol>
-      <li><strong>Proyecto Android</strong> comprimido (ZIP) o enlace al repositorio Git. Debe compilar y ejecutarse.</li>
-      <li><strong>Informe UI/UX</strong> (PDF o Markdown, máx. 2 páginas) con:
+      <li><strong>Informe</strong> con:
         <ul>
-          <li>Wireframe: captura o dibujo de la pantalla diseñada.</li>
-          <li>Decisiones de diseño: colores, tipografía, márgenes, por qué.</li>
-          <li>Estrategia de validación: reglas aplicadas al email y a la contraseña.</li>
-          <li>Capturas de pruebas: estado normal, error de email, error de contraseña, navegación a Home.</li>
+          <li>Evidencias de funcionalidades en las diferentes pantallas</li>
+          <li>Desarrollo y documentación del reto 1</li>
+          <li>Enlace a github tanto de la actividad como del reto desarrollado</li>
         </ul>
       </li>
     </ol>
@@ -999,7 +995,7 @@ class HomeActivity : ComponentActivity() {
     <div class="num">12</div><h2>Checklist de autoevaluación</h2><div class="chev">▾</div>
   </div>
   <div class="card-body">
-    <p>Antes de entregar, marca cada casilla. Si alguna no la puedes marcar, <strong>no entregues todavía</strong>.</p>
+    <p>Antes de entregar, asegúrate de que cumples cada casilla.</p>
     <ul class="checklist" id="selfChecklist"></ul>
     <div class="progress-track"><div class="progress-fill" id="checklistFill"></div></div>
     <div class="progress-label" id="checklistLabel">0 / 14 completado</div>
@@ -1009,31 +1005,7 @@ class HomeActivity : ComponentActivity() {
 <!-- 13 -->
 <div class="section card" id="s13">
   <div class="card-head" onclick="toggleCard(this)">
-    <div class="num">13</div><h2>Rúbrica de evaluación</h2><div class="chev">▾</div>
-  </div>
-  <div class="card-body">
-    <div id="rubricBars"></div>
-    <table style="margin-top:18px;">
-      <tr><th>Total</th><td><strong>10.0 puntos</strong></td></tr>
-    </table>
-  </div>
-</div>
-
-<!-- 14 -->
-<div class="section card" id="s14">
-  <div class="card-head" onclick="toggleCard(this)">
-    <div class="num">14</div><h2>Estimación de tiempos</h2><div class="chev">▾</div>
-  </div>
-  <div class="card-body">
-    <div class="timeline" id="timelineChart"></div>
-    <p class="small"><strong>Total estimado: 5 horas</strong></p>
-  </div>
-</div>
-
-<!-- 15 -->
-<div class="section card" id="s15">
-  <div class="card-head" onclick="toggleCard(this)">
-    <div class="num">15</div><h2>Recursos adicionales</h2><div class="chev">▾</div>
+    <div class="num">13</div><h2>Recursos adicionales</h2><div class="chev">▾</div>
   </div>
   <div class="card-body">
     <div class="resource-grid">
@@ -1046,13 +1018,13 @@ class HomeActivity : ComponentActivity() {
   </div>
 </div>
 
-<!-- 16 -->
-<div class="section card" id="s16">
+<!-- 14 -->
+<div class="section card" id="s14">
   <div class="card-head" onclick="toggleCard(this)">
-    <div class="num">16</div><h2>Retos adicionales (opcionales)</h2><div class="chev">▾</div>
+    <div class="num">14</div><h2>Retos adicionales</h2><div class="chev">▾</div>
   </div>
   <div class="card-body">
-    <div class="callout warn"><strong>Regla del reto:</strong> antes de empezar cada uno, haz una copia de seguridad del archivo que vas a modificar (o usa Git).</div>
+    <div class="callout warn"><strong>Regla del reto:</strong> antes de empezar cada uno, haz una copia de seguridad del archivo que vas a modificar (usa Git).</div>
     <div id="retosContainer"></div>
   </div>
 </div>
@@ -1247,62 +1219,34 @@ function buildChecklist(listId, items, fillId, labelId, suffix){
   }
 }
 
-/* ---------- RUBRIC BARS (section 13) ---------- */
-const rubric = [
-  ["Maquetación (CE.b)","Usa Column + Modifier correctamente. UI responsiva (no se corta en horizontal).",2.0],
-  ["Validación (CE.a)","Implementa validación de Email y Password. Muestra errores visuales claros.",2.0],
-  ["Gestión de foco (CE.g)","Foco inicial correcto. Navegación con teclado (Next/Done) funcional.",1.5],
-  ["Estado y recomposición (CE.g)","Usa remember y mutableStateOf correctamente. La UI se actualiza sola.",1.5],
-  ["Documentación (CE.i)","El informe explica el diseño UI/UX y muestra capturas de las pruebas.",2.0],
-  ["Calidad del código","Código limpio, comentado, siguiendo convenciones de Compose. Textos en strings.xml.",1.0]
-];
-const rubricWrap = document.getElementById('rubricBars');
-rubric.forEach(([name,desc,pts])=>{
-  const row = document.createElement('div');
-  row.className='rubric-row';
-  row.innerHTML = `<div class="rubric-top"><strong>${name}</strong><span>${pts.toFixed(1)} pts</span></div>
-    <div class="rubric-track"><div class="rubric-fill" style="width:${pts/2*100}%"></div></div>
-    <p class="small" style="margin:4px 0 0;">${desc}</p>`;
-  rubricWrap.appendChild(row);
-});
-
-/* ---------- TIMELINE (section 14) ---------- */
-const timeline = [
-  ["Lectura de conceptos y glosario",30],
-  ["Diseño del composable",60],
-  ["Recursos (strings.xml)",15],
-  ["Lógica de estado y validaciones",90],
-  ["Navegación a Home y Manifest",30],
-  ["Pruebas y depuración",45],
-  ["Documentación UI/UX",30]
-];
-const maxT = Math.max(...timeline.map(t=>t[1]));
-const tlWrap = document.getElementById('timelineChart');
-timeline.forEach(([name,min])=>{
-  const row = document.createElement('div');
-  row.className='tl-row';
-  row.innerHTML = `<div class="tl-label">${name}</div><div class="tl-bar-bg"><div class="tl-bar" style="width:${min/maxT*100}%">${min} min</div></div>`;
-  tlWrap.appendChild(row);
-});
-
 /* ---------- RETOS (section 16) ---------- */
 const retos = [
   {n:1, titulo:'Mover el botón "¿Olvidaste tu contraseña?"', nivel:1, archivo:'LoginScreen.kt', tiempo:'10-15 min',
    enunciado:'El enlace está centrado debajo del botón. Queremos que se coloque alineado a la derecha, justo debajo del botón, y que siga viéndose en horizontal.',
-   pistas:['Repasa cómo funciona layout_constraintEnd_toEndOf. ¿A qué elemento debería "pegarse" por la derecha?','layout_width="wrap_content" hace que la View ocupe solo lo necesario. ¿Es eso lo que quieres?','Si en horizontal no se ve, ¿qué contenedor con scroll podría resolverlo? (sección 4.1)'],
-   aprende:'A alinear elementos con constraintEnd y a detectar problemas de desbordamiento en horizontal.'},
+   pistas:['En Compose, dentro de una Column, cada hijo puede sobreescribir la alineación del padre con Modifier.align(...). ¿A qué valor de Alignment lo quieres alinear horizontalmente?',
+          'Alternativa: puedes rodear el TextButton con una Row que ocupe todo el ancho (Modifier.fillMaxWidth()) y usar horizontalArrangement = Arrangement.End. ¿Cuál de las dos opciones te parece más limpia?',
+          'Ojo con el Modifier.fillMaxWidth() en el TextButton: si lo pones, el botón ocupará todo el ancho y la alineación interna no se notará. Probablemente quieras quitarlo en este caso.',
+          'Si en horizontal el botón no se ve, revisa si la Column exterior tiene verticalScroll. Ya debería tenerlo. Si no lo tiene, añádelo'],
+   aprende:'A sobreescribir la alineación de un hijo con Modifier.align(...) o con Arrangement.End en una Row. A decidir entre dos formas válidas de hacer lo mismo y razonar cuál es más limpia. A verificar el comportamiento del scroll en horizontal.'},
   {n:2, titulo:'Validación en tiempo real (mientras se escribe)', nivel:2, archivo:'LoginScreen.kt', tiempo:'20-30 min',
    enunciado:'El email solo se valida al salir del campo. Queremos que se valide mientras se escribe, pero el error solo debe aparecer tras al menos 3 caracteres. Si se borra todo, el error desaparece.',
    pistas:['¿Conoces algún listener que se dispare con cada cambio en un EditText? Busca TextWatcher o doAfterTextChanged.','Comprueba la longitud del texto antes de decidir si validar.','Patterns.EMAIL_ADDRESS.matcher("").matches() devuelve false. ¿Qué pasa si el usuario borra todo el texto?','¿Puedes reutilizar validarEmail() o necesitas adaptarla?'],
    aprende:'A usar TextWatcher / doAfterTextChanged y a gestionar estados intermedios de validación.'},
-  {n:3, titulo:'Añadir un icono personalizado en la contraseña', nivel:2, archivo:'LoginScreen.kt', tiempo:'15-20 min',
+  {n:3, titulo:'Añadir un icono personalizado en la contraseña', nivel:2, archivo:'gradle/libs.versions.toml, app/build.gradle.kts, LoginScreen.kt', tiempo:'20-25 min',
    enunciado:'Ahora mismo el icono del ojo usa Icons.Filled.Visibility. Queremos cambiarlo por otros iconos de material-icons-extended, por ejemplo un candado.',
-   pistas:['Para usar iconos extendidos, necesitas añadir la dependencia material-icons-extended en build.gradle.kts.','Busca en la documentación los nombres de los iconos disponibles.','¿Dónde se cambia el icono? En el bloque trailingIcon = { Icon(...) }.','Cuidado con el contentDescription: debe seguir siendo descriptivo.'],
-   aprende:'A añadir dependencias al proyecto y a usar la librería de iconos extendidos.'},
+   pistas:['Para explorar iconos disponibles, busca en la documentación oficial de material-icons-extended o en la propia IDE: dentro del código, escribe Icons.Filled. y deja que Android Studio te autocomplete con la lista',
+          'El sitio donde se cambia el icono es el bloque trailingIcon = { Icon(...) }. Cambia el imageVector por el nuevo icono.',
+          'No olvides actualizar el contentDescription si el icono cambia de significado. Por ejemplo, si usas un candado, el contentDescription debería ser "Mostrar/ocultar contraseña" igual, porque la acción sigue siendo la misma.'],
+   aprende:'A explorar la librería material-icons-extended para encontrar iconos. A mantener el contentDescription coherente con la acción, no con el icono.'},
   {n:4, titulo:'Bloquear el botón hasta que el formulario sea válido', nivel:3, archivo:'LoginScreen.kt', tiempo:'30-40 min',
-   enunciado:'El botón ENTRAR debe estar deshabilitado hasta que tanto el email como la contraseña sean válidos. Combina con el Reto 2.',
-   pistas:['boton.isEnabled = false lo deshabilita.','Necesitas escuchar los cambios de ambos campos.','Crea actualizarEstadoBoton(): lee ambos campos, comprueba validez sin mostrar errores, habilita/deshabilita.','Llama a esa función en cada cambio de texto de cualquiera de los dos campos.','¿Dónde inicializas el estado deshabilitado? ¿En onCreate?'],
-   aprende:'A gestionar estado derivado y a separar validación (mostrar errores) de comprobación (habilitar botón).'},
+   enunciado:'Queremos que el botón ENTRAR esté deshabilitado (en gris, sin poder pulsarse) hasta que tanto el email como la contraseña sean válidos. En cuanto ambos sean válidos, el botón se habilita automáticamente. Este reto combina el Reto 2 (validación en tiempo real) con la gestión del estado del botón.',
+   pistas:['En Compose, un botón se deshabilita con enabled = false.',
+          'Necesitas un estado derivado: "¿son ambos campos válidos?". Puedes calcularlo con derivedStateOf o simplemente calcularlo en cada recomposición.',
+          'Cuidado con el caso vacío: Patterns.EMAIL_ADDRESS.matcher("").matches() devuelve false, así que un email vacío no se considera válido. Perfecto para nuestro caso, pero conviene que lo verifiques.',
+          'Cuidado con la contraseña vacía: regex.matches("") también devuelve false. Bien.',
+          'Pásalo al botón: enabled = formularioValido.',
+          'Pregunta para pensar: Al principio, cuando email y password son "", ¿el botón está habilitado o deshabilitado? ¿Es lo que quieres?'],
+   aprende:'A usar derivedStateOf para calcular estado a partir de otro estado. A verificar casos límite (campos vacíos). A gestionar el estado del botón según el formulario.'},
   {n:5, titulo:'Añadir un tercer campo "Confirmar contraseña"', nivel:3, archivo:'LoginScreen.kt, strings.xml', tiempo:'30-45 min',
    enunciado:'Añade un campo "Confirmar contraseña" que compruebe que es idéntico al de contraseña, mostrando error en el campo de confirmación si no coincide.',
    pistas:['Añade un nuevo TextInputLayout + TextInputEditText en el XML. ¿Entre qué elementos?','Añade el hint en strings.xml.','Añade confirmPasswordInputLayout y confirmPasswordEditText en Kotlin y enlázalas en onCreate.','Crea validarConfirmPassword() comparando ambos textos.','¿Debería revalidarse la confirmación si se cambia la contraseña original después? Piensa en la UX.'],
@@ -1313,7 +1257,11 @@ const retos = [
    aprende:'Cómo funciona la internacionalización (i18n) en Android y por qué importa strings.xml.'},
   {n:7, titulo:'Tema claro / oscuro', nivel:4, archivo:'Theme.kt, Color.kt, LoginScreen.kt', tiempo:'45-60 min',
    enunciado:'La app debe soportar modo oscuro automáticamente: fondos oscuros y textos claros en modo oscuro, y al revés en modo claro.',
-   pistas:['Existe una carpeta especial para temas oscuros (empieza por values- pero no es idioma).','Usa referencias a atributos del tema como ?attr/colorOnSurface o ?attr/colorSurface en vez de colores hardcoded.','Revisa tu LoginScreen.kt: ¿hay colores hardcoded?','Prueba cambiando el modo oscuro en Settings > Display > Dark theme.'],
+   pistas:['El parámetro darkTheme de MiAppTheme ya viene con isSystemInDarkTheme() por defecto. Eso significa que la app ya detecta automáticamente si el sistema está en modo oscuro. Compruébalo cambiando el modo en el emulador: Settings &gt; Display &gt; Dark theme.',
+          'El problema es que algunos colores pueden estar hardcoded en tu LoginScreen.kt. Por ejemplo, si has puesto Color.Red en algún sitio, ese color no cambiará con el tema.',
+          'Busca en tu LoginScreen.kt cualquier uso de Color(...) o Color.XXX. Cámbialo por referencias al tema: MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.error, etc.',
+          'Pista sobre Material 3: Los colores comunes del tema son primary, onPrimary, surface, onSurface, error, onError, etc. Cada uno tiene su pareja "on" para el color del texto que va encima.',
+          'Prueba con TalkBack y contraste: En modo oscuro, comprueba que el texto se lee bien. Si no, es que has usado un color hardcoded que no se adapta.'],
    aprende:'A usar temas y atributos Material 3 en lugar de colores hardcoded, y cómo funciona el modo oscuro.'},
   {n:8, titulo:'Navegación con NavHost', nivel:4, archivo:'MainActivity.kt, Navigation.kt', tiempo:'60-90 min',
    enunciado:'Ahora la navegación se hace con Intent. Queremos migrar a NavHost (navigation-compose), la forma recomendada en proyectos Compose modernos.',
@@ -1332,7 +1280,7 @@ retos.forEach(r=>{
       <div class="chev">▾</div>
     </div>
     <div class="reto-body">
-      <p><span class="badge">📄 ${r.archivo}</span><span class="badge">⏱{r.tiempo}</span></p>
+      <p><span class="badge">📄 ${r.archivo}</span><span class="badge">⏱ ${r.tiempo}</span></p>
       <p>${r.enunciado}</p>
       <button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
       <div class="hint-box"><ul>${r.pistas.map(p=>'<li>'+p+'</li>').join('')}</ul></div>
