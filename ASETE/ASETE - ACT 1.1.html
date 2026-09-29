@@ -659,9 +659,7 @@ mostrarLibros(filtrarPorGenero($libros, "ciencia ficción"));
 ?>` },
 
 "b4-datos": { title: "datos simulados del formulario", code: `// En producción real esto vendría de $_GET
-$accion = "prestar";      // Prueba: "listar", "prestar", "prestados"
-$idLibro = 2;
-$usuario = "Ana";` },
+$accion = "prestar";` },
 
 "b4-pista": { title: "modificar dentro del bucle", code: `foreach ($libros as $i => $libro) {
     if ($libro["id"] == $id) {
@@ -716,7 +714,7 @@ function librosPrestados($libros) {
 }
 
 // --- Simulación de formulario ---
-$accion = "prestar";   // Prueba: "listar", "prestados", "prestar"
+$accion = "prestar";   // Prueba: "listar", "prestar"
 $idLibro = 2;
 
 echo "<h1>📚 Mi Biblioteca</h1>";
@@ -727,16 +725,9 @@ switch ($accion) {
         mostrarLibros($libros);
         break;
 
-    case "prestados":
+    case "prestar":
         echo "<h2>Libros prestados</h2>";
         mostrarLibros(librosPrestados($libros));
-        break;
-
-    case "prestar":
-        echo "<h2>Prestar libro ID $idLibro</h2>";
-        $libros = prestarLibro($libros, $idLibro);
-        echo "<h2>Catálogo actualizado</h2>";
-        mostrarLibros($libros);
         break;
 
     default:
@@ -984,9 +975,12 @@ function login($usuarios, $nombre, $clave) {
     return out + esc(code.slice(last));
   }
   function hlHTML(code) {
-    return esc(code)
+    let tmp = esc(code)
       .replace(/(&lt;\/?[a-zA-Z][\w-]*)/g, '<span class="tok-t">$1</span>')
-      .replace(/([a-zA-Z-]+)=("[^"]*")/g, '<span class="tok-f">$1</span>=<span class="tok-s">$2</span>');
+      .replace(/<span[^>]*>/g, m => m.replace(/=/g, '\x01'))
+      .replace(/([a-zA-Z-]+)=("[^"\x01]*")/g, '<span class="tok-f">$1</span>=<span class="tok-s">$2</span>')
+      .replace(/\x01/g, '=');
+    return tmp;
   }
   function hl(code, lang) { return lang === "html" ? hlHTML(code) : hlPHP(code); }
 
