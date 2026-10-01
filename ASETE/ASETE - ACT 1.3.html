@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniApp de Tareas · Guía interactiva del alumnado · DAM</title>
+<meta name="description" content="Guía interactiva: formularios, PDO, sesiones, cookies y roles en PHP. MiniApp de Tareas con login, persistencia en tres niveles y panel de administración.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7E4D9;
+  --card:#FBF9F3;
+  --card-2:#F2EFE5;
+  --ink:#22201B;
+  --muted:#6B6659;
+  --line:#CBC5B4;
+  --line-soft:#DED9CA;
+  --olive:#3E5233;
+  --olive-2:#2C3B24;
+  --burgundy:#7C2C3E;
+  --burgundy-soft:#F3E2E5;
+  --ochre:#A86F0E;
+  --ochre-soft:#F6EBD2;
+  --olive-soft:#E4EBDB;
+  --blue:#2E5C86;
+  --blue-soft:#E2EAF1;
+  --code-bg:#23261F;
+  --code-ink:#E7E6DA;
+  --k:#E8B96A; --s:#B7CE92; --v:#93C8D6; --c:#8A8D7C; --n:#E5A3B0; --f:#EFE7BE; --t:#9FD9C4;
+  --sidebar:262px;
+  --shadow:0 12px 30px -22px rgba(34,32,27,.7);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Work Sans',system-ui,sans-serif;font-size:16.5px;line-height:1.62;
+  background-image:repeating-linear-gradient(to bottom,transparent 0 33px,rgba(62,82,51,.06) 33px 34px);
+}
+h1,h2,h3,h4{margin:0;line-height:1.16}
+h1,h2,.serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.005em}
+h3,h4{font-family:'Work Sans';font-weight:700;letter-spacing:-.01em}
+p{margin:0 0 1em}
+a{color:var(--burgundy);text-underline-offset:3px}
+a:hover{color:var(--olive-2)}
+:focus-visible{outline:3px solid var(--ochre);outline-offset:2px;border-radius:2px}
+code,pre,kbd{font-family:'JetBrains Mono',ui-monospace,monospace}
+.inline{background:var(--card-2);border:1px solid var(--line-soft);padding:1px 5px;font-family:'JetBrains Mono';font-size:.87em}
+
+/* ---------- barra superior ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(251,249,243,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1280px;margin:0 auto;padding:9px 20px;display:flex;align-items:center;gap:14px}
+.menu-toggle{display:none}
+.sig{font-family:'Instrument Serif';font-size:19px;white-space:nowrap}
+.sig b{font-family:'Work Sans';font-weight:700;font-size:12px;letter-spacing:.04em;background:var(--olive);color:#fff;padding:2px 8px;border-radius:2px;margin-right:8px;vertical-align:2px}
+.topbar .spacer{flex:1}
+.score{font-family:'JetBrains Mono';font-size:12.5px;color:var(--muted);white-space:nowrap}
+.bar{height:8px;background:var(--card-2);border:1px solid var(--line);border-radius:2px;overflow:hidden;width:150px}
+.bar span{display:block;height:100%;width:0;background:var(--olive);transition:width .25s}
+
+/* ---------- estructura shell ---------- */
+.shell{display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr);align-items:start;max-width:1280px;margin:0 auto}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;padding:22px 16px 100px;border-right:1px solid var(--line)}
+.sidebar h4{font-size:11.5px;letter-spacing:.06em;color:var(--muted);font-weight:700;margin:20px 0 7px;text-transform:uppercase}
+.sidebar h4:first-child{margin-top:0}
+.nav-link{display:flex;gap:8px;align-items:baseline;padding:6px 9px;border-radius:2px;color:var(--ink);text-decoration:none;font-size:14px;line-height:1.35;border-left:2px solid transparent}
+.nav-link .tag{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);flex:none}
+.nav-link:hover{background:var(--card-2)}
+.nav-link.active{background:var(--card);border-left-color:var(--olive);font-weight:700;color:var(--olive-2)}
+main{padding:0 clamp(16px,3.5vw,48px) 130px;max-width:900px}
+section{padding:42px 0 6px;border-top:1px dashed var(--line)}
+section:first-of-type{border-top:0}
+.sec-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:8px}
+.sec-num{font-family:'JetBrains Mono';font-size:11.5px;color:var(--olive);border:1px solid var(--olive);padding:2px 8px;border-radius:2px;flex:none;margin-top:6px;background:var(--card)}
+h2{font-size:clamp(25px,3.2vw,33px)}
+h3{font-size:19px;margin:26px 0 9px}
+h4{font-size:15.5px;margin:18px 0 6px}
+.time-badge{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:2px 9px;border-radius:99px;white-space:nowrap}
+p,li{max-width:74ch}
+
+/* ---------- avisos / callouts ---------- */
+.banner{display:flex;gap:14px;align-items:flex-start;background:var(--ochre-soft);border:1px solid #DEC48A;border-left:5px solid var(--ochre);padding:14px 16px;margin:20px 0}
+.banner .ico{font-size:20px;line-height:1}
+.banner h4{margin:0 0 4px;font-size:15px}
+.banner p:last-child{margin-bottom:0}
+.note{border:1px solid var(--line);border-left:5px solid var(--burgundy);background:var(--card);padding:13px 16px;margin:18px 0}
+.note h4{margin-bottom:4px;font-size:15px}
+.note p:last-child{margin-bottom:0}
+.tip{border:1px solid var(--line);border-left:5px solid var(--blue);background:var(--blue-soft);padding:13px 16px;margin:18px 0}
+.tip h4{margin-bottom:4px;font-size:15px;color:#1E3E5C}
+.tip p:last-child{margin-bottom:0}
+
+/* ---------- tablas ---------- */
+.tw{overflow-x:auto;margin:18px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:14.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--card-2);font-weight:700;font-size:13.5px}
+td.mono,th.mono{font-family:'JetBrains Mono';font-size:13px}
+
+/* ---------- código ---------- */
+.code{margin:16px 0}
+.code-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#1A1D17;border:1px solid #11130E;border-bottom:0;padding:7px 12px;font-family:'JetBrains Mono';font-size:12px;color:#B9BCAC}
+.code-head .spacer{flex:1}
+.cbtn{font-family:'Work Sans';font-weight:600;font-size:12.5px;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.2);color:#D8DACB;padding:4px 11px;border-radius:2px}
+.cbtn:hover{background:rgba(255,255,255,.1)}
+.cbtn.copied{color:#B7CE92;border-color:#B7CE92}
+pre.src{margin:0;padding:14px 16px;background:var(--code-bg);color:var(--code-ink);border:1px solid #11130E;overflow-x:auto;font-size:13px;line-height:1.6}
+.tok-k{color:var(--k)}.tok-s{color:var(--s)}.tok-v{color:var(--v)}.tok-c{color:var(--c);font-style:italic}
+.tok-n{color:var(--n)}.tok-f{color:var(--f)}.tok-t{color:var(--t);font-weight:500}
+pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--code-ink);border:1px solid #11130E;overflow-x:auto;font-size:12px;line-height:1.5}
+
+/* ---------- reveal genérico (retos, piensa un momento) ---------- */
+.reveal{margin-top:10px}
+.reveal-btn{font-family:'Work Sans';font-weight:600;font-size:13.5px;cursor:pointer;background:var(--card);border:1px solid var(--line);padding:7px 14px;border-radius:2px;color:var(--olive-2)}
+.reveal-btn:hover{background:var(--card-2);border-color:var(--olive)}
+.reveal-box{border:1px solid var(--line);border-left:4px solid var(--olive);background:var(--olive-soft);padding:12px 15px;margin-top:9px;font-size:15px}
+.reveal-box[hidden]{display:none}
+.reveal-box p:last-child,.reveal-box pre:last-child{margin-bottom:0}
+.reveal-box pre.mini-sql{background:var(--code-bg);color:var(--code-ink);padding:10px 12px;border-radius:3px;font-size:13px;overflow-x:auto;margin:8px 0}
+
+/* ---------- piensa un momento ---------- */
+.piensa{border:1px solid var(--line);background:var(--card);padding:13px 16px;margin:18px 0}
+.piensa > .ptitle{font-weight:700;font-size:14.5px;margin-bottom:8px;color:var(--burgundy);font-family:'JetBrains Mono';letter-spacing:.02em}
+.piensa ul{margin:0 0 0;padding-left:20px}
+.piensa li{margin-bottom:4px}
+
+/* ---------- retos ---------- */
+.reto{border:1px solid var(--line);background:var(--card);padding:14px 16px;margin:14px 0;box-shadow:var(--shadow)}
+.reto.done{border-color:var(--olive)}
+.reto-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.reto-check{display:flex;align-items:center;gap:9px;background:transparent;border:0;cursor:pointer;padding:0;font-family:'Work Sans';font-weight:700;font-size:15px;color:var(--ink)}
+.reto-check .box{width:19px;height:19px;flex:none;border:2px solid var(--olive);background:var(--card);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;border-radius:2px}
+.reto.done .box{background:var(--olive)}
+.reto.done .box::after{content:"✓"}
+.reto p{margin:0 0 4px}
+
+/* ---------- checklist final ---------- */
+.check{list-style:none;padding:0;margin:16px 0}
+.check li{display:flex;gap:11px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);background:var(--card);border-radius:2px;margin-bottom:7px;cursor:pointer;font-size:15px}
+.check li:hover{border-color:var(--olive)}
+.check li.done{background:var(--olive-soft);border-color:#BDCDAE}
+.check .box{width:18px;height:18px;border:2px solid var(--olive);border-radius:3px;flex:none;margin-top:2px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;background:var(--card)}
+.check li.done .box{background:var(--olive)}
+.check li.done .box::after{content:"✓"}
+
+/* ---------- inspector devtools (demo estrella) ---------- */
+.devtools{border:1px solid #11130E;background:#1A1D17;border-radius:5px;overflow:hidden;margin:20px 0;box-shadow:0 18px 40px -26px rgba(6,20,18,.8)}
+.dt-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#111310;color:#9FA89C;font-family:'JetBrains Mono';font-size:12px}
+.dt-bar .dot{width:9px;height:9px;border-radius:50%;background:#3A4038}
+.dt-tabs{display:flex;gap:2px;background:#1A1D17;padding:0 8px;border-bottom:1px solid #11130E}
+.dt-tab{font-family:'JetBrains Mono';font-size:12.5px;color:#8B9188;background:transparent;border:0;cursor:pointer;padding:9px 14px}
+.dt-tab[aria-selected="true"]{color:#F4D67A;border-bottom:2px solid var(--ochre)}
+.dt-body{padding:14px 16px;color:var(--code-ink);font-size:13px;min-height:150px}
+.dt-body[hidden]{display:none}
+.dt-empty{color:#6E756B;font-family:'JetBrains Mono';font-size:12.5px}
+.dt-req{border:1px solid #333A2F;background:#20241C;border-radius:3px;padding:10px 12px;margin-bottom:10px;font-family:'JetBrains Mono';font-size:12.5px;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.dt-req.show{opacity:1;transform:none}
+.dt-req .line1{color:#F4D67A;margin-bottom:6px}
+.dt-req .hdr{color:#B9BCAC}
+.dt-req .hdr b{color:#9FD9C4}
+.dt-req .hdr .setcookie{color:#E5A3B0}
+.dt-cookies{width:100%;border-collapse:collapse;font-family:'JetBrains Mono';font-size:12px}
+.dt-cookies th,.dt-cookies td{border:1px solid #333A2F;padding:6px 9px;text-align:left}
+.dt-cookies th{background:#20241C;color:#B9BCAC}
+.dt-cookies td{color:var(--code-ink)}
+.dt-flag-on{color:#9FD9C4}
+.dt-flag-off{color:#6E756B}
+.dt-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.dt-btn{font-family:'Work Sans';font-weight:600;font-size:12.5px;cursor:pointer;background:transparent;border:1px solid #3A4038;color:#D8DACB;padding:6px 12px;border-radius:2px}
+.dt-btn:hover{background:#2A2E23}
+.dt-btn.primary{background:var(--ochre);border-color:var(--ochre);color:#2A1C00;font-weight:700}
+.dt-btn.primary:hover{background:#C08016}
+.dt-note{margin-top:10px;padding:9px 11px;background:#20241C;border-left:3px solid var(--ochre);font-size:12.5px;color:#E9E6D8}
+.dt-jsline{font-family:'JetBrains Mono';font-size:12.5px;background:#111310;padding:8px 10px;border-radius:3px;margin-top:8px}
+
+/* ---------- generador de reflexion.md ---------- */
+.mem-q{margin:16px 0}
+.mem-q label{display:block;font-weight:700;font-size:14.5px;margin-bottom:6px}
+.mem-q textarea{
+  width:100%;min-height:74px;padding:10px 12px;border:1px solid var(--line);background:var(--card);
+  color:var(--ink);font-family:'Work Sans';font-size:14.5px;border-radius:2px;resize:vertical
+}
+.mem-q textarea:focus{border-color:var(--olive)}
+.mem-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.mem-preview{display:none;margin-top:14px}
+.mem-preview.show{display:block}
+.mem-preview pre{background:var(--code-bg);color:var(--code-ink);padding:14px 16px;border-radius:3px;font-size:12.5px;overflow-x:auto;white-space:pre-wrap}
+
+/* ---------- botones generales ---------- */
+.btn{font-family:'Work Sans';font-weight:600;font-size:14px;cursor:pointer;background:var(--olive);border:1px solid var(--olive-2);color:#fff;padding:9px 16px;border-radius:2px}
+.btn:hover{background:var(--olive-2)}
+.btn.sec{background:var(--card);color:var(--olive-2);border-color:var(--line)}
+.btn.sec:hover{background:var(--card-2);border-color:var(--olive)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);z-index:90;background:var(--ink);color:#F3F1E8;padding:10px 18px;font-size:14px;border-radius:2px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0}
+.mini{border:1px solid var(--line);background:var(--card);padding:13px 15px}
+.mini h4{margin:0 0 5px;font-size:14.5px}
+.mini p{margin:0;font-size:13.5px;color:var(--muted)}
+.foot{border-top:2px solid var(--ink);margin-top:50px;padding-top:20px;color:var(--muted);font-size:14px}
+
+@media (max-width:960px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:53px;bottom:0;width:280px;z-index:55;background:var(--card);transform:translateX(-101%);transition:transform .25s;height:auto;box-shadow:0 0 40px rgba(34,32,27,.25)}
+  .sidebar.open{transform:none}
+  .menu-toggle{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:2px;padding:6px 11px;font-family:'Work Sans';font-weight:600;font-size:13px;cursor:pointer;color:var(--ink)}
+  .bar{display:none}
+  main{padding-left:16px;padding-right:16px}
+}
+@media print{
+  .topbar,.sidebar,.cbtn,.btn,.toast,.dt-actions{display:none}
+  body{background:#fff}
+  main{max-width:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir el índice">☰ Índice</button>
+  <div class="sig"><b>DAM</b> MiniApp de Tareas</div>
+  <div class="spacer"></div>
+  <div class="score" id="score">0 / 34</div>
+  <div class="bar" title="Progreso: retos + checklist final"><span id="barFill"></span></div>
+</header>
+
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Índice de la guía">
+  <h4>Introducción</h4>
+  <a class="nav-link" href="#inicio">Qué vas a construir</a>
+  <a class="nav-link" href="#evaluacion">Cómo se evalúa</a>
+  <h4>Bloques</h4>
+  <a class="nav-link" href="#bloque-0"><span class="tag">0</span> Entorno</a>
+  <a class="nav-link" href="#bloque-1"><span class="tag">1</span> Formularios</a>
+  <a class="nav-link" href="#bloque-2"><span class="tag">2</span> BBDD y usuarios</a>
+  <a class="nav-link" href="#bloque-3"><span class="tag">3</span> Sesiones y cookies</a>
+  <a class="nav-link" href="#bloque-4"><span class="tag">4</span> Roles</a>
+  <a class="nav-link" href="#bloque-5"><span class="tag">5</span> Cierre</a>
+  <h4>Para terminar</h4>
+  <a class="nav-link" href="#checklist">Checklist final</a>
+  <a class="nav-link" href="#ampliaciones">Ampliaciones</a>
+  <a class="nav-link" href="#flujo">Esquema del flujo</a>
+</nav>
+
+<main>
+
+<section id="inicio">
+  <div class="eyebrow" style="font-family:'JetBrains Mono';font-size:12.5px;color:var(--burgundy);margin-bottom:14px">Guía interactiva del alumnado · Continuación de BiblioTech</div>
+  <h1 style="font-size:clamp(36px,6vw,58px);margin-bottom:14px">🎯 MiniApp <i>de Tareas</i></h1>
+  <p style="font-size:18px;color:var(--muted);max-width:62ch">Login de usuarios, dos roles, persistencia en tres niveles a la vez (base de datos, sesión y cookie) y un panel de administración. Esta vez con MySQL de verdad detrás, vía PDO.</p>
+
+  <div class="grid" style="margin-top:24px">
+    <div class="mini"><h4>Login</h4><p>Email + contraseña, dos roles: <span class="inline">user</span> y <span class="inline">admin</span>.</p></div>
+    <div class="mini"><h4>Aislamiento</h4><p>Cada usuario ve solo sus tareas; el admin ve además un panel con todos los usuarios.</p></div>
+    <div class="mini"><h4>Persistencia triple</h4><p>Base de datos (tareas y usuarios), sesión (quién eres) y cookie (recordarme).</p></div>
+    <div class="mini"><h4>Duración</h4><p>4 horas · 2 sesiones de 2 h.</p></div>
+  </div>
+
+  <h3>Qué vas a aprender</h3>
+  <p>Al terminar serás capaz de:</p>
+  <ol>
+    <li>Recibir y validar datos de un formulario con <span class="inline">$_POST</span>.</li>
+    <li>Explicar la diferencia entre <span class="inline">GET</span> y <span class="inline">POST</span> y elegir el adecuado.</li>
+    <li>Explicar qué es una cabecera HTTP.</li>
+    <li>Explicar qué es una cookie a nivel técnico: dónde se guarda, cómo viaja, quién la puede leer.</li>
+    <li>Explicar qué es una sesión y en qué se diferencia de una cookie.</li>
+    <li>Implementar un login que consulte la BBDD con <span class="inline">PDO::prepare</span> y cree una sesión.</li>
+    <li>Mostrar contenido distinto según <span class="inline">$_SESSION['user']['rol']</span>.</li>
+    <li>Persistir el email del usuario en una cookie con expiración.</li>
+    <li>Bloquear el acceso a <span class="inline">admin.php</span> a un usuario no admin desde el servidor.</li>
+  </ol>
+
+  <div class="tip">
+    <h4>💡 Regla de oro</h4>
+    <p style="margin-bottom:0">Si algo no funciona y no sabes por qué, imprime <span class="inline">var_dump()</span>. El 80% de los bugs en PHP inicial son: rutas mal, <span class="inline">header()</span> después de haber impreso algo, o una variable mal escrita.</p>
+  </div>
+</section>
+
+<section id="evaluacion">
+  <div class="sec-head"><span class="sec-num">00</span><h2>⚖️ Cómo se te va a evaluar</h2></div>
+  <div class="tw">
+  <table>
+    <thead><tr><th style="width:120px">Nivel</th><th>Qué necesitas</th><th style="width:70px">Nota</th></tr></thead>
+    <tbody>
+      <tr><td><b>Mínimo (apto)</b></td><td>Login funcional, sesión, listado de tareas propias, <span class="inline">admin.php</span> bloqueado a usuarios</td><td>5–6</td></tr>
+      <tr><td><b>Notable</b></td><td>Además: cookie «recordarme», validación de errores en formulario, respuestas razonadas a los retos 1.x–3.x</td><td>7–8</td></tr>
+      <tr><td><b>Excelente</b></td><td>Además: retos 4.x resueltos, código limpio con funciones separadas, reflexión completa</td><td>9–10</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Entregables</h3>
+  <ol>
+    <li>Carpeta <span class="inline">src/</span> comprimida.</li>
+    <li><span class="inline">reflexion.md</span> con respuestas a los retos y a las preguntas del bloque final (genera un borrador al final de esta guía).</li>
+    <li>Capturas de pantalla: dashboard de <span class="inline">user</span>, panel de <span class="inline">admin</span>, DevTools → Application → Cookies (<span class="inline">PHPSESSID</span> y <span class="inline">ultimo_email</span>), DevTools → Network (<span class="inline">Set-Cookie</span> en la respuesta del login).</li>
+    <li>Autoevaluación: te pones una nota del 1 al 10 y la justificas en 2 frases.</li>
+  </ol>
+</section>
+
+<!-- ============ BLOQUE 0 ============ -->
+<section id="bloque-0">
+  <div class="sec-head"><span class="sec-num">01</span><h2>🚀 Bloque 0 — Puesta en marcha del entorno</h2><span class="time-badge" style="margin-top:8px">⏱ 15 min</span></div>
+
+  <h3>Estructura del proyecto</h3>
+  <p>Vas a trabajar en una carpeta <span class="inline">src/</span> que se montará dentro del contenedor como <span class="inline">/var/www/html</span>. Al final tendrás:</p>
+  <div class="code" data-code="b0-arbol"></div>
+
+  <h3>Paso 1: <span class="inline">docker-compose.yml</span></h3>
+  <div class="code" data-code="b0-compose"></div>
+
+  <h3>Paso 2: <span class="inline">php.ini</span> (en la raíz, junto al <span class="inline">docker-compose.yml</span>)</h3>
+  <div class="code" data-code="b0-phpini"></div>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Muy importante</h4><p style="margin-bottom:0">Sin esto, cuando haya un error verás una pantalla en blanco sin pistas. Es la causa número 1 de frustración en PHP.</p></div></div>
+
+  <h3>Paso 3: <span class="inline">.htaccess</span> dentro de <span class="inline">src/</span></h3>
+  <div class="code" data-code="b0-htaccess"></div>
+
+  <h3>Paso 4: Arrancar</h3>
+  <div class="code" data-code="b0-arranque"></div>
+  <ul>
+    <li>App: <span class="inline">http://localhost:8080</span></li>
+    <li>phpMyAdmin: <span class="inline">http://localhost:8081</span> (usuario <span class="inline">dam</span> / <span class="inline">dam</span>)</li>
+  </ul>
+
+  <h3>🧪 Retos de arranque</h3>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 0.1</button></div>
+    <p>Entra a phpMyAdmin y comprueba que existe la tabla <span class="inline">usuarios</span>. ¿Qué pasa si borras el volumen y vuelves a levantar? (Pista: <span class="inline">docker compose down -v</span>).</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Al hacer <span class="inline">docker compose down -v</span> se borra el volumen de MySQL, y al levantar de nuevo se vuelve a ejecutar <span class="inline">sql/init.sql</span> desde cero. Es decir, se reinicia la BBDD. Útil cuando quieres partir de cero durante el desarrollo.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 0.2</button></div>
+    <p>Modifica <span class="inline">index.php</span> con <span class="inline">&lt;?php phpinfo(); ?&gt;</span>. Localiza la línea <span class="inline">Loaded Configuration File</span>. ¿Apunta a tu <span class="inline">php.ini</span>?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Debe apuntar a <span class="inline">/usr/local/etc/php/conf.d/custom.ini</span> (el que has montado como volumen). Si no aparece, revisa la ruta en el <span class="inline">docker-compose.yml</span>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 1 ============ -->
+<section id="bloque-1">
+  <div class="sec-head"><span class="sec-num">02</span><h2>📝 Bloque 1 — Procesamiento de formularios</h2><span class="time-badge" style="margin-top:8px">⏱ 45 min</span></div>
+
+  <h3>🧠 Antes de escribir código: conceptos clave</h3>
+  <h4>¿Qué pasa cuando envías un formulario?</h4>
+  <p>El navegador construye una petición HTTP y la envía al servidor. Esa petición tiene tres partes:</p>
+  <div class="code" data-code="b1-anatomia-req"></div>
+  <p>Y el servidor responde con:</p>
+  <div class="code" data-code="b1-anatomia-res"></div>
+  <p><b>Idea clave:</b> las cabeceras son metadatos de la petición (información <i>sobre</i> la petición, no el contenido). Se escriben siempre <span class="inline">Clave: valor</span>. Las veremos a fondo en el Bloque 3.</p>
+
+  <h4><span class="inline">GET</span> vs <span class="inline">POST</span></h4>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Aspecto</th><th>GET</th><th>POST</th></tr></thead>
+    <tbody>
+      <tr><td>Dónde van los datos</td><td>En la URL (<span class="inline">?clave=valor</span>)</td><td>En el cuerpo de la petición</td></tr>
+      <tr><td>Visibilidad</td><td>Barra de direcciones, historial, logs</td><td>No visible en la URL</td></tr>
+      <tr><td>Longitud</td><td>Limitada (~2000 car.)</td><td>Sin límite práctico</td></tr>
+      <tr><td>Cacheable / bookmarkeable</td><td>Sí</td><td>No</td></tr>
+      <tr><td>Uso típico</td><td>Buscar, filtrar, navegar</td><td>Enviar credenciales, crear/editar datos</td></tr>
+      <tr><td>Idempotente</td><td>Sí (repetir no cambia estado)</td><td>No</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="tip"><h4>🔑 Regla mnemotécnica</h4><p style="margin-bottom:0">«Si al recargar la página no quieres que se repita la acción, usa <span class="inline">POST</span>.»</p></div>
+
+  <p><b>Formulario mínimo:</b></p>
+  <div class="code" data-code="b1-form-html"></div>
+  <p>Al enviar, PHP recibe los datos en <span class="inline">$_POST['email']</span> y <span class="inline">$_POST['password']</span>.</p>
+
+  <div class="piensa">
+    <div class="ptitle">🤔 PIENSA UN MOMENTO…</div>
+    <ul>
+      <li>Si el formulario de login usara <span class="inline">GET</span>, ¿qué problema tendríamos?</li>
+      <li>¿Qué pasa si recargas la página después de enviar un formulario con <span class="inline">POST</span>?</li>
+    </ul>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver respuestas</button>
+      <div class="reveal-box" hidden>
+        <p>Con GET, la contraseña quedaría visible en la URL y en el historial del navegador. Mala idea.</p>
+        <p style="margin-bottom:0">El navegador avisa de «reenviar formulario» porque repetir un POST podría duplicar acciones (ej. crear dos tareas iguales).</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>📄 <span class="inline">login.php</span> — código inicial</h3>
+  <div class="code" data-code="b1-login"></div>
+  <div class="note"><h4>📌 Aviso</h4><p style="margin-bottom:0">Este código usa <span class="inline">$_COOKIE['ultimo_email']</span> y <span class="inline">setcookie(...)</span>. Todavía no sabemos qué significan esos dos elementos — los veremos en detalle en el Bloque 3. Por ahora, quédate con que sirven para «recordar el email la próxima vez». Los retos de este bloque se centran solo en el formulario y en <span class="inline">$_POST</span>.</p></div>
+
+  <h3>🧪 Retos</h3>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.1</button></div>
+    <p>Cambia <span class="inline">method="POST"</span> por <span class="inline">method="GET"</span>. Observa la URL tras enviar.</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">La URL muestra <span class="inline">?email=...&password=...</span>. Es mala idea porque: (a) las credenciales quedan en el historial y logs, (b) hay límite de longitud, (c) es cacheable. POST mantiene los datos en el cuerpo.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.2</button></div>
+    <p>¿Por qué <span class="inline">htmlspecialchars</span> en el <span class="inline">value</span> del email?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Evita XSS reflejado: si un usuario introduce <span class="inline">&lt;script&gt;alert(1)&lt;/script&gt;</span> como email, sin <span class="inline">htmlspecialchars</span> el navegador ejecutaría el script al recargar el formulario. Con él, se muestra como texto plano.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.3</button></div>
+    <p>Añade validación de que el email contiene <span class="inline">@</span>. ¿Dónde es mejor: cliente o servidor?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">En ambos. Cliente (HTML5 <span class="inline">type="email"</span>) = UX rápida. Servidor (<span class="inline">filter_var($email, FILTER_VALIDATE_EMAIL)</span>) = seguridad real. Nunca confiar solo en el cliente (se puede desactivar con DevTools).</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.4</button></div>
+    <p>¿Qué hace <span class="inline">$_SERVER['REQUEST_METHOD']</span>? ¿Por qué lo usamos en lugar de comprobar <span class="inline">isset($_POST['email'])</span>?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Devuelve el método HTTP de la petición actual (GET, POST, etc.). Es más robusto porque distingue explícitamente «es un POST» y no depende de si un campo concreto llegó.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 2 ============ -->
+<section id="bloque-2">
+  <div class="sec-head"><span class="sec-num">03</span><h2>🗄️ Bloque 2 — Persistencia en BBDD y usuarios</h2><span class="time-badge" style="margin-top:8px">⏱ 60 min</span></div>
+
+  <h3>📄 <span class="inline">sql/init.sql</span></h3>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Antes de empezar</h4><p>Genera hashes reales con:</p>
+    <div class="code" data-code="b2-genhash"></div>
+    <p style="margin-bottom:0">Pega los resultados en <span class="inline">init.sql</span>. No reutilices hashes de internet — no funcionarán.</p>
+  </div></div>
+  <div class="code" data-code="b2-initsql"></div>
+
+  <h3>📄 <span class="inline">config/db.php</span></h3>
+  <div class="code" data-code="b2-dbphp"></div>
+
+  <h3>📄 <span class="inline">includes/auth.php</span></h3>
+  <div class="note"><h4>📌 De momento, quédate con la idea mínima</h4><p style="margin-bottom:0">En este bloque introducimos <span class="inline">session_start()</span> y <span class="inline">$_SESSION</span>. Por ahora: «el servidor guarda datos asociados a un ID que el navegador lleva consigo; así el servidor recuerda quién eres entre peticiones». El detalle va en el Bloque 3.</p></div>
+  <div class="code" data-code="b2-authphp"></div>
+
+  <h3>🧪 Retos</h3>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.1</button></div>
+    <p>Prueba a introducir <span class="inline">' OR '1'='1</span> como email. ¿Funciona el login? ¿Por qué no?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">No funciona porque <span class="inline">prepare()</span> + <span class="inline">execute()</span> tratan el input como dato, no como SQL. El motor recibe el string literal y lo busca como email, que no existe. Esta es la base de la prevención de inyección SQL.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.2</button></div>
+    <p>Genera el hash de <span class="inline">admin123</span> dos veces. ¿Son iguales? ¿Por qué?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">No. <span class="inline">password_hash</span> incluye un salt aleatorio en cada llamada. Eso evita ataques de rainbow tables. Por eso <span class="inline">password_verify</span> compara sin necesitar el salt aparte: lo lleva embebido en el propio hash.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.3</button></div>
+    <p>¿Qué hace <span class="inline">session_regenerate_id(true)</span>? ¿Qué ataque previene?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Cambia el ID de sesión tras login. Previene <i>session fixation</i>: un atacante que fije un ID conocido antes del login no podrá reutilizarlo después. Lo veremos con más detalle en el Bloque 3.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.4</button></div>
+    <p>¿Por qué usamos <span class="inline">PDO::ATTR_EMULATE_PREPARES => false</span>?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Fuerza a MySQL a hacer prepared statements reales (en el servidor), no emulados por PHP. Es más seguro y eficiente, y evita ciertos edge cases de escape.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 3 ============ -->
+<section id="bloque-3">
+  <div class="sec-head"><span class="sec-num">04</span><h2>🍪 Bloque 3 — Sesiones, cookies y cabeceras HTTP</h2><span class="time-badge" style="margin-top:8px">⏱ 75 min</span></div>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Este es el bloque más conceptual</h4><p style="margin-bottom:0">Dedica tiempo a entenderlo antes de tocar código. Todo lo que has usado en el Bloque 2 (<span class="inline">session_start</span>, <span class="inline">$_SESSION</span>, <span class="inline">setcookie</span>) se explica aquí.</p></div></div>
+
+  <h3>🧠 Parte 1 · ¿Qué es una cabecera HTTP?</h3>
+  <p>Como viste en el Bloque 1, una petición HTTP tiene tres partes: línea de petición, cabeceras y cuerpo. Las cabeceras son metadatos que viajan junto a la petición o respuesta. Siempre tienen la forma <span class="inline">Clave: valor</span>.</p>
+  <p><b>Cómo verlas en la práctica:</b></p>
+  <ol>
+    <li>Abre DevTools (F12).</li>
+    <li>Pestaña Network.</li>
+    <li>Haz login en tu app.</li>
+    <li>Haz clic en la petición <span class="inline">login.php</span>.</li>
+    <li>Pestaña Headers. Verás las cabeceras de petición (Request Headers) y de respuesta (Response Headers).</li>
+  </ol>
+  <p>Busca estas dos en particular: en la respuesta, <span class="inline">Set-Cookie: PHPSESSID=...</span>; en la petición, <span class="inline">Cookie: PHPSESSID=...</span>. Esto es exactamente lo que vamos a estudiar en este bloque — y lo puedes probar ahora mismo abajo, sin DevTools de verdad.</p>
+
+  <div class="devtools" id="devtools">
+    <div class="dt-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:4px">Inspector de DevTools (simulado) — localhost:8080</span></div>
+    <div class="dt-tabs" role="tablist">
+      <button class="dt-tab" type="button" role="tab" aria-selected="true" data-dt-tab="network">Network</button>
+      <button class="dt-tab" type="button" role="tab" aria-selected="false" data-dt-tab="application">Application</button>
+    </div>
+    <div class="dt-body" id="dtNetwork"><p class="dt-empty">Sin peticiones capturadas todavía. Pulsa «Simular login» para generar una.</p></div>
+    <div class="dt-body" id="dtApplication" hidden><p class="dt-empty">Sin cookies todavía.</p></div>
+    <div style="padding:0 16px 16px">
+      <div class="dt-actions">
+        <button class="dt-btn primary" id="dtLogin" type="button">▶ Simular login (con «recordarme»)</button>
+        <button class="dt-btn" id="dtJs" type="button">Ejecutar document.cookie en consola</button>
+        <button class="dt-btn" id="dtReset" type="button">Reiniciar</button>
+      </div>
+      <div id="dtJsOut"></div>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--muted)">Esto es una simulación para entender el mecanismo; en tu proyecto real usa el DevTools de verdad del navegador — los retos 3.1 a 3.6 te piden exactamente eso.</p>
+
+  <h3>🧠 Parte 2 · ¿Qué es una cookie?</h3>
+  <p>Una cookie es un pequeño dato (<span class="inline">clave=valor</span>) que:</p>
+  <ol>
+    <li>El servidor envía al navegador en una cabecera <span class="inline">Set-Cookie:</span>.</li>
+    <li>El navegador la guarda en disco, asociada al dominio.</li>
+    <li>En cada petición posterior a ese dominio, el navegador la reenvía automáticamente al servidor en una cabecera <span class="inline">Cookie:</span>.</li>
+  </ol>
+  <p><b>Consecuencias importantes:</b></p>
+  <ul>
+    <li>Las cookies viajan en cada petición → no metas datos grandes ni sensibles.</li>
+    <li>El usuario puede leerlas, editarlas o borrarlas con DevTools → no son de confianza.</li>
+    <li>El «aviso de cookies» que ves en muchas webs es porque las cookies pueden rastrear al usuario entre visitas.</li>
+  </ul>
+
+  <p><b>Atributos que vamos a usar:</b></p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Atributo</th><th>Qué hace</th><th>Por qué lo usamos</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">expires</td><td>Fecha de caducidad</td><td>Sin él, la cookie muere al cerrar el navegador</td></tr>
+      <tr><td class="mono">path</td><td>Rutas donde aplica</td><td><span class="inline">/</span> = todo el sitio</td></tr>
+      <tr><td class="mono">httponly</td><td>JavaScript no puede leerla (<span class="inline">document.cookie</span>)</td><td>Mitiga XSS</td></tr>
+      <tr><td class="mono">samesite</td><td>No se envía en peticiones cross-site</td><td>Mitiga CSRF</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><b>Cómo verlas en DevTools (paso a paso):</b></p>
+  <ol>
+    <li>Abre DevTools (F12).</li>
+    <li>Pestaña Application (Chrome/Edge) o Storage (Firefox).</li>
+    <li>Panel izquierdo → despliega Cookies → haz clic en <span class="inline">http://localhost:8080</span>.</li>
+    <li>Verás una tabla con columnas: Name, Value, Domain, Path, Expires, HttpOnly, Secure, SameSite.</li>
+    <li>Prueba a borrar una cookie y recargar. ¿Qué pasa? (Puedes probarlo también en el inspector simulado de arriba.)</li>
+  </ol>
+
+  <h3>🧠 Parte 3 · ¿Qué es una sesión?</h3>
+  <p><b>Problema:</b> HTTP es <i>stateless</i> (sin estado). Cada petición es independiente. ¿Cómo sabe el servidor que dos peticiones vienen del mismo usuario ya logueado?</p>
+  <p><b>Solución:</b> el servidor crea una «caja» con un ID único (ej. <span class="inline">abc123</span>) donde guarda datos (<span class="inline">$_SESSION['user'] = [...]</span>). Al cliente solo le envía el ID en una cookie llamada <span class="inline">PHPSESSID</span>.</p>
+  <div class="code" data-code="b3-secuencia"></div>
+
+  <p><b>Sesión vs cookie:</b></p>
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>Sesión</th><th>Cookie</th></tr></thead>
+    <tbody>
+      <tr><td>Dónde se guarda el dato</td><td>En el servidor</td><td>En el cliente (navegador)</td></tr>
+      <tr><td>Qué viaja por la red</td><td>Solo un ID (<span class="inline">PHPSESSID</span>)</td><td>El dato completo</td></tr>
+      <tr><td>¿Manipulable por el usuario?</td><td>No (está en el servidor)</td><td>Sí (con DevTools)</td></tr>
+      <tr><td>Caducidad</td><td>Al cerrar navegador por defecto</td><td>Configurable</td></tr>
+      <tr><td>Uso típico</td><td>Datos de login, carrito, permisos</td><td>Preferencias, «recordarme», tracking</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="piensa">
+    <div class="ptitle">🤔 PIENSA UN MOMENTO…</div>
+    <ul>
+      <li>¿Por qué NO guardamos el rol del usuario en una cookie?</li>
+      <li>¿Qué ventaja tiene que solo viaje un ID por la red?</li>
+      <li>«Recordarme» en una web, ¿es cookie o sesión?</li>
+    </ul>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver respuestas</button>
+      <div class="reveal-box" hidden>
+        <p>Porque el usuario podría editarla con DevTools y ponerse <span class="inline">rol=admin</span>. La autorización va siempre en servidor.</p>
+        <p>El dato sensible no se expone; solo el servidor conoce el contenido real de la sesión.</p>
+        <p style="margin-bottom:0">Es cookie, porque tiene que sobrevivir al cierre del navegador y no requiere que el servidor guarde estado.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>🧠 Parte 4 · Repaso — qué has usado ya sin saberlo</h3>
+  <p>En el Bloque 2 escribimos <span class="inline">session_start()</span> y <span class="inline">$_SESSION</span> sin explicar en detalle. Ahora ya sabes qué son. Vuelve a mirar <span class="inline">includes/auth.php</span> y localiza:</p>
+  <ul>
+    <li><span class="inline">session_set_cookie_params([...])</span>: configurar los atributos de la cookie <span class="inline">PHPSESSID</span> antes de crearla.</li>
+    <li><span class="inline">session_start()</span>: crear o recuperar la sesión.</li>
+    <li><span class="inline">$_SESSION['user'] = [...]</span>: escribir en la caja del servidor.</li>
+    <li><span class="inline">session_regenerate_id(true)</span>: cambiar el ID (anti-fixation).</li>
+    <li><span class="inline">logout()</span>: vaciar y destruir la sesión.</li>
+  </ul>
+
+  <h3>📄 <span class="inline">includes/header.php</span></h3>
+  <div class="code" data-code="b3-headerphp"></div>
+  <h3>📄 <span class="inline">includes/footer.php</span></h3>
+  <div class="code" data-code="b3-footerphp"></div>
+  <h3>📄 <span class="inline">logout.php</span></h3>
+  <div class="code" data-code="b3-logoutphp"></div>
+
+  <h3>🧪 Retos</h3>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.1</button></div>
+    <p>Abre DevTools → Network → haz login. Localiza la petición <span class="inline">POST /login.php</span>. Mira la cabecera de respuesta <span class="inline">Set-Cookie</span>. ¿Qué valor tiene <span class="inline">PHPSESSID</span>? ¿Coincide con la cookie que ves en Application → Cookies?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Sí, coincide. El servidor envía el ID en <span class="inline">Set-Cookie</span> y el navegador lo guarda. En la siguiente petición (<span class="inline">GET /index.php</span>) aparece en la cabecera <span class="inline">Cookie:</span> de la petición. Puedes comprobarlo en la pestaña Network → clic en <span class="inline">index.php</span> → Headers → Request Headers.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.2</button></div>
+    <p>Compara <span class="inline">PHPSESSID</span> con <span class="inline">ultimo_email</span> en DevTools → Application → Cookies. ¿Qué diferencias ves en las columnas <span class="inline">Expires</span> y <span class="inline">HttpOnly</span>?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0"><span class="inline">PHPSESSID</span> caduca «Session» (al cerrar navegador) y tiene <span class="inline">HttpOnly</span> marcado. <span class="inline">ultimo_email</span> caduca en 30 días, contiene el email en claro, y también tiene <span class="inline">HttpOnly</span> porque lo pusimos así.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.3</button></div>
+    <p>¿Qué pasa si borras <span class="inline">PHPSESSID</span> pero mantienes <span class="inline">ultimo_email</span>? ¿Y al revés? (Pruébalo también en el inspector simulado de arriba, con los botones de borrar.)</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden>
+        <p>Borras PHPSESSID → pierdes la sesión (vuelves a login) pero el email queda relleno.</p>
+        <p style="margin-bottom:0">Borras ultimo_email → sigues logueado pero el campo email estará vacío. Esto demuestra que son mecanismos independientes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.4</button></div>
+    <p>Abre dos navegadores distintos (o ventana incógnito) y loguéate con <span class="inline">user</span> en uno y <span class="inline">admin</span> en otro. ¿Qué <span class="inline">PHPSESSID</span> tiene cada uno? ¿Por qué no se mezclan?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Cada navegador guarda su propia cookie <span class="inline">PHPSESSID</span>, así que el servidor mantiene dos «cajas» separadas. Esto demuestra que la sesión es por cliente, no global.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.5</button></div>
+    <p>Cambia la duración de <span class="inline">ultimo_email</span> a 1 minuto. Cierra el navegador, espera 2 minutos, vuelve a abrir. ¿Sigue el email relleno?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">No, la cookie ha caducado. El campo aparece vacío. Esto demuestra que <span class="inline">expires</span> es la fecha absoluta de caducidad, no un contador.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.6</button></div>
+    <p>Escribe <span class="inline">document.cookie</span> en la consola de DevTools. ¿Aparece <span class="inline">PHPSESSID</span>? ¿Por qué? (Prueba el botón equivalente en el inspector simulado de arriba.)</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">No aparece porque <span class="inline">PHPSESSID</span> está marcada como <span class="inline">HttpOnly</span>. Solo se pueden leer desde JavaScript las cookies que NO son <span class="inline">HttpOnly</span> — y en esta app, ambas cookies lo son. Esto protege contra robo de sesión por XSS.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 4 ============ -->
+<section id="bloque-4">
+  <div class="sec-head"><span class="sec-num">05</span><h2>👥 Bloque 4 — Entornos diferenciados por rol</h2><span class="time-badge" style="margin-top:8px">⏱ 50 min</span></div>
+
+  <h3>📄 <span class="inline">tareas.php</span></h3>
+  <div class="code" data-code="b4-tareasphp"></div>
+
+  <h3>📄 <span class="inline">index.php</span></h3>
+  <div class="code" data-code="b4-indexphp"></div>
+
+  <h3>📄 <span class="inline">admin.php</span></h3>
+  <div class="code" data-code="b4-adminphp"></div>
+
+  <h3>🧪 Retos</h3>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 4.1</button></div>
+    <p>Accede a <span class="inline">admin.php</span> como <span class="inline">user</span>. ¿Qué código exacto bloquea el acceso?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0"><span class="inline">requireAdmin()</span> en la línea 3 → llama a <span class="inline">requireLogin()</span> → comprueba <span class="inline">currentUser()['rol'] !== 'admin'</span> → <span class="inline">http_response_code(403)</span> + <span class="inline">exit</span>. El navegador no llega siquiera a ejecutar el HTML.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 4.2</button></div>
+    <p>¿Es suficiente con ocultar el enlace «Panel admin» en el <span class="inline">header.php</span>?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">No. Ocultar el enlace es UX, no seguridad. La seguridad está en <span class="inline">requireAdmin()</span>. Un usuario podría escribir la URL a mano. Regla: toda ruta protegida debe verificar el rol en servidor.</p></div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 4.3</button></div>
+    <p>Añade al <span class="inline">admin.php</span> un contador de tareas por usuario.</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden>
+        <pre class="mini-sql">SELECT u.id, u.email, u.rol, COUNT(t.id) AS total
+FROM usuarios u LEFT JOIN tareas t ON t.usuario_id = u.id
+GROUP BY u.id</pre>
+        <p style="margin-bottom:0"><b>¿Por qué LEFT JOIN?</b> Porque hay usuarios sin tareas y queremos que aparezcan con 0.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 4.4</button></div>
+    <p>Un usuario puede marcar sus propias tareas, pero no las de otros. ¿Dónde lo garantizas?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">En el <span class="inline">WHERE</span> del <span class="inline">UPDATE</span>: <span class="inline">AND usuario_id = ?</span>. Nunca confiar en que el id de la tarea venga «limpio» del formulario. Si no lo pones, un usuario podría enviar el <span class="inline">toggle_id</span> de otro usuario y modificar su tarea.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOQUE 5 ============ -->
+<section id="bloque-5">
+  <div class="sec-head"><span class="sec-num">06</span><h2>✅ Bloque 5 — Cierre: prueba funcional y reflexión</h2><span class="time-badge" style="margin-top:8px">⏱ 25 min</span></div>
+
+  <h3>🔍 Prueba funcional</h3>
+  <p>Recorre esta secuencia y anota qué ocurre:</p>
+  <ol>
+    <li>Login como <span class="inline">user@demo.com</span> / <span class="inline">user123</span> → crear 2 tareas → marcar una → logout.</li>
+    <li>Login como <span class="inline">admin@demo.com</span> / <span class="inline">admin123</span> → ver panel admin → intentar borrar usuario.</li>
+    <li>Abrir DevTools → Network → login → inspeccionar <span class="inline">Set-Cookie</span> en la respuesta.</li>
+    <li>Abrir DevTools → Application → Cookies → ver <span class="inline">PHPSESSID</span> y <span class="inline">ultimo_email</span>.</li>
+    <li>Consultar phpMyAdmin: ¿las contraseñas están hasheadas?</li>
+  </ol>
+
+  <h3>✍️ Borrador de <span class="inline">reflexion.md</span></h3>
+  <p>Responde aquí mismo (mínimo 3 líneas por pregunta) y descarga el borrador al terminar — luego lo revisas y lo entregas como <span class="inline">reflexion.md</span>.</p>
+  <div id="reflexionHost"></div>
+  <div class="mem-actions">
+    <button class="btn" id="memPreview">Vista previa</button>
+    <button class="btn sec" id="memDownload">Descargar reflexion.md</button>
+  </div>
+  <div class="mem-preview" id="memPreviewBox"><pre id="memPreviewText"></pre></div>
+</section>
+
+<!-- ============ CHECKLIST ============ -->
+<section id="checklist">
+  <div class="sec-head"><span class="sec-num">07</span><h2>✅ Checklist final de «terminado»</h2></div>
+  <ul class="check" id="checklistHost"></ul>
+</section>
+
+<!-- ============ AMPLIACIONES ============ -->
+<section id="ampliaciones">
+  <div class="sec-head"><span class="sec-num">08</span><h2>🚀 Ampliaciones opcionales</h2></div>
+  <p>Si terminas antes, elige una o varias:</p>
+  <div class="grid" id="ampliacionesHost"></div>
+</section>
+
+<!-- ============ FLUJO ============ -->
+<section id="flujo">
+  <div class="sec-head"><span class="sec-num">09</span><h2>🗺️ Esquema visual del flujo completo</h2></div>
+  <div class="code" data-code="b5-flujo"></div>
+
+  <div class="foot">
+    <p><b>MiniApp de Tareas · guía interactiva del alumnado.</b> Archivo único: CSS y JavaScript incrustados, funciona sin conexión salvo por las tipografías.</p>
+    <p>El cronómetro de cada bloque es orientativo. El progreso de la barra superior cuenta los retos marcados como «probados» y los puntos del checklist final — no sustituye a la revisión del profesorado.</p>
+  </div>
+</section>
+
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===== Fragmentos de código (resaltado automático + botón Copiar) ===== */
+var CODE = {
+
+"b0-arbol": { title: "estructura del proyecto", lang: "text", code: `src/
+├── config/
+│   └── db.php
+├── includes/
+│   ├── auth.php
+│   ├── header.php
+│   └── footer.php
+├── sql/
+│   └── init.sql
+├── login.php
+├── logout.php
+├── index.php
+├── admin.php
+├── tareas.php
+├── style.css
+└── .htaccess` },
+
+"b0-compose": { title: "docker-compose.yml", lang: "yaml", code: `services:
+  web:
+    image: php:8.2-apache
+    container_name: miniapp_web
+    ports: ["8080:80"]
+    volumes:
+      - ./src:/var/www/html
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      bash -c "docker-php-ext-install pdo_mysql && apache2-foreground"
+
+  db:
+    image: mysql:8.0
+    container_name: miniapp_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: miniapp
+      MYSQL_USER: dam
+      MYSQL_PASSWORD: dam
+    ports: ["3306:3306"]
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: miniapp_pma
+    ports: ["8081:80"]
+    environment:
+      PMA_HOST: db
+    depends_on: [db]` },
+
+"b0-phpini": { title: "php.ini", lang: "ini", code: `display_errors = On
+error_reporting = E_ALL
+log_errors = On` },
+
+"b0-htaccess": { title: ".htaccess", lang: "apache", code: `Options -Indexes
+
+<FilesMatch "\\.(sql|ini|md)$">
+  Require all denied
+</FilesMatch>
+
+RedirectMatch 403 ^/config/.*$
+RedirectMatch 403 ^/includes/.*$` },
+
+"b0-arranque": { title: "arrancar el entorno", lang: "bash", code: `docker compose up -d
+docker compose logs -f web    # esperar "Apache/2.4 ... configured"` },
+
+"b1-anatomia-req": { title: "petición HTTP", lang: "text", code: `POST /login.php HTTP/1.1        ← línea de petición (método + ruta + versión)
+Host: localhost:8080            ← cabeceras (Clave: valor)
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 42
+                                 ← línea en blanco
+email=user@demo.com&password=user123   ← cuerpo (solo en POST)` },
+
+"b1-anatomia-res": { title: "respuesta HTTP", lang: "text", code: `HTTP/1.1 302 Found              ← línea de estado
+Location: /index.php            ← cabeceras de respuesta
+Content-Type: text/html
+
+<html>...                       ← cuerpo` },
+
+"b1-form-html": { title: "formulario mínimo", lang: "html", code: `<form method="POST" action="login.php">
+  <input type="email" name="email">
+  <input type="password" name="password">
+  <button>Enviar</button>
+</form>` },
+
+"b1-login": { title: "login.php", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+
+$error = '';
+$email = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $pass  = $_POST['password'] ?? '';
+
+    if ($email === '' || $pass === '') {
+        $error = 'Rellena todos los campos.';
+    } elseif (strlen($pass) < 6) {
+        $error = 'La contraseña debe tener al menos 6 caracteres.';
+    } elseif (login($email, $pass)) {
+        if (!empty($_POST['recordarme'])) {
+            setcookie('ultimo_email', $email, [
+                'expires'  => time() + 60 * 60 * 24 * 30,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+        header('Location: index.php');
+        exit;
+    } else {
+        $error = 'Credenciales incorrectas.';
+    }
+}
+
+require __DIR__ . '/includes/header.php';
+?>
+<h1>Iniciar sesión</h1>
+
+<?php if ($error): ?>
+  <p class="error"><?= htmlspecialchars($error) ?></p>
+<?php endif; ?>
+
+<form method="POST" action="login.php" novalidate>
+  <label>Email
+    <input type="email" name="email" required
+           value="<?= htmlspecialchars($email ?: ($_COOKIE['ultimo_email'] ?? '')) ?>">
+  </label>
+
+  <label>Contraseña
+    <input type="password" name="password" required minlength="6">
+  </label>
+
+  <label>
+    <input type="checkbox" name="recordarme" value="1"> Recordarme
+  </label>
+
+  <button type="submit">Entrar</button>
+</form>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>` },
+
+"b2-genhash": { title: "generar hashes reales", lang: "bash", code: `docker compose exec web php -r "echo password_hash('admin123', PASSWORD_DEFAULT), PHP_EOL;"
+docker compose exec web php -r "echo password_hash('user123', PASSWORD_DEFAULT), PHP_EOL;"` },
+
+"b2-initsql": { title: "sql/init.sql", lang: "sql", code: `CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  rol ENUM('user','admin') DEFAULT 'user',
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tareas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  titulo VARCHAR(150) NOT NULL,
+  completada TINYINT(1) DEFAULT 0,
+  creada_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- ⚠️ SUSTITUIR por los hashes generados en tu entorno
+INSERT INTO usuarios (email, password_hash, rol) VALUES
+('admin@demo.com', '$2y$10$REEMPLAZA_CON_TU_HASH_REAL', 'admin'),
+('user@demo.com',  '$2y$10$REEMPLAZA_CON_TU_HASH_REAL', 'user');` },
+
+"b2-dbphp": { title: "config/db.php", lang: "php", code: `<?php
+function db(): PDO {
+    static $pdo = null;
+    if ($pdo === null) {
+        $dsn = 'mysql:host=db;dbname=miniapp;charset=utf8mb4';
+        try {
+            $pdo = new PDO($dsn, 'dam', 'dam', [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]);
+        } catch (PDOException $e) {
+            error_log('DB error: ' . $e->getMessage());
+            http_response_code(500);
+            exit('Error de conexión a la base de datos. Revisa que el contenedor "db" esté levantado.');
+        }
+    }
+    return $pdo;
+}` },
+
+"b2-authphp": { title: "includes/auth.php", lang: "php", code: `<?php
+session_set_cookie_params([
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'path'     => '/',
+]);
+session_start();
+
+require_once __DIR__ . '/../config/db.php';
+
+function login(string $email, string $pass): bool {
+    $stmt = db()->prepare('SELECT id, email, password_hash, rol FROM usuarios WHERE email = ?');
+    $stmt->execute([$email]);
+    $u = $stmt->fetch();
+
+    if ($u && password_verify($pass, $u['password_hash'])) {
+        session_regenerate_id(true);
+        $_SESSION['user'] = [
+            'id'    => (int)$u['id'],
+            'email' => $u['email'],
+            'rol'   => $u['rol'],
+        ];
+        return true;
+    }
+    return false;
+}
+
+function currentUser(): ?array {
+    return $_SESSION['user'] ?? null;
+}
+
+function requireLogin(): void {
+    if (!currentUser()) {
+        header('Location: login.php');
+        exit;
+    }
+}
+
+function requireAdmin(): void {
+    requireLogin();
+    if (currentUser()['rol'] !== 'admin') {
+        http_response_code(403);
+        exit('Acceso denegado: se requiere rol administrador.');
+    }
+}
+
+function logout(): void {
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+                  $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+    }
+    session_destroy();
+}` },
+
+"b3-secuencia": { title: "sesión: ciclo completo", lang: "text", code: `1. Cliente → POST /login.php (email + password)
+2. Servidor → verifica → crea "caja" abc123 con los datos del usuario
+3. Servidor → responde: Set-Cookie: PHPSESSID=abc123
+4. Cliente → guarda la cookie
+5. Cliente → GET /index.php + Cookie: PHPSESSID=abc123
+6. Servidor → busca la caja abc123 → encuentra los datos → sabe quién es` },
+
+"b3-headerphp": { title: "includes/header.php", lang: "php", code: `<?php require_once __DIR__ . '/auth.php'; ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MiniApp Tareas</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav>
+  <?php if (currentUser()): ?>
+    <a href="/index.php">Mis tareas</a>
+    <?php if (currentUser()['rol'] === 'admin'): ?>
+      | <a href="/admin.php">Panel admin</a>
+    <?php endif; ?>
+    | <span><?= htmlspecialchars(currentUser()['email']) ?></span>
+    | <a href="/logout.php">Salir</a>
+  <?php else: ?>
+    <a href="/login.php">Entrar</a>
+  <?php endif; ?>
+</nav>
+<main>` },
+
+"b3-footerphp": { title: "includes/footer.php", lang: "php", code: `</main>
+</body>
+</html>` },
+
+"b3-logoutphp": { title: "logout.php", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+logout();
+header('Location: login.php');
+exit;` },
+
+"b4-tareasphp": { title: "tareas.php", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+requireLogin();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['titulo'])) {
+        $titulo = trim($_POST['titulo']);
+        if ($titulo !== '' && mb_strlen($titulo) <= 150) {
+            $stmt = db()->prepare('INSERT INTO tareas (usuario_id, titulo) VALUES (?, ?)');
+            $stmt->execute([currentUser()['id'], $titulo]);
+        }
+    } elseif (isset($_POST['toggle_id'])) {
+        $stmt = db()->prepare('UPDATE tareas SET completada = 1 - completada
+                               WHERE id = ? AND usuario_id = ?');
+        $stmt->execute([(int)$_POST['toggle_id'], currentUser()['id']]);
+    }
+    header('Location: index.php');
+    exit;
+}` },
+
+"b4-indexphp": { title: "index.php", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+requireLogin();
+require __DIR__ . '/includes/header.php';
+
+$stmt = db()->prepare('SELECT * FROM tareas WHERE usuario_id = ? ORDER BY creada_en DESC');
+$stmt->execute([currentUser()['id']]);
+$tareas = $stmt->fetchAll();
+?>
+<h1>Mis tareas</h1>
+
+<form method="POST" action="tareas.php">
+  <input type="text" name="titulo" maxlength="150" placeholder="Nueva tarea" required>
+  <button>Añadir</button>
+</form>
+
+<ul>
+<?php foreach ($tareas as $t): ?>
+  <li>
+    <form method="POST" action="tareas.php" style="display:inline">
+      <input type="hidden" name="toggle_id" value="<?= $t['id'] ?>">
+      <button type="submit"><?= $t['completada'] ? '☑' : '☐' ?></button>
+    </form>
+    <?= htmlspecialchars($t['titulo']) ?>
+  </li>
+<?php endforeach; ?>
+</ul>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>` },
+
+"b4-adminphp": { title: "admin.php", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+requireAdmin();
+require __DIR__ . '/includes/header.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    $id = (int)$_POST['delete_id'];
+    if ($id !== currentUser()['id']) {
+        $stmt = db()->prepare('DELETE FROM usuarios WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+    header('Location: admin.php');
+    exit;
+}
+
+$usuarios = db()->query('SELECT id, email, rol, creado_en FROM usuarios ORDER BY id')->fetchAll();
+?>
+<h1>Panel de administración</h1>
+<table>
+  <tr><th>ID</th><th>Email</th><th>Rol</th><th>Creado</th><th>Acciones</th></tr>
+  <?php foreach ($usuarios as $u): ?>
+    <tr>
+      <td><?= $u['id'] ?></td>
+      <td><?= htmlspecialchars($u['email']) ?></td>
+      <td><?= $u['rol'] ?></td>
+      <td><?= $u['creado_en'] ?></td>
+      <td>
+        <?php if ($u['id'] !== currentUser()['id']): ?>
+          <form method="POST" style="display:inline"
+                onsubmit="return confirm('¿Borrar usuario?')">
+            <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
+            <button>Borrar</button>
+          </form>
+        <?php else: ?>
+          <em>(tú)</em>
+        <?php endif; ?>
+      </td>
+    </tr>
+  <?php endforeach; ?>
+</table>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>` },
+
+"b5-flujo": { title: "esquema visual del flujo completo", lang: "text", code: `[Cliente]                          [Servidor PHP]              [MySQL]
+   |                                    |                          |
+   |--- POST /login.php --------------->|                          |
+   |    Content-Type: ...               |                          |
+   |    email=...&password=...          |--- SELECT usuario ------>|
+   |                                    |<-- fila + hash ----------|
+   |                                    | password_verify()        |
+   |                                    | session_regenerate_id()  |
+   |                                    | $_SESSION['user']=...    |
+   |                                    | setcookie(ultimo_email)  |
+   |<-- 302 Found ----------------------|                          |
+   |    Location: /index.php            |                          |
+   |    Set-Cookie: PHPSESSID=abc123    |                          |
+   |    Set-Cookie: ultimo_email=...    |                          |
+   |                                    |                          |
+   |--- GET /index.php ---------------->|                          |
+   |    Cookie: PHPSESSID=abc123        |                          |
+   |    Cookie: ultimo_email=...        | session_start() recupera |
+   |                                    | requireLogin()           |
+   |                                    |--- SELECT tareas ------->|
+   |<-- 200 OK + HTML ------------------|                          |
+   |                                    |                          |
+   |--- GET /admin.php ---------------->|                          |
+   |    Cookie: PHPSESSID=abc123        | requireAdmin()           |
+   |<-- 403 Forbidden ------------------|  (si rol != admin)       |` }
+
+};
+
+/* ===== Preguntas de reflexión (generador de reflexion.md) ===== */
+var REFLEXION = [
+  "Diferencia GET y POST, con un ejemplo de tu código donde usarías cada uno.",
+  "¿Qué es una cabecera HTTP? Pon un ejemplo de cabecera de petición y otro de respuesta que hayas visto hoy.",
+  "Explica con tus palabras qué es una cookie a nivel técnico: dónde se guarda, cómo viaja y quién puede leerla.",
+  "Explica con tus palabras qué es una sesión y en qué se diferencia de una cookie. ¿Dónde se guarda cada una?",
+  "Cita los tres mecanismos de persistencia usados en la MiniApp y para qué sirve cada uno.",
+  "Diferencia autenticación vs autorización con un ejemplo de tu código.",
+  "¿Por qué llamamos a session_regenerate_id(true) tras el login?",
+  "¿Qué pasaría si un usuario edita su cookie PHPSESSID a otro valor? ¿Y si edita ultimo_email?",
+  "¿Qué significa que PHPSESSID tenga HttpOnly? ¿Qué ataque mitiga?"
+];
+
+/* ===== Checklist final de "terminado" ===== */
+var CHECKLIST = [
+  "docker compose up -d levanta sin errores",
+  "http://localhost:8080/login.php muestra el formulario",
+  "Login con admin@demo.com / user@demo.com de prueba entra en index.php",
+  "Login con admin@demo.com entra y ve el enlace «Panel admin»",
+  "Un usuario normal intentando admin.php recibe 403",
+  "Crear tarea, marcarla completada, ver que persiste tras recargar",
+  "Marcar «recordarme» y ver la cookie ultimo_email en DevTools → Application",
+  "Ver PHPSESSID en DevTools y comprobar que la petición lo envía en Cookie: (pestaña Network)",
+  "logout.php cierra sesión y redirige a login",
+  "Las contraseñas en BBDD están hasheadas (verlo en phpMyAdmin)",
+  "He respondido los retos de cada bloque (1.x, 2.x, 3.x, 4.x)",
+  "He escrito reflexion.md con las 9 preguntas",
+  "He hecho las capturas de pantalla pedidas (usuario, admin, cookies, network)",
+  "He rellenado la autoevaluación"
+];
+
+/* ===== Ampliaciones opcionales ===== */
+var AMPLIACIONES = [
+  { t: "Registro de usuarios", d: "Formulario con password_hash + validación de email único." },
+  { t: "Paginación", d: "En el listado de usuarios del panel de administración." },
+  { t: "Token CSRF", d: "En los formularios POST, para mitigar peticiones falsificadas entre sitios." },
+  { t: "Tabla de logs", d: "Registrar cada intento de login: fecha, IP, éxito o fracaso." },
+  { t: "Bloqueo tras 3 intentos", d: "Contador de intentos fallidos guardado en sesión." }
+];
+
+(function () {
+  "use strict";
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ============================================================
+     RESALTADO DE SINTAXIS (varios lenguajes)
+     ============================================================ */
+  var PHP_KW = ["and","array","as","break","case","catch","class","const","continue","declare","default","do","echo","else","elseif","empty","exit","finally","fn","for","foreach","function","global","if","isset","list","match","new","null","or","print","return","static","switch","throw","try","unset","use","while","true","false","int","float","string","bool","void","mixed","callable"];
+  var PHP_RE = new RegExp([
+    "(<\\?php|<\\?=|\\?>)",
+    "(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*|#[^\\n]*)",
+    "('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\")",
+    "(\\$[A-Za-z_][A-Za-z0-9_]*)",
+    "(\\b\\d+\\.?\\d*\\b)",
+    "([A-Za-z_][A-Za-z0-9_]*)"
+  ].join("|"), "g");
+
+  function hlPHP(code) {
+    var out = "", last = 0, m; PHP_RE.lastIndex = 0;
+    while ((m = PHP_RE.exec(code)) !== null) {
+      out += esc(code.slice(last, m.index));
+      var txt = m[0], cls = null;
+      if (m[1]) cls = "tok-t";
+      else if (m[2]) cls = "tok-c";
+      else if (m[3]) cls = "tok-s";
+      else if (m[4]) cls = "tok-v";
+      else if (m[5]) cls = "tok-n";
+      else if (m[6]) {
+        if (PHP_KW.indexOf(txt.toLowerCase()) >= 0) cls = "tok-k";
+        else if (/^\s*\(/.test(code.slice(m.index + txt.length))) cls = "tok-f";
+        else if (/^[A-Z_][A-Z0-9_]*$/.test(txt)) cls = "tok-n";
+      }
+      out += cls ? '<span class="' + cls + '">' + esc(txt) + "</span>" : esc(txt);
+      last = m.index + txt.length;
+    }
+    return out + esc(code.slice(last));
+  }
+
+  function hlHTML(code) {
+    let tmp = esc(code)
+      .replace(/(&lt;\/?[a-zA-Z][\w-]*)/g, '<span class="tok-t">$1</span>')
+      .replace(/<span[^>]*>/g, m => m.replace(/=/g, '\x01'))
+      .replace(/([a-zA-Z-]+)=("[^"\x01]*")/g, '<span class="tok-f">$1</span>=<span class="tok-s">$2</span>')
+      .replace(/\x01/g, '=');
+    return tmp;
+  }
+
+  var SQL_KW = ["CREATE","TABLE","INT","AUTO_INCREMENT","PRIMARY","KEY","VARCHAR","UNIQUE","NOT","NULL","DEFAULT","ENUM","TIMESTAMP","CURRENT_TIMESTAMP","FOREIGN","REFERENCES","ON","DELETE","CASCADE","INSERT","INTO","VALUES","SELECT","FROM","WHERE","UPDATE","SET","GROUP","BY","LEFT","JOIN","AS","COUNT","TINYINT","ORDER","DESC","AND","OR"];
+
+  function hlGeneric(code, cfg) {
+    var out = "", i = 0, n = code.length;
+    while (i < n) {
+      var c = code[i];
+      if (cfg.lineComment && code.startsWith(cfg.lineComment, i)) {
+        var j = code.indexOf("\n", i); if (j < 0) j = n;
+        out += '<span class="tok-c">' + esc(code.slice(i, j)) + "</span>"; i = j; continue;
+      }
+      if (c === "'" || c === '"') {
+        var quote = c, j2 = i + 1;
+        while (j2 < n && code[j2] !== quote) { if (code[j2] === "\\") j2++; j2++; }
+        j2 = Math.min(j2 + 1, n);
+        out += '<span class="tok-s">' + esc(code.slice(i, j2)) + "</span>"; i = j2; continue;
+      }
+      if (/[A-Za-z_]/.test(c)) {
+        var j3 = i; while (j3 < n && /[A-Za-z0-9_]/.test(code[j3])) j3++;
+        var word = code.slice(i, j3);
+        if (cfg.keywords && cfg.keywords.indexOf(word.toUpperCase()) >= 0) {
+          out += '<span class="tok-k">' + esc(word) + "</span>";
+        } else { out += esc(word); }
+        i = j3; continue;
+      }
+      if (/[0-9]/.test(c)) {
+        var j4 = i; while (j4 < n && /[0-9.]/.test(code[j4])) j4++;
+        out += '<span class="tok-n">' + esc(code.slice(i, j4)) + "</span>"; i = j4; continue;
+      }
+      out += esc(c); i++;
+    }
+    return out;
+  }
+
+  function hlYAML(code) {
+    return code.split("\n").map(function (line) {
+      var m = line.match(/^(\s*(?:-\s*)?)([A-Za-z0-9_.\-]+)(:)(.*)$/);
+      if (m) {
+        var rest = m[4], comment = "", ci = rest.indexOf("#");
+        if (ci >= 0) { comment = rest.slice(ci); rest = rest.slice(0, ci); }
+        return esc(m[1]) + '<span class="tok-f">' + esc(m[2]) + "</span>" + esc(m[3]) +
+          '<span class="tok-s">' + esc(rest) + "</span>" +
+          (comment ? '<span class="tok-c">' + esc(comment) + "</span>" : "");
+      }
+      var cm = line.match(/^(\s*)#(.*)$/);
+      if (cm) return esc(cm[1]) + '<span class="tok-c">#' + esc(cm[2]) + "</span>";
+      return esc(line);
+    }).join("\n");
+  }
+
+  function hlIni(code) {
+    return code.split("\n").map(function (line) {
+      var m = line.match(/^([A-Za-z0-9_.]+)(\s*=\s*)(.*)$/);
+      if (m) return '<span class="tok-f">' + esc(m[1]) + "</span>" + esc(m[2]) + '<span class="tok-s">' + esc(m[3]) + "</span>";
+      return esc(line);
+    }).join("\n");
+  }
+
+  function hlText(code) {
+    return code.split("\n").map(function (line) {
+      var idx = line.indexOf("←");
+      if (idx >= 0) return esc(line.slice(0, idx)) + '<span class="tok-c">' + esc(line.slice(idx)) + "</span>";
+      return esc(line);
+    }).join("\n");
+  }
+
+  function hl(code, lang) {
+    switch (lang) {
+      case "html": case "apache": return hlHTML(code);
+      case "sql": return hlGeneric(code, { keywords: SQL_KW, lineComment: "--" });
+      case "yaml": return hlYAML(code);
+      case "ini": return hlIni(code);
+      case "bash": return hlGeneric(code, { lineComment: "#" });
+      case "text": return hlText(code);
+      default: return hlPHP(code);
+    }
+  }
+
+  /* ============================================================
+     UTILIDADES
+     ============================================================ */
+  var toastEl = $("#toast"), tt = null;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+  function copyText(text, btn) {
+    function done() {
+      var p = btn.textContent; btn.textContent = "Copiado"; btn.classList.add("copied");
+      setTimeout(function () { btn.textContent = p; btn.classList.remove("copied"); }, 1400);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); });
+    } else { fb(text); done(); }
+    function fb(t) {
+      var ta = document.createElement("textarea");
+      ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+  function download(name, text) {
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 300);
+  }
+
+  /* ============================================================
+     BLOQUES DE CÓDIGO
+     ============================================================ */
+  $$(".code[data-code]").forEach(function (el) {
+    var key = el.getAttribute("data-code");
+    var s = CODE[key];
+    if (!s) { el.textContent = "Fragmento no encontrado: " + key; return; }
+    var head = document.createElement("div");
+    head.className = "code-head";
+    head.innerHTML = "<span>" + esc(s.title) + "</span><span class='spacer'></span>";
+    var copy = document.createElement("button");
+    copy.className = "cbtn"; copy.type = "button"; copy.textContent = "Copiar";
+    copy.addEventListener("click", function () { copyText(s.code, copy); });
+    head.appendChild(copy);
+    var pre = document.createElement("pre");
+    pre.className = "src";
+    pre.innerHTML = hl(s.code, s.lang);
+    el.appendChild(head); el.appendChild(pre);
+  });
+
+  /* ============================================================
+     REVEAL GENÉRICO (retos, "piensa un momento")
+     ============================================================ */
+  $$(".reveal-btn").forEach(function (btn) {
+    var box = btn.nextElementSibling;
+    btn.addEventListener("click", function () {
+      box.hidden = !box.hidden;
+      var t = btn.textContent;
+      if (t.indexOf("Ver ") === 0) btn.textContent = "Ocultar " + t.slice(4);
+      else if (t.indexOf("Ocultar ") === 0) btn.textContent = "Ver " + t.slice(8);
+    });
+  });
+
+  /* ============================================================
+     PROGRESO: RETOS + CHECKLIST FINAL
+     ============================================================ */
+  var totalRetos = $$("[data-reto]").length;
+  var hechos = 0, totalChecklist = CHECKLIST.length, total = totalRetos + totalChecklist;
+  function updateScore() {
+    $("#score").textContent = hechos + " / " + total;
+    $("#barFill").style.width = (total ? (hechos / total) * 100 : 0) + "%";
+  }
+  $$(".reto-check").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var reto = btn.closest(".reto");
+      var done = reto.classList.toggle("done");
+      btn.setAttribute("aria-pressed", done ? "true" : "false");
+      hechos += done ? 1 : -1;
+      updateScore();
+    });
+  });
+
+  /* ============================================================
+     CHECKLIST FINAL
+     ============================================================ */
+  var checklistHost = $("#checklistHost");
+  CHECKLIST.forEach(function (texto) {
+    var li = document.createElement("li");
+    li.setAttribute("role", "checkbox"); li.setAttribute("aria-checked", "false"); li.setAttribute("tabindex", "0");
+    li.innerHTML = '<span class="box"></span><span>' + esc(texto) + "</span>";
+    function toggle() {
+      var ok = li.classList.toggle("done");
+      li.setAttribute("aria-checked", ok ? "true" : "false");
+      hechos += ok ? 1 : -1;
+      updateScore();
+      if (ok) toast("Marcado.");
+    }
+    li.addEventListener("click", toggle);
+    li.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+    checklistHost.appendChild(li);
+  });
+  updateScore();
+
+  /* ============================================================
+     AMPLIACIONES OPCIONALES
+     ============================================================ */
+  var ampHost = $("#ampliacionesHost");
+  AMPLIACIONES.forEach(function (a) {
+    var div = document.createElement("div");
+    div.className = "mini";
+    div.innerHTML = "<h4>" + esc(a.t) + "</h4><p>" + esc(a.d) + "</p>";
+    ampHost.appendChild(div);
+  });
+
+  /* ============================================================
+     GENERADOR DE reflexion.md
+     ============================================================ */
+  var reflexionHost = $("#reflexionHost");
+  var nombreWrap = document.createElement("div");
+  nombreWrap.className = "mem-q";
+  nombreWrap.innerHTML = '<label for="reflexionNombre">Tu nombre</label><input type="text" id="reflexionNombre" style="width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--card);font-family:\'Work Sans\';font-size:14.5px;border-radius:2px" placeholder="Nombre y apellidos">';
+  reflexionHost.appendChild(nombreWrap);
+  REFLEXION.forEach(function (q, i) {
+    var wrap = document.createElement("div");
+    wrap.className = "mem-q";
+    wrap.innerHTML = "<label>" + (i + 1) + ". " + esc(q) + "</label><textarea data-mem-q='" + i + "' placeholder='Mínimo 3 líneas...'></textarea>";
+    reflexionHost.appendChild(wrap);
+  });
+
+  function buildReflexionMd() {
+    var nombre = $("#reflexionNombre").value.trim() || "______________________";
+    var lines = ["# Reflexión — MiniApp de Tareas", "", "**Nombre:** " + nombre, ""];
+    REFLEXION.forEach(function (q, i) {
+      var ta = $("[data-mem-q='" + i + "']");
+      lines.push("## " + (i + 1) + ". " + q, "", (ta.value.trim() || "_(sin responder)_"), "");
+    });
+    return lines.join("\n");
+  }
+  $("#memPreview").addEventListener("click", function () {
+    $("#memPreviewText").textContent = buildReflexionMd();
+    $("#memPreviewBox").classList.add("show");
+  });
+  $("#memDownload").addEventListener("click", function () {
+    download("reflexion.md", buildReflexionMd());
+    toast("reflexion.md descargado.");
+  });
+
+  /* ============================================================
+     INSPECTOR DEVTOOLS SIMULADO (demo estrella)
+     ============================================================ */
+  (function () {
+    var dtNetwork = $("#dtNetwork"), dtApplication = $("#dtApplication"), dtJsOut = $("#dtJsOut");
+    var cookies = {}; // { PHPSESSID: {value, expires, httpOnly, sameSite}, ultimo_email: {...} }
+    var loggedIn = false;
+
+    function renderNetworkEmpty() {
+      dtNetwork.innerHTML = '<p class="dt-empty">Sin peticiones capturadas todavía. Pulsa «Simular login» para generar una.</p>';
+    }
+    function renderApplication() {
+      var keys = Object.keys(cookies);
+      if (!keys.length) { dtApplication.innerHTML = '<p class="dt-empty">Sin cookies todavía.</p>'; return; }
+      var rows = keys.map(function (k) {
+        var c = cookies[k];
+        return "<tr><td>" + k + "</td><td>" + esc(c.value) + "</td><td>" + c.expires + "</td>" +
+          "<td class='" + (c.httpOnly ? "dt-flag-on" : "dt-flag-off") + "'>" + (c.httpOnly ? "✓" : "—") + "</td>" +
+          "<td>" + c.sameSite + "</td>" +
+          "<td><button class='dt-btn' data-del='" + k + "' type='button'>Borrar</button></td></tr>";
+      }).join("");
+      dtApplication.innerHTML =
+        "<table class='dt-cookies'><tr><th>Name</th><th>Value</th><th>Expires</th><th>HttpOnly</th><th>SameSite</th><th></th></tr>" + rows + "</table>";
+      $$("[data-del]", dtApplication).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var k = b.getAttribute("data-del");
+          delete cookies[k];
+          if (k === "PHPSESSID") loggedIn = false;
+          renderApplication();
+          var nota = k === "PHPSESSID"
+            ? "Has borrado PHPSESSID: pierdes la sesión. En la app real, la próxima petición te mandaría de vuelta a login."
+            : "Has borrado ultimo_email: sigues logueado (la sesión no depende de esta cookie), pero el campo email del login dejará de precargarse.";
+          dtApplication.insertAdjacentHTML("beforeend", "<div class='dt-note'>" + nota + "</div>");
+        });
+      });
+    }
+    renderNetworkEmpty();
+    renderApplication();
+
+    $$(".dt-tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        $$(".dt-tab").forEach(function (t) { t.setAttribute("aria-selected", "false"); });
+        tab.setAttribute("aria-selected", "true");
+        var which = tab.getAttribute("data-dt-tab");
+        dtNetwork.hidden = which !== "network";
+        dtApplication.hidden = which !== "application";
+      });
+    });
+
+    $("#dtLogin").addEventListener("click", function () {
+      dtJsOut.innerHTML = "";
+      dtNetwork.innerHTML = "";
+      var req = document.createElement("div");
+      req.className = "dt-req";
+      req.innerHTML =
+        "<div class='line1'>POST /login.php HTTP/1.1</div>" +
+        "<div class='hdr'>Content-Type: <b>application/x-www-form-urlencoded</b></div>" +
+        "<div class='hdr'>Cookie: <span style='color:#6E756B'>(ninguna todavía)</span></div>";
+      dtNetwork.appendChild(req);
+      requestAnimationFrame(function () { req.classList.add("show"); });
+
+      setTimeout(function () {
+        var res = document.createElement("div");
+        res.className = "dt-req";
+        res.innerHTML =
+          "<div class='line1'>HTTP/1.1 302 Found</div>" +
+          "<div class='hdr'>Location: <b>/index.php</b></div>" +
+          "<div class='hdr setcookie'>Set-Cookie: PHPSESSID=a1b2c3d4e5f6; HttpOnly; SameSite=Lax</div>" +
+          "<div class='hdr setcookie'>Set-Cookie: ultimo_email=user%40demo.com; Max-Age=2592000; HttpOnly; SameSite=Lax</div>";
+        dtNetwork.appendChild(res);
+        requestAnimationFrame(function () { res.classList.add("show"); });
+
+        loggedIn = true;
+        cookies.PHPSESSID = { value: "a1b2c3d4e5f6", expires: "Session", httpOnly: true, sameSite: "Lax" };
+        cookies.ultimo_email = { value: "user%40demo.com", expires: "30 días", httpOnly: true, sameSite: "Lax" };
+        renderApplication();
+
+        dtNetwork.insertAdjacentHTML("beforeend",
+          "<div class='dt-note'>Dos cabeceras <b>Set-Cookie</b>, una por cada cookie. Cambia a la pestaña <b>Application</b> para verlas ya guardadas.</div>");
+      }, 650);
+    });
+
+    $("#dtJs").addEventListener("click", function () {
+      var visibles = Object.keys(cookies).filter(function (k) { return !cookies[k].httpOnly; });
+      var resultado = visibles.map(function (k) { return k + "=" + cookies[k].value; }).join("; ");
+      dtJsOut.innerHTML =
+        "<div class='dt-jsline'>&gt; document.cookie<br>&lt; \"" + esc(resultado) + "\"</div>" +
+        "<div class='dt-note'>" + (resultado
+          ? "Solo aparecen las cookies SIN HttpOnly."
+          : "Cadena vacía: todas las cookies de esta app tienen HttpOnly, así que JavaScript no puede leer ninguna. Así se protege la sesión ante un posible XSS.") +
+        "</div>";
+    });
+
+    $("#dtReset").addEventListener("click", function () {
+      cookies = {}; loggedIn = false; dtJsOut.innerHTML = "";
+      renderNetworkEmpty(); renderApplication();
+      toast("Inspector reiniciado.");
+    });
+  })();
+
+  /* ============================================================
+     NAVEGACIÓN
+     ============================================================ */
+  var sidebar = $("#sidebar");
+  $("#menuToggle").addEventListener("click", function () { sidebar.classList.toggle("open"); });
+  $$(".nav-link").forEach(function (a) { a.addEventListener("click", function () { sidebar.classList.remove("open"); }); });
+
+  var links = $$(".nav-link");
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (l) { l.classList.toggle("active", l.getAttribute("href") === "#" + entry.target.id); });
+      });
+    }, { rootMargin: "-80px 0px -70% 0px", threshold: 0 });
+    secs.forEach(function (s) { io.observe(s); });
+  }
+})();
+
+</script>
+</body>
+</html>
