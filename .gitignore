@@ -7,3 +7,6 @@ Claude.md
 
 # Logs
 *.log
+
+# Archivos auxiliares temporales
+temp/
