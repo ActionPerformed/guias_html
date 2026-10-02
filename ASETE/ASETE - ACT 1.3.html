@@ -391,15 +391,28 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     </div>
   </div>
 
+  <p>Antes de crear login.php necesitamos un includes/auth.php mínimo, porque login.php lo va a incluir. En este bloque, la función login() siempre devuelve false — no consulta BBDD todavía. La implementación real la harás en el Bloque 2.</p>
+  <h3>📄 <span class="inline">includes/auth.php</span> (versión stub)</h3>
+  <div class="code" data-code="b1-auth-stub"></div>
+
   <h3>📄 <span class="inline">login.php</span> — código inicial</h3>
   <div class="code" data-code="b1-login"></div>
   <div class="note"><h4>📌 Aviso</h4><p style="margin-bottom:0">Este código usa <span class="inline">$_COOKIE['ultimo_email']</span> y <span class="inline">setcookie(...)</span>. Todavía no sabemos qué significan esos dos elementos — los veremos en detalle en el Bloque 3. Por ahora, quédate con que sirven para «recordar el email la próxima vez». Los retos de este bloque se centran solo en el formulario y en <span class="inline">$_POST</span>.</p></div>
+
+  <h3>🧪 Cómo probar el formulario</h3>
+  <p>Arranca el contenedor (docker compose up -d) y abre http://localhost:8080/login.php. Prueba estos casos:</p>
+  <ol>
+    <li>Enviar vacío → debe mostrar "Rellena todos los campos".</li>
+    <li>Enviar con contraseña de 3 letras → debe mostrar "La contraseña debe tener al menos 6 caracteres".</li>
+    <li>Enviar con datos correctos → debe mostrar "Credenciales incorrectas".</li>
+  </ol>
+  <p>✅ Esto es lo esperado. Como login() siempre devuelve false (es un stub), el formulario nunca deja entrar. Pero la validación sí funciona. En el Bloque 2 haremos que login() consulte la BBDD y permita entrar.</p>
 
   <h3>🧪 Retos</h3>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.1</button></div>
-    <p>Cambia <span class="inline">method="POST"</span> por <span class="inline">method="GET"</span>. Observa la URL tras enviar.</p>
+    <p>Cambia <span class="inline">form method="POST"</span> por <span class="inline">form method="GET"</span>. Observa la URL tras enviar.</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
       <div class="reveal-box" hidden><p style="margin-bottom:0">La URL muestra <span class="inline">?email=...&password=...</span>. Es mala idea porque: (a) las credenciales quedan en el historial y logs, (b) hay límite de longitud, (c) es cacheable. POST mantiene los datos en el cuerpo.</p></div>
     </div>
@@ -860,6 +873,29 @@ Content-Type: text/html
   <button>Enviar</button>
 </form>` },
 
+"b1-auth-stub": { title: "includes/auth.php", lang: "pbp", code: `<?php
+// includes/auth.php — VERSIÓN STUB (se completará en el Bloque 2)
+
+session_start();
+
+/**
+ * Intenta iniciar sesión.
+ * TODO: En el Bloque 2 conectaremos con la BBDD.
+ * Por ahora siempre devuelve false para poder probar el formulario.
+ */
+function login(string $email, string $pass): bool {
+    // TODO: implementar en Bloque 2
+    return false;
+}
+
+/**
+ * Devuelve el usuario logueado, o null si no hay sesión.
+ */
+function currentUser(): ?array {
+    return $_SESSION['user'] ?? null;
+}` },
+
+
 "b1-login": { title: "login.php", lang: "php", code: `<?php
 require_once __DIR__ . '/includes/auth.php';
 
@@ -889,13 +925,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Credenciales incorrectas.';
     }
 }
-
-require __DIR__ . '/includes/header.php';
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login — MiniApp Tareas</title>
+</head>
+<body>
 <h1>Iniciar sesión</h1>
 
 <?php if ($error): ?>
-  <p class="error"><?= htmlspecialchars($error) ?></p>
+  <p style="color:red"><?= htmlspecialchars($error) ?></p>
 <?php endif; ?>
 
 <form method="POST" action="login.php" novalidate>
@@ -914,8 +955,8 @@ require __DIR__ . '/includes/header.php';
 
   <button type="submit">Entrar</button>
 </form>
-
-<?php require __DIR__ . '/includes/footer.php'; ?>` },
+</body>
+</html>` },
 
 "b2-genhash": { title: "generar hashes reales", lang: "bash", code: `docker compose exec web php -r "echo password_hash('admin123', PASSWORD_DEFAULT), PHP_EOL;"
 docker compose exec web php -r "echo password_hash('user123', PASSWORD_DEFAULT), PHP_EOL;"` },
