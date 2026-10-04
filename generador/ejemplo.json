@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "title": "Docker Avanzado",
+    "sig": "DAW",
+    "description": "Guía interactiva sobre Docker: compose, redes, volúmenes y despliegue.",
+    "h1": "🐳 Docker Avanzado",
+    "eyebrow": "Guía interactiva · DAW",
+    "introduccion": "En esta guía aprenderás a desplegar aplicaciones multicontenedor con Docker Compose, configurar redes personalizadas y persistir datos con volúmenes.",
+    "intro_anchor": "Inicio",
+    "sec_num_checklist": "06",
+    "sec_num_ampliaciones": "07"
+  },
+  "bloques": [
+    {
+      "numero": "01",
+      "titulo": "Contenedores básicos",
+      "anchor": "contenedores",
+      "tipo": "texto",
+      "icono": "📦",
+      "tiempo": "30 min",
+      "sec_num": "01",
+      "contenido": "<p>Docker permite empaquetar y ejecutar aplicaciones en entornos aislados llamados <strong>contenedores</strong>.</p><p>Un contenedor se crea a partir de una <strong>imagen</strong>, que es una plantilla de solo lectura.</p>"
+    },
+    {
+      "numero": "02",
+      "titulo": "Docker Compose",
+      "anchor": "compose",
+      "tipo": "texto_codigo",
+      "icono": "🔧",
+      "tiempo": "45 min",
+      "sec_num": "02",
+      "contenido": "<p>Docker Compose permite definir y ejecutar aplicaciones multicontenedor.</p>",
+      "codigo": ["dc-services", "dc-volumes"]
+    },
+    {
+      "numero": "03",
+      "titulo": "Reto: Despliega un WordPress",
+      "anchor": "reto-wp",
+      "tipo": "reto",
+      "icono": "🏆",
+      "sec_num": "03",
+      "enunciado": "Despliega WordPress con MariaDB usando Docker Compose",
+      "contenido": "<p>Configura un stack WordPress + MariaDB:</p><ul><li>Red personalizada <code>wp-network</code></li><li>Volumen persistente para datos</li><li>Puertos: 8080 → 80</li></ul>",
+      "codigo": ["wp-compose"]
+    }
+  ],
+  "code_snippets": {
+    "dc-services": {
+      "title": "Servicios",
+      "lang": "yaml",
+      "code": "version: '3.8'\nservices:\n  web:\n    image: nginx:alpine\n    depends_on:\n      - api\n  api:\n    image: node:18-alpine"
+    },
+    "dc-volumes": {
+      "title": "Volúmenes",
+      "lang": "yaml",
+      "code": "volumes:\n  db_data:\nservices:\n  db:\n    image: mariadb:11\n    volumes:\n      - db_data:/var/lib/mysql"
+    },
+    "wp-compose": {
+      "title": "WordPress + MariaDB",
+      "lang": "yaml",
+      "code": "version: '3.8'\nservices:\n  db:\n    image: mariadb:11\n    environment:\n      MYSQL_ROOT_PASSWORD: rootsecret\n      MYSQL_DATABASE: wordpress\n    volumes:\n      - db_data:/var/lib/mysql\n  wordpress:\n    image: wordpress:latest\n    depends_on:\n      - db\n    ports:\n      - \"8080:80\"\nvolumes:\n  db_data:"
+    }
+  },
+  "checklist": [
+    "docker compose up -d levanta sin errores",
+    "El servicio web es accesible en http://localhost:8080",
+    "Los datos persisten tras reiniciar los contenedores",
+    "He respondido todos los retos"
+  ],
+  "ampliaciones": [
+    {"t": "Docker Swarm", "d": "Despliega el mismo stack en modo Swarm."},
+    {"t": "HTTPS con Traefik", "d": "Añade Traefik como reverse proxy."}
+  ]
+}

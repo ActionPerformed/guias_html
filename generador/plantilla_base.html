@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} · Guía interactiva</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+{{CSS_THEME}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="menu-toggle" id="menuToggle" type="button">☰ Índice</button>
+    <div class="sig"><b>{{SIG}}</b> {{TITLE_SHORT}}</div>
+    <div class="spacer"></div>
+    <div class="score" id="score">0 / {{TOTAL}}</div>
+    <div class="bar" title="Progreso"><span id="barFill"></span></div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Índice de la guía">
+  <h4>Introducción</h4>
+  <a class="nav-link" href="#inicio">{{INTRO_ANCHOR}}</a>
+  <a class="nav-link" href="#objetivos">Objetivos</a>
+  <h4>Bloques</h4>
+{{NAV_ITEMS}}
+  <h4>Para terminar</h4>
+  <a class="nav-link" href="#checklist">Checklist final</a>
+  <a class="nav-link" href="#ampliaciones">Ampliaciones</a>
+</nav>
+
+<main>
+
+<section id="inicio">
+  <div class="eyebrow">{{EYEBROW}}</div>
+  <h1 style="font-size:clamp(36px,6vw,58px);margin-bottom:14px">{{H1}}</h1>
+  <p style="font-size:18px;color:var(--muted);max-width:62ch">{{INTRO}}</p>
+</section>
+
+{{CONTENT}}
+
+<!-- ============ CHECKLIST ============ -->
+<section id="checklist">
+  <div class="sec-head"><span class="sec-num">{{SEC_NUM_CHECKLIST}}</span><h2>✅ Checklist final</h2></div>
+  <ul class="check" id="checklistHost"></ul>
+</section>
+
+<!-- ============ AMPLIACIONES ============ -->
+<section id="ampliaciones">
+  <div class="sec-head"><span class="sec-num">{{SEC_NUM_AMPLIACIONES}}</span><h2>🚀 Ampliaciones opcionales</h2></div>
+  <div class="grid" id="ampliacionesHost"></div>
+</section>
+
+<div class="foot">
+  <p><b>{{TITLE}} · guía interactiva del alumnado.</b></p>
+</div>
+</main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+{{CODE_ARRAY}}
+
+/* ===== Checklist final ===== */
+var CHECKLIST = {{CHECKLIST}};
+
+/* ===== Ampliaciones ===== */
+var AMPLIACIONES = {{AMPLIACIONES}};
+
+(function () {
+  "use strict";
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* === SYNTAX HIGHLIGHTING === */
+  var PHP_KW = ["and","array","as","break","case","catch","class","const","continue","declare","default","do","echo","else","elseif","empty","exit","finally","fn","for","foreach","function","global","if","isset","list","match","new","null","or","print","return","static","switch","throw","try","unset","use","while","true","false","int","float","string","bool","void","mixed","callable"];
+  var PHP_RE = new RegExp(["(<\\?php|<\\?=|\\?>)","(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*|#[^\\n]*)","('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\")","(\\$[A-Za-z_][A-Za-z0-9_]*)","(\\b\\d+\\.?\\d*\\b)","([A-Za-z_][A-Za-z0-9_]*)"].join("|"),"g");
+
+  function hlPHP(code) {
+    var out = "", last = 0, m; PHP_RE.lastIndex = 0;
+    while ((m = PHP_RE.exec(code)) !== null) {
+      out += esc(code.slice(last, m.index));
+      var txt = m[0], cls = null;
+      if (m[1]) cls = "tok-t";
+      else if (m[2]) cls = "tok-c";
+      else if (m[3]) cls = "tok-s";
+      else if (m[4]) cls = "tok-v";
+      else if (m[5]) cls = "tok-n";
+      else if (m[6]) { if (PHP_KW.indexOf(txt.toLowerCase()) >= 0) cls = "tok-k"; else if (/^\s*\(/.test(code.slice(m.index + txt.length))) cls = "tok-f"; else if (/^[A-Z_][A-Z0-9_]*$/.test(txt)) cls = "tok-n"; }
+      out += cls ? '<span class="' + cls + '">' + esc(txt) + "</span>" : esc(txt);
+      last = m.index + txt.length;
+    }
+    return out + esc(code.slice(last));
+  }
+
+  function hlHTML(code) {
+    let tmp = esc(code).replace(/(&lt;\/?[a-zA-Z][\w-]*)/g,'<span class="tok-t">$1</span>').replace(/<span[^>]*>/g,m=>m.replace(/=/g,'\x01')).replace(/([a-zA-Z-]+)=("[^"\x01]*")/g,'<span class="tok-f">$1</span>=<span class="tok-s">$2</span>').replace(/\x01/g,'=');
+    return tmp;
+  }
+
+  var SQL_KW = ["CREATE","TABLE","INT","AUTO_INCREMENT","PRIMARY","KEY","VARCHAR","UNIQUE","NOT","NULL","DEFAULT","ENUM","TIMESTAMP","CURRENT_TIMESTAMP","FOREIGN","REFERENCES","ON","DELETE","CASCADE","INSERT","INTO","VALUES","SELECT","FROM","WHERE","UPDATE","SET","GROUP","BY","LEFT","JOIN","AS","COUNT","TINYINT","ORDER","DESC","AND","OR","LIMIT","OFFSET"];
+  function hlGeneric(code, cfg) {
+    var out = "", i = 0, n = code.length;
+    while (i < n) {
+      var c = code[i];
+      if (cfg.lineComment && code.startsWith(cfg.lineComment, i)) { var j = code.indexOf("\n", i); if (j < 0) j = n; out += '<span class="tok-c">' + esc(code.slice(i, j)) + "</span>"; i = j; continue; }
+      if (c === "'" || c === '"') { var q = c, j2 = i + 1; while (j2 < n && code[j2] !== q) { if (code[j2] === "\\") j2++; j2++; } j2 = Math.min(j2 + 1, n); out += '<span class="tok-s">' + esc(code.slice(i, j2)) + "</span>"; i = j2; continue; }
+      if (/[A-Za-z_]/.test(c)) { var j3 = i; while (j3 < n && /[A-Za-z0-9_]/.test(code[j3])) j3++; var w = code.slice(i, j3); if (cfg.keywords && cfg.keywords.indexOf(w.toUpperCase()) >= 0) out += '<span class="tok-k">' + esc(w) + "</span>"; else out += esc(w); i = j3; continue; }
+      if (/[0-9]/.test(c)) { var j4 = i; while (j4 < n && /[0-9.]/.test(code[j4])) j4++; out += '<span class="tok-n">' + esc(code.slice(i, j4)) + "</span>"; i = j4; continue; }
+      out += esc(c); i++;
+    }
+    return out;
+  }
+
+  function hlYAML(code) {
+    return code.split("\n").map(function (line) {
+      var m = line.match(/^(\s*(?:-\s*)?)([A-Za-z0-9_.\-]+)(:)(.*)$/);
+      if (m) { var rest = m[4], comment = "", ci = rest.indexOf("#"); if (ci >= 0) { comment = rest.slice(ci); rest = rest.slice(0, ci); } return esc(m[1]) + '<span class="tok-f">' + esc(m[2]) + "</span>" + esc(m[3]) + '<span class="tok-s">' + esc(rest) + "</span>" + (comment ? '<span class="tok-c">' + esc(comment) + "</span>" : ""); }
+      var cm = line.match(/^(\s*)#(.*)$/); if (cm) return esc(cm[1]) + '<span class="tok-c">#' + esc(cm[2]) + "</span>";
+      return esc(line);
+    }).join("\n");
+  }
+
+  function hlText(code) {
+    return code.split("\n").map(function (line) {
+      var idx = line.indexOf("←"); if (idx >= 0) return esc(line.slice(0, idx)) + '<span class="tok-c">' + esc(line.slice(idx)) + "</span>"; return esc(line);
+    }).join("\n");
+  }
+
+  function hl(code, lang) {
+    switch (lang) {
+      case "html": return hlHTML(code);
+      case "sql": return hlGeneric(code, { keywords: SQL_KW, lineComment: "--" });
+      case "yaml": return hlYAML(code);
+      case "bash": return hlGeneric(code, { lineComment: "#" });
+      case "text": return hlText(code);
+      default: return hlPHP(code);
+    }
+  }
+
+  /* === UTILITIES === */
+  var toastEl = $("#toast"), tt = null;
+  function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("show"); }, 2200); }
+  function copyText(text, btn) {
+    function done() { var p = btn.textContent; btn.textContent = "Copiado"; btn.classList.add("copied"); setTimeout(function () { btn.textContent = p; btn.classList.remove("copied"); }, 1400); }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); }); else { fb(text); done(); }
+    function fb(t) { var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta); }
+  }
+
+  /* === CODE BLOCKS === */
+  $$(".code[data-code]").forEach(function (el) {
+    var key = el.getAttribute("data-code");
+    var s = CODE[key]; if (!s) { el.textContent = "Fragmento no encontrado: " + key; return; }
+    var head = document.createElement("div"); head.className = "code-head";
+    head.innerHTML = "<span>" + esc(s.title) + "</span><span class='spacer'></span>";
+    var copy = document.createElement("button"); copy.className = "cbtn"; copy.type = "button"; copy.textContent = "Copiar";
+    copy.addEventListener("click", function () { copyText(s.code, copy); });
+    head.appendChild(copy);
+    var pre = document.createElement("pre"); pre.className = "src"; pre.innerHTML = hl(s.code, s.lang);
+    el.appendChild(head); el.appendChild(pre);
+  });
+
+  /* === REVEAL === */
+  $$(".reveal-btn").forEach(function (btn) {
+    var box = btn.nextElementSibling;
+    btn.addEventListener("click", function () {
+      box.hidden = !box.hidden;
+      var t = btn.textContent;
+      if (t.indexOf("Ver ") === 0) btn.textContent = "Ocultar " + t.slice(4);
+      else if (t.indexOf("Ocultar ") === 0) btn.textContent = "Ver " + t.slice(8);
+    });
+  });
+
+  /* === PROGRESS === */
+  var totalRetos = $$("[data-reto]").length;
+  var hechos = 0, totalChecklist = CHECKLIST.length, total = totalRetos + totalChecklist;
+  function updateScore() { $("#score").textContent = hechos + " / " + total; $("#barFill").style.width = (total ? (hechos / total) * 100 : 0) + "%"; }
+  $$(".reto-check").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var reto = btn.closest(".reto");
+      var done = reto.classList.toggle("done");
+      btn.setAttribute("aria-pressed", done ? "true" : "false");
+      hechos += done ? 1 : -1; updateScore();
+    });
+  });
+
+  /* === CHECKLIST === */
+  var checklistHost = $("#checklistHost");
+  CHECKLIST.forEach(function (texto) {
+    var li = document.createElement("li"); li.setAttribute("role", "checkbox"); li.setAttribute("aria-checked", "false"); li.setAttribute("tabindex", "0");
+    li.innerHTML = '<span class="box"></span><span>' + esc(texto) + "</span>";
+    function toggle() { var ok = li.classList.toggle("done"); li.setAttribute("aria-checked", ok ? "true" : "false"); hechos += ok ? 1 : -1; updateScore(); if (ok) toast("Marcado."); }
+    li.addEventListener("click", toggle);
+    li.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+    checklistHost.appendChild(li);
+  });
+  updateScore();
+
+  /* === AMPLIACIONES === */
+  var ampHost = $("#ampliacionesHost");
+  AMPLIACIONES.forEach(function (a) {
+    var div = document.createElement("div"); div.className = "mini";
+    div.innerHTML = "<h4>" + esc(a.t) + "</h4><p>" + esc(a.d) + "</p>";
+    ampHost.appendChild(div);
+  });
+
+  /* === NAVIGATION === */
+  var sidebar = $("#sidebar");
+  $("#menuToggle").addEventListener("click", function () { sidebar.classList.toggle("open"); });
+  $$(".nav-link").forEach(function (a) { a.addEventListener("click", function () { sidebar.classList.remove("open"); }); });
+  var links = $$(".nav-link");
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (l) { l.classList.toggle("active", l.getAttribute("href") === "#" + entry.target.id); });
+      });
+    }, { rootMargin: "-80px 0px -70% 0px", threshold: 0 });
+    secs.forEach(function (s) { io.observe(s); });
+  }
+})();
+{{CUSTOM_JS}}
+</script>
+</body>
+</html>

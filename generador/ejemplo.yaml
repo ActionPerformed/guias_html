@@ -1,0 +1,147 @@
+# Ejemplo de contenido para el generador de guías
+# Copia este archivo y adáptalo a tu guía
+
+meta:
+  title: "Docker Avanzado"
+  sig: "DAW"
+  description: "Guía interactiva sobre Docker: compose, redes, volúmenes y despliegue."
+  h1: "🐳 Docker Avanzado"
+  eyebrow: "Guía interactiva · DAW"
+  introduccion: "En esta guía aprenderás a desplegar aplicaciones multicontenedor con Docker Compose, configurar redes personalizadas y persistir datos con volúmenes."
+  intro_anchor: "Inicio"
+  sec_num_checklist: "06"
+  sec_num_ampliaciones: "07"
+
+# Bloques de contenido
+# Tipos disponibles: texto, texto_codigo, reto, piensa, callout, tabla, componente
+bloques:
+  - numero: "01"
+    titulo: "Contenedores básicos"
+    anchor: "contenedores"
+    tipo: texto
+    icono: "📦"
+    tiempo: "30 min"
+    sec_num: "01"
+    contenido: |
+      <p>Docker permite打包 y ejecutar aplicaciones en entornos aislados llamados <strong>contenedores</strong>.</p>
+      <p>Un contenedor se crea a partir de una <strong>imagen</strong>, que es una plantilla de solo lectura.</p>
+
+  - numero: "02"
+    titulo: "Docker Compose"
+    anchor: "compose"
+    tipo: texto_codigo
+    icono: "🔧"
+    tiempo: "45 min"
+    sec_num: "02"
+    contenido: |
+      <p>Docker Compose permite definir y ejecutar aplicaciones multicontenedor.</p>
+    codigo:
+      - dc-header
+      - dc-services
+      - dc-volumes
+
+  - numero: "03"
+    titulo: "Reto: Despliega un WordPress"
+    anchor: "reto-wp"
+    tipo: reto
+    icono: "🏆"
+    sec_num: "03"
+    enunciado: "Despliega WordPress con MariaDB usando Docker Compose"
+    contenido: |
+      <p>Configura un stack WordPress + MariaDB con las siguientes características:</p>
+      <ul>
+        <li>Red personalizada <code>wp-network</code></li>
+        <li>Volumen persistente para datos de MariaDB</li>
+        <li>Puertos expuestos: 8080 → 80</li>
+      </ul>
+    codigo:
+      - wp-compose
+
+# Code snippets: se referencian por clave en los bloques
+code_snippets:
+  dc-header:
+    title: "docker-compose.yml"
+    lang: yaml
+    code: |
+      version: '3.8'
+      services:
+        web:
+          image: nginx:alpine
+          ports:
+            - "8080:80"
+
+  dc-services:
+    title: "Servicios"
+    lang: yaml
+    code: |
+      services:
+        web:
+          image: nginx:alpine
+          depends_on:
+            - api
+        api:
+          image: node:18-alpine
+
+  dc-volumes:
+    title: "Volúmenes"
+    lang: yaml
+    code: |
+      volumes:
+        db_data:
+      services:
+        db:
+          image: mariadb:11
+          volumes:
+            - db_data:/var/lib/mysql
+
+  wp-compose:
+    title: "WordPress + MariaDB"
+    lang: yaml
+    code: |
+      version: '3.8'
+      services:
+        db:
+          image: mariadb:11
+          environment:
+            MYSQL_ROOT_PASSWORD: rootsecret
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wp_user
+            MYSQL_PASSWORD: wp_pass
+          volumes:
+            - db_data:/var/lib/mysql
+          networks:
+            - wp-network
+        wordpress:
+          image: wordpress:latest
+          depends_on:
+            - db
+          ports:
+            - "8080:80"
+          environment:
+            WORDPRESS_DB_HOST: db
+            WORDPRESS_DB_USER: wp_user
+            WORDPRESS_DB_PASSWORD: wp_pass
+            WORDPRESS_DB_NAME: wordpress
+          networks:
+            - wp-network
+      volumes:
+        db_data:
+      networks:
+        wp-network:
+
+# Checklist final
+checklist:
+  - "docker compose up -d levanta sin errores"
+  - "El servicio web es accesible en http://localhost:8080"
+  - "Los datos persisten tras reiniciar los contenedores"
+  - "La red personalizada aísla los contenedores"
+  - "He respondido todos los retos"
+
+# Ampliaciones opcionales
+ampliaciones:
+  - t: "Docker Swarm"
+    d: "Despliega el mismo stack en modo Swarm con replicas."
+  - t: "HTTPS con Traefik"
+    d: "Añade Traefik como reverse proxy con certificados Let's Encrypt."
+  - t: "Monitorización"
+    d: "Añade Prometheus y Grafana al compose."
