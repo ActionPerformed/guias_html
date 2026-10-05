@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instalación y securización de WordPress sobre LEMP · ASIR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f14; --bg-panel:#111823; --bg-panel-2:#161f2b; --bg-raised:#1b2532;
+  --border:#223042; --border-soft:#1a2431; --grid-line:rgba(120,170,220,0.055);
+  --text:#e7edf3; --text-dim:#93a6ba; --text-faint:#5b6b7d;
+  --docker:#2496ed; --docker-dim:#12365a;
+  --nginx:#2ecc71; --nginx-dim:#123a26;
+  --mariadb:#e0a23a; --mariadb-dim:#4a3212;
+  --pma:#f2954a; --pma-dim:#4a2f12;
+  --wp:#4fb3e8; --wp-dim:#123450;
+  --wpvol:#4fd1c5; --wpvol-dim:#0f3a36;
+  --volume:#b28cf5; --volume-dim:#2c2148;
+  --danger:#f2555a; --danger-dim:#4a1618;
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --font-head:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.65;
+  background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:34px 34px;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} html{scroll-behavior:auto;}}
+::selection{background:var(--docker-dim); color:#fff;}
+h1,h2,h3,h4{font-family:var(--font-head); font-weight:600; letter-spacing:-0.01em; margin:0 0 .5em;}
+p{margin:0 0 1em; color:var(--text-dim); max-width:72ch;}
+code, pre, .mono{font-family:var(--font-mono);}
+code{background:var(--bg-raised); padding:1.5px 6px; border-radius:4px; color:var(--nginx); font-size:.88em;}
+a{color:var(--docker);}
+:focus-visible{outline:2px solid var(--docker); outline-offset:2px; border-radius:3px;}
+
+.topbar{position:sticky; top:0; z-index:60; display:flex; align-items:center; gap:14px; padding:0 18px; height:56px;
+  background:rgba(11,15,20,0.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+.topbar .brand{display:flex; align-items:center; gap:9px; font-family:var(--font-head); font-weight:600; font-size:15px; color:var(--text); white-space:nowrap;}
+.brand-dot{width:9px;height:9px;border-radius:2px; background:var(--wp); box-shadow:0 0 10px var(--wp); flex:none;}
+.topbar .sep{color:var(--text-faint); font-weight:400;}
+.topbar .subject{color:var(--text-dim); font-size:13px; font-family:var(--font-mono); display:none;}
+@media(min-width:720px){.topbar .subject{display:inline;}}
+.ver-pill{font-family:var(--font-mono); font-size:10.5px; padding:2px 8px; border-radius:999px; background:var(--wp-dim); color:var(--wp); border:1px solid var(--wp); flex:none;}
+.menu-btn{margin-left:auto; display:flex; align-items:center; gap:6px; background:var(--bg-raised); border:1px solid var(--border); color:var(--text);
+  font-family:var(--font-mono); font-size:12px; padding:7px 11px; border-radius:var(--radius-s); cursor:pointer;}
+@media(min-width:960px){.menu-btn{display:none;}}
+.progress-track{position:absolute; left:0; bottom:-1px; height:2px; width:100%;}
+.progress-bar{height:100%; width:0%; background:linear-gradient(90deg,var(--docker),var(--wp),var(--nginx)); transition:width .1s linear;}
+
+.shell{display:flex; max-width:1180px; margin:0 auto; align-items:flex-start;}
+.toc{width:252px; flex:none; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; padding:26px 14px 40px 18px; border-right:1px solid var(--border-soft); display:none;}
+@media(min-width:960px){.toc{display:block;}}
+.toc-title{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:var(--text-faint); margin:0 0 10px 8px; text-transform:uppercase;}
+.toc a{display:block; padding:5px 8px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:12.4px; border-left:2px solid transparent; margin-bottom:1px;}
+.toc a:hover{color:var(--text); background:var(--bg-panel);}
+.toc a.active{color:var(--text); border-left-color:var(--wp); background:var(--bg-panel); font-weight:500;}
+.toc .num{color:var(--text-faint); font-family:var(--font-mono); font-size:10.5px; margin-right:6px;}
+
+.toc-drawer{position:fixed; inset:0; z-index:80; display:none;}
+.toc-drawer.open{display:block;}
+.toc-drawer .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55);}
+.toc-drawer .panel{position:absolute; top:0; left:0; bottom:0; width:78%; max-width:320px; background:var(--bg-panel); border-right:1px solid var(--border); padding:20px 16px; overflow-y:auto;}
+.toc-drawer .panel a{display:block; padding:9px 10px; border-radius:var(--radius-s); color:var(--text-dim); text-decoration:none; font-size:14px;}
+.toc-drawer .panel a:hover, .toc-drawer .panel a.active{background:var(--bg-raised); color:var(--text);}
+
+main{flex:1; min-width:0; padding:0 18px;}
+.content{max-width:760px; margin:0 auto; padding:0 0 80px;}
+
+.titleblock{margin:40px 0 40px; border:1px solid var(--border); border-radius:var(--radius-l); background:var(--bg-panel); overflow:hidden;}
+.tb-top{padding:26px 26px 18px; border-bottom:1px solid var(--border-soft);}
+.tb-top .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--wp); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.tb-top .eyebrow .blink{width:6px;height:6px;border-radius:50%;background:var(--wp); animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.tb-top h1{font-size:clamp(23px,3.4vw,33px); line-height:1.2; margin:0;}
+.tb-meta{display:grid; grid-template-columns:repeat(2,1fr);}
+@media(min-width:600px){.tb-meta{grid-template-columns:repeat(4,1fr);}}
+.tb-cell{padding:14px 18px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft);}
+.tb-cell:last-child{border-right:none;}
+.tb-cell .k{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; color:var(--text-faint); text-transform:uppercase; margin-bottom:3px;}
+.tb-cell .v{font-family:var(--font-mono); font-size:13px; color:var(--text); font-weight:600;}
+
+section.block{scroll-margin-top:72px; margin-bottom:52px;}
+.block-head{display:flex; align-items:baseline; gap:12px; margin-bottom:16px;}
+.block-head .idx{font-family:var(--font-mono); font-size:13px; color:var(--text-faint); flex:none;}
+.block-head h2{font-size:21px; margin:0;}
+.criterio-tag{display:inline-block; font-family:var(--font-mono); font-size:10.5px; color:var(--wp); background:var(--wp-dim); border:1px solid var(--wp); padding:3px 9px; border-radius:999px; margin-bottom:14px;}
+.panel{background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius-l); padding:22px 24px;}
+.panel + .panel{margin-top:14px;}
+.panel h3{font-size:15px; margin-bottom:8px;}
+.panel h4{font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); margin-bottom:8px;}
+
+.tbl-wrap{overflow-x:auto; margin:16px 0; border:1px solid var(--border-soft); border-radius:var(--radius-m);}
+table{width:100%; border-collapse:collapse; font-size:13.2px;}
+thead th{text-align:left; font-family:var(--font-mono); font-weight:500; font-size:10.8px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; padding:9px 13px; background:var(--bg-raised); border-bottom:1px solid var(--border);}
+tbody td{padding:9px 13px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody td strong{color:var(--text); font-weight:600;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+
+.code-block{position:relative; margin:16px 0; border-radius:var(--radius-m); border:1px solid var(--border); background:#0a0e13; overflow:hidden;}
+.code-block .cb-head{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--bg-raised); border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+.code-block pre{margin:0; padding:15px; overflow-x:auto; font-size:12.6px; line-height:1.6; color:#d3e0ec;}
+.code-block .cmt{color:#5b6b7d;}
+.code-block .hl{background:rgba(79,179,232,0.14); border-left:2px solid var(--wp); display:inline-block; width:100%; margin:0 -15px; padding:0 15px 0 13px;}
+.copy-btn{background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:var(--font-mono); font-size:10.5px; padding:3px 9px; border-radius:5px; cursor:pointer;}
+.copy-btn:hover{color:var(--text); border-color:var(--text-dim);}
+.copy-btn.copied{color:var(--nginx); border-color:var(--nginx);}
+
+.tabs{border:1px solid var(--border); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.tab-nav{display:flex; background:var(--bg-raised); border-bottom:1px solid var(--border); overflow-x:auto;}
+.tab-nav button{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); background:transparent; border:none; padding:10px 15px; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent;}
+.tab-nav button.active{color:var(--text); border-bottom-color:var(--wp); background:var(--bg-panel);}
+.tab-panel{display:none; padding:14px;}
+.tab-panel.active{display:block;}
+.tab-panel .code-block{margin:0;}
+
+.accordion{border:1px solid var(--border-soft); border-radius:var(--radius-m); overflow:hidden; margin:16px 0;}
+.acc-item + .acc-item{border-top:1px solid var(--border-soft);}
+.acc-trigger{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--bg-panel-2); border:none; color:var(--text); text-align:left; padding:13px 16px; font-family:var(--font-body); font-size:14px; font-weight:500; cursor:pointer;}
+.acc-trigger:hover{background:var(--bg-raised);}
+.acc-trigger .chev{transition:transform .2s ease; color:var(--text-faint); flex:none;}
+.acc-item.open .acc-trigger .chev{transform:rotate(180deg);}
+.acc-panel{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.acc-panel-inner{padding:4px 16px 16px;}
+
+.tip{border-left:3px solid var(--mariadb); background:var(--mariadb-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.3px;}
+.tip strong{color:var(--mariadb); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.tip p{margin:0; color:#e9d9b8;}
+.important{border-left:3px solid var(--danger); background:var(--danger-dim); border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 16px; margin:16px 0; font-size:13.3px;}
+.important strong{color:var(--danger); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px;}
+.important p{margin:0; color:#f7d7d8;}
+
+/* capture-required badge */
+.capture{display:flex; gap:10px; align-items:flex-start; border:1px dashed var(--pma); background:var(--pma-dim); border-radius:var(--radius-m); padding:10px 14px; margin:14px 0;}
+.capture .cam{font-size:16px; flex:none; line-height:1;}
+.capture p{margin:0; color:#fbd9b8; font-size:12.8px;}
+.capture strong{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--pma); display:block; margin-bottom:2px;}
+
+/* self-check component */
+.selfcheck{border:1px solid var(--docker); border-radius:var(--radius-m); background:var(--docker-dim); margin:18px 0; overflow:hidden;}
+.sc-q{display:flex; gap:10px; padding:14px 16px; align-items:flex-start;}
+.sc-q .sc-icon{font-family:var(--font-head); font-weight:700; font-size:13px; color:var(--docker); width:24px; height:24px; border-radius:50%; border:1.5px solid var(--docker); display:flex; align-items:center; justify-content:center; flex:none; background:var(--bg-panel);}
+.sc-q p{margin:0; color:#cfe4fb; font-size:13.8px; font-weight:500;}
+.sc-actions{padding:0 16px 14px;}
+.sc-reveal-btn{font-family:var(--font-mono); font-size:11.5px; padding:7px 13px; border-radius:var(--radius-s); border:1px solid var(--docker); background:transparent; color:var(--docker); cursor:pointer;}
+.sc-reveal-btn:hover{background:var(--docker); color:#fff;}
+.sc-answer{max-height:0; overflow:hidden; transition:max-height .3s ease; background:var(--bg-panel);}
+.sc-answer-inner{padding:14px 16px; border-top:1px solid rgba(36,150,237,0.3); font-size:13.4px;}
+.sc-answer-inner p{margin:0; color:var(--text-dim);}
+.sc-answer-inner strong{color:var(--nginx); font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:6px;}
+
+ul.plain, ol.plain{margin:12px 0; padding-left:22px; color:var(--text-dim); font-size:14px;}
+ul.plain li, ol.plain li{margin-bottom:6px;}
+.step-list{margin:0 0 12px; padding-left:22px; color:var(--text-dim); font-size:14px;}
+.step-list li{margin-bottom:5px;}
+
+.check-row{display:flex; align-items:flex-start; gap:9px; padding:7px 0;}
+.check-row input[type=checkbox]{appearance:none; width:17px; height:17px; border:1.5px solid var(--border); border-radius:4px; background:var(--bg-panel); cursor:pointer; flex:none; margin-top:2px; position:relative;}
+.check-row input[type=checkbox]:checked{background:var(--nginx); border-color:var(--nginx);}
+.check-row input[type=checkbox]:checked::after{content:''; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid #06210f; border-width:0 2px 2px 0; transform:rotate(45deg);}
+.check-row label{font-size:13.6px; color:var(--text-dim); cursor:pointer;}
+.check-row input[type=checkbox]:checked ~ label{color:var(--text-faint);}
+.progress-mini{height:5px; border-radius:3px; background:var(--bg-raised); overflow:hidden; margin:6px 0 16px;}
+.progress-mini-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--docker),var(--wp)); transition:width .3s ease;}
+
+.topology-wrap{border:1px solid var(--border-soft); border-radius:var(--radius-l); background:var(--bg-panel-2); padding:20px; margin:16px 0;}
+.topology-svg{width:100%; height:auto; display:block;}
+.topo-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; fill:var(--text-dim);}
+.topo-node-label{font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:600; fill:#fff;}
+
+.crit-row{display:grid; grid-template-columns:1fr auto; gap:6px 14px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-soft);}
+.crit-row:last-child{border-bottom:none;}
+.crit-name{font-size:13.4px; color:var(--text);}
+.crit-indicator{grid-column:1/2; font-size:12px; color:var(--text-faint);}
+.crit-weight{font-family:var(--font-mono); font-size:12.5px; color:var(--wp); text-align:right;}
+.crit-bar-track{grid-column:1/-1; height:5px; border-radius:3px; background:var(--bg-raised); overflow:hidden;}
+.crit-bar-fill{height:100%; background:linear-gradient(90deg,var(--docker),var(--wp));}
+
+/* SIGNATURE DEMO: boot sequencer */
+.boot-wrap{border:1px solid var(--border); border-radius:var(--radius-l); background:radial-gradient(circle at 15% 0%, rgba(79,179,232,0.09), transparent 55%), var(--bg-panel); padding:22px; margin:18px 0;}
+.boot-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;}
+.boot-title{display:flex; align-items:center; gap:9px;}
+.boot-title .dot{width:8px;height:8px;border-radius:50%; background:var(--wp); box-shadow:0 0 8px var(--wp); animation:blink 2s infinite;}
+.boot-title span{font-family:var(--font-mono); font-size:12px; color:var(--text-dim);}
+.boot-toggle{display:flex; border:1px solid var(--border); border-radius:var(--radius-s); overflow:hidden;}
+.boot-toggle button{font-family:var(--font-mono); font-size:11px; padding:7px 12px; background:var(--bg-raised); border:none; color:var(--text-faint); cursor:pointer;}
+.boot-toggle button.active{background:var(--wp); color:#07202e;}
+.boot-lanes{display:flex; flex-direction:column; gap:10px; margin:16px 0;}
+.boot-lane{display:grid; grid-template-columns:110px 1fr; gap:12px; align-items:center;}
+.boot-lane-name{font-family:var(--font-mono); font-size:12px; color:var(--text-dim); text-align:right;}
+.boot-track{position:relative; height:34px; background:#0a0e13; border:1px solid var(--border-soft); border-radius:var(--radius-s); overflow:hidden;}
+.boot-fill{position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--border); transition:width .25s linear, background .25s ease;}
+.boot-fill.starting{background:var(--mariadb);}
+.boot-fill.healthy{background:var(--nginx);}
+.boot-fill.waiting{background:var(--bg-raised);}
+.boot-fill.error{background:var(--danger);}
+.boot-status{position:absolute; inset:0; display:flex; align-items:center; padding:0 10px; font-family:var(--font-mono); font-size:11px; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.4);}
+.boot-controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+.sim-btn{font-family:var(--font-mono); font-size:12px; padding:9px 14px; border-radius:var(--radius-s); border:1px solid var(--border); background:var(--bg-raised); color:var(--text); cursor:pointer;}
+.sim-btn:hover{border-color:var(--wp);}
+.sim-btn.primary{background:var(--wp-dim); border-color:var(--wp); color:var(--wp);}
+.sim-btn:disabled{opacity:.35; cursor:not-allowed;}
+.boot-log{margin-top:12px; background:#070a0e; border:1px solid var(--border-soft); border-radius:var(--radius-s); padding:10px 14px; font-family:var(--font-mono); font-size:11.4px; color:var(--text-dim); min-height:60px; max-height:140px; overflow-y:auto;}
+.boot-log .log-line{margin-bottom:3px;}
+.boot-log .log-line.ok{color:var(--nginx);}
+.boot-log .log-line.warn{color:var(--danger);}
+.boot-log .log-line.sys{color:var(--text-faint);}
+.boot-log .log-line.hop{color:var(--wp);}
+
+footer{border-top:1px solid var(--border-soft); padding:34px 18px 60px; text-align:center;}
+footer p{margin:0 auto; max-width:60ch; font-size:13px; color:var(--text-faint);}
+footer .next-practice{display:inline-block; margin-top:14px; padding:10px 18px; border-radius:999px; border:1px solid var(--wp); color:var(--wp); font-family:var(--font-mono); font-size:12.5px;}
+
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="brand-dot"></span>WordPress<span class="sep">/</span>LEMP</div>
+  <span class="ver-pill">Práctica 2</span>
+  <span class="subject">Implantación de Aplicaciones Web · 2º ASIR</span>
+  <button class="menu-btn" id="menuBtn">☰ Índice</button>
+  <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<div class="toc-drawer" id="tocDrawer">
+  <div class="backdrop" id="tocBackdrop"></div>
+  <div class="panel" id="tocDrawerPanel"></div>
+</div>
+
+<div class="shell">
+  <nav class="toc" id="tocDesktop"><p class="toc-title">Contenidos</p></nav>
+
+  <main>
+    <div class="content">
+
+      <div class="titleblock">
+        <div class="tb-top">
+          <div class="eyebrow"><span class="blink"></span>GUÍA PRÁCTICA 2 · CONTINUACIÓN DE LA PRÁCTICA 1</div>
+          <h1>Instalación y securización básica de WordPress</h1>
+        </div>
+        <div class="tb-meta">
+          <div class="tb-cell"><div class="k">Módulo</div><div class="v">Implant. Apps Web</div></div>
+          <div class="tb-cell"><div class="k">Curso</div><div class="v">2º ASIR</div></div>
+          <div class="tb-cell"><div class="k">Duración</div><div class="v">5–6 h trabajo</div></div>
+          <div class="tb-cell"><div class="k">Versión</div><div class="v">2.0</div></div>
+        </div>
+      </div>
+
+      <!-- 1 INTRODUCCIÓN -->
+      <section class="block" id="introduccion" data-title="Introducción">
+        <div class="block-head"><span class="idx">01</span><h2>Introducción</h2></div>
+        <div class="panel">
+          <p>En la práctica anterior desplegaste un stack LEMP funcional con Nginx, MariaDB y phpMyAdmin. Ese stack servía una página estática y permitía administrar la base de datos desde el navegador.</p>
+          <p>En esta segunda práctica, vas a <strong style="color:var(--text)">transformar ese stack en un gestor de contenidos real</strong>: WordPress. Aprenderás a integrarlo en el stack existente, personalizarlo desde la interfaz, activar mecanismos de seguridad y verificar que todo funciona correctamente.</p>
+          <div class="tip"><strong>Producto a entregar</strong><p>Un <strong>informe técnico</strong> con capturas de pantalla de cada paso. La guía te indicará exactamente qué capturar y por qué — busca las marcas 📸 a lo largo del documento.</p></div>
+        </div>
+      </section>
+
+      <!-- 2 OBJETIVOS -->
+      <section class="block" id="objetivos" data-title="Objetivos de aprendizaje">
+        <div class="block-head"><span class="idx">02</span><h2>Objetivos de aprendizaje</h2></div>
+        <div class="panel">
+          <p>Al terminar esta práctica, serás capaz de:</p>
+          <ul class="plain">
+            <li>Modificar la configuración de Nginx para actuar como proxy inverso hacia WordPress.</li>
+            <li>Añadir un servicio WordPress con PHP-FPM al <code>docker-compose.yml</code>.</li>
+            <li>Implementar <code>healthcheck</code> para garantizar el orden correcto de arranque.</li>
+            <li>Gestionar secretos mediante variables de entorno (<code>.env</code>).</li>
+            <li>Completar la instalación de WordPress desde el navegador.</li>
+            <li>Personalizar el sitio desde la interfaz de administración.</li>
+            <li>Activar y configurar plugins de seguridad.</li>
+            <li>Realizar pruebas de funcionamiento completas.</li>
+            <li>Diagnosticar y resolver problemas comunes.</li>
+            <li>Documentar todo el proceso en un informe técnico.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3 PRERREQUISITOS -->
+      <section class="block" id="prerrequisitos" data-title="Prerrequisitos y punto de partida">
+        <div class="block-head"><span class="idx">03</span><h2>Prerrequisitos y punto de partida</h2></div>
+        <div class="panel">
+          <p>Esta práctica <strong style="color:var(--text)">continúa directamente</strong> la anterior. Verifica que:</p>
+          <ul class="plain">
+            <li>El stack de la Práctica 1 está levantado o puede levantarse con <code>docker compose up -d</code>.</li>
+            <li>Accedes a <code>http://localhost:8080</code> (Nginx sirviendo la página estática).</li>
+            <li>Accedes a <code>http://localhost:8081</code> (phpMyAdmin conectado a MariaDB).</li>
+          </ul>
+          <div class="important"><strong>Atención</strong><p>Si ejecutaste <code>docker compose down --volumes</code> en la práctica anterior, los datos de MariaDB se borraron. No hay problema: WordPress creará sus propias tablas. Asegúrate de que el contenedor <code>mariadb</code> arranca correctamente antes de continuar.</p></div>
+        </div>
+      </section>
+
+      <!-- 4 ARQUITECTURA -->
+      <section class="block" id="arquitectura" data-title="Arquitectura final del stack">
+        <div class="block-head"><span class="idx">04</span><h2>Arquitectura final del stack</h2></div>
+        <div class="panel">
+          <p>El stack final tendrá <strong style="color:var(--text)">cuatro contenedores</strong>:</p>
+          <div class="topology-wrap">
+            <svg class="topology-svg" viewBox="0 0 640 290" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="10" width="620" height="230" rx="10" fill="none" stroke="#5b6b7d" stroke-width="1.3"/>
+              <text x="26" y="30" class="topo-label">TU EQUIPO (Windows 11)</text>
+              <rect x="26" y="42" width="588" height="178" rx="10" fill="none" stroke="#2496ed" stroke-width="1.3"/>
+              <text x="40" y="60" class="topo-label" fill="#2496ed">Docker · red: mi-red</text>
+
+              <rect x="50" y="78" width="130" height="52" rx="8" fill="#123a26" stroke="#2ecc71" stroke-width="1.4"/>
+              <text x="115" y="100" text-anchor="middle" class="topo-node-label">Nginx</text>
+              <text x="115" y="116" text-anchor="middle" class="topo-label" fill="#2ecc71">:8080→80 · proxy</text>
+
+              <rect x="235" y="78" width="150" height="52" rx="8" fill="#123450" stroke="#4fb3e8" stroke-width="1.4"/>
+              <text x="310" y="100" text-anchor="middle" class="topo-node-label">WordPress</text>
+              <text x="310" y="116" text-anchor="middle" class="topo-label" fill="#4fb3e8">php-fpm :9000</text>
+
+              <rect x="440" y="78" width="140" height="52" rx="8" fill="#4a3212" stroke="#e0a23a" stroke-width="1.4"/>
+              <text x="510" y="100" text-anchor="middle" class="topo-node-label">MariaDB</text>
+              <text x="510" y="116" text-anchor="middle" class="topo-label" fill="#e0a23a">interno</text>
+
+              <line x1="180" y1="104" x2="233" y2="104" stroke="#4fb3e8" stroke-width="1.4"/>
+              <line x1="385" y1="104" x2="438" y2="104" stroke="#e0a23a" stroke-width="1.4"/>
+              <text x="412" y="96" text-anchor="middle" class="topo-label" fill="#e0a23a" font-size="9">DB_HOST</text>
+
+              <rect x="235" y="155" width="150" height="46" rx="8" fill="#4a2f12" stroke="#f2954a" stroke-width="1.4"/>
+              <text x="310" y="175" text-anchor="middle" class="topo-node-label">phpMyAdmin</text>
+              <text x="310" y="190" text-anchor="middle" class="topo-label" fill="#f2954a">:8081→80</text>
+              <line x1="310" y1="130" x2="310" y2="153" stroke="#f2954a" stroke-width="1.3" stroke-dasharray="3 2"/>
+
+              <text x="115" y="150" text-anchor="middle" class="topo-label" fill="#4fd1c5" font-size="9.5">vol: wordpress_data</text>
+              <line x1="115" y1="130" x2="115" y2="146" stroke="#4fd1c5" stroke-width="1.2" stroke-dasharray="3 2"/>
+              <line x1="115" y1="146" x2="310" y2="146" stroke="#4fd1c5" stroke-width="1.2" stroke-dasharray="3 2"/>
+              <line x1="310" y1="146" x2="310" y2="130" stroke="#4fd1c5" stroke-width="1.2" stroke-dasharray="3 2"/>
+
+              <text x="510" y="150" text-anchor="middle" class="topo-label" fill="#b28cf5" font-size="9.5">vol: mariadb_data</text>
+              <line x1="510" y1="130" x2="510" y2="146" stroke="#b28cf5" stroke-width="1.2" stroke-dasharray="3 2"/>
+
+              <line x1="115" y1="220" x2="115" y2="242" stroke="#5b6b7d" stroke-width="1.3"/>
+              <text x="115" y="258" text-anchor="middle" class="topo-label">localhost:8080</text>
+              <line x1="310" y1="220" x2="310" y2="201" stroke="none"/>
+            </svg>
+          </div>
+          <h4>Cambios respecto a la Práctica 1</h4>
+          <ul class="plain">
+            <li><strong style="color:var(--text)">Nuevo servicio:</strong> <code>wordpress</code> (PHP-FPM).</li>
+            <li><strong style="color:var(--text)">Nuevo volumen:</strong> <code>wordpress_data</code> (archivos de WordPress).</li>
+            <li><strong style="color:var(--text)">Nginx cambia de rol:</strong> de servidor estático a <strong style="color:var(--text)">proxy inverso</strong> hacia WordPress.</li>
+            <li><strong style="color:var(--text)">Nuevo archivo <code>.env</code>:</strong> centraliza contraseñas y variables.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 5 MODIFICACIONES -->
+      <section class="block" id="modificaciones" data-title="Modificaciones en la configuración">
+        <div class="block-head"><span class="idx">05</span><h2>Modificaciones en la configuración existente</h2></div>
+
+        <div class="panel">
+          <h3>5.1 · Crear archivo .env para gestionar secretos</h3>
+          <p style="font-size:13.6px;">En la Práctica 1 las contraseñas estaban en el <code>docker-compose.yml</code>. Es una mala práctica. Vamos a externalizarlas.</p>
+          <p style="font-size:13.4px;">Crear archivo: <code>C:\proyectos\mi-proyecto\.env</code></p>
+          <div class="code-block"><div class="cb-head"><span>.env</span><button class="copy-btn" data-copy="c-env">Copiar</button></div><pre id="c-env"><span class="cmt"># Contraseñas de MariaDB</span>
+MARIADB_ROOT_PASSWORD=rootpass
+MARIADB_DATABASE=mi_app
+MARIADB_USER=usuario
+MARIADB_PASSWORD=userpass
+
+<span class="cmt"># Configuración de WordPress</span>
+WORDPRESS_DB_NAME=mi_app
+WORDPRESS_TABLE_PREFIX=wp_</pre></div>
+          <p style="font-size:13.4px;">Docker Compose lee automáticamente este archivo y sustituye las variables <code>${VARIABLE}</code> en el YAML. Así, las contraseñas no quedan expuestas en el archivo de configuración.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del archivo <code>.env</code> con los valores configurados.</p></div></div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Por qué es mala práctica tener las contraseñas directamente en el <code>docker-compose.yml</code> en vez de en un <code>.env</code>?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Porque el <code>docker-compose.yml</code> suele subirse a un repositorio de control de versiones (Git) y compartirse con el equipo. Si las contraseñas están escritas ahí, quedan expuestas a cualquiera que tenga acceso al repositorio, incluido su historial. El archivo <code>.env</code> se puede excluir del control de versiones (añadiéndolo a <code>.gitignore</code>), de forma que cada persona o entorno tenga sus propios secretos sin que viajen junto al código.</p></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>5.2 · Cambio en Nginx: de servidor estático a proxy inverso</h3>
+          <p style="font-size:13.4px;">Archivo a modificar: <code>C:\proyectos\mi-proyecto\config\nginx\default.conf</code></p>
+          <div class="code-block"><div class="cb-head"><span>nginx · default.conf (nuevo)</span><button class="copy-btn" data-copy="c-nginxnew">Copiar</button></div><pre id="c-nginxnew">server {
+    listen 80;
+    server_name localhost;
+    root /var/www/html;
+    index index.php;
+
+    <span class="cmt"># Permitir subidas de hasta 64MB (temas, plugins, imágenes)</span>
+    client_max_body_size 64M;
+
+    <span class="cmt"># Pasar todas las peticiones a WordPress (permite enlaces permanentes)</span>
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    <span class="cmt"># Pasar los archivos .php a PHP-FPM de WordPress</span>
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass wordpress:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    <span class="cmt"># Bloquear acceso a archivos sensibles</span>
+    location = /wp-config.php { deny all; }
+    location = /xmlrpc.php    { deny all; }
+    location ~ /\.ht          { deny all; }
+
+    <span class="cmt"># Bloquear acceso a wp-login.php desde fuera (opcional, descomentar si se necesita)</span>
+    <span class="cmt"># location = /wp-login.php {</span>
+    <span class="cmt">#     allow 192.168.1.0/24;</span>
+    <span class="cmt">#     allow 127.0.0.1;</span>
+    <span class="cmt">#     deny all;</span>
+    <span class="cmt">#     include fastcgi_params;</span>
+    <span class="cmt">#     fastcgi_pass wordpress:9000;</span>
+    <span class="cmt">#     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;</span>
+    <span class="cmt"># }</span>
+}</pre></div>
+
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Directiva</th><th>Antes (Práctica 1)</th><th>Ahora (Práctica 2)</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td><code>root</code></td><td><code>/usr/share/nginx/html</code></td><td><code>/var/www/html</code></td><td>Donde WordPress monta sus archivos</td></tr>
+              <tr><td><code>client_max_body_size</code></td><td>No existía</td><td><code>64M</code></td><td>Permitir subidas grandes</td></tr>
+              <tr><td><code>location /</code></td><td>Servía <code>index.html</code></td><td>Redirige a <code>index.php</code></td><td>Enlaces permanentes de WordPress</td></tr>
+              <tr><td><code>location ~ \.php$</code></td><td>No existía</td><td><code>fastcgi_pass wordpress:9000</code></td><td>Pasar PHP a PHP-FPM</td></tr>
+              <tr><td><code>location = /wp-config.php</code></td><td>No existía</td><td><code>deny all</code></td><td>Bloquear archivos sensibles</td></tr>
+            </tbody>
+          </table></div>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del archivo <code>default.conf</code> completo con los cambios.</p></div></div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Qué pasaría si quitaras el bloque <code>location ~ \.php$</code>? ¿Qué vería el navegador al pedir una página de WordPress?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Nginx seguiría la regla de <code>location /</code>, que intenta servir el archivo con <code>try_files</code>. Como Nginx no sabe interpretar PHP (solo sirve archivos), si el archivo <code>.php</code> existe en disco lo enviaría al navegador <strong style="color:var(--text)">como texto plano sin ejecutar</strong> (el usuario vería el código fuente de PHP en vez de la página). Sin ese bloque, Nginx no tiene ninguna instrucción para delegar en PHP-FPM, así que WordPress nunca llegaría a ejecutarse.</p></div></div>
+          </div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Por qué es crítico bloquear el acceso directo a <code>wp-config.php</code> aunque solo esté alojado dentro del contenedor?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p><code>wp-config.php</code> contiene las credenciales de la base de datos (usuario, contraseña, host) y claves secretas de WordPress. El bloqueo en Nginx evita que, ante un fallo de configuración de PHP-FPM o un error de interpretación, ese archivo se sirva como texto plano al navegador, exponiendo las credenciales a cualquiera que conozca la URL. Es una capa adicional de defensa, no una confianza ciega en que PHP-FPM siempre funcionará como se espera.</p></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>5.3 · Nuevo volumen para WordPress</h3>
+          <div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-volnew">Copiar</button></div><pre id="c-volnew">volumes:
+  mariadb_data:
+<span class="hl">  wordpress_data:    # NUEVO</span></pre></div>
+          <p style="font-size:13.4px;"><code>wordpress_data</code> almacena los archivos de WordPress (<code>/var/www/html</code>). Sin este volumen, cada recreación del contenedor borraría temas, plugins y archivos subidos.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la sección <code>volumes:</code> del YAML actualizado.</p></div></div>
+        </div>
+
+        <div class="panel">
+          <h3>5.4 · Modificación del servicio Nginx</h3>
+          <div class="tabs">
+            <div class="tab-nav"><button class="active" data-tab="tab-nginxsvc-antes">Antes (Práctica 1)</button><button data-tab="tab-nginxsvc-ahora">Ahora (Práctica 2)</button></div>
+            <div class="tab-panel active" id="tab-nginxsvc-antes"><div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-nginxsvc1">Copiar</button></div><pre id="c-nginxsvc1">nginx:
+  image: nginx:alpine
+  container_name: mi-nginx
+  ports:
+    - "8080:80"
+  volumes:
+    - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    - ./index.html:/usr/share/nginx/html/index.html:ro
+  depends_on:
+    - mariadb
+  networks:
+    - mi-red
+  restart: unless-stopped</pre></div></div>
+            <div class="tab-panel" id="tab-nginxsvc-ahora"><div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-nginxsvc2">Copiar</button></div><pre id="c-nginxsvc2">nginx:
+  image: nginx:alpine
+  container_name: mi-nginx
+  ports:
+    - "8080:80"
+  volumes:
+    - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+<span class="hl">    - wordpress_data:/var/www/html    # CAMBIO: monta el volumen de WordPress</span>
+  depends_on:
+<span class="hl">    - wordpress                        # CAMBIO: depende de WordPress</span>
+  networks:
+    - mi-red
+  restart: unless-stopped</pre></div></div>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Elemento</th><th>Antes</th><th>Ahora</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td><code>volumes</code></td><td>Montaba <code>./index.html</code></td><td>Monta <code>wordpress_data</code></td><td>Nginx necesita ver los archivos de WordPress</td></tr>
+              <tr><td><code>depends_on</code></td><td><code>mariadb</code></td><td><code>wordpress</code></td><td>Nginx necesita que WordPress esté disponible</td></tr>
+            </tbody>
+          </table></div>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del servicio <code>nginx</code> completo en el YAML actualizado.</p></div></div>
+        </div>
+
+        <div class="panel">
+          <h3>5.5 · Añadir secretos y healthcheck a MariaDB</h3>
+          <div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-healthcheck">Copiar</button></div><pre id="c-healthcheck">mariadb:
+  image: mariadb:10.11
+  container_name: mi-mariadb
+  environment:
+<span class="hl">    MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    MARIADB_DATABASE: ${MARIADB_DATABASE}
+    MARIADB_USER: ${MARIADB_USER}
+    MARIADB_PASSWORD: ${MARIADB_PASSWORD}</span>
+  volumes:
+    - mariadb_data:/var/lib/mysql
+  networks:
+    - mi-red
+<span class="hl">  healthcheck:
+    test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+    interval: 10s
+    timeout: 5s
+    retries: 5</span>
+  restart: unless-stopped</pre></div>
+          <p style="font-size:13.4px;">El <code>healthcheck</code> ejecuta un script dentro del contenedor que verifica si MariaDB está <strong style="color:var(--text)">realmente lista</strong> para aceptar conexiones, no solo arrancada. Esto evita el error clásico de «WordPress no conecta con la base de datos» en el primer arranque.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del servicio <code>mariadb</code> con el <code>healthcheck</code> añadido.</p></div></div>
+        </div>
+      </section>
+
+      <!-- 6 NUEVOS SERVICIOS -->
+      <section class="block" id="nuevos-servicios" data-title="Nuevos servicios a añadir">
+        <div class="block-head"><span class="idx">06</span><h2>Nuevos servicios a añadir</h2></div>
+
+        <div class="panel">
+          <h3>6.1 · Servicio WordPress</h3>
+          <div class="code-block"><div class="cb-head"><span>yaml</span><button class="copy-btn" data-copy="c-wordpress-svc">Copiar</button></div><pre id="c-wordpress-svc">wordpress:
+  image: wordpress:6-php8.3-fpm
+  container_name: mi-wordpress
+  environment:
+    WORDPRESS_DB_HOST: mariadb
+    WORDPRESS_DB_USER: ${MARIADB_USER}
+    WORDPRESS_DB_PASSWORD: ${MARIADB_PASSWORD}
+    WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+    WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
+  volumes:
+    - wordpress_data:/var/www/html
+  depends_on:
+<span class="hl">    mariadb:
+      condition: service_healthy    # CAMBIO: espera a que MariaDB esté lista</span>
+  networks:
+    - mi-red
+  restart: unless-stopped</pre></div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Elemento</th><th>Valor</th><th>Significado</th></tr></thead>
+            <tbody>
+              <tr><td><code>image</code></td><td><code>wordpress:6-php8.3-fpm</code></td><td>Imagen oficial con PHP-FPM (sin servidor web)</td></tr>
+              <tr><td><code>WORDPRESS_DB_HOST</code></td><td><code>mariadb</code></td><td>Nombre del servicio de la base de datos</td></tr>
+              <tr><td><code>WORDPRESS_DB_USER</code></td><td><code>${MARIADB_USER}</code></td><td>Referencia al archivo <code>.env</code></td></tr>
+              <tr><td><code>WORDPRESS_TABLE_PREFIX</code></td><td><code>${WORDPRESS_TABLE_PREFIX}</code></td><td>Prefijo de tablas (<code>wp_</code>)</td></tr>
+              <tr><td><code>volumes</code></td><td><code>wordpress_data:/var/www/html</code></td><td>Persiste archivos de WordPress</td></tr>
+              <tr><td><code>depends_on</code></td><td><code>condition: service_healthy</code></td><td><strong>Espera a que MariaDB esté lista</strong>, no solo arrancada</td></tr>
+            </tbody>
+          </table></div>
+          <div class="important"><strong>Nota sobre PHP-FPM</strong><p>La imagen <code>wordpress:6-php8.3-fpm</code> <strong>no incluye servidor web</strong>. Solo procesa PHP. Nginx actúa como proxy inverso: recibe las peticiones HTTP, las pasa a PHP-FPM (puerto 9000) y devuelve la respuesta.</p></div>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del servicio <code>wordpress</code> completo.</p></div></div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>Esta imagen de WordPress no sirve directamente si accedes a su puerto desde fuera. ¿Qué le falta y quién completa esa función?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Le falta un servidor web que hable HTTP con el navegador. La variante <code>-fpm</code> de la imagen solo ejecuta PHP-FPM, que escucha en el puerto 9000 con el protocolo FastCGI — no HTTP. Por eso no se publica ningún puerto del contenedor <code>wordpress</code> hacia el host: es Nginx quien recibe las peticiones HTTP del navegador en el puerto 80/8080 y las traduce a FastCGI contra <code>wordpress:9000</code>.</p></div></div>
+          </div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Qué diferencia real hay entre <code>depends_on: - mariadb</code> (Práctica 1) y <code>depends_on: mariadb: condition: service_healthy</code> (Práctica 2)?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>La forma simple (<code>- mariadb</code>) solo garantiza el <strong style="color:var(--text)">orden de arranque de los contenedores</strong>: Docker inicia el contenedor de MariaDB antes que el de WordPress, pero no espera a que el proceso de MariaDB esté realmente aceptando conexiones — el contenedor puede estar "arrancado" mientras MariaDB todavía está inicializando sus tablas internamente. La forma con <code>condition: service_healthy</code> obliga a Docker Compose a esperar a que el <code>healthcheck</code> de MariaDB informe <code>healthy</code> antes de arrancar WordPress, evitando el error de conexión en el primer arranque.</p></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>6.2–6.4 · Verificar, levantar y comprobar</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell · validar</span><button class="copy-btn" data-copy="c-config2">Copiar</button></div><pre id="c-config2">docker compose config</pre></div>
+          <p style="font-size:13.4px;">Valida la sintaxis y muestra el YAML con las variables del <code>.env</code> sustituidas.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la salida de <code>docker compose config</code> sin errores.</p></div></div>
+
+          <div class="code-block"><div class="cb-head"><span>powershell · levantar</span><button class="copy-btn" data-copy="c-up2">Copiar</button></div><pre id="c-up2">docker compose up -d
+docker compose ps</pre></div>
+          <p style="font-size:13.4px;">Verifica que los cuatro contenedores están en ejecución.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de <code>docker compose ps</code> con los cuatro contenedores en estado <code>running</code> (o <code>healthy</code>).</p></div></div>
+
+          <div class="code-block"><div class="cb-head"><span>powershell · healthcheck</span><button class="copy-btn" data-copy="c-healthcheck2">Copiar</button></div><pre id="c-healthcheck2">docker inspect mi-mariadb --format "{{json .State.Health.Status}}"</pre></div>
+          <p style="font-size:13.4px;">Debe devolver <code>"healthy"</code>. Si devuelve <code>"starting"</code>, espera unos segundos y vuelve a ejecutar.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la salida del comando mostrando <code>"healthy"</code>.</p></div></div>
+        </div>
+
+        <div class="boot-wrap">
+          <div class="boot-head">
+            <div class="boot-title"><span class="dot"></span><span>SIMULADOR · secuenciador de arranque (depends_on + healthcheck)</span></div>
+            <div class="boot-toggle">
+              <button class="active" id="toggleWith">Con healthcheck</button>
+              <button id="toggleWithout">Sin healthcheck</button>
+            </div>
+          </div>
+          <p style="font-size:13px; margin:6px 0 0;">Compara el arranque correcto con el error clásico del primer <code>docker compose up -d</code> cuando WordPress no espera a que MariaDB esté realmente lista.</p>
+
+          <div class="boot-lanes">
+            <div class="boot-lane"><div class="boot-lane-name">mariadb</div><div class="boot-track"><div class="boot-fill" id="fillMariadb"></div><div class="boot-status" id="statusMariadb">detenido</div></div></div>
+            <div class="boot-lane"><div class="boot-lane-name">wordpress</div><div class="boot-track"><div class="boot-fill" id="fillWordpress"></div><div class="boot-status" id="statusWordpress">detenido</div></div></div>
+            <div class="boot-lane"><div class="boot-lane-name">nginx</div><div class="boot-track"><div class="boot-fill" id="fillNginx"></div><div class="boot-status" id="statusNginx">detenido</div></div></div>
+          </div>
+
+          <div class="boot-controls">
+            <button class="sim-btn primary" id="btnBoot">▸ docker compose up -d</button>
+            <button class="sim-btn" id="btnBootReset" disabled>↺ Reiniciar</button>
+          </div>
+          <div class="boot-log" id="bootLog"><div class="log-line sys">$ listo — elige el modo y pulsa «docker compose up -d»</div></div>
+        </div>
+      </section>
+
+      <!-- 7 INSTALACIÓN -->
+      <section class="block" id="instalacion" data-title="Instalación y configuración inicial">
+        <div class="block-head"><span class="idx">07</span><h2>Instalación y configuración inicial de WordPress</h2></div>
+        <div class="panel">
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>7.1 · Acceder al instalador</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p>Abre en el navegador <code>http://localhost:8080</code>. WordPress mostrará la pantalla de <strong style="color:var(--text)">selección de idioma</strong>. Elige <strong style="color:var(--text)">Español</strong>.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de selección de idioma.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>7.2 · Completar la instalación</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="tbl-wrap"><table>
+                  <thead><tr><th>Campo</th><th>Valor sugerido</th></tr></thead>
+                  <tbody>
+                    <tr><td>Título del sitio</td><td><code>Mi WordPress ASIR</code></td></tr>
+                    <tr><td>Nombre de usuario</td><td><code>admin</code></td></tr>
+                    <tr><td>Contraseña</td><td>Una contraseña robusta (guárdala)</td></tr>
+                    <tr><td>Correo electrónico</td><td><code>admin@ejemplo.local</code></td></tr>
+                  </tbody>
+                </table></div>
+                <p>Pulsa <strong style="color:var(--text)">Instalar WordPress</strong>.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de éxito de instalación.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>7.3 · Acceder al panel de administración</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p>Accede a <code>http://localhost:8080/wp-admin</code> e inicia sesión con las credenciales creadas.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del Escritorio de WordPress.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>7.4 · Verificar las extensiones PHP disponibles</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-phpm">Copiar</button></div><pre id="c-phpm">docker exec -it mi-wordpress php -m</pre></div>
+                <p>Observa qué extensiones están instaladas. Anota las que veas. Si falta alguna que necesites (por ejemplo, <code>gd</code> para manipulación de imágenes), tendrás que crear una imagen personalizada.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la salida de <code>php -m</code>.</p></div></div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 PERSONALIZACIÓN -->
+      <section class="block" id="personalizacion" data-title="Personalización desde la administración">
+        <div class="block-head"><span class="idx">08</span><h2>Personalización básica desde la interfaz de administración</h2></div>
+        <div class="criterio-tag">Criterio e) · Personalización y configuración desde la UI — 25%</div>
+        <div class="panel">
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>8.1 · Ajustes generales</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Ajustes → Generales</p>
+                <ul class="plain">
+                  <li><strong style="color:var(--text)">Título del sitio:</strong> <code>Blog de Administración ASIR</code></li>
+                  <li><strong style="color:var(--text)">Descripción corta:</strong> una frase descriptiva</li>
+                  <li><strong style="color:var(--text)">Dirección de WordPress (URL):</strong> <code>http://localhost:8080</code></li>
+                  <li><strong style="color:var(--text)">Dirección del sitio (URL):</strong> <code>http://localhost:8080</code></li>
+                </ul>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de Ajustes Generales.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>8.2 · Ajustes de lectura</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Ajustes → Lectura</p>
+                <ul class="plain">
+                  <li><strong style="color:var(--text)">La página inicial muestra:</strong> Una página estática</li>
+                  <li><strong style="color:var(--text)">Página inicial:</strong> crea una página llamada «Inicio» y selecciónala</li>
+                  <li><strong style="color:var(--text)">Página de entradas:</strong> crea una página llamada «Blog» y selecciónala</li>
+                </ul>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de Ajustes de Lectura.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>8.3 · Crear contenido básico</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Páginas → Añadir nueva</p>
+                <ol class="plain">
+                  <li><strong style="color:var(--text)">Inicio:</strong> título y texto de bienvenida (mínimo 2 párrafos).</li>
+                  <li><strong style="color:var(--text)">Blog:</strong> déjala vacía.</li>
+                </ol>
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Entradas → Añadir nueva — crea al menos una entrada con título y contenido significativo (mínimo 3 párrafos).</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la lista de páginas y entradas creadas.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>8.4 · Cambiar el tema</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Apariencia → Temas — instala y activa un tema gratuito (por ejemplo, <strong style="color:var(--text)">Twenty Twenty-Four</strong>).</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de temas con el tema activo.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>8.5 · Añadir un menú de navegación</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Apariencia → Menús</p>
+                <ol class="plain">
+                  <li>Crea un menú llamado «Principal».</li>
+                  <li>Añade las páginas «Inicio» y «Blog».</li>
+                  <li>Asígnalo a Menú principal.</li>
+                </ol>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del menú configurado.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>8.6 · Probar la subida de archivos (límite de Nginx)</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Medios → Añadir nuevo</p>
+                <p>Sube una imagen pequeña (menos de 1&nbsp;MB) — debe funcionar. Intenta subir un archivo grande (más de 64&nbsp;MB) — debe fallar con un error de tamaño.</p>
+                <p style="font-size:13px;">El <code>client_max_body_size 64M</code> que configuraste en Nginx controla este límite.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del resultado de ambas subidas.</p></div></div>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>Has configurado <code>client_max_body_size 64M</code> en Nginx. ¿Qué pasaría si subieras un archivo de 70&nbsp;MB? ¿Dónde se rechaza, en Nginx o en WordPress?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Nginx rechazaría la petición <strong style="color:var(--text)">antes</strong> de que llegara a WordPress, devolviendo un error 413 (Request Entity Too Large). La petición nunca alcanza PHP-FPM: Nginx corta la subida en cuanto el cuerpo de la petición supera el límite configurado. Por eso este límite debe coordinarse con los límites internos de PHP (<code>upload_max_filesize</code>, <code>post_max_size</code>) si se quiere subir archivos grandes de verdad — el más restrictivo de todos gana.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 SEGURIDAD -->
+      <section class="block" id="seguridad" data-title="Activación de mecanismos de seguridad">
+        <div class="block-head"><span class="idx">09</span><h2>Activación de mecanismos de seguridad de WordPress</h2></div>
+        <div class="criterio-tag">Criterio f) · Activación de mecanismos de seguridad — 20%</div>
+        <div class="panel">
+          <div class="accordion">
+            <div class="acc-item open">
+              <button class="acc-trigger"><span>9.1 · Instalar un plugin de seguridad</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Plugins → Añadir nuevo — busca e instala <strong style="color:var(--text)">Wordfence Security</strong>. Pulsa Instalar ahora y luego Activar.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de plugin activado.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>9.2 · Configurar Wordfence</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Wordfence → Firewall</p>
+                <ol class="plain">
+                  <li>Email de alertas: tu correo.</li>
+                  <li>Nivel de protección: Extendido.</li>
+                  <li>Escaneo de malware: activa escaneo automático.</li>
+                  <li>Protección de login: activa límite de intentos fallidos.</li>
+                </ol>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura del panel de Wordfence configurado.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>9.3 · Ajustes de seguridad adicionales</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Ajustes → Comentarios</p>
+                <ul class="plain">
+                  <li>Desactiva «Permitir comentarios» en nuevas entradas.</li>
+                  <li>Activa «Los comentarios deben ser aprobados manualmente».</li>
+                </ul>
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Wordfence → Login Security</p>
+                <ul class="plain">
+                  <li>Activa «Ocultar mensajes de error de login».</li>
+                  <li>Activa «Limitar intentos de inicio de sesión».</li>
+                </ul>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de Login Security configurado.</p></div></div>
+              </div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-trigger"><span>9.4 · Gestionar usuarios y roles</span><span class="chev">▾</span></button>
+              <div class="acc-panel"><div class="acc-panel-inner">
+                <p><strong style="color:var(--text)">Ruta:</strong> Escritorio → Usuarios — crea un usuario nuevo con rol <strong style="color:var(--text)">Colaborador</strong> (no administrador). Esto aplica el principio de mínimo privilegio: cada usuario debe tener solo los permisos que necesita.</p>
+                <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la lista de usuarios mostrando los diferentes roles.</p></div></div>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Por qué activar el límite de intentos de login es una medida de seguridad importante en un WordPress público?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Sin límite, un atacante puede lanzar un ataque de <strong style="color:var(--text)">fuerza bruta</strong>: probar miles de combinaciones de usuario/contraseña de forma automatizada contra <code>wp-login.php</code> hasta acertar. Limitar los intentos fallidos (y bloquear temporalmente la IP o la cuenta tras varios fallos) convierte ese ataque en impracticable en un tiempo razonable, sin afectar a un usuario legítimo que simplemente se equivoca una o dos veces.</p></div></div>
+          </div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Por qué crear un usuario con rol Colaborador en vez de dar acceso de Administrador a todo el mundo?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>Es la aplicación directa del <strong style="color:var(--text)">principio de mínimo privilegio</strong>: un Colaborador puede escribir y editar sus propias entradas, pero no publicarlas directamente, ni instalar plugins, ni cambiar la configuración del sitio, ni gestionar otros usuarios. Si esa cuenta se ve comprometida (contraseña filtrada, sesión robada), el daño posible queda limitado a lo que ese rol puede hacer — muy lejos del control total que tendría una cuenta de Administrador.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 PRUEBAS -->
+      <section class="block" id="pruebas" data-title="Pruebas de funcionamiento">
+        <div class="block-head"><span class="idx">10</span><h2>Pruebas de funcionamiento</h2></div>
+        <div class="criterio-tag">Criterio g) · Pruebas de funcionamiento — 25%</div>
+        <div class="panel">
+          <p style="font-size:13px; margin-bottom:4px;">Progreso de la checklist de pruebas:</p>
+          <div class="progress-mini"><div class="progress-mini-fill" id="pruebasProgress"></div></div>
+
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr1"><label for="pr1"><strong style="color:var(--text)">10.1</strong> — El sitio público carga correctamente: abre <code>http://localhost:8080</code>. Debes ver el título, la página de inicio y el menú.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr2"><label for="pr2"><strong style="color:var(--text)">10.2</strong> — La página de blog lista las entradas: navega a Blog y comprueba que se ve la entrada creada.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr3"><label for="pr3"><strong style="color:var(--text)">10.3</strong> — El panel de administración es accesible: <code>http://localhost:8080/wp-admin</code> muestra el Escritorio.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr4"><label for="pr4"><strong style="color:var(--text)">10.4</strong> — La base de datos contiene las tablas de WordPress: en phpMyAdmin, <code>mi_app</code> muestra <code>wp_posts</code>, <code>wp_users</code>, <code>wp_options</code>.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr5"><label for="pr5"><strong style="color:var(--text)">10.5</strong> — Los archivos de WordPress están en el volumen: <code>docker exec -it mi-wordpress ls /var/www/html</code> muestra <code>wp-admin</code>, <code>wp-content</code>, <code>wp-includes</code>.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr6"><label for="pr6"><strong style="color:var(--text)">10.6</strong> — Los logs no muestran errores críticos: <code>docker compose logs wordpress</code> y <code>docker compose logs nginx</code>, sin líneas <code>error</code> o <code>failed</code>.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr7"><label for="pr7"><strong style="color:var(--text)">10.7</strong> — Prueba de persistencia: crea una entrada, <code>docker compose down</code>, <code>docker compose up -d</code>, verifica que la entrada sigue ahí.</label></div>
+          <div class="check-row"><input type="checkbox" class="pruebas-chk" id="pr8"><label for="pr8"><strong style="color:var(--text)">10.8</strong> — Diagnóstico de Salud del Sitio: Escritorio → Herramientas → Salud del sitio, sin errores críticos.</label></div>
+
+          <div class="capture" style="margin-top:14px;"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Cada una de las 8 pruebas anteriores requiere su propia captura — revisa el documento fuente para el detalle exacto de cada una.</p></div></div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>En la prueba 10.7, la entrada sobrevive a <code>docker compose down</code>. Ahora hay <strong>dos</strong> sitios donde vive información de WordPress — ¿cuáles son y qué guarda cada uno?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>El volumen <code>mariadb_data</code> guarda el <strong style="color:var(--text)">contenido</strong> de la entrada (título, texto, metadatos) en las tablas de la base de datos, como <code>wp_posts</code>. El volumen <code>wordpress_data</code> guarda los <strong style="color:var(--text)">archivos</strong> de WordPress: el núcleo, los temas, los plugins y los archivos subidos a la biblioteca de medios (imágenes, documentos). Un <code>down</code> simple conserva ambos; un <code>down --volumes</code> los borraría a los dos.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 PUBLICACIÓN -->
+      <section class="block" id="publicacion" data-title="Publicación del gestor de contenidos">
+        <div class="block-head"><span class="idx">11</span><h2>Publicación del gestor de contenidos</h2></div>
+        <div class="criterio-tag">Criterio h) · Publicación del gestor de contenidos — 20%</div>
+        <div class="panel">
+          <h3>11.1 · Verificar la accesibilidad desde otro dispositivo</h3>
+          <div class="code-block"><div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="c-ipconfig">Copiar</button></div><pre id="c-ipconfig">ipconfig</pre></div>
+          <p style="font-size:13.4px;">Busca la dirección IPv4. Desde otro dispositivo (móvil, otro PC), accede a <code>http://[IP-DE-TU-PC]:8080</code>.</p>
+          <div class="important"><strong>Problema común</strong><p>WordPress guarda la URL del sitio en la base de datos. Si accedes desde otra IP, WordPress redirige a <code>localhost:8080</code>, rompiendo la navegación. Para solucionarlo, edita <code>wp-config.php</code> o usa phpMyAdmin:</p></div>
+          <div class="code-block"><div class="cb-head"><span>sql</span><button class="copy-btn" data-copy="c-sqlurl">Copiar</button></div><pre id="c-sqlurl">UPDATE wp_options SET option_value = 'http://[IP-DE-TU-PC]:8080' WHERE option_name IN ('siteurl', 'home');</pre></div>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura desde otro dispositivo mostrando el sitio accesible.</p></div></div>
+
+          <div class="selfcheck">
+            <div class="sc-q"><span class="sc-icon">?</span><p>¿Por qué WordPress guarda la URL del sitio en la base de datos en vez de leerla dinámicamente de la petición del navegador?</p></div>
+            <div class="sc-actions"><button class="sc-reveal-btn">Ver solución</button></div>
+            <div class="sc-answer"><div class="sc-answer-inner"><strong>Solución</strong><p>WordPress usa <code>siteurl</code> y <code>home</code> para construir enlaces absolutos en todo el sitio (menús, enlaces internos, URLs de recursos, redirecciones tras el login). Guardarlos de forma fija evita inconsistencias y ataques de manipulación de cabeceras (un atacante podría falsificar la cabecera <code>Host</code> de una petición para intentar generar enlaces maliciosos si WordPress confiara ciegamente en lo que dice el navegador). El coste es justamente el que has visto: si cambias cómo accedes al sitio, hay que actualizar también ese valor guardado.</p></div></div>
+          </div>
+
+          <h3 style="margin-top:20px;">11.2 · Añadir contenido público significativo</h3>
+          <p style="font-size:13.4px;">Crea una entrada nueva con contenido elaborado (mínimo 3 párrafos, una imagen, categorías) y publícala.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la entrada publicada visible en el sitio.</p></div></div>
+
+          <h3>11.3 · Verificar el estado del sitio</h3>
+          <p style="font-size:13.4px;">Escritorio → Herramientas → Salud del sitio — revisa que no haya errores críticos.</p>
+          <div class="capture"><span class="cam">📸</span><div><strong>Captura requerida</strong><p>Captura de la pantalla de Salud del Sitio.</p></div></div>
+        </div>
+      </section>
+
+      <!-- 12 PROBLEMAS -->
+      <section class="block" id="problemas" data-title="Solución de problemas">
+        <div class="block-head"><span class="idx">12</span><h2>Solución de problemas frecuentes</h2></div>
+        <div class="panel">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Problema</th><th>Causa probable</th><th>Solución</th></tr></thead>
+            <tbody>
+              <tr><td>WordPress no conecta con MariaDB</td><td>MariaDB no está lista</td><td>Verifica <code>docker inspect mi-mariadb --format "{{json .State.Health.Status}}"</code></td></tr>
+              <tr><td>Nginx devuelve error 502</td><td>PHP-FPM no está listo</td><td>Espera unos segundos. Verifica <code>docker compose logs wordpress</code></td></tr>
+              <tr><td>Error 413 al subir archivos</td><td>Límite de Nginx</td><td>Asegúrate de que <code>client_max_body_size 64M</code> está en <code>default.conf</code></td></tr>
+              <tr><td>Los cambios no se ven</td><td>Caché del navegador</td><td>Refresca con Ctrl+F5</td></tr>
+              <tr><td>WordPress redirige a localhost desde otra IP</td><td>URL guardada en BD</td><td>Actualiza <code>siteurl</code> y <code>home</code> en <code>wp_options</code></td></tr>
+              <tr><td>Permiso denegado en wp-content</td><td>Permisos de archivos</td><td>Verifica permisos del volumen</td></tr>
+              <tr><td>Plugin no funciona</td><td>Falta extensión PHP</td><td>Ejecuta <code>php -m</code> dentro del contenedor. Crea imagen personalizada si falta alguna</td></tr>
+            </tbody>
+          </table></div>
+          <div class="tip"><strong>Consejo</strong><p>Ante cualquier error, empieza siempre por <code>docker compose logs &lt;servicio&gt;</code> y <code>docker compose ps</code>.</p></div>
+        </div>
+      </section>
+
+      <!-- 13 ENTREGA -->
+      <section class="block" id="entrega" data-title="Entrega del informe">
+        <div class="block-head"><span class="idx">13</span><h2>Entrega del informe</h2></div>
+        <div class="panel">
+          <p>El producto a evaluar es un <strong style="color:var(--text)">informe técnico</strong> que documente todo el proceso.</p>
+          <h3>Contenido del informe</h3>
+          <ol class="plain">
+            <li>Portada con tu nombre, módulo y fecha.</li>
+            <li>Índice de secciones.</li>
+            <li>Capturas de pantalla de cada paso marcado con 📸.</li>
+            <li>Explicación de cada captura (qué se ve y por qué es relevante).</li>
+            <li>Respuestas a las preguntas planteadas.</li>
+            <li>Reflexión final: ¿qué has aprendido? ¿qué dificultades has encontrado?</li>
+          </ol>
+          <h3>Formato</h3>
+          <ul class="plain">
+            <li>Documento en PDF o Markdown.</li>
+            <li>Capturas integradas en el documento.</li>
+            <li>Cada captura con un pie de foto explicativo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 14 EVALUACIÓN -->
+      <section class="block" id="evaluacion" data-title="Criterios de evaluación">
+        <div class="block-head"><span class="idx">14</span><h2>Criterios de evaluación</h2></div>
+        <div class="panel">
+          <div class="crit-row"><div class="crit-name">e) Personalización y configuración desde la UI</div><div class="crit-weight">25%</div><div class="crit-indicator">Ajustes modificados, contenido creado, tema cambiado, menú configurado</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:25%;"></div></div></div>
+          <div class="crit-row"><div class="crit-name">f) Activación de mecanismos de seguridad</div><div class="crit-weight">20%</div><div class="crit-indicator">Plugin instalado y configurado, ajustes de seguridad aplicados</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:20%;"></div></div></div>
+          <div class="crit-row"><div class="crit-name">g) Pruebas de funcionamiento</div><div class="crit-weight">25%</div><div class="crit-indicator">Todas las pruebas realizadas y documentadas</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:25%;"></div></div></div>
+          <div class="crit-row"><div class="crit-name">h) Publicación del gestor de contenidos</div><div class="crit-weight">20%</div><div class="crit-indicator">Sitio accesible desde otro dispositivo, contenido público</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:20%;"></div></div></div>
+          <div class="crit-row"><div class="crit-name">Informe</div><div class="crit-weight">10%</div><div class="crit-indicator">Documentación clara, capturas explicadas, reflexión final</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:10%;"></div></div></div>
+        </div>
+      </section>
+
+      <!-- RETOS AVANZADOS -->
+      <section class="block" id="retos" data-title="Retos para alumnado avanzado">
+        <div class="block-head"><span class="idx">＋</span><h2>Retos para alumnado avanzado</h2></div>
+        <div class="panel">
+          <ol class="plain">
+            <li><strong style="color:var(--text)">Crear una imagen personalizada de WordPress:</strong> añade extensiones PHP que falten (por ejemplo, <code>gd</code>) creando un <code>Dockerfile</code> que extienda la imagen oficial.</li>
+            <li><strong style="color:var(--text)">Añadir HTTPS:</strong> configura un certificado autofirmado o Let's Encrypt para servir el sitio por HTTPS.</li>
+            <li><strong style="color:var(--text)">Bloquear wp-login.php por IP:</strong> descomenta el bloque en <code>default.conf</code> y limita el acceso al panel de administración.</li>
+            <li><strong style="color:var(--text)">Instalar WP-CLI:</strong> usa la variante <code>wordpress:cli</code> para gestionar WordPress desde línea de comandos.</li>
+            <li><strong style="color:var(--text)">Añadir caché con Redis:</strong> investiga cómo integrar Redis para mejorar el rendimiento.</li>
+          </ol>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>Guía práctica 2 · Implantación de Aplicaciones Web · 2º ASIR — instalación y securización básica de WordPress sobre el stack LEMP.</p>
+  <span class="next-practice">← Continúa de la Práctica 1: despliegue del LEMP</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* TOC */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.block[id]'));
+  var tocDesktop = document.getElementById('tocDesktop');
+  var tocDrawerPanel = document.getElementById('tocDrawerPanel');
+  sections.forEach(function(sec, i){
+    var title = sec.getAttribute('data-title') || sec.id;
+    var num = String(i+1).padStart(2,'0');
+    var a1 = document.createElement('a');
+    a1.href = '#' + sec.id; a1.dataset.target = sec.id;
+    a1.innerHTML = '<span class="num">'+num+'</span>' + title;
+    tocDesktop.appendChild(a1);
+    tocDrawerPanel.appendChild(a1.cloneNode(true));
+  });
+
+  var menuBtn = document.getElementById('menuBtn');
+  var drawer = document.getElementById('tocDrawer');
+  var backdrop = document.getElementById('tocBackdrop');
+  function closeDrawer(){ drawer.classList.remove('open'); }
+  menuBtn.addEventListener('click', function(){ drawer.classList.add('open'); });
+  backdrop.addEventListener('click', closeDrawer);
+  tocDrawerPanel.addEventListener('click', function(e){ if(e.target.closest('a')) closeDrawer(); });
+
+  var allTocLinks = document.querySelectorAll('.toc a, .toc-drawer a');
+  var progressBar = document.getElementById('progressBar');
+  function onScroll(){
+    var scrollY = window.scrollY;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollY/docH*100) : 0) + '%';
+    var current = sections[0] ? sections[0].id : null;
+    for(var i=0;i<sections.length;i++){
+      var rect = sections[i].getBoundingClientRect();
+      if(rect.top <= 110){ current = sections[i].id; }
+    }
+    allTocLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.target === current); });
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if(!el) return;
+      navigator.clipboard.writeText(el.innerText).then(function(){
+        var orig = btn.textContent;
+        btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  document.querySelectorAll('.acc-trigger').forEach(function(trigger){
+    trigger.addEventListener('click', function(){
+      var item = trigger.closest('.acc-item');
+      var panel = item.querySelector('.acc-panel');
+      var isOpen = item.classList.contains('open');
+      if(isOpen){ panel.style.maxHeight = null; item.classList.remove('open'); }
+      else { item.classList.add('open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    });
+    if(trigger.closest('.acc-item').classList.contains('open')){
+      var panel = trigger.closest('.acc-item').querySelector('.acc-panel');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    }
+  });
+
+  document.querySelectorAll('.tabs').forEach(function(tabGroup){
+    var buttons = tabGroup.querySelectorAll('.tab-nav button');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        buttons.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        tabGroup.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  });
+
+  /* self-check reveal */
+  document.querySelectorAll('.selfcheck').forEach(function(sc){
+    var btn = sc.querySelector('.sc-reveal-btn');
+    var ans = sc.querySelector('.sc-answer');
+    btn.addEventListener('click', function(){
+      var open = ans.style.maxHeight && ans.style.maxHeight !== '0px';
+      if(open){ ans.style.maxHeight = null; btn.textContent = 'Ver solución'; }
+      else { ans.style.maxHeight = ans.scrollHeight + 'px'; btn.textContent = 'Ocultar solución'; }
+    });
+  });
+
+  /* pruebas checklist progress */
+  var pruebasChks = document.querySelectorAll('.pruebas-chk');
+  var pruebasProgress = document.getElementById('pruebasProgress');
+  function updatePruebas(){
+    var checked = 0;
+    pruebasChks.forEach(function(c){ if(c.checked) checked++; });
+    pruebasProgress.style.width = (checked / pruebasChks.length * 100) + '%';
+  }
+  pruebasChks.forEach(function(c){ c.addEventListener('change', updatePruebas); });
+  updatePruebas();
+
+  /* SIGNATURE DEMO: boot sequencer */
+  var mode = 'with'; // with | without
+  var toggleWith = document.getElementById('toggleWith');
+  var toggleWithout = document.getElementById('toggleWithout');
+  var btnBoot = document.getElementById('btnBoot');
+  var btnBootReset = document.getElementById('btnBootReset');
+  var bootLog = document.getElementById('bootLog');
+  var fillMariadb = document.getElementById('fillMariadb'), statusMariadb = document.getElementById('statusMariadb');
+  var fillWordpress = document.getElementById('fillWordpress'), statusWordpress = document.getElementById('statusWordpress');
+  var fillNginx = document.getElementById('fillNginx'), statusNginx = document.getElementById('statusNginx');
+  var running = false;
+
+  function setMode(m){
+    if(running) return;
+    mode = m;
+    toggleWith.classList.toggle('active', m==='with');
+    toggleWithout.classList.toggle('active', m==='without');
+    resetBoot();
+  }
+  toggleWith.addEventListener('click', function(){ setMode('with'); });
+  toggleWithout.addEventListener('click', function(){ setMode('without'); });
+
+  function logLine(text, cls){
+    var d = document.createElement('div');
+    d.className = 'log-line ' + (cls||'sys');
+    d.textContent = '$ ' + text;
+    bootLog.appendChild(d); bootLog.scrollTop = bootLog.scrollHeight;
+  }
+  function setLane(fillEl, statusEl, pct, cls, label){
+    fillEl.style.width = pct + '%';
+    fillEl.className = 'boot-fill ' + cls;
+    statusEl.textContent = label;
+  }
+  function resetBoot(){
+    bootLog.innerHTML = '';
+    logLine('listo — modo: ' + (mode==='with' ? 'con healthcheck (correcto)' : 'sin healthcheck (el error típico)'), 'sys');
+    setLane(fillMariadb, statusMariadb, 0, '', 'detenido');
+    setLane(fillWordpress, statusWordpress, 0, '', 'detenido');
+    setLane(fillNginx, statusNginx, 0, '', 'detenido');
+    toggleWith.disabled = false; toggleWithout.disabled = false;
+  }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  btnBoot.addEventListener('click', async function(){
+    if(running) return;
+    running = true;
+    btnBoot.disabled = true; btnBootReset.disabled = true;
+    toggleWith.disabled = true; toggleWithout.disabled = true;
+
+    logLine('docker compose up -d', 'ok');
+    setLane(fillMariadb, statusMariadb, 15, 'starting', 'arrancando…');
+    await wait(500);
+    setLane(fillMariadb, statusMariadb, 45, 'starting', 'inicializando InnoDB…');
+    logLine('mariadb: inicializando tablas internas…', 'sys');
+
+    if(mode === 'without'){
+      // wordpress starts in parallel, too early
+      setLane(fillWordpress, statusWordpress, 20, 'starting', 'arrancando…');
+      await wait(400);
+      logLine('wordpress: intentando conectar con mariadb…', 'hop');
+      await wait(500);
+      setLane(fillWordpress, statusWordpress, 35, 'error', 'Error establishing a database connection');
+      logLine('wordpress: ERROR — MariaDB aún no acepta conexiones', 'warn');
+      await wait(700);
+      setLane(fillMariadb, statusMariadb, 100, 'healthy', 'lista (demasiado tarde)');
+      logLine('mariadb: ya está lista… pero WordPress no reintentó automáticamente', 'warn');
+      await wait(500);
+      logLine('resultado: hay que reiniciar manualmente "docker compose restart wordpress"', 'warn');
+      setLane(fillNginx, statusNginx, 100, 'error', 'depende de wordpress (502)');
+    } else {
+      await wait(600);
+      setLane(fillMariadb, statusMariadb, 75, 'starting', 'healthcheck: comprobando…');
+      logLine('mariadb: healthcheck.sh --connect --innodb_initialized', 'sys');
+      setLane(fillWordpress, statusWordpress, 0, 'waiting', 'esperando a mariadb (healthy)');
+      logLine('wordpress: en espera — depends_on: condition: service_healthy', 'sys');
+      await wait(700);
+      setLane(fillMariadb, statusMariadb, 100, 'healthy', 'healthy ✓');
+      logLine('mariadb: healthcheck OK → estado "healthy"', 'ok');
+      await wait(300);
+      setLane(fillWordpress, statusWordpress, 30, 'starting', 'arrancando…');
+      logLine('wordpress: arrancando ahora que mariadb está healthy', 'hop');
+      await wait(500);
+      setLane(fillWordpress, statusWordpress, 100, 'healthy', 'conectado ✓');
+      logLine('wordpress: conexión a mariadb establecida a la primera', 'ok');
+      await wait(300);
+      setLane(fillNginx, statusNginx, 50, 'starting', 'arrancando…');
+      await wait(400);
+      setLane(fillNginx, statusNginx, 100, 'healthy', 'proxy activo ✓');
+      logLine('nginx: arrancado, proxy_pass hacia wordpress:9000 operativo', 'ok');
+    }
+
+    btnBoot.disabled = false; btnBootReset.disabled = false;
+    running = false;
+  });
+
+  btnBootReset.addEventListener('click', function(){ if(!running) resetBoot(); });
+  resetBoot();
+
+})();
+</script>
+</body>
+</html>
