@@ -57,7 +57,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
 | [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de introducción |
 | [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP (Apache + PHP + MariaDB) con Docker |
-| [ASETE - ACT 1.3 vs.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3%20vs.html) _(tmp)_ | Actividad 1.3 — MiniApp de Tareas (Docker LAMP: Apache + PHP-FPM + MariaDB) — versión en pruebas |
+| [ASETE - ACT 1.3 vs.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3%20vs.html) | Actividad 1.3 — MiniApp de Tareas (Docker LAMP: Apache + PHP-FPM + MariaDB) |
 
 ### IAW (Implantación de Aplicaciones Web)
 

@@ -319,9 +319,9 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 0.2</button></div>
-    <p>Crea un <span class="inline">index.php</span> dentro de <span class="inline">src/</span> con <span class="inline">&lt;?php phpinfo(); ?&gt;</span>. Ábrelo en <span class="inline">http://localhost:8080</span>. Localiza la línea <span class="inline">Loaded Configuration File</span>. ¿Aparece tu <span class="inline">custom.ini</span>?</p>
+    <p>Crea un <span class="inline">index.php</span> dentro de <span class="inline">src/</span> con <span class="inline">&lt;?php phpinfo(); ?&gt;</span>. Ábrelo en <span class="inline">http://localhost:8080</span>. Localiza la línea <span class="inline">Additional .ini files parsed</span>. ¿Aparece tu <span class="inline">custom.ini</span>?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">Debe aparecer <span class="inline">display errors = on</span> en la la seccion Core. Si no está, no has reconstruido la imagen de PHP-FPM después de modificar el Dockerfile.</p></div>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Debe aparecer, así como <span class="inline">display_errors = on</span> en la la seccion Core. Si no está, no has reconstruido la imagen de PHP-FPM después de modificar el Dockerfile.</p></div>
     </div>
   </div>
 </section>
@@ -743,7 +743,7 @@ $u = db()->query($sql)->fetch();</pre>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.2</button></div>
-    <p>Compara <span class="inline">PHPSESSID</span> con <span class="inline">ultimo_email</span> en DevTools → Application → Cookies. ¿Qué diferencias ves en las columnas <span class="inline">Expires</span> y <span class="inline">HttpOnly</span>?</p>
+    <p>Marca el check de recordar contraseña y haz login. Compara <span class="inline">PHPSESSID</span> con <span class="inline">ultimo_email</span> en DevTools → Application → Cookies. ¿Qué diferencias ves en las columnas <span class="inline">Expires</span> y <span class="inline">HttpOnly</span>?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
       <div class="reveal-box" hidden><p style="margin-bottom:0"><span class="inline">PHPSESSID</span> caduca «Session» (al cerrar navegador) y tiene <span class="inline">HttpOnly</span> marcado. <span class="inline">ultimo_email</span> caduca en 30 días, contiene el email en claro, y también tiene <span class="inline">HttpOnly</span> porque lo pusimos así.</p></div>
     </div>
@@ -1157,10 +1157,10 @@ function logout(): void {
 
 "b2-reto25-hash": { title: "Generar hash para nuevo usuario", lang: "bash", code: `docker compose exec php-fpm php -r "echo password_hash('maria123', PASSWORD_DEFAULT), PHP_EOL;"` },
 
-"b2-reto25-insert": { title: "Insertar nuevo usuario", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \\
+"b2-reto25-insert": { title: "Insertar nuevo usuario", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \`
   "INSERT INTO usuarios (email, password_hash, rol) VALUES ('maria@demo.com', 'TU_HASH_AQUI', 'user');"` },
 
-"b2-reto25-check": { title: "Verificar usuario insertado", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \\
+"b2-reto25-check": { title: "Verificar usuario insertado", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \`
   "SELECT id, email, rol FROM usuarios;"` },
 
 "b2-anexo-cli": { title: "Comandos CLI de MariaDB", lang: "bash", code: `# Ver usuarios
