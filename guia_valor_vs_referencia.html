@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valor vs referencia · Java y PHP</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Figtree:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1424;--pn:#161e35;--ln:#2a3558;--tx:#e6eaf7;--mu:#8f9bc0;--j:#ffb454;--p:#9aa7ff;--ok:#5ee0a0;--ko:#ff6b7d;--r:10px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.65 Figtree,system-ui,sans-serif;background-image:radial-gradient(#1c2645 1px,transparent 1px);background-size:22px 22px}
+h1,h2,h3{font-family:Syne,sans-serif;line-height:1.15;margin:0 0 .5em}
+code,pre,.mono{font-family:'Fira Code',monospace}
+nav{position:sticky;top:0;z-index:9;background:#0e1424ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--ln);display:flex;gap:4px;padding:8px 14px;overflow-x:auto;white-space:nowrap}
+nav a{color:var(--mu);text-decoration:none;padding:4px 12px;border-radius:99px;font-size:14px}nav a:hover{background:var(--pn);color:var(--tx)}
+#bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--j),var(--p));width:0;z-index:10}
+main{max-width:980px;margin:0 auto;padding:0 18px 80px}
+.hero{padding:70px 0 40px}.hero h1{font-size:clamp(40px,8vw,84px);font-weight:800}
+.j{color:var(--j)}.p{color:var(--p)}.hero p{max-width:620px;color:var(--mu);font-size:18px}
+.btn{background:var(--j);color:#1a1200;border:0;border-radius:99px;padding:9px 20px;font:600 15px Figtree;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--ln)}.btn:hover{filter:brightness(1.12)}
+details.s{background:var(--pn);border:1px solid var(--ln);border-radius:14px;margin:18px 0;overflow:hidden}
+details.s>summary{cursor:pointer;padding:16px 20px;font:800 22px Syne;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.s>summary::after{content:'＋';color:var(--j)}details.s[open]>summary::after{content:'－'}
+.body{padding:2px 20px 20px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:700px){.two{grid-template-columns:1fr}}
+.card{border:1px solid var(--ln);border-radius:var(--r);padding:14px 16px;background:#0e1424aa}
+.card.v{border-top:4px solid var(--j)}.card.rf{border-top:4px solid var(--p)}
+.note{border-left:4px solid var(--j);background:#ffb45414;padding:10px 14px;border-radius:0 var(--r) var(--r) 0;margin:14px 0}
+.note.w{border-color:var(--ko);background:#ff6b7d14}.note.t{border-color:var(--p);background:#9aa7ff14}
+pre.c{position:relative;background:#0a0f1d;border:1px solid var(--ln);border-radius:var(--r);padding:14px;overflow-x:auto;font-size:14px;line-height:1.55;margin:12px 0}
+.cp{position:absolute;top:6px;right:6px;background:var(--ln);color:var(--tx);border:0;border-radius:6px;font-size:12px;padding:3px 9px;cursor:pointer}
+.k{color:#c792ea}.s2{color:#a5e075}.cm{color:#6b789c}.n{color:var(--j)}.v2{color:#7fdbff}.rf2{color:var(--ko);font-weight:700;background:#ff6b7d22;border-radius:3px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button,.chip{background:transparent;color:var(--mu);border:1px solid var(--ln);border-radius:99px;padding:5px 14px;cursor:pointer;font:600 14px Figtree}
+.tabs button.on,.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.tabs button.jv.on{background:var(--j);border-color:var(--j);color:#1a1200}.tabs button.ph.on{background:var(--p);border-color:var(--p);color:#0b1030}
+table{width:100%;border-collapse:collapse;font-size:14.5px;overflow:hidden}
+th,td{border:1px solid var(--ln);padding:8px 10px;text-align:left}th{background:#0a0f1d;cursor:pointer}th:hover{color:var(--j)}
+td.hl,th.hl{background:#ffb45422}.okc{color:var(--ok)}.koc{color:var(--ko)}
+/* simulador */
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.sim{grid-template-columns:1fr}}
+.code{background:#0a0f1d;border:1px solid var(--ln);border-radius:var(--r);padding:8px 0;font-size:13.5px}
+.ln{padding:1px 12px;white-space:pre;border-left:3px solid transparent;color:#cfd6ee}.ln.on{background:#ffb45422;border-left-color:var(--j)}
+.mem{display:flex;flex-direction:column;gap:10px}
+.box{border:1px solid var(--ln);border-radius:var(--r);padding:8px 10px;background:#0a0f1d;min-height:46px}
+.box h4{margin:0 0 6px;font:600 12px Figtree;color:var(--mu)}
+.fr{border:1px dashed var(--p);border-radius:8px;padding:6px 8px;margin-bottom:6px}.fr b{font:500 12px 'Fira Code';color:var(--p)}
+.var{display:inline-flex;gap:6px;align-items:center;margin:3px 6px 3px 0;font:500 13px 'Fira Code'}
+.cell{background:var(--ln);padding:2px 8px;border-radius:6px;transition:.3s}
+.cell.ptr{background:#ffb45433;color:var(--j)}.cell.al{background:#9aa7ff33;color:var(--p)}.cell.fl{outline:2px solid var(--ok);background:#5ee0a033}
+.msg{min-height:3.4em;margin:10px 0;color:var(--tx)}.out{font:500 14px 'Fira Code';color:var(--ok)}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.gr{margin:0 0 6px;color:var(--mu);font-size:13px}
+.q{border:1px solid var(--ln);border-radius:var(--r);padding:12px 16px;margin:12px 0}
+.q summary,.rev summary{cursor:pointer;color:var(--j);font-weight:600}
+ul.r{padding-left:20px}ul.r li{margin:6px 0}
+footer{color:var(--mu);text-align:center;font-size:14px;margin-top:40px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style></head><body>
+<div id="bar"></div>
+<nav><a href="#lab">🧪 Simulador</a><a href="#idea">Idea central</a><a href="#java">Java</a><a href="#php">PHP</a><a href="#tabla">Tabla</a><a href="#cadena">Cadena</a><a href="#anal">Analogía</a><a href="#reglas">Reglas</a><a href="#quiz">Test</a></nav>
+<main>
+<header class="hero"><h1><span class="j">Valor</span> vs <span class="p">referencia</span><br>Java y PHP</h1>
+<p>¿Por qué a veces los cambios «se pierden» al pasar datos a una función? Aquí lo ves ejecutándose en memoria, paso a paso.</p>
+<a class="btn" href="#lab">Abrir el simulador</a> <a class="btn g" href="#idea">Empezar por la teoría</a></header>
+
+<details class="s" id="lab" open><summary>Simulador de memoria</summary><div class="body">
+<p>Elige un caso y avanza línea a línea. Verás el <b>stack</b> (variables de cada función) y el <b>heap</b> (objetos de Java). Las celdas en verde son las que acaban de cambiar.</p>
+<p class="gr">Java</p><div class="tabs jv" id="sj"></div><p class="gr">PHP</p><div class="tabs ph" id="sp"></div>
+<div class="sim"><div><div class="code" id="code"></div>
+<div class="ctl" style="margin-top:10px"><button class="btn g" id="bp">◀</button><button class="btn" id="bn">Siguiente ▶</button><button class="btn g" id="br">↺</button><button class="btn g" id="ba">Auto ▶▶</button><span class="mono" id="cnt" style="color:var(--mu)"></span></div></div>
+<div class="mem"><div class="box"><h4>STACK</h4><div id="stk"></div></div><div class="box" id="hbox"><h4>HEAP (objetos Java)</h4><div id="hp"></div></div><div class="box"><h4>SALIDA</h4><div class="out" id="out">—</div></div></div></div>
+<div class="msg" id="msg"></div></div></details>
+
+<details class="s" id="idea" open><summary>1 · La idea central</summary><div class="body">
+<div class="two"><div class="card v"><h3>🪣 Por valor</h3>Se pasa una <b>copia</b>. Lo que hagas dentro <b>no afecta</b> al original.</div>
+<div class="card rf"><h3>🚰 Por referencia</h3>Se pasa un <b>alias</b> de la variable. Lo que hagas dentro <b>sí afecta</b> al original.</div></div>
+<div class="note t">💡 «Valor» y «referencia» significan cosas distintas en Java y en PHP. No asumas que son lo mismo.</div></div></details>
+
+<details class="s" id="java" open><summary>2 · Java: todo se pasa por valor</summary><div class="body">
+<p>En Java <b>no existe</b> el paso por referencia. Siempre se pasa una copia, pero hay dos casos.</p>
+<div class="tabs" data-t><button class="jv on">Primitivos</button><button class="jv">Objetos y arrays</button></div>
+<div data-p><p>Se copia el <b>valor</b> directamente (<code>int</code>, <code>boolean</code>, <code>double</code>…).</p>
+<pre class="c">void cambiar(int x) {
+    x = 99;   // solo cambia la copia
+}
+int a = 1;
+cambiar(a);
+System.out.println(a);   // imprime 1</pre></div>
+<div data-p hidden><p>Se copia la <b>referencia</b> al objeto (su «dirección»).</p>
+<pre class="c">void modificar(int[] arr) {
+    arr[0] = 99;         // ✅ SÍ afecta: modifica el objeto apuntado
+    arr = new int[]{7};  // ❌ NO afecta: reasigna la copia local
+}
+int[] datos = {1, 2, 3};
+modificar(datos);
+System.out.println(datos[0]);   // imprime 99</pre>
+<div class="two"><div class="card"><span class="okc">✅</span> Modificar el <b>contenido</b> → afecta al original.</div><div class="card"><span class="koc">❌</span> <b>Reasignar</b> la variable → no afecta.</div></div>
+<p>La copia de la referencia apunta al mismo objeto, pero es otra variable. Si cambias a qué apunta la copia, el original sigue apuntando a lo de antes.</p></div>
+<div class="note w">⚠️ <b>String</b> es inmutable: cualquier «modificación» crea un objeto nuevo, así que nunca verás cambios fuera. No es un caso especial del paso por valor, es inmutabilidad.</div></div></details>
+
+<details class="s" id="php" open><summary>3 · PHP: por valor, o por referencia con &amp;</summary><div class="body">
+<p>Por defecto todo se pasa por valor, pero PHP te deja elegir la referencia con <code>&amp;</code> en la <b>definición</b> de la función.</p>
+<div class="tabs" data-t><button class="ph on">Por valor</button><button class="ph">Por referencia (&amp;)</button></div>
+<div data-p><pre class="c">function modificar($arr) {
+    $arr[0] = 99;      // ❌ NO afecta (se copió el array)
+    $arr = [7];        // ❌ tampoco
+}
+$datos = [1, 2, 3];
+modificar($datos);
+echo $datos[0];   // imprime 1</pre>
+<div class="note t">💡 En PHP los arrays <b>no son objetos</b>, son tipos de valor: se copian. Es la raíz de la mayoría de confusiones al venir de Java.<br>💡 Internamente usa <i>copy-on-write</i>: solo se duplica de verdad al modificar, así que el rendimiento no es un problema.</div></div>
+<div data-p hidden><pre class="c">function modificar(&amp;$arr) {
+    $arr[0] = 99;   // ✅ afecta al original
+    $arr = [7];     // ✅ también afecta (¡reasigna el original!)
+}
+$datos = [1, 2, 3];
+modificar($datos);
+echo $datos[0];   // imprime 7</pre>
+<p>Con <code>&amp;</code> la variable de dentro es un <b>alias</b>: la misma variable con dos nombres.</p>
+<div class="note w">⚠️ Error común: poner <code>&amp;</code> en la llamada.<br><code>modificar(&amp;$datos);</code> ❌ error de sintaxis · <code>modificar($datos);</code> ✅ el <code>&amp;</code> va solo en la definición.</div>
+<div class="note t">💡 <b>Objetos en PHP</b> (desde PHP 5): como en Java, se pasa la referencia al objeto, así que modificar sus propiedades afecta al original sin <code>&amp;</code>. Solo arrays y escalares lo necesitan.</div></div></div></details>
+
+<details class="s" id="tabla" open><summary>4 · Tabla comparativa</summary><div class="body">
+<p class="gr">Pulsa una cabecera para resaltar su columna.</p>
+<div style="overflow-x:auto"><table id="tb"><tr><th></th><th>Java</th><th>PHP sin &amp;</th><th>PHP con &amp;</th></tr>
+<tr><td>Primitivo / escalar</td><td>copia</td><td>copia</td><td>alias</td></tr>
+<tr><td>Array</td><td>copia de la referencia</td><td><b>copia del array</b></td><td>alias</td></tr>
+<tr><td>Objeto</td><td>copia de la referencia</td><td>copia de la referencia</td><td>alias</td></tr>
+<tr><td>Modificar contenido</td><td class="okc">✅ afecta (objetos)</td><td class="koc">❌ no afecta (arrays)</td><td class="okc">✅ afecta</td></tr>
+<tr><td>Reasignar la variable</td><td class="koc">❌ no afecta</td><td class="koc">❌ no afecta</td><td class="okc">✅ afecta</td></tr>
+<tr><td>¿Se puede elegir?</td><td>No</td><td>—</td><td>Sí, con &amp;</td></tr></table></div></div></details>
+
+<details class="s" id="cadena" open><summary>5 · El error clásico: la cadena de funciones</summary><div class="body">
+<p>Si pasas un array por varias funciones encadenadas, <b>cada eslabón debe estar bien</b>.</p>
+<div class="two"><div><b class="koc">❌ Eslabón roto</b><pre class="c">function interna(&amp;$datos) {
+    $datos[0] = 99;
+}
+function intermedia($datos) { // sin &amp;
+    interna($datos);
+}
+$arr = [1, 2, 3];
+intermedia($arr);
+echo $arr[0];   // 1 ❌</pre></div>
+<div><b class="okc">✅ Cadena completa</b><pre class="c">function interna(&amp;$datos) {
+    $datos[0] = 99;
+}
+function intermedia(&amp;$datos) {
+    interna($datos);
+}
+$arr = [1, 2, 3];
+intermedia($arr);
+echo $arr[0];   // 99 ✅</pre></div></div>
+<p><code>intermedia()</code> hizo una copia antes de llamar a <code>interna()</code>: los cambios se quedan en esa copia y desaparecen al terminar. <b>Solución:</b> <code>&amp;</code> en todos los eslabones. En Java esto no pasa con objetos: mientras no reasignes la referencia, los cambios se propagan solos.</p>
+<button class="btn g" onclick="load(4);location.hash='lab'">Verlo en el simulador</button></div></details>
+
+<details class="s" id="anal"><summary>6 · Analogía del estanque</summary><div class="body"><div class="two">
+<div class="card v"><h3>🪣 Por valor</h3>Te dan un <b>cubo con agua copiada</b>. Haz lo que quieras: el estanque no cambia.</div>
+<div class="card rf"><h3>🚰 Por referencia</h3>Te dan una <b>tubería conectada</b> al estanque. Todo lo que hagas afecta al real.</div></div>
+<div class="note">🗺️ <b>Java con objetos:</b> te dan una tubería… hacia una <b>copia del mapa</b> que dice dónde está el estanque. Si sigues el mapa, llegas al estanque (modificas contenido). Si cambias el mapa por otro, el estanque antiguo sigue igual.</div></div></details>
+
+<details class="s" id="reglas"><summary>7 · Reglas rápidas y resumen</summary><div class="body"><div class="two">
+<div class="card v"><h3>Java</h3><ul class="r"><li>Todo se pasa por valor.</li><li>Con objetos el «valor» es la referencia: modificar contenido sí, reasignar no.</li><li>No puedes forzar paso por referencia.</li><li><code>String</code> es inmutable.</li></ul></div>
+<div class="card rf"><h3>PHP</h3><ul class="r"><li>Por defecto, todo por valor (los arrays se copian).</li><li>Con <code>&amp;</code> en la firma, alias real.</li><li>En cadenas, <code>&amp;</code> en <b>cada</b> eslabón.</li><li>Los objetos se comportan como en Java.</li></ul></div></div>
+<div class="note">«Referencia» significa cosas distintas: en Java es <b>dirección a un objeto</b>; en PHP (<code>&amp;</code>) es <b>alias de variable</b>. Si vienes de Java a PHP, el fallo típico es olvidar el <code>&amp;</code> y preguntarte por qué tu función no modifica el array.</div></div></details>
+
+<details class="s" id="quiz" open><summary>8 · Ponte a prueba</summary><div class="body"><p>Predice la salida antes de abrir la solución.</p>
+<div class="q"><b>Pregunta 1 · Java</b><pre class="c">void f(String s) { s = s + "b"; }
+String t = "a";
+f(t);
+System.out.println(t);</pre><details class="rev"><summary>Ver solución</summary>Imprime <b>a</b>. <code>String</code> es inmutable: <code>s + "b"</code> crea un objeto nuevo y solo se reasigna la copia local.</details></div>
+<div class="q"><b>Pregunta 2 · PHP</b><pre class="c">function f($o) { $o->x = 5; }
+$p = new stdClass; $p->x = 1;
+f($p);
+echo $p->x;</pre><details class="rev"><summary>Ver solución</summary>Imprime <b>5</b>. Los objetos se pasan como referencia al objeto, igual que en Java, sin necesidad de <code>&amp;</code>.</details></div>
+<div class="q"><b>Pregunta 3 · PHP</b><pre class="c">function interna($d) { $d[0] = 99; }
+function intermedia(&amp;$d) { interna($d); }
+$a = [1, 2, 3];
+intermedia($a);
+echo $a[0];</pre><details class="rev"><summary>Ver solución</summary>Imprime <b>1</b>. El eslabón roto está al final: <code>interna()</code> recibe una copia. Todos los eslabones que deben propagar el cambio necesitan <code>&amp;</code>, incluido el último.</details></div></div></details>
+<footer>Guía didáctica · DAM / DAW</footer></main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hl(t){return esc(t).replace(/(\/\/.*)|("[^"]*")|\b(void|int|new|function|echo|String|stdClass)\b|(\$\w+)|(\b\d+\b)|(&amp;)(?=\$)/g,(m,a,b,c,d,e,f)=>a?`<span class=cm>${m}</span>`:b?`<span class=s2>${m}</span>`:c?`<span class=k>${m}</span>`:d?`<span class=v2>${m}</span>`:e?`<span class=n>${m}</span>`:`<span class=rf2>${m}</span>`)}
+document.querySelectorAll('pre.c').forEach(p=>{const t=p.textContent;p.innerHTML=hl(t);const b=document.createElement('button');b.className='cp';b.textContent='Copiar';b.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='¡Copiado!';setTimeout(()=>b.textContent='Copiar',1200)};p.appendChild(b)});
+document.querySelectorAll('[data-t]').forEach(t=>{const ps=[...t.parentNode.querySelectorAll(':scope>[data-p]')];[...t.children].forEach((b,i)=>b.onclick=()=>{[...t.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');ps.forEach((p,j)=>p.hidden=i!=j)})});
+document.querySelectorAll('#tb th').forEach((th,i)=>i&&(th.onclick=()=>{const on=th.classList.contains('hl');document.querySelectorAll('#tb tr').forEach(r=>[...r.children].forEach((c,j)=>c.classList.toggle('hl',!on&&j==i)))}));
+addEventListener('scroll',()=>$('#bar').style.width=100*scrollY/(document.body.scrollHeight-innerHeight)+'%');
+/* ---- simulador ---- */
+const M='main',D=[
+{t:'int (primitivo)',l:'j',code:["void cambiar(int x) {","    x = 99;","}","","int a = 1;","cambiar(a);","System.out.println(a);"],st:[
+[4,{main:{a:'1'}},{},'Se crea <b>a</b> en el stack de main.'],
+[5,{main:{a:'1'},cambiar:{x:'1'}},{},'Llamada: <b>x</b> recibe una <b>copia</b> del valor 1.'],
+[1,{main:{a:'1'},cambiar:{x:'99'}},{},'Cambia x. a ni se entera.'],
+[6,{main:{a:'1'}},{},'cambiar() termina y su frame desaparece. a sigue valiendo 1.','1']]},
+{t:'array: contenido y reasignación',l:'j',code:["void modificar(int[] arr) {","    arr[0] = 99;","    arr = new int[]{7};","}","","int[] datos = {1, 2, 3};","modificar(datos);","System.out.println(datos[0]);"],st:[
+[5,{main:{datos:'→#1'}},{'#1':'[1, 2, 3]'},'<b>datos</b> guarda una referencia al objeto #1 del heap.'],
+[6,{main:{datos:'→#1'},modificar:{arr:'→#1'}},{'#1':'[1, 2, 3]'},'Se copia la <b>referencia</b>: arr y datos apuntan al mismo objeto.'],
+[1,{main:{datos:'→#1'},modificar:{arr:'→#1'}},{'#1':'[99, 2, 3]'},'Modificar el <b>contenido</b> SÍ afecta al original: es el mismo objeto.'],
+[2,{main:{datos:'→#1'},modificar:{arr:'→#2'}},{'#1':'[99, 2, 3]','#2':'[7]'},'<b>Reasignar</b> solo cambia la copia local de la referencia. datos sigue en #1.'],
+[7,{main:{datos:'→#1'}},{'#1':'[99, 2, 3]'},'Al salir, #2 queda huérfano. datos[0] vale 99.','99']]},
+{t:'por valor (array)',l:'p',code:["function modificar($arr) {","    $arr[0] = 99;","}","","$datos = [1, 2, 3];","modificar($datos);","echo $datos[0];"],st:[
+[4,{main:{$datos:'[1, 2, 3]'}},{},'En PHP el array es un <b>valor</b>: vive dentro de la variable.'],
+[5,{main:{$datos:'[1, 2, 3]'},modificar:{$arr:'[1, 2, 3]'}},{},'Se copia el array entero (copy-on-write: la copia real se hace al modificar).'],
+[1,{main:{$datos:'[1, 2, 3]'},modificar:{$arr:'[99, 2, 3]'}},{},'Solo cambia la copia.'],
+[6,{main:{$datos:'[1, 2, 3]'}},{},'El cambio se perdió junto con el frame.','1']]},
+{t:'por referencia (&)',l:'p',code:["function modificar(&$arr) {","    $arr[0] = 99;","    $arr = [7];","}","","$datos = [1, 2, 3];","modificar($datos);","echo $datos[0];"],st:[
+[5,{main:{$datos:'[1, 2, 3]'}},{},'Variable normal en main.'],
+[6,{main:{$datos:'[1, 2, 3]'},modificar:{$arr:'⇄ $datos'}},{},'Con <b>&</b> no se copia: <b>$arr</b> es un alias de <b>$datos</b>.'],
+[1,{main:{$datos:'[99, 2, 3]'},modificar:{$arr:'⇄ $datos'}},{},'Cambiar $arr es cambiar $datos.'],
+[2,{main:{$datos:'[7]'},modificar:{$arr:'⇄ $datos'}},{},'¡Reasignar también afecta! Son la misma variable.'],
+[7,{main:{$datos:'[7]'}},{},'El cambio persiste.','7']]},
+{t:'cadena rota',l:'p',code:["function interna(&$datos) {","    $datos[0] = 99;","}","function intermedia($datos) {   // sin &","    interna($datos);","}","","$arr = [1, 2, 3];","intermedia($arr);","echo $arr[0];"],st:[
+[7,{main:{$arr:'[1, 2, 3]'}},{},'Array normal en main.'],
+[8,{main:{$arr:'[1, 2, 3]'},intermedia:{$datos:'[1, 2, 3]'}},{},'intermedia recibe por <b>valor</b>: copia.'],
+[4,{main:{$arr:'[1, 2, 3]'},intermedia:{$datos:'[1, 2, 3]'},interna:{$datos:'⇄ $datos'}},{},'interna recibe por referencia… pero <b>de la copia</b> de intermedia.'],
+[1,{main:{$arr:'[1, 2, 3]'},intermedia:{$datos:'[99, 2, 3]'},interna:{$datos:'⇄ $datos'}},{},'Se modifica la copia de intermedia.'],
+[9,{main:{$arr:'[1, 2, 3]'}},{},'Eslabón roto: el cambio muere con intermedia.','1']]},
+{t:'cadena completa',l:'p',code:["function interna(&$datos) {","    $datos[0] = 99;","}","function intermedia(&$datos) {","    interna($datos);","}","","$arr = [1, 2, 3];","intermedia($arr);","echo $arr[0];"],st:[
+[7,{main:{$arr:'[1, 2, 3]'}},{},'Array normal en main.'],
+[8,{main:{$arr:'[1, 2, 3]'},intermedia:{$datos:'⇄ $arr'}},{},'intermedia recibe un <b>alias</b> de $arr.'],
+[4,{main:{$arr:'[1, 2, 3]'},intermedia:{$datos:'⇄ $arr'},interna:{$datos:'⇄ $arr'}},{},'El alias se propaga: interna apunta a la misma variable.'],
+[1,{main:{$arr:'[99, 2, 3]'},intermedia:{$datos:'⇄ $arr'},interna:{$datos:'⇄ $arr'}},{},'Cambia $arr de verdad.'],
+[9,{main:{$arr:'[99, 2, 3]'}},{},'Con <b>&</b> en todos los eslabones el cambio llega.','99']]}];
+let cur=0,i=0,timer=null;
+D.forEach((d,k)=>{const b=document.createElement('button');b.textContent=d.t;b.dataset.k=k;b.onclick=()=>load(k);$(d.l=='j'?'#sj':'#sp').appendChild(b)});
+function load(k){cur=k;i=0;stop();document.querySelectorAll('#sj button,#sp button').forEach(b=>b.classList.toggle('on',b.dataset.k==k));$('#code').innerHTML=D[k].code.map((l,n)=>`<div class=ln data-n=${n}>${hl(l)||' '}</div>`).join('');$('#hbox').hidden=D[k].l!='j';draw()}
+function cells(o,prev){return Object.entries(o).map(([k,v])=>`<span class=var>${esc(k)}<span class="cell ${v[0]=='→'?'ptr':v[0]=='⇄'?'al':''} ${prev&&prev[k]!==v?'fl':''}">${esc(v)}</span></span>`).join('')}
+function draw(){const s=D[cur].st[i],pv=i?D[cur].st[i-1]:null,fr=Object.keys(s[1]).reverse();
+$('#stk').innerHTML=fr.map(f=>`<div class=fr><b>${f}()</b><br>${cells(s[1][f],pv&&pv[1][f])}</div>`).join('');
+$('#hp').innerHTML=Object.keys(s[2]).length?cells(s[2],pv&&pv[2]):'<span style="color:var(--mu)">vacío</span>';
+document.querySelectorAll('.ln').forEach(e=>e.classList.toggle('on',e.dataset.n==s[0]));
+$('#msg').innerHTML=s[3];const o=D[cur].st.slice(0,i+1).find(x=>x[4]);$('#out').textContent=s[4]?s[4]:'—';$('#cnt').textContent=`${i+1}/${D[cur].st.length}`;
+$('#bp').disabled=i==0;$('#bn').disabled=i==D[cur].st.length-1}
+function stop(){clearInterval(timer);timer=null;$('#ba').textContent='Auto ▶▶'}
+$('#bn').onclick=()=>{if(i<D[cur].st.length-1){i++;draw()}};$('#bp').onclick=()=>{if(i>0){i--;draw()}};$('#br').onclick=()=>{i=0;stop();draw()};
+$('#ba').onclick=()=>{if(timer)return stop();$('#ba').textContent='Pausa ⏸';if(i==D[cur].st.length-1)i=0;draw();timer=setInterval(()=>{if(i<D[cur].st.length-1){i++;draw()}else stop()},1700)};
+load(1);
+</script></body></html>
