@@ -1,0 +1,1573 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 2.2 · NavHost, Registro, Scaffold y Diálogos · PMDM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f4fb;
+  --surface:#ffffff;
+  --ink:#1b1d2e;
+  --muted:#5c5f78;
+  --primary:#5b3fd1;
+  --primary-dark:#4429ab;
+  --primary-light:#eeeafc;
+  --accent:#1db97a;
+  --accent-dark:#12935f;
+  --warn:#ff9800;
+  --error:#e5484d;
+  --success:#2e9e5b;
+  --border:#e2e3f2;
+  --code-bg:#1c1e2e;
+  --code-ink:#e7e8f5;
+  --radius:16px;
+  --shadow:0 6px 24px rgba(91,63,209,.10);
+  --shadow-sm:0 2px 10px rgba(91,63,209,.08);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:90px;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Inter',sans-serif; line-height:1.65;
+  background-image:radial-gradient(circle,#dcdef2 1px, transparent 1px);
+  background-size:22px 22px;
+}
+h1,h2,h3,h4{font-family:'Sora',sans-serif; color:var(--ink); line-height:1.25;}
+code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+a{color:var(--primary);}
+p{color:var(--ink);}
+.small{font-size:.85rem;color:var(--muted);}
+
+/* progress bar */
+#progressBar{position:fixed; top:0; left:0; height:4px; background:linear-gradient(90deg,var(--primary),var(--accent)); width:0%; z-index:9999; transition:width .1s;}
+
+/* HERO */
+.hero{
+  background:linear-gradient(160deg,var(--primary) 0%, #7e5bef 55%, var(--accent) 130%);
+  color:#fff; padding:70px 24px 100px; text-align:center; position:relative; overflow:hidden;
+}
+.hero::before,.hero::after{
+  content:""; position:absolute; border-radius:50%; background:rgba(255,255,255,.08);
+}
+.hero::before{width:340px;height:340px; top:-140px; left:-100px;}
+.hero::after{width:260px;height:260px; bottom:-120px; right:-60px;}
+.hero .eyebrow{
+  display:inline-block; background:rgba(255,255,255,.18); padding:6px 16px; border-radius:999px;
+  font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:18px; font-weight:600;
+}
+.hero h1{color:#fff; font-size:2.3rem; margin:0 0 10px; max-width:760px; margin-inline:auto;}
+.hero p.lead{max-width:620px; margin:0 auto 26px; color:rgba(255,255,255,.92); font-size:1.05rem;}
+.hero-meta{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; position:relative; z-index:2;}
+.chip{
+  background:rgba(255,255,255,.16); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.3);
+  padding:8px 16px; border-radius:999px; font-size:.85rem; font-weight:600;
+}
+.hero-phone{
+  position:relative; z-index:2; margin:34px auto 0; width:150px; height:290px;
+  background:#101223; border-radius:28px; border:6px solid #101223; box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.hero-phone .screen{background:#fff; border-radius:20px; height:100%; padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+.hero-phone .logo-dot{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent)); margin-top:8px;}
+.hero-phone .bar{width:100%; height:9px; border-radius:5px; background:#eef;}
+.hero-phone .bar.short{width:65%;}
+.hero-phone .btn-fake{width:100%; height:16px; border-radius:8px; background:var(--primary); margin-top:6px;}
+
+/* NAV */
+.navbar{
+  position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border); box-shadow:var(--shadow-sm);
+}
+.navbar-inner{max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:6px; padding:10px 18px; overflow-x:auto;}
+.navbar-inner::-webkit-scrollbar{height:5px;}
+.navbar-inner::-webkit-scrollbar-thumb{background:var(--border); border-radius:5px;}
+.nav-brand{font-family:'Sora'; font-weight:700; color:var(--primary); white-space:nowrap; margin-right:10px; font-size:.95rem;}
+.nav-link{
+  white-space:nowrap; padding:7px 12px; border-radius:8px; font-size:.82rem; font-weight:600;
+  color:var(--muted); text-decoration:none; transition:.15s;
+}
+.nav-link:hover{background:var(--primary-light); color:var(--primary-dark);}
+.nav-link.active{background:var(--primary); color:#fff;}
+
+main{max-width:980px; margin:0 auto; padding:40px 20px 90px;}
+
+/* section cards */
+.section{margin-bottom:26px;}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow-sm); overflow:hidden;
+}
+.card-head{
+  display:flex; align-items:center; gap:14px; padding:20px 24px; cursor:pointer; user-select:none;
+}
+.card-head .num{
+  min-width:38px;height:38px;border-radius:11px;background:var(--primary-light); color:var(--primary-dark);
+  display:flex;align-items:center;justify-content:center; font-family:'Sora'; font-weight:700;
+}
+.card-head h2{margin:0; font-size:1.15rem; flex:1;}
+.chev{transition:transform .25s; color:var(--muted); font-size:1.1rem;}
+.card.open .chev{transform:rotate(180deg);}
+.card-body{padding:0 24px 26px; display:none;}
+.card.open .card-body{display:block;}
+.card-body h3{font-size:1rem; margin-top:26px;}
+.card-body h4{font-size:.92rem; color:var(--primary-dark);}
+
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+th,td{padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
+th{background:var(--primary-light); color:var(--primary-dark); font-family:'Sora'; font-size:.82rem;}
+tr:hover td{background:#fafbff;}
+
+.callout{
+  border-left:4px solid var(--primary); background:var(--primary-light); padding:14px 16px;
+  border-radius:0 10px 10px 0; margin:16px 0; font-size:.92rem;
+}
+.callout.warn{border-color:var(--warn); background:#fff4e0;}
+.callout strong{color:var(--primary-dark);}
+.callout.warn strong{color:#a86400;}
+
+/* code blocks */
+.code-wrap{position:relative; margin:16px 0; border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm);}
+.code-wrap .code-label{
+  background:#141626; color:#9fa3c9; font-size:.75rem; padding:8px 14px; font-family:'JetBrains Mono';
+  display:flex; justify-content:space-between; align-items:center;
+}
+.copy-btn{
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:#e7e8f5;
+  font-size:.7rem; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:'Inter';
+}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.copy-btn.copied{background:var(--success); border-color:var(--success);}
+pre{margin:0; background:var(--code-bg); color:var(--code-ink); padding:16px; overflow-x:auto; font-size:.83rem; line-height:1.55;}
+.tok-kw{color:#ff9d76;} .tok-str{color:#a5e07a;} .tok-com{color:#7d8199; font-style:italic;} .tok-type{color:#7ec8ff;} .tok-tag{color:#ff8fc7;} .tok-num{color:#f2c46d;} .tok-attr{color:#ffd479;}
+
+/* tabs */
+.tabs{display:flex; gap:6px; margin-top:14px; flex-wrap:wrap;}
+.tab-btn{
+  border:1px solid var(--border); background:#fff; padding:8px 14px; border-radius:9px 9px 0 0;
+  cursor:pointer; font-family:'JetBrains Mono'; font-size:.78rem; font-weight:600; color:var(--muted);
+}
+.tab-btn.active{background:var(--code-bg); color:#fff; border-color:var(--code-bg);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* glossary flip cards */
+.glossary-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-top:16px;}
+.flip-card{perspective:1000px; height:120px; cursor:pointer;}
+.flip-inner{position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-front,.flip-back{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.flip-front{background:var(--primary-light); color:var(--primary-dark); font-family:'Sora'; font-weight:700; font-size:.95rem;}
+.flip-back{background:var(--primary); color:#fff; transform:rotateY(180deg); font-size:.8rem;}
+
+/* file tree */
+.tree{font-family:'JetBrains Mono'; font-size:.83rem; background:#fbfbff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px;}
+.tree ul{list-style:none; margin:0; padding-left:20px; border-left:1px dashed #c6c9e6;}
+.tree>ul{padding-left:0; border-left:none;}
+.tree li{margin:5px 0; position:relative;}
+.tree .fname{cursor:pointer; padding:2px 6px; border-radius:5px;}
+.tree .fname:hover{background:var(--primary-light);}
+.tree .fdesc{display:none; color:var(--muted); font-family:'Inter'; font-size:.78rem; margin-top:3px; padding-left:6px;}
+.tree .fname.open + .fdesc{display:block;}
+.tree .folder::before{content:"📁 ";} .tree .file::before{content:"📄 ";}
+
+/* lifecycle diagram */
+.lifecycle{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+.lc-step{
+  flex:1; min-width:130px; background:#fbfbff; border:1px solid var(--border); border-radius:12px; padding:12px;
+  text-align:center; cursor:pointer; transition:.15s;
+}
+.lc-step:hover{border-color:var(--primary); transform:translateY(-2px);}
+.lc-step.key{border-color:var(--accent); background:#e6fbf7;}
+.lc-step .lc-name{font-family:'JetBrains Mono'; font-weight:700; color:var(--primary-dark); font-size:.85rem;}
+.lc-detail{display:none; font-size:.78rem; color:var(--muted); margin-top:8px;}
+.lc-step.open .lc-detail{display:block;}
+
+/* layout comparison */
+.layout-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:14px;}
+.layout-card{border:1px solid var(--border); border-radius:12px; padding:14px; background:#fbfbff;}
+.layout-card.reco{border-color:var(--accent); background:#e6fbf7;}
+.layout-card h4{margin:0 0 6px;}
+
+/* SIGNATURE DEMO */
+.demo-section{
+  background:linear-gradient(155deg,#1c1e2e,#232748); border-radius:22px; padding:34px 22px; color:#fff; margin:36px 0;
+  box-shadow:0 20px 50px rgba(28,30,46,.35);
+}
+.demo-title{text-align:center; margin-bottom:6px;}
+.demo-title h2{color:#fff; font-size:1.4rem; margin:0;}
+.demo-title p{color:#aeb2d6; margin:6px 0 0;}
+.demo-grid{display:flex; gap:26px; flex-wrap:wrap; justify-content:center; margin-top:26px;}
+.phone-frame{
+  width:290px; background:#0d0f1c; border-radius:34px; padding:14px 12px; box-shadow:0 15px 40px rgba(0,0,0,.5); flex-shrink:0;
+}
+.phone-notch{width:60px;height:6px;background:#2a2d45; border-radius:4px; margin:0 auto 8px;}
+.phone-screen{background:#fff; border-radius:20px; padding:18px 16px; min-height:430px; color:var(--ink); position:relative;}
+.phone-statusbar{display:flex; justify-content:space-between; font-size:.65rem; color:#888; margin-bottom:10px;}
+.app-logo{width:56px;height:56px;border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); margin:6px auto 10px;}
+.app-title{text-align:center; font-family:'Sora'; font-weight:700; margin-bottom:16px;}
+.field{margin-bottom:14px; position:relative;}
+.field label{
+  position:absolute; left:12px; top:13px; font-size:.85rem; color:#8a8ea8; pointer-events:none; transition:.15s; background:#fff; padding:0 4px;
+}
+.field input{
+  width:100%; padding:14px 12px; border:1.5px solid #d3d5ea; border-radius:8px; font-family:'Inter'; font-size:.88rem; outline:none;
+}
+.field input:focus{border-color:var(--primary);}
+.field input:focus + label, .field.filled label{top:-8px; font-size:.68rem; color:var(--primary);}
+.field.error input{border-color:var(--error);}
+.field.error label{color:var(--error);}
+.field-error-msg{color:var(--error); font-size:.72rem; margin-top:4px; display:none;}
+.field.error .field-error-msg{display:block;}
+.eye-toggle{position:absolute; right:10px; top:14px; cursor:pointer; font-size:.9rem; color:#8a8ea8; user-select:none;}
+.remember-row{display:flex; align-items:center; gap:8px; font-size:.8rem; color:#555; margin-bottom:16px;}
+.login-btn{
+  width:100%; padding:13px; background:#c9cbe0; color:#fff; border:none; border-radius:8px; font-weight:700;
+  letter-spacing:.03em; cursor:not-allowed; transition:.2s; font-family:'Inter';
+}
+.login-btn.enabled{background:var(--primary); cursor:pointer;}
+.login-btn.enabled:hover{background:var(--primary-dark);}
+.forgot-link{display:block; text-align:center; font-size:.78rem; color:var(--primary); margin-top:14px; cursor:pointer;}
+.toast{
+  position:absolute; bottom:16px; left:16px; right:16px; background:#333; color:#fff; padding:10px; border-radius:8px;
+  text-align:center; font-size:.78rem; opacity:0; transform:translateY(10px); transition:.25s; pointer-events:none;
+}
+.toast.show{opacity:1; transform:translateY(0);}
+.home-overlay{
+  position:absolute; inset:14px; background:linear-gradient(160deg,var(--primary),var(--accent)); border-radius:16px;
+  display:none; align-items:center; justify-content:center; flex-direction:column; color:#fff; text-align:center; padding:20px;
+}
+.home-overlay.show{display:flex;}
+.home-overlay button{margin-top:16px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4); color:#fff; padding:8px 18px; border-radius:8px; cursor:pointer;}
+
+.logcat-panel{flex:1; min-width:290px; background:#111324; border-radius:16px; padding:16px; max-height:470px; display:flex; flex-direction:column;}
+.logcat-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.logcat-head span{font-family:'JetBrains Mono'; font-size:.8rem; color:#8a8ea8;}
+.logcat-body{flex:1; overflow-y:auto; font-family:'JetBrains Mono'; font-size:.72rem; line-height:1.7; max-height:340px;}
+.logcat-body div{padding:2px 6px; border-radius:4px;}
+.log-info{color:#7ec8ff;} .log-ok{color:#7be495;} .log-err{color:#ff8b8b;} .log-sys{color:#c9a8ff;}
+.demo-controls{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.demo-btn{
+  flex:1; min-width:110px; background:var(--primary); color:#fff; border:none; padding:9px 10px; border-radius:8px;
+  font-size:.78rem; cursor:pointer; font-weight:600;
+}
+.demo-btn.secondary{background:#2a2d45;}
+.demo-btn:hover{opacity:.88;}
+.demo-hint{color:#aeb2d6; font-size:.75rem; margin-top:14px; text-align:center; max-width:600px; margin-inline:auto;}
+
+/* timeline chart */
+.timeline{margin-top:16px;}
+.tl-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:.82rem;}
+.tl-label{width:190px; flex-shrink:0; color:var(--muted);}
+.tl-bar-bg{flex:1; background:#eef; border-radius:6px; height:20px; overflow:hidden;}
+.tl-bar{height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:6px; display:flex; align-items:center; justify-content:flex-end; color:#fff; font-size:.68rem; padding-right:6px; font-weight:600;}
+
+/* checklist */
+.checklist{list-style:none; padding:0; margin:16px 0;}
+.checklist li{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:10px; margin-bottom:6px; cursor:pointer;
+  border:1px solid transparent;
+}
+.checklist li:hover{background:#fafbff; border-color:var(--border);}
+.checklist input{margin-top:3px; width:17px; height:17px; accent-color:var(--primary); cursor:pointer;}
+.checklist li.checked span{text-decoration:line-through; color:var(--muted);}
+.progress-track{background:#eef; border-radius:20px; height:14px; overflow:hidden; margin:14px 0 6px;}
+.progress-fill{background:linear-gradient(90deg,var(--primary),var(--accent)); height:100%; width:0%; transition:.3s; border-radius:20px;}
+.progress-label{font-size:.8rem; color:var(--muted); text-align:right;}
+
+/* rubric bars */
+.rubric-row{margin-bottom:12px;}
+.rubric-top{display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:4px;}
+.rubric-track{background:#eef; height:12px; border-radius:8px; overflow:hidden;}
+.rubric-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--primary));}
+
+/* resources */
+.resource-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:14px;}
+.resource-card{border:1px solid var(--border); border-radius:12px; padding:14px; background:#fbfbff; text-decoration:none; display:block; transition:.15s;}
+.resource-card:hover{border-color:var(--primary); transform:translateY(-2px);}
+.resource-card h4{margin:0 0 4px; color:var(--primary-dark); font-size:.9rem;}
+.resource-card span{font-size:.76rem; color:var(--muted);}
+
+/* retos */
+.reto-card{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden;}
+.reto-head{padding:14px 18px; display:flex; align-items:center; gap:12px; cursor:pointer; background:#fbfbff;}
+.reto-head:hover{background:var(--primary-light);}
+.reto-stars{color:var(--warn); font-size:.9rem; white-space:nowrap;}
+.reto-head h4{margin:0; flex:1; font-size:.95rem;}
+.reto-body{display:none; padding:0 18px 18px;}
+.reto-card.open .reto-body{display:block;}
+.reveal-btn{
+  background:var(--primary-light); color:var(--primary-dark); border:1px dashed var(--primary); padding:8px 14px;
+  border-radius:8px; cursor:pointer; font-size:.8rem; font-weight:600; margin-top:8px;
+}
+.hint-box{display:none; margin-top:10px; background:#fffbe8; border-left:3px solid var(--warn); padding:10px 12px; border-radius:0 8px 8px 0; font-size:.85rem;}
+.hint-box.show{display:block;}
+.badge{display:inline-block; background:var(--primary-light); color:var(--primary-dark); font-size:.72rem; padding:2px 9px; border-radius:999px; margin-right:6px; font-weight:600;}
+
+footer{text-align:center; padding:34px 20px; color:var(--muted); font-size:.82rem;}
+
+@media(max-width:640px){
+  .hero h1{font-size:1.6rem;}
+  .card-head h2{font-size:1rem;}
+  .demo-grid{flex-direction:column; align-items:center;}
+}
+
+/* ===== Guía 2.2 · estilos adicionales ===== */
+.tok-num{color:#f2c46d;}
+.hero-row{display:flex;gap:18px;justify-content:center;align-items:center;margin-top:34px;position:relative;z-index:2;flex-wrap:wrap;}
+.hero-row .hero-phone{margin:0;width:120px;height:238px;border-radius:24px;}
+.hero-phone .screen{overflow:hidden;}
+.hero-arrow{font-size:1.7rem;color:rgba(255,255,255,.85);}
+.mini-appbar{width:calc(100% + 20px);height:24px;background:var(--primary);margin:-14px -10px 8px;position:relative;}
+.mini-appbar i{position:absolute;right:8px;top:9px;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 -5px #fff,0 5px #fff;}
+.hero code{background:rgba(255,255,255,.18);padding:1px 6px;border-radius:5px;}
+code{background:#f0f1fb;padding:1px 5px;border-radius:5px;font-size:.88em;}
+pre code{background:none;padding:0;}
+.callout code{background:rgba(255,255,255,.65);}
+li pre{margin:8px 0;border-radius:8px;}
+
+/* código */
+pre.tall{max-height:460px;overflow:auto;}
+pre.tall.expanded{max-height:none;}
+.jump-row,.filters{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+.jump-chip,.filter-chip{border:1px solid var(--border);background:#fff;padding:5px 11px;border-radius:999px;font-size:.76rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Inter';}
+.jump-chip:hover,.filter-chip:hover{border-color:var(--primary);color:var(--primary-dark);}
+.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.explain-row{border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;background:#fbfbff;}
+.explain-row code{background:none;color:var(--primary-dark);padding:0;}
+.explain-row p{margin:6px 0 0;}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ba>div{min-width:0;}
+.b-new2{background:#dff7ea;color:#12935f;}
+@media(max-width:760px){.ba{grid-template-columns:1fr;}}
+
+/* tabla hover columnas */
+table.hover-cols td:hover{background:var(--primary-light);}
+table.anexo.only21 th:nth-child(3),table.anexo.only21 td:nth-child(3){display:none;}
+table.anexo.only22 th:nth-child(2),table.anexo.only22 td:nth-child(2){display:none;}
+
+/* árbol */
+.sbadge{display:inline-block;font-family:'Inter';font-size:.62rem;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;}
+.b-new{background:#dff7ea;color:#12935f;}.b-mod{background:#fff1d6;color:#a86400;}.b-del{background:#ffe3e3;color:#c0262d;}
+.tree li.dim{opacity:.25;}
+.tree li[data-st="del"] .fname{text-decoration:line-through;color:#a05a5e;}
+
+/* scaffold widget */
+.sc-wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin:14px 0;}
+.sc-phone{position:relative;width:190px;height:330px;border:6px solid #101223;border-radius:24px;background:#fff;overflow:hidden;flex-shrink:0;}
+.sc-zone{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;cursor:pointer;transition:.2s;border:2px dashed transparent;font-family:'JetBrains Mono';}
+.sc-top{top:0;height:44px;background:var(--primary);color:#fff;z-index:3;}
+.sc-content{background:#f1f2fb;color:var(--ink);z-index:1;flex-direction:column;align-items:flex-start;justify-content:flex-start;font-family:'Inter';font-weight:500;padding:10px;gap:8px;top:0;bottom:0;}
+.sc-content.pad{top:44px;bottom:48px;}
+.sc-line{background:#fff;border-radius:6px;padding:6px 8px;width:100%;font-size:.7rem;}
+.sc-line.first{border-left:3px solid var(--accent);}
+.sc-bottom{bottom:0;height:48px;background:#d9dcf5;z-index:3;}
+.sc-snack{bottom:56px;height:30px;background:#333;color:#fff;z-index:4;left:10px;right:10px;border-radius:6px;}
+.sc-fab{right:12px;left:auto;bottom:94px;width:46px;height:46px;border-radius:14px;background:var(--accent);color:#fff;z-index:5;}
+.sc-zone.sel{border-color:var(--warn);box-shadow:0 0 0 3px rgba(255,152,0,.35);}
+.sc-info{flex:1;min-width:230px;}
+.demo-opt2{display:flex;gap:8px;align-items:center;font-weight:600;font-size:.88rem;cursor:pointer;}
+.sc-msg{margin:10px 0;padding:10px 12px;border-radius:8px;font-size:.84rem;}
+.sc-msg.ok{background:#e6fbf7;border-left:4px solid var(--accent);}
+.sc-msg.bad{background:#ffe9e9;border-left:4px solid var(--error);}
+.sc-detail{background:#fbfbff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.84rem;}
+.sc-detail pre{margin-top:8px;border-radius:8px;padding:10px;}
+
+/* TopAppBar variantes */
+.tb-prev{background:#efeffc;border-radius:12px;display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;font-weight:700;transition:.25s;position:relative;margin:10px 0 4px;}
+.tb-prev .tb-title{flex:1;}
+.tb-prev.c .tb-title{text-align:center;}
+.tb-prev.m,.tb-prev.l{flex-wrap:wrap;align-content:space-between;padding:8px 14px 12px;}
+.tb-prev.m{height:92px;}.tb-prev.l{height:128px;}
+.tb-prev.m .tb-title,.tb-prev.l .tb-title{order:5;flex:0 0 100%;font-size:1.1rem;}
+.tb-prev.l .tb-title{font-size:1.5rem;}
+.tb-nav,.tb-act{font-size:1.1rem;}
+
+/* alert dialog widget */
+.da-dialog{background:#f3edf7;border-radius:26px;padding:18px 20px;max-width:340px;margin:12px auto 6px;box-shadow:0 8px 28px rgba(0,0,0,.18);}
+.da-part{cursor:pointer;padding:5px 8px;border-radius:8px;border:1.5px dashed transparent;margin:3px 0;}
+.da-part:hover,.da-part.sel{border-color:var(--primary);background:#fff;}
+.da-title{font-family:'Sora';font-weight:700;font-size:1.1rem;}
+.da-actions{text-align:right;margin-top:10px;}
+.da-actions .da-part{display:inline-block;color:var(--primary);font-weight:600;}
+.da-outside{text-align:center;font-size:.74rem;color:var(--muted);cursor:pointer;padding:6px;border:1.5px dashed var(--border);border-radius:10px;max-width:340px;margin:0 auto;}
+.da-outside:hover,.da-outside.sel{border-color:var(--primary);color:var(--primary-dark);}
+
+/* route graph */
+.rg-nodes{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.rg-node{padding:10px 18px;border-radius:12px;border:2px solid var(--border);background:#fff;font-family:'JetBrains Mono';font-weight:700;font-size:.82rem;transition:.2s;}
+.rg-node.from{border-color:var(--warn);background:#fff4e0;}
+.rg-node.to{border-color:var(--accent);background:#e6fbf7;}
+.rg-edges{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;}
+.rg-edge{border:1px solid var(--border);background:#fff;border-radius:9px;padding:7px 12px;font-size:.78rem;cursor:pointer;font-weight:600;color:var(--muted);}
+.rg-edge:hover{border-color:var(--primary);}
+.rg-edge.sel{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* laboratorio Uri.encode / filtros */
+.lab{background:#fbfbff;border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;}
+.lab input[type=text]{width:100%;padding:10px 12px;border:1.5px solid #d3d5ea;border-radius:8px;font-family:'JetBrains Mono';font-size:.85rem;outline:none;}
+.lab input[type=text]:focus{border-color:var(--primary);}
+.lab .out{font-family:'JetBrains Mono';font-size:.8rem;margin-top:10px;word-break:break-all;line-height:1.9;}
+.lab .bad{color:var(--error);}.lab .good{color:var(--success);}
+
+/* retos */
+.reto-body .learn{margin-top:10px;font-size:.85rem;color:var(--muted);}
+.reto-body .learn ul{margin:4px 0 0;}
+.reto-body .hint-box ul{margin:0;padding-left:18px;}
+
+/* ===== SIMULADOR NavHost ===== */
+.demo-side{flex:1;min-width:290px;display:flex;flex-direction:column;gap:14px;max-width:520px;}
+.demo-side .logcat-panel{max-height:none;}
+.demo-side .logcat-body{max-height:200px;}
+.phone-screen{overflow:hidden;}
+.appbar{display:flex;align-items:center;gap:8px;margin:0 -16px 12px;padding:8px 12px;background:#efeffc;font-weight:700;font-size:.9rem;position:relative;}
+.appbar .ab-title{flex:1;}
+.ab-btn{cursor:pointer;font-size:1.05rem;padding:2px 9px;border-radius:50%;}
+.ab-btn:hover{background:rgba(0,0,0,.08);}
+.dd-menu{position:absolute;right:10px;top:34px;background:#fff;border-radius:8px;box-shadow:0 6px 22px rgba(0,0,0,.28);z-index:20;min-width:150px;overflow:hidden;}
+.dd-item{padding:10px 14px;font-size:.82rem;cursor:pointer;font-weight:500;}
+.dd-item:hover{background:#eee;}
+.dlg-scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:30;display:flex;align-items:center;justify-content:center;}
+.dlg{background:#fff;border-radius:22px;padding:20px;width:86%;color:var(--ink);font-size:.82rem;}
+.dlg h4{margin:0 0 8px;font-size:1.05rem;}
+.dlg-actions{text-align:right;margin-top:14px;}
+.dlg-actions span{color:var(--primary);font-weight:700;cursor:pointer;padding:6px 8px;}
+.home-body{display:flex;align-items:center;justify-content:center;min-height:300px;text-align:center;font-family:'Sora';font-weight:700;font-size:1.1rem;word-break:break-word;}
+.exit-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:430px;gap:12px;text-align:center;color:#555;font-size:.85rem;}
+.exit-box button{background:var(--primary);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-weight:600;}
+.stack-view{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.stk{padding:8px 12px;border-radius:8px;background:#1d2040;color:#cfd2f5;font-family:'JetBrains Mono';font-size:.74rem;display:flex;justify-content:space-between;}
+.stk.top{background:var(--primary);color:#fff;}
+.stk-base{font-size:.68rem;color:#6d7196;text-align:center;font-family:'JetBrains Mono';}
+.route-box{font-family:'JetBrains Mono';font-size:.72rem;background:#0c0e1b;color:#ffd479;padding:8px 10px;border-radius:8px;word-break:break-all;line-height:1.6;}
+.demo-opt{color:#cfd2f5;font-size:.8rem;display:flex;gap:7px;align-items:center;cursor:pointer;flex:1 1 100%;margin-bottom:4px;}
+.demo-controls{align-items:center;}
+.err-line{color:var(--error);font-size:.72rem;margin:-8px 0 10px 4px;display:none;}
+</style></head><body><div id="progressBar"></div><header class="hero"><span class="eyebrow">PMDM · 2º DAM · Jetpack Compose</span>
+<h1>Actividad 2.2 · Registro, Navegación con NavHost, Scaffold y Diálogos</h1>
+<p class="lead">Migra de <code>Intent</code> a <code>NavHost</code>: tres pantallas navegables, barra superior con menú overflow, diálogo «Acerca de» y paso de datos entre destinos.</p>
+<div class="hero-meta"><span class="chip">⏱ 4 horas + retos</span><span class="chip">🧭 NavHost · Scaffold · AlertDialog</span><span class="chip">🎯 CE.a · CE.b · CE.g · CE.i</span></div>
+<div class="hero-row">
+<div class="hero-phone"><div class="screen"><div class="logo-dot"></div><div class="bar short"></div><div class="bar"></div><div class="bar"></div><div class="btn-fake"></div></div></div><span class="hero-arrow">⇄</span>
+<div class="hero-phone"><div class="screen"><div class="mini-appbar"></div><div class="bar short"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="btn-fake"></div></div></div><span class="hero-arrow">→</span>
+<div class="hero-phone"><div class="screen"><div class="mini-appbar"><i></i></div><div style="flex:1;display:flex;align-items:center"><div class="bar short" style="height:12px"></div></div></div></div></div></header>
+<nav class="navbar"><div class="navbar-inner" id="navInner"><span class="nav-brand">🧭 NavHost PMDM</span><a class="nav-link" href="#s1">1·Intro</a><a class="nav-link" href="#s2">2·Glosario</a><a class="nav-link" href="#s3">3·Estructura</a><a class="nav-link" href="#s4">4·Conceptos</a><a class="nav-link" href="#s5">5·Dependencias</a><a class="nav-link" href="#s6">6·Registro</a><a class="nav-link" href="#s7">7·NavGraph</a><a class="nav-link" href="#s8">8·Scaffold</a><a class="nav-link" href="#s9">9·Diálogo</a><a class="nav-link" href="#s10">10·Datos</a><a class="nav-link" href="#s11">11·Main</a><a class="nav-link" href="#demo">🧪 Demo</a><a class="nav-link" href="#s12">12·Pruebas</a><a class="nav-link" href="#s13">13·Errores</a><a class="nav-link" href="#s14">14·Accesib.</a><a class="nav-link" href="#s15">15·Entregables</a><a class="nav-link" href="#s16">16·Checklist</a><a class="nav-link" href="#s17">18·Tiempos</a><a class="nav-link" href="#s19">19·Recursos</a><a class="nav-link" href="#s20">20·Retos</a><a class="nav-link" href="#anexo">★ Anexo</a></div></nav>
+<main><div class="section card open" id="s1"><div class="card-head" onclick="toggleCard(this)"><div class="num">1</div><h2>¿Qué vamos a construir?</h2><div class="chev">▾</div></div><div class="card-body"><div class="callout "><strong>Nota previa:</strong> esta actividad es la <strong>continuación directa de la Actividad 2.1 (Login con Compose)</strong>. Se asume que ya tienes el proyecto con <code>LoginScreen.kt</code>, <code>HomeScreen.kt</code>, <code>HomeActivity.kt</code> y <code>MainActivity.kt</code> funcionando, con validaciones de email y contraseña, gestión de foco y navegación por <code>Intent</code>. Si no es así, recupera primero la actividad anterior.</div><div class="callout warn"><strong>Importante:</strong> vamos a <strong>migrar de <code>Intent</code> a <code>NavHost</code></strong>. La <code>HomeActivity</code> dejará de ser una Activity independiente y pasará a ser un <strong>destino dentro del grafo de navegación</strong>. Si no entiendes por qué, no te preocupes: lo veremos paso a paso.</div><p>Vamos a convertir nuestra app de <strong>una sola pantalla funcional (Login)</strong> en una app con <strong>tres pantallas navegables</strong> (Login, Registro, Home) más una estructura de app real: barra superior, menú de opciones y diálogo informativo.</p><h3>Flujo de navegación objetivo</h3><div class="rg-nodes" style="margin:18px 0"><div class="rg-node">LOGIN</div><span class="small">⇄</span><div class="rg-node">REGISTRO</div></div><div class="rg-nodes" style="margin:0 0 18px"><div class="rg-node">LOGIN / REGISTRO</div><span class="small">login correcto →</span><div class="rg-node to">HOME · TopAppBar ⋮</div><span class="small">→</span><div class="rg-node">AlertDialog «Acerca de»</div></div><h3>Objetivos específicos</h3><ul><li>Crear una <strong>pantalla de Registro</strong> con validaciones equivalentes al Login (email, contraseña, confirmar contraseña, aceptar términos).</li><li>Sustituir la navegación por <code>Intent</code> por <strong><code>NavHost</code> + <code>NavController</code></strong>.</li><li>Envolver las pantallas en un <strong><code>Scaffold</code></strong> con <code>TopAppBar</code>.</li><li>Añadir un <strong>menú overflow</strong> (los tres puntos verticales) con opciones.</li><li>Implementar un <strong><code>AlertDialog</code></strong> de «Acerca de».</li><li>Practicar el <strong>paso de datos</strong> entre pantallas (por ejemplo, el email del Login a Home).</li></ul><h3>Competencias trabajadas</h3><table class=""><tr><th>CE</th><th>Descripción</th></tr><tr><td><strong>CE.a</strong></td><td>Estrategia y estructura de clases de la aplicación (grafo de navegación).</td></tr><tr><td><strong>CE.b</strong></td><td>Clases de interfaz gráfica (nuevas pantallas, <code>Scaffold</code>, menús).</td></tr><tr><td><strong>CE.g</strong></td><td>Pruebas de interacción y optimización en emuladores.</td></tr><tr><td><strong>CE.i</strong></td><td>Documentación de los procesos de desarrollo.</td></tr></table></div></div>
+<div class="section card" id="s2"><div class="card-head" onclick="toggleCard(this)"><div class="num">2</div><h2>Glosario mínimo</h2><div class="chev">▾</div></div><div class="card-body"><p class="small">Toca cada tarjeta para ver la definición.</p><div class="glossary-grid"><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">NavHost</div><div class="flip-back">Composable que contiene el grafo de navegación. Es el "contenedor" de pantallas.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">NavController</div><div class="flip-back">Objeto que permite navegar entre destinos (<code>navigate</code>, <code>popBackStack</code>).</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">Ruta (route)</div><div class="flip-back">Identificador único de una pantalla dentro del grafo. Ej: <code>"login"</code>.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">Argumento de navegación</div><div class="flip-back">Dato que se pasa de una pantalla a otra a través de la ruta.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">Scaffold</div><div class="flip-back">Composable que proporciona la estructura Material 3: <code>topBar</code>, <code>bottomBar</code>, <code>floatingActionButton</code>, <code>content</code>.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">TopAppBar</div><div class="flip-back">Barra superior de la app. Puede tener título, icono de navegación y acciones.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">Menú overflow</div><div class="flip-back">Menú desplegable que aparece al pulsar los tres puntos verticales (<code>⋮</code>).</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">DropdownMenu</div><div class="flip-back">Composable de Material 3 que implementa un menú desplegable.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">AlertDialog</div><div class="flip-back">Diálogo modal de Material 3 para mostrar información o pedir confirmación.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">rememberNavController()</div><div class="flip-back">Crea y recuerda un <code>NavController</code> entre recomposiciones.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">NavType</div><div class="flip-back">Tipo del argumento de navegación (String, Int, etc.).</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">Back stack</div><div class="flip-back">Pila de pantallas visitadas. <code>popBackStack()</code> vuelve a la anterior.</div></div></div><div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner"><div class="flip-front">innerPadding</div><div class="flip-back">Padding que <code>Scaffold</code> pasa al contenido para que no se solape con las barras. <strong>Hay que aplicarlo siempre.</strong></div></div></div></div></div></div>
+<div class="section card" id="s3"><div class="card-head" onclick="toggleCard(this)"><div class="num">3</div><h2>Estructura del proyecto</h2><div class="chev">▾</div></div><div class="card-body"><p>Partimos del proyecto de la Actividad 2.1. Vamos a <strong>añadir</strong>, <strong>modificar</strong> y <strong>eliminar</strong> archivos. Seguimos usando el <strong>mismo paquete plano</strong> <code>com.ejemplo.login</code> (sin subpaquetes <code>navigation/</code> ni <code>ui/</code>) para no introducir complejidad organizativa innecesaria.</p><div class="filters"><button class="filter-chip active" onclick="filterTree('all',this)">Todos</button><button class="filter-chip" onclick="filterTree('new',this)">Nuevo</button><button class="filter-chip" onclick="filterTree('mod',this)">Modificado</button><button class="filter-chip" onclick="filterTree('del',this)">Eliminado</button></div><div class="tree"><ul><li data-st="x"><span class="fname folder">app/</span><ul><li data-st="x"><span class="fname folder">manifests/</span><ul><li data-st="mod"><span class="fname file" onclick="toggleTree(this)">AndroidManifest.xml</span> <span class="sbadge b-mod">MODIFICADO</span><div class="fdesc">Ya NO registra HomeActivity.</div></li></ul></li><li data-st="x"><span class="fname folder">java/com/ejemplo/login/</span><ul><li data-st="mod"><span class="fname file" onclick="toggleTree(this)">MainActivity.kt</span> <span class="sbadge b-mod">MODIFICADO</span><div class="fdesc">Ahora solo contiene el NavHost.</div></li><li data-st="new"><span class="fname file" onclick="toggleTree(this)">NavGraph.kt</span> <span class="sbadge b-new">NUEVO</span><div class="fdesc">Define rutas y destinos.</div></li><li data-st="mod"><span class="fname file" onclick="toggleTree(this)">LoginScreen.kt</span> <span class="sbadge b-mod">MODIFICADO</span><div class="fdesc">Navega a Registro y Home.</div></li><li data-st="new"><span class="fname file" onclick="toggleTree(this)">RegisterScreen.kt</span> <span class="sbadge b-new">NUEVO</span><div class="fdesc">Pantalla de registro.</div></li><li data-st="mod"><span class="fname file" onclick="toggleTree(this)">HomeScreen.kt</span> <span class="sbadge b-mod">MODIFICADO</span><div class="fdesc">Con Scaffold + TopAppBar.</div></li><li data-st="del"><span class="fname file" onclick="toggleTree(this)">HomeActivity.kt</span> <span class="sbadge b-del">ELIMINADO</span><div class="fdesc">Ya no es necesaria.</div></li></ul></li><li data-st="x"><span class="fname folder">res/values/</span><ul><li data-st="mod"><span class="fname file" onclick="toggleTree(this)">strings.xml</span> <span class="sbadge b-mod">MODIFICADO</span><div class="fdesc">Nuevos textos.</div></li></ul></li></ul></li></ul></div><h3>Resumen de cambios</h3><table class=""><tr><th>Archivo</th><th>Acción</th><th>Motivo</th></tr><tr><td><code>NavGraph.kt</code></td><td><strong>Crear</strong></td><td>Centraliza toda la navegación.</td></tr><tr><td><code>RegisterScreen.kt</code></td><td><strong>Crear</strong></td><td>Nueva pantalla de registro.</td></tr><tr><td><code>LoginScreen.kt</code></td><td><strong>Modificar</strong></td><td>Cambiar firma para navegar a Registro y pasar email a Home.</td></tr><tr><td><code>HomeScreen.kt</code></td><td><strong>Modificar</strong></td><td>Añadir <code>Scaffold</code>, <code>TopAppBar</code>, menú y diálogo.</td></tr><tr><td><code>MainActivity.kt</code></td><td><strong>Modificar</strong></td><td>Reducir a solo cargar el <code>NavGraph</code>.</td></tr><tr><td><code>HomeActivity.kt</code></td><td><strong>Eliminar</strong></td><td>Ya no es una Activity; es un destino del grafo.</td></tr><tr><td><code>AndroidManifest.xml</code></td><td><strong>Modificar</strong></td><td>Quitar la entrada de <code>HomeActivity</code>.</td></tr><tr><td><code>strings.xml</code></td><td><strong>Modificar</strong></td><td>Añadir los textos nuevos.</td></tr></table><div class="callout "><strong>Regla de oro (recordatorio de la Actividad 2.1):</strong> los textos <strong>nunca</strong> se escriben directamente en el código. Siempre van en <code>strings.xml</code> y se referencian con <code>stringResource(R.string.mi_texto)</code>.</div></div></div>
+<div class="section card" id="s4"><div class="card-head" onclick="toggleCard(this)"><div class="num">4</div><h2>Conceptos fundamentales</h2><div class="chev">▾</div></div><div class="card-body"><h3>4.1. ¿Qué es <code>NavHost</code> y por qué sustituye a los <code>Intent</code>?</h3><p>En la Actividad 2.1 navegábamos con <code>Intent</code> y <code>startActivity</code>. Eso funciona, pero tiene problemas:</p><ul><li><strong>Cada pantalla es una Activity</strong> → más código repetido, más coste de memoria.</li><li><strong>Pasar datos</strong> entre Activities es verboso (<code>putExtra</code>, <code>getStringExtra</code>).</li><li><strong>No hay control centralizado</strong> del flujo de navegación.</li><li><strong>Las animaciones</strong> entre pantallas hay que configurarlas una a una.</li></ul><p>En Compose, la forma recomendada es <strong><code>NavHost</code></strong>: una <strong>única Activity</strong> que contiene todas las pantallas, y un <strong><code>NavController</code></strong> que decide cuál mostrar en cada momento.</p><table class="hover-cols"><tr><th>Intent + Activity</th><th>NavHost + Composable</th></tr><tr><td>Cada pantalla es una <code>Activity</code>.</td><td>Cada pantalla es un <code>@Composable</code>.</td></tr><tr><td><code>startActivity(Intent(...))</code></td><td><code>navController.navigate("ruta")</code></td></tr><tr><td><code>putExtra("email", email)</code></td><td><code>navigate("home/$email")</code></td></tr><tr><td><code>intent.getStringExtra("email")</code></td><td><code>backStackEntry.arguments?.getString("email")</code></td></tr><tr><td><code>finish()</code></td><td><code>navController.popBackStack()</code></td></tr></table><div class="callout "><strong>Ventaja clave:</strong> en Compose, <strong>todo el flujo de navegación vive en un solo archivo</strong> (<code>NavGraph.kt</code>). Es más fácil de leer, de testear y de modificar.</div><h3>4.2. ¿Qué es un <code>NavController</code>?</h3><ul><li>Sabe en qué pantalla estás (<code>currentBackStackEntry</code>).</li><li>Permite ir a otra pantalla (<code>navigate("ruta")</code>).</li><li>Permite volver atrás (<code>popBackStack()</code>).</li><li>Gestiona el <strong>back stack</strong> (la pila de pantallas).</li></ul><p>Se crea con <code>rememberNavController()</code> y se pasa al <code>NavHost</code>:</p><div class="code-wrap"><div class="code-label"><span>NavController + NavHost</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">val navController = rememberNavController()
+NavHost(navController = navController, startDestination = "login") {
+    composable("login") { LoginScreen(navController) }
+    composable("home") { HomeScreen(navController) }
+}</pre></div><h3>4.3. ¿Qué es un <code>Scaffold</code>?</h3><p><code>Scaffold</code> proporciona la <strong>estructura visual</strong> de una pantalla Material 3. <strong>Toca cada zona</strong> del móvil y prueba a desactivar el <code>innerPadding</code>:</p><div class="sc-wrap"><div class="sc-phone" id="scPhone">
+<div class="sc-zone sc-top" onclick="scSel('topBar',this)">topBar</div>
+<div class="sc-zone sc-content pad" id="scContent" onclick="scSel('content',this)"><div class="sc-line first">① Primera línea del contenido</div><div class="sc-line">② Segunda línea</div><div class="sc-line">③ Tercera línea</div></div>
+<div class="sc-zone sc-snack" onclick="scSel('snackbarHost',this)">snackbarHost</div>
+<div class="sc-zone sc-fab" onclick="scSel('floatingActionButton',this)">FAB</div>
+<div class="sc-zone sc-bottom" onclick="scSel('bottomBar',this)">bottomBar</div></div>
+<div class="sc-info"><label class="demo-opt2"><input type="checkbox" checked onchange="scPad(this.checked)"> Aplicar <code>Modifier.padding(innerPadding)</code></label>
+<div class="sc-msg ok" id="scMsg">Con <code>innerPadding</code> el contenido empieza justo debajo de la barra superior.</div>
+<div class="sc-detail" id="scDetail">👆 Toca una zona del móvil para ver su parámetro en <code>Scaffold</code>.</div></div></div><table class=""><tr><th>Parámetro</th><th>Para qué sirve</th></tr><tr><td><code>topBar</code></td><td>Barra superior (normalmente un <code>TopAppBar</code>).</td></tr><tr><td><code>bottomBar</code></td><td>Barra inferior (navegación, etc.).</td></tr><tr><td><code>floatingActionButton</code></td><td>Botón flotante.</td></tr><tr><td><code>snackbarHost</code></td><td>Host para mostrar <code>Snackbar</code>.</td></tr><tr><td><code>content</code></td><td>El contenido principal. Recibe un <code>PaddingValues</code> que <strong>debes aplicar</strong>.</td></tr></table><div class="callout warn"><strong>Importante:</strong> el bloque <code>content</code> recibe un <code>PaddingValues</code> que <strong>hay que aplicar</strong> con <code>Modifier.padding(innerPadding)</code>. Si no lo haces, el contenido se solapará con la <code>TopAppBar</code>.</div><div class="code-wrap"><div class="code-label"><span>Scaffold básico</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">Scaffold(
+    topBar = { TopAppBar(title = { Text("Home") }) }
+) { innerPadding -&gt;
+    Column(modifier = Modifier.padding(innerPadding)) {
+        // contenido
+    }
+}</pre></div><h3>4.4. ¿Qué es un <code>TopAppBar</code>?</h3><ul><li><strong><code>title</code></strong>: el texto del título (un composable <code>Text</code>).</li><li><strong><code>navigationIcon</code></strong>: icono a la izquierda (flecha «atrás» o menú hamburguesa).</li><li><strong><code>actions</code></strong>: <code>RowScope</code> con iconos a la derecha (típicamente el menú overflow).</li><li><strong><code>colors</code></strong>: colores personalizados de la barra.</li></ul><p><strong>Variantes</strong> (pulsa para ver cómo cambia):</p><div class="filters"><button class="filter-chip active" onclick="tbVar('s',this)">TopAppBar</button><button class="filter-chip" onclick="tbVar('c',this)">CenterAlignedTopAppBar</button><button class="filter-chip" onclick="tbVar('m',this)">MediumTopAppBar</button><button class="filter-chip" onclick="tbVar('l',this)">LargeTopAppBar</button></div>
+<div class="tb-prev s" id="tbPrev"><span class="tb-nav">←</span><span class="tb-title">Título</span><span class="tb-act">⋮</span></div><p class="small" id="tbDesc">Small: la estándar.</p><div class="callout warn"><strong>Nota:</strong> <code>TopAppBar</code> en Material 3 sigue marcado como <code>@ExperimentalMaterial3Api</code>. Por eso en cada pantalla que lo use hay que añadir <code>@OptIn(ExperimentalMaterial3Api::class)</code> antes del <code>@Composable</code>. Si no lo pones, verás un aviso amarillo (no un error) y en algunas versiones de las librerías no compilará.</div><h3>4.5. ¿Qué es un menú overflow?</h3><p>Es el menú que aparece al pulsar los tres puntos verticales (<code>⋮</code>) en la <code>TopAppBar</code>. Se implementa con:</p><ul><li>Un <code>IconButton</code> con el icono <code>Icons.Default.MoreVert</code> dentro de <code>actions</code>.</li><li>Un <code>DropdownMenu</code> con <code>DropdownMenuItem</code> para cada opción.</li><li>Un estado <code>var menuExpanded by remember { mutableStateOf(false) }</code> que controla si el menú está abierto o cerrado.</li></ul><h3>4.6. ¿Qué es un <code>AlertDialog</code>?</h3><p>Diálogo modal de Material 3. <strong>Toca cada parte</strong> del diálogo para ver su parámetro:</p><div class="da-dialog"><div class="da-part" onclick="daSel('icon',this)" style="text-align:center">ⓘ <small>icon</small></div>
+<div class="da-part da-title" onclick="daSel('title',this)">Acerca de</div>
+<div class="da-part" onclick="daSel('text',this)">MiApp v1.0 · Desarrollada por 2º DAM</div>
+<div class="da-actions"><span class="da-part" onclick="daSel('dismiss',this)">Cancelar</span><span class="da-part strong" onclick="daSel('confirm',this)">Aceptar</span></div></div>
+<div class="da-outside" onclick="daSel('onDismissRequest',this)">⬆ toca «fuera» del diálogo (scrim)</div>
+<div class="sc-detail" id="daDetail" style="margin-top:10px">👆 Elige una parte del diálogo.</div><p><strong>Se controla con estado:</strong> <code>var showDialog by remember { mutableStateOf(false) }</code>.</p><h3>4.7. ¿Cómo se pasan datos entre pantallas?</h3><p><strong>1. Argumentos en la ruta (recomendado para datos simples):</strong></p><div class="code-wrap"><div class="code-label"><span>Argumento de ruta</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">// En el grafo:
+composable(
+    route = "home/{email}",
+    arguments = listOf(navArgument("email") { type = NavType.StringType })
+) { backStackEntry -&gt;
+    val email = backStackEntry.arguments?.getString("email") ?: ""
+    HomeScreen(email = email)
+}
+
+// Al navegar:
+navController.navigate("home/$email")</pre></div><p><strong>2. Estado compartido (ViewModel, <code>remember</code> a nivel de NavHost):</strong> más complejo, lo veremos en futuras actividades. Para esta actividad, usaremos <strong>argumentos de ruta</strong>.</p><div class="callout warn"><strong>Importante:</strong> si el email contiene caracteres especiales (<code>@</code>, <code>/</code>, etc.), hay que <strong>codificarlo</strong> con <code>Uri.encode(email)</code> antes de meterlo en la ruta. Si no, la navegación fallará. Ejemplo: <code>alumno@ejemplo.com</code> contiene <code>@</code>, un carácter reservado en las URIs. (Pruébalo en el laboratorio de la sección 10.)</div><h3>4.8. Ciclo de vida en navegación</h3><p>Cuando navegas de Login a Home:</p><ul><li><code>LoginScreen</code> <strong>no se destruye</strong>, se queda en el <strong>back stack</strong> (pausado).</li><li><code>HomeScreen</code> se compone y se muestra.</li><li>Si el usuario pulsa «atrás», <code>HomeScreen</code> se destruye y <code>LoginScreen</code> se reanuda.</li></ul><div class="callout "><strong>Consecuencia práctica:</strong> el estado del Login (email, contraseña) se mantiene mientras no se destruya el composable. Si quieres limpiarlo al volver, tienes que hacerlo explícitamente (por ejemplo, con <code>popUpTo</code>).</div></div></div>
+<div class="section card" id="s5"><div class="card-head" onclick="toggleCard(this)"><div class="num">5</div><h2>Dependencias necesarias</h2><div class="chev">▾</div></div><div class="card-body"><p>Abre <code>gradle/libs.versions.toml</code> (o directamente <code>app/build.gradle.kts</code>, según cómo tengas el proyecto) y añade la dependencia de <code>navigation-compose</code>.</p><div class="tabgroup"><div class="tabs"><button class="tab-btn active" onclick="tab(this,'dep_0')">Con catálogo de versiones</button><button class="tab-btn" onclick="tab(this,'dep_1')">Sin catálogo</button></div><div class="tab-panel active" id="dep_0"><p><strong>Si usas <code>libs.versions.toml</code>:</strong></p><div class="code-wrap"><div class="code-label"><span>gradle/libs.versions.toml</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="toml">[versions]
+navigationCompose = "2.8.4"
+
+[libraries]
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }</pre></div><p>Y en <code>app/build.gradle.kts</code>:</p><div class="code-wrap"><div class="code-label"><span>app/build.gradle.kts</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">dependencies {
+    implementation(libs.androidx.navigation.compose)
+    // ... resto de dependencias
+}</pre></div></div><div class="tab-panel" id="dep_1"><p><strong>Si no usas el catálogo de versiones:</strong></p><div class="code-wrap"><div class="code-label"><span>app/build.gradle.kts</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">dependencies {
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+    // ... resto de dependencias
+}</pre></div></div></div><div class="callout warn"><strong>Importante:</strong> después de modificar <code>build.gradle.kts</code>, pulsa <strong>«Sync Now»</strong> en la barra amarilla que aparece arriba. Si no sincronizas, Android Studio no reconocerá <code>NavHost</code>, <code>rememberNavController</code>, etc.</div><p><strong>Verificación:</strong> si al escribir <code>import androidx.navigation.compose.NavHost</code> el editor no se queja, la dependencia está bien.</p><div class="callout "><strong>Nota sobre versiones:</strong> si tu proyecto usa una versión de Compose más antigua (por ejemplo, BOM 2023.x), puede que necesites una versión de <code>navigation-compose</code> más antigua (2.7.x). Si al sincronizar te da error de compatibilidad, baja la versión hasta que encaje con tu BOM. La versión exacta no importa para esta actividad; lo importante es que <code>NavHost</code> y <code>rememberNavController</code> estén disponibles.</div></div></div>
+<div class="section card" id="s6"><div class="card-head" onclick="toggleCard(this)"><div class="num">6</div><h2>Diseñando la pantalla de Registro (RegisterScreen.kt)</h2><div class="chev">▾</div></div><div class="card-body"><h3>6.1. Mockup objetivo</h3><div class="phone-frame" style="margin:16px auto"><div class="phone-notch"></div><div class="phone-screen" style="min-height:400px">
+<div class="appbar"><span class="ab-btn">←</span><span class="ab-title">Crear cuenta</span></div>
+<div class="app-title">Bienvenido/a</div>
+<div class="field"><input disabled placeholder="Email"></div><div class="field"><input disabled placeholder="Contraseña 👁"></div><div class="field"><input disabled placeholder="Confirmar contraseña 👁"></div>
+<div class="remember-row"><input type="checkbox" disabled> Acepto los términos y condiciones</div><button class="login-btn enabled" disabled>CREAR CUENTA</button><span class="forgot-link">¿Ya tienes cuenta? Inicia sesión</span></div></div><h3>6.2. <code>RegisterScreen.kt</code> completo</h3><p>Crea <code>RegisterScreen.kt</code> en el mismo paquete que <code>LoginScreen.kt</code> y pega. Usa los atajos para saltar entre bloques:</p><div class="jump-row"><button class="jump-chip" onclick="jumpCode('regCode','// 1. ESTADO')">1 · Estado</button><button class="jump-chip" onclick="jumpCode('regCode','// 2. FOCO')">2 · Foco</button><button class="jump-chip" onclick="jumpCode('regCode','// 3. VALIDACIONES')">3 · Validaciones</button><button class="jump-chip" onclick="jumpCode('regCode','// 4. UI')">4 · UI</button><button class="jump-chip" onclick="jumpCode('regCode','// --- Email ---')">Email</button><button class="jump-chip" onclick="jumpCode('regCode','// --- Contraseña ---')">Contraseña</button><button class="jump-chip" onclick="jumpCode('regCode','// --- Confirmar contraseña ---')">Confirmar</button><button class="jump-chip" onclick="jumpCode('regCode','// --- Checkbox términos ---')">Términos</button><button class="jump-chip" onclick="jumpCode('regCode','// --- Botón Crear cuenta ---')">Botón</button></div><div class="code-wrap"><div class="code-label"><span>RegisterScreen.kt</span><span><button class="copy-btn" style="margin-right:6px" onclick="expandCode(this)">Expandir</button><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre class="tall" data-lang="kt" id="regCode">package com.ejemplo.login
+
+import android.util.Patterns
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegisterScreen(
+    onRegisterSuccess: (String) -&gt; Unit,   // Recibe el email para pasarlo a Home
+    onBackToLogin: () -&gt; Unit
+) {
+    // ---------------------------------------------------------
+    // 1. ESTADO
+    // ---------------------------------------------------------
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var acceptTerms by remember { mutableStateOf(false) }
+
+    var emailError by remember { mutableStateOf&lt;String?&gt;(null) }
+    var passwordError by remember { mutableStateOf&lt;String?&gt;(null) }
+    var confirmError by remember { mutableStateOf&lt;String?&gt;(null) }
+    var termsError by remember { mutableStateOf&lt;String?&gt;(null) }
+
+    var showPassword by remember { mutableStateOf(false) }
+    var showConfirm by remember { mutableStateOf(false) }
+
+    // ---------------------------------------------------------
+    // 2. FOCO
+    // ---------------------------------------------------------
+    val focusManager = LocalFocusManager.current
+    val emailFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        emailFocusRequester.requestFocus()
+    }
+
+    // ---------------------------------------------------------
+    // 3. VALIDACIONES
+    // ---------------------------------------------------------
+    fun validarEmail(): Boolean {
+        val ok = email.isNotBlank() &amp;&amp;
+                Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+        emailError = if (!ok) "Introduce un email válido" else null
+        return ok
+    }
+
+    fun validarPassword(): Boolean {
+        val regex = "^(?=.*[A-Z])(?=.*[0-9]).{8,}$".toRegex()
+        val ok = regex.matches(password)
+        passwordError = if (!ok) {
+            "Mínimo 8 caracteres, una mayúscula y un número"
+        } else null
+        return ok
+    }
+
+    fun validarConfirm(): Boolean {
+        val ok = confirmPassword == password &amp;&amp; confirmPassword.isNotEmpty()
+        confirmError = if (!ok) "Las contraseñas no coinciden" else null
+        return ok
+    }
+
+    fun validarTerminos(): Boolean {
+        termsError = if (!acceptTerms) "Debes aceptar los términos" else null
+        return acceptTerms
+    }
+
+    // ---------------------------------------------------------
+    // 4. UI
+    // ---------------------------------------------------------
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.titulo_registro)) },
+                navigationIcon = {
+                    IconButton(onClick = onBackToLogin) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.volver)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding -&gt;
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.titulo_bienvenida),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Email ---
+            OutlinedTextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                    if (it.isNotEmpty()) validarEmail()
+                },
+                label = { Text(stringResource(R.string.hint_email)) },
+                isError = emailError != null,
+                supportingText = emailError?.let { { Text(it) } },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(emailFocusRequester)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- Contraseña ---
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    if (it.isNotEmpty()) validarPassword()
+                    // Si ya había confirmación escrita, revalidamos
+                    if (confirmPassword.isNotEmpty()) validarConfirm()
+                },
+                label = { Text(stringResource(R.string.hint_password)) },
+                isError = passwordError != null,
+                supportingText = passwordError?.let { { Text(it) } },
+                visualTransformation = if (showPassword) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(
+                            imageVector = if (showPassword) {
+                                Icons.Filled.Visibility
+                            } else {
+                                Icons.Filled.VisibilityOff
+                            },
+                            contentDescription = stringResource(R.string.toggle_password)
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- Confirmar contraseña ---
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = {
+                    confirmPassword = it
+                    if (it.isNotEmpty()) validarConfirm()
+                },
+                label = { Text(stringResource(R.string.hint_confirm_password)) },
+                isError = confirmError != null,
+                supportingText = confirmError?.let { { Text(it) } },
+                visualTransformation = if (showConfirm) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                trailingIcon = {
+                    IconButton(onClick = { showConfirm = !showConfirm }) {
+                        Icon(
+                            imageVector = if (showConfirm) {
+                                Icons.Filled.Visibility
+                            } else {
+                                Icons.Filled.VisibilityOff
+                            },
+                            contentDescription = stringResource(R.string.toggle_password)
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() }
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // --- Checkbox términos ---
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = acceptTerms,
+                    onCheckedChange = {
+                        acceptTerms = it
+                        if (it) termsError = null
+                    }
+                )
+                Text(stringResource(R.string.acepto_terminos))
+            }
+            termsError?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Botón Crear cuenta ---
+            Button(
+                onClick = {
+                    val emailOk = validarEmail()
+                    val passOk = validarPassword()
+                    val confirmOk = validarConfirm()
+                    val termsOk = validarTerminos()
+                    if (emailOk &amp;&amp; passOk &amp;&amp; confirmOk &amp;&amp; termsOk) {
+                        focusManager.clearFocus()
+                        onRegisterSuccess(email.trim())
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.boton_crear_cuenta))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- Volver a Login ---
+            TextButton(onClick = onBackToLogin) {
+                Text(stringResource(R.string.ya_tienes_cuenta))
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    MaterialTheme {
+        RegisterScreen(onRegisterSuccess = {}, onBackToLogin = {})
+    }
+}</pre></div><div class="callout "><strong>Nota sobre los mensajes de error:</strong> en la Actividad 2.1 los mensajes de error se pasaban como <code>String</code> directamente en el código. En esta actividad <strong>mantenemos la misma aproximación</strong> para no introducir complejidad adicional con <code>stringResource</code> dentro de funciones no-composable. Si quieres mejorarlo, en los retos verás cómo externalizarlos.</div><h3>6.3. Recursos: <code>strings.xml</code></h3><p>Añade estas cadenas a <code>res/values/strings.xml</code> (junto a las de la Actividad 2.1):</p><div class="code-wrap"><div class="code-label"><span>strings.xml</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="xml">&lt;resources&gt;
+    &lt;!-- ... las de la Actividad 2.1 ... --&gt;
+
+    &lt;!-- Registro --&gt;
+    &lt;string name="titulo_registro"&gt;Crear cuenta&lt;/string&gt;
+    &lt;string name="hint_confirm_password"&gt;Confirmar contraseña&lt;/string&gt;
+    &lt;string name="acepto_terminos"&gt;Acepto los términos y condiciones&lt;/string&gt;
+    &lt;string name="boton_crear_cuenta"&gt;CREAR CUENTA&lt;/string&gt;
+    &lt;string name="ya_tienes_cuenta"&gt;¿Ya tienes cuenta? Inicia sesión&lt;/string&gt;
+    &lt;string name="volver"&gt;Volver&lt;/string&gt;
+
+    &lt;!-- Home --&gt;
+    &lt;string name="home_bienvenida"&gt;¡Bienvenido, %1$s!&lt;/string&gt;
+    &lt;string name="home_sin_email"&gt;¡Bienvenido!&lt;/string&gt;
+    &lt;string name="menu_acerca_de"&gt;Acerca de&lt;/string&gt;
+    &lt;string name="menu_cerrar_sesion"&gt;Cerrar sesión&lt;/string&gt;
+    &lt;string name="dialog_acerca_titulo"&gt;Acerca de&lt;/string&gt;
+    &lt;string name="dialog_acerca_texto"&gt;MiApp v1.0\nDesarrollada por 2º DAM\nProgramación Multimedia y Dispositivos Móviles&lt;/string&gt;
+    &lt;string name="dialog_aceptar"&gt;Aceptar&lt;/string&gt;
+    &lt;string name="dialog_cancelar"&gt;Cancelar&lt;/string&gt;
+    &lt;string name="abrir_menu"&gt;Abrir menú&lt;/string&gt;
+&lt;/resources&gt;</pre></div><div class="callout "><strong>Nota sobre <code>%1$s</code>:</strong> es un <strong>placeholder</strong> de Android. Cuando uses <code>stringResource(R.string.home_bienvenida, email)</code>, Android sustituye <code>%1$s</code> por el valor de <code>email</code>. Si no pasas argumentos, no lo uses.</div><div class="callout "><strong>Nota sobre <code>\n</code>:</strong> en <code>strings.xml</code>, <code>\n</code> se interpreta como salto de línea. Es la forma correcta de meter saltos de línea en recursos de texto.</div></div></div>
+<div class="section card" id="s7"><div class="card-head" onclick="toggleCard(this)"><div class="num">7</div><h2>El grafo de navegación (NavGraph.kt)</h2><div class="chev">▾</div></div><div class="card-body"><h3>7.1. Teoría: estructura de un <code>NavHost</code></h3><p>Un <code>NavHost</code> se compone de:</p><ul><li>Un <strong><code>NavController</code></strong> (creado con <code>rememberNavController()</code>).</li><li>Una <strong><code>startDestination</code></strong> (la ruta inicial).</li><li>Un <strong>bloque</strong> con las rutas (<code>composable("ruta") { ... }</code>).</li></ul><p>Cada <code>composable</code> recibe: <strong><code>route</code></strong> (identificador único), <strong><code>arguments</code></strong> (opcional, lista de <code>navArgument</code>) y <strong><code>content</code></strong> (lambda que recibe un <code>NavBackStackEntry</code> y devuelve el composable de la pantalla).</p><h3>7.2. <code>NavGraph.kt</code> completo</h3><p>Primero, el <strong>mapa de rutas</strong>. Pulsa una transición para ver su código:</p><div class="rg-nodes"><div class="rg-node" id="rgn_login">login</div><span class="small">⇄</span><div class="rg-node" id="rgn_register">register</div><span class="small">→</span><div class="rg-node" id="rgn_home">home/{email}</div></div><div class="rg-edges"><button class="rg-edge" onclick="rgSel(0,this)">Login → Registro</button><button class="rg-edge" onclick="rgSel(1,this)">Registro → Login</button><button class="rg-edge" onclick="rgSel(2,this)">Login → Home</button><button class="rg-edge" onclick="rgSel(3,this)">Registro → Home</button><button class="rg-edge" onclick="rgSel(4,this)">Home → Login</button></div><div class="sc-detail" id="rgDetail">👆 Elige una transición.</div><script>var RG=[{"cb": "onGoToRegister", "code": "navController.navigate(Routes.REGISTER)", "txt": "Apila Registro sobre Login: Login sigue en el back stack, por eso la flecha «atrás» de Registro vuelve a él.", "f": "login", "t": "register"}, {"cb": "onBackToLogin", "code": "navController.popBackStack()", "txt": "Desapila la pantalla actual y vuelve a la anterior.", "f": "register", "t": "login"}, {"cb": "onLoginSuccess", "code": "navController.navigate(Routes.home(email)) {\n    popUpTo(Routes.LOGIN) { inclusive = true }\n}", "txt": "Navega a Home pasando el email codificado y elimina Login del back stack (equivale a finish()).", "f": "login", "t": "home"}, {"cb": "onRegisterSuccess", "code": "navController.navigate(Routes.home(email)) {\n    popUpTo(Routes.LOGIN) { inclusive = true }\n}", "txt": "Igual que el login: se limpian Login y Registro de la pila (popUpTo hasta LOGIN, inclusive).", "f": "register", "t": "home"}, {"cb": "onLogout", "code": "navController.navigate(Routes.LOGIN) {\n    popUpTo(0) { inclusive = true }\n}", "txt": "popUpTo(0) limpia TODO el back stack: el usuario no puede volver atrás a Home.", "f": "home", "t": "login"}];</script><div class="code-wrap"><div class="code-label"><span>NavGraph.kt</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">package com.ejemplo.login
+
+import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
+// ---------------------------------------------------------
+// Definimos las rutas como constantes para evitar errores tipográficos.
+// ---------------------------------------------------------
+object Routes {
+    const val LOGIN = "login"
+    const val REGISTER = "register"
+    const val HOME = "home/{email}"
+
+    fun home(email: String): String = "home/${Uri.encode(email)}"
+}
+
+@Composable
+fun AppNavGraph() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Routes.LOGIN
+    ) {
+        // --- LOGIN ---
+        composable(Routes.LOGIN) {
+            LoginScreen(
+                onLoginSuccess = { email -&gt;
+                    navController.navigate(Routes.home(email)) {
+                        // Evita que al volver atrás se vuelva al login
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onGoToRegister = {
+                    navController.navigate(Routes.REGISTER)
+                }
+            )
+        }
+
+        // --- REGISTRO ---
+        composable(Routes.REGISTER) {
+            RegisterScreen(
+                onRegisterSuccess = { email -&gt;
+                    navController.navigate(Routes.home(email)) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onBackToLogin = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // --- HOME (con argumento email) ---
+        composable(
+            route = Routes.HOME,
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry -&gt;
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            HomeScreen(
+                userEmail = email,
+                onLogout = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+    }
+}</pre></div><h3>7.3. Explicación línea a línea</h3><div class="explain-row"><code>object Routes</code><p class="small">Contenedor de constantes. Evita escribir "login" a mano en varios sitios (y equivocarse).</p></div><div class="explain-row"><code>Routes.home(email)</code><p class="small">Función auxiliar que construye la ruta con el email <strong>codificado</strong> (Uri.encode). Sin esto, un email con @ rompería la ruta.</p></div><div class="explain-row"><code>rememberNavController()</code><p class="small">Crea el NavController. remember hace que se mantenga entre recomposiciones.</p></div><div class="explain-row"><code>NavHost(...)</code><p class="small">Define el grafo. startDestination = Routes.LOGIN significa que la app arranca en Login.</p></div><div class="explain-row"><code>composable(Routes.LOGIN) { ... }</code><p class="small">Declara la pantalla de Login. El bloque recibe un NavBackStackEntry (que aquí no usamos).</p></div><div class="explain-row"><code>onLoginSuccess = { email -&gt; navController.navigate(...) }</code><p class="small">Cuando el Login tenga éxito, navega a Home pasando el email.</p></div><div class="explain-row"><code>popUpTo(Routes.LOGIN) { inclusive = true }</code><p class="small"><strong>Elimina Login del back stack</strong> al navegar a Home. Así, si el usuario pulsa «atrás» desde Home, no vuelve al Login (que ya está logueado). Es el equivalente a finish() en la versión con Intent.</p></div><div class="explain-row"><code>navArgument("email") { type = NavType.StringType }</code><p class="small">Declara que la ruta home/{email} espera un argumento llamado email de tipo String.</p></div><div class="explain-row"><code>backStackEntry.arguments?.getString("email")</code><p class="small">Recupera el valor del argumento.</p></div><div class="explain-row"><code>navController.popBackStack()</code><p class="small">Vuelve a la pantalla anterior. En Registro, esto vuelve a Login.</p></div><div class="explain-row"><code>popUpTo(0) { inclusive = true }</code><p class="small">Limpia <strong>todo</strong> el back stack. Se usa al cerrar sesión para que el usuario no pueda volver atrás a Home.</p></div><h3>7.4. Modificación de <code>LoginScreen.kt</code></h3><p><code>LoginScreen</code> debe cambiar su firma para aceptar <strong>dos callbacks</strong>: uno para login correcto y otro para ir a Registro. Además, debe pasar el email a <code>onLoginSuccess</code>.</p><div class="ba"><div><span class="badge">Antes (2.1)</span><div class="code-wrap"><div class="code-label"><span>LoginScreen · firma</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">@Composable
+fun LoginScreen(
+    onLoginSuccess: () -&gt; Unit
+) { ... }</pre></div></div><div><span class="badge b-new2">Después (2.2)</span><div class="code-wrap"><div class="code-label"><span>LoginScreen · firma</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">@Composable
+fun LoginScreen(
+    onLoginSuccess: (String) -&gt; Unit,   // Ahora recibe el email
+    onGoToRegister: () -&gt; Unit          // Nuevo callback
+) { ... }</pre></div></div></div><p>Y en el botón de Login:</p><div class="code-wrap"><div class="code-label"><span>Botón ENTRAR</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">Button(
+    onClick = {
+        val emailOk = validarEmail()
+        val passOk = validarPassword()
+        if (emailOk &amp;&amp; passOk) {
+            focusManager.clearFocus()
+            onLoginSuccess(email.trim())   // Pasamos el email
+        }
+    },
+    modifier = Modifier.fillMaxWidth()
+) {
+    Text(stringResource(R.string.boton_entrar))
+}</pre></div><p>Y al final, añade un botón para ir a Registro (sustituyendo o acompañando al de «¿Olvidaste tu contraseña?»):</p><div class="code-wrap"><div class="code-label"><span>Botón → Registro</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">Spacer(modifier = Modifier.height(16.dp))
+
+TextButton(onClick = onGoToRegister) {
+    Text(stringResource(R.string.ya_tienes_cuenta))
+}</pre></div><p><strong>No olvides actualizar el <code>@Preview</code>:</strong></p><div class="code-wrap"><div class="code-label"><span>LoginScreenPreview</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    MaterialTheme {
+        LoginScreen(onLoginSuccess = { _ -&gt; }, onGoToRegister = {})
+    }
+}</pre></div><div class="callout warn"><strong>Nota:</strong> el parámetro <code>onLoginSuccess</code> ahora recibe un <code>String</code>. En el <code>Preview</code> hay que usar <code>{ _ -&gt; }</code> (lambda que ignora el parámetro) o <code>{ _: String -&gt; }</code>. Si pones <code>{}</code> a secas, Kotlin se quejará porque espera un parámetro.</div><h3>7.5. Aviso sobre el <code>@Preview</code> de <code>LoginScreen</code></h3><p>Si <code>LoginScreen</code> ahora usa <code>Scaffold</code> (no es el caso, pero podría serlo si sigues los retos), recuerda que <code>TopAppBar</code> requiere <code>@OptIn(ExperimentalMaterial3Api::class)</code>. En esta actividad, <code>LoginScreen</code> no usa <code>TopAppBar</code>, así que no lo necesita. <strong>Solo <code>RegisterScreen</code> y <code>HomeScreen</code> lo requieren.</strong></p></div></div>
+<div class="section card" id="s8"><div class="card-head" onclick="toggleCard(this)"><div class="num">8</div><h2>Scaffold, TopAppBar y menú overflow</h2><div class="chev">▾</div></div><div class="card-body"><h3>8.1. Teoría: <code>Scaffold</code> + <code>TopAppBar</code> + menú</h3><p>Vamos a modificar <code>HomeScreen.kt</code> para que tenga:</p><ul><li>Un <code>Scaffold</code> con <code>TopAppBar</code>.</li><li>Un <strong>menú overflow</strong> con dos opciones: «Acerca de» y «Cerrar sesión».</li><li>Un <strong><code>AlertDialog</code></strong> que se abre desde «Acerca de».</li><li>El email del usuario mostrado en el centro.</li></ul><h3>8.2. <code>HomeScreen.kt</code> completo</h3><p>Sustituye el contenido de <code>HomeScreen.kt</code> por:</p><div class="code-wrap"><div class="code-label"><span>HomeScreen.kt</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">package com.ejemplo.login
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    userEmail: String,
+    onLogout: () -&gt; Unit
+) {
+    // ---------------------------------------------------------
+    // ESTADO: controla el menú overflow y el diálogo
+    // ---------------------------------------------------------
+    var menuExpanded by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    // --- Botón del menú overflow ---
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = stringResource(R.string.abrir_menu)
+                        )
+                    }
+
+                    // --- Menú desplegable ---
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_acerca_de)) },
+                            onClick = {
+                                menuExpanded = false
+                                showAboutDialog = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_cerrar_sesion)) },
+                            onClick = {
+                                menuExpanded = false
+                                onLogout()
+                            }
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding -&gt;
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (userEmail.isNotEmpty()) {
+                    stringResource(R.string.home_bienvenida, userEmail)
+                } else {
+                    stringResource(R.string.home_sin_email)
+                },
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            // Aquí se añadirán en futuras actividades:
+            // - Lista de elementos (Room)
+            // - Lista de la API (Retrofit)
+            // - Botones de navegación a Mapas, Bluetooth, etc.
+        }
+    }
+
+    // ---------------------------------------------------------
+    // DIÁLOGO "Acerca de"
+    // ---------------------------------------------------------
+    if (showAboutDialog) {
+        AlertDialog(
+            onDismissRequest = { showAboutDialog = false },
+            title = { Text(stringResource(R.string.dialog_acerca_titulo)) },
+            text = { Text(stringResource(R.string.dialog_acerca_texto)) },
+            confirmButton = {
+                TextButton(onClick = { showAboutDialog = false }) {
+                    Text(stringResource(R.string.dialog_aceptar))
+                }
+            }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    MaterialTheme {
+        HomeScreen(userEmail = "alumno@ejemplo.com", onLogout = {})
+    }
+}</pre></div><h3>8.3. Explicación línea a línea</h3><div class="explain-row"><code>@OptIn(ExperimentalMaterial3Api::class)</code><p class="small"><code>TopAppBar</code> en Material 3 sigue siendo experimental. Esta anotación silencia el warning.</p></div><div class="explain-row"><code>var menuExpanded by remember { mutableStateOf(false) }</code><p class="small">Estado que controla si el menú está abierto.</p></div><div class="explain-row"><code>var showAboutDialog by remember { mutableStateOf(false) }</code><p class="small">Estado que controla si el diálogo está visible.</p></div><div class="explain-row"><code>TopAppBar(title = { Text(...) }, actions = { ... })</code><p class="small">Barra superior con título y acciones a la derecha.</p></div><div class="explain-row"><code>IconButton { Icon(Icons.Filled.MoreVert, ...) }</code><p class="small">El botón de los tres puntos.</p></div><div class="explain-row"><code>DropdownMenu(expanded = menuExpanded, ...)</code><p class="small">El menú. Se muestra solo si <code>menuExpanded</code> es <code>true</code>.</p></div><div class="explain-row"><code>DropdownMenuItem(text = { Text(...) }, onClick = { ... })</code><p class="small">Cada opción del menú.</p></div><div class="explain-row"><code>onDismissRequest = { menuExpanded = false }</code><p class="small">Al tocar fuera del menú, se cierra.</p></div><div class="explain-row"><code>Scaffold { innerPadding -&gt; ... Modifier.padding(innerPadding) }</code><p class="small">El <code>innerPadding</code> es <strong>crítico</strong>. Sin él, el contenido se solaparía con la <code>TopAppBar</code>.</p></div><div class="explain-row"><code>if (showAboutDialog) { AlertDialog(...) }</code><p class="small">El diálogo solo se compone si el estado es <code>true</code>. Cuando se cierra, se destruye.</p></div><div class="explain-row"><code>onDismissRequest (diálogo)</code><p class="small">Se llama cuando el usuario toca fuera del diálogo o pulsa atrás.</p></div><h3>8.4. Eliminar <code>HomeActivity</code></h3><p>Ahora que Home es un destino del <code>NavHost</code>, la <code>HomeActivity</code> <strong>ya no es necesaria</strong>:</p><ol><li><strong>Borra el archivo <code>HomeActivity.kt</code></strong>.</li><li><strong>Abre <code>AndroidManifest.xml</code></strong> y <strong>elimina</strong> la línea:</li></ol><div class="code-wrap"><div class="code-label"><span>AndroidManifest.xml</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="xml">&lt;activity android:name=".HomeActivity" /&gt;</pre></div><p>3. Mantén solo <code>MainActivity</code> con <code>windowSoftInputMode="adjustResize"</code>.</p><div class="callout warn"><strong>Importante:</strong> si no eliminas <code>HomeActivity</code> del Manifest, Android te dará un error al compilar porque la clase ya no existe.</div></div></div>
+<div class="section card" id="s9"><div class="card-head" onclick="toggleCard(this)"><div class="num">9</div><h2>AlertDialog «Acerca de»</h2><div class="chev">▾</div></div><div class="card-body"><p>Ya lo hemos integrado en <code>HomeScreen</code>. Vamos a entenderlo mejor.</p><h3>9.1. Teoría: <code>AlertDialog</code> en Material 3</h3><ul><li><strong><code>AlertDialog</code> básico:</strong> título, texto, botones. Es el que usamos.</li><li><strong><code>BasicAlertDialog</code>:</strong> tú controlas todo el contenido. Más flexible, más trabajo.</li></ul><table class=""><tr><th>Parámetro</th><th>Obligatorio</th><th>Para qué</th></tr><tr><td><code>onDismissRequest</code></td><td>Sí</td><td>Qué hacer cuando se cierra (tocar fuera, atrás).</td></tr><tr><td><code>confirmButton</code></td><td>Sí</td><td>El botón principal.</td></tr><tr><td><code>title</code></td><td>No</td><td>Título del diálogo.</td></tr><tr><td><code>text</code></td><td>No</td><td>Cuerpo del diálogo.</td></tr><tr><td><code>dismissButton</code></td><td>No</td><td>Botón secundario ("Cancelar").</td></tr><tr><td><code>icon</code></td><td>No</td><td>Icono a la izquierda del título.</td></tr></table><div class="callout "><strong>Regla de oro:</strong> un <code>AlertDialog</code> <strong>siempre</strong> se controla con un estado booleano. No se muestra «porque sí»; se muestra cuando el estado es <code>true</code>.</div><h3>9.2. Variante con dos botones</h3><p>Si quieres un diálogo de confirmación (con «Cancelar» y «Aceptar»):</p><div class="code-wrap"><div class="code-label"><span>AlertDialog de confirmación</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">AlertDialog(
+    onDismissRequest = { showDialog = false },
+    title = { Text("¿Cerrar sesión?") },
+    text = { Text("Se cerrará tu sesión actual.") },
+    confirmButton = {
+        TextButton(onClick = {
+            showDialog = false
+            onLogout()
+        }) { Text("Aceptar") }
+    },
+    dismissButton = {
+        TextButton(onClick = { showDialog = false }) { Text("Cancelar") }
+    }
+)</pre></div><div class="callout "><strong>Reto opcional:</strong> cambia el menú «Cerrar sesión» para que muestre este diálogo de confirmación en lugar de cerrar directamente. Lo verás en los retos.</div></div></div>
+<div class="section card" id="s10"><div class="card-head" onclick="toggleCard(this)"><div class="num">10</div><h2>Paso de datos entre pantallas</h2><div class="chev">▾</div></div><div class="card-body"><h3>10.1. Teoría: argumentos de ruta</h3><p>Ya hemos visto cómo se declara un argumento:</p><div class="code-wrap"><div class="code-label"><span>Declaración</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">composable(
+    route = "home/{email}",
+    arguments = listOf(navArgument("email") { type = NavType.StringType })
+) { backStackEntry -&gt;
+    val email = backStackEntry.arguments?.getString("email") ?: ""
+    HomeScreen(email = email)
+}</pre></div><p>Y cómo se navega con el argumento:</p><div class="code-wrap"><div class="code-label"><span>Navegación</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">navController.navigate("home/$email")</pre></div><p><strong>Reglas importantes:</strong></p><ol><li><strong>Codifica los valores</strong> con <code>Uri.encode(...)</code> si pueden contener caracteres especiales (<code>@</code>, <code>/</code>, <code>?</code>, <code>&amp;</code>, espacios...).</li><li><strong>Declara el <code>navArgument</code></strong> en el <code>composable</code>. Si no lo haces, <code>arguments</code> será <code>null</code>.</li><li><strong>Proporciona un valor por defecto</strong> (<code>defaultValue = ""</code>) para evitar <code>null</code> inesperados.</li><li><strong>No uses argumentos para objetos complejos.</strong> Para eso, usa un <code>ViewModel</code> compartido o serializa a JSON. Para esta actividad, con String es suficiente.</li></ol><p>🧪 <strong>Laboratorio <code>Uri.encode</code>:</strong> escribe un email (o elige un ejemplo) y mira qué ruta se construye con y sin codificar.</p><div class="lab"><input type="text" id="uriIn" value="alumno+test@ejemplo.com" oninput="uriUpd()"><div class="filters" style="margin-top:8px">
+<button class="filter-chip" onclick="uriSet('alumno@ejemplo.com')">alumno@ejemplo.com</button><button class="filter-chip" onclick="uriSet('alumno+test@ejemplo.com')">con +</button>
+<button class="filter-chip" onclick="uriSet('nombre apellido@ejemplo.es')">con espacio</button><button class="filter-chip" onclick="uriSet('a/b@ejemplo.com')">con /</button></div>
+<div class="out" id="uriOut"></div></div><h3>10.2. Tipos de <code>NavType</code></h3><table class=""><tr><th>NavType</th><th>Tipo Kotlin</th><th>Ejemplo de ruta</th></tr><tr><td><code>NavType.StringType</code></td><td><code>String</code></td><td><code>"home/{email}"</code></td></tr><tr><td><code>NavType.IntType</code></td><td><code>Int</code></td><td><code>"detalle/{id}"</code></td></tr><tr><td><code>NavType.BoolType</code></td><td><code>Boolean</code></td><td><code>"config/{activado}"</code></td></tr><tr><td><code>NavType.FloatType</code></td><td><code>Float</code></td><td><code>"mapa/{lat}"</code></td></tr></table><div class="callout "><strong>No hay <code>NavType</code> para <code>List</code>, <code>Map</code> u objetos.</strong> Para eso, serializa.</div><h3>10.3. Argumentos opcionales</h3><p>Si quieres que un argumento sea opcional:</p><div class="code-wrap"><div class="code-label"><span>Argumento opcional</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">composable(
+    route = "home?email={email}",
+    arguments = listOf(
+        navArgument("email") {
+            type = NavType.StringType
+            defaultValue = ""
+            nullable = true
+        }
+    )
+) { ... }</pre></div><ul><li>El <code>?</code> en la ruta indica que el argumento es opcional.</li><li><code>defaultValue</code> define qué valor toma si no se pasa.</li><li><code>nullable = true</code> permite que sea <code>null</code>.</li></ul><p>En esta actividad usamos argumento <strong>obligatorio</strong> (sin <code>?</code>), porque siempre pasamos el email.</p></div></div>
+<div class="section card" id="s11"><div class="card-head" onclick="toggleCard(this)"><div class="num">11</div><h2>Refactorizando MainActivity</h2><div class="chev">▾</div></div><div class="card-body"><h3>11.1. <code>MainActivity.kt</code> final</h3><p>Ahora <code>MainActivity</code> es <strong>mucho más simple</strong>: solo carga el grafo de navegación.</p><div class="code-wrap"><div class="code-label"><span>MainActivity.kt</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="kt">package com.ejemplo.login
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MaterialTheme {
+                AppNavGraph()
+            }
+        }
+    }
+}</pre></div><p><strong>Comparación con la Actividad 2.1:</strong></p><table class=""><tr><th>Antes</th><th>Ahora</th></tr><tr><td><code>MainActivity</code> llamaba a <code>LoginScreen</code> y navegaba con <code>Intent</code>.</td><td><code>MainActivity</code> solo llama a <code>AppNavGraph()</code>.</td></tr><tr><td><code>HomeActivity</code> existía.</td><td><code>HomeActivity</code> se ha eliminado.</td></tr><tr><td>La navegación estaba dispersa.</td><td>Toda la navegación vive en <code>NavGraph.kt</code>.</td></tr></table><h3>11.2. <code>AndroidManifest.xml</code> final</h3><p>Debe quedar así (solo <code>MainActivity</code>):</p><div class="code-wrap"><div class="code-label"><span>AndroidManifest.xml</span><span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div><pre data-lang="xml">&lt;application
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/Theme.MiApp"&gt;
+
+    &lt;activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:windowSoftInputMode="adjustResize"&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name="android.intent.action.MAIN" /&gt;
+            &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+
+&lt;/application&gt;</pre></div><div class="callout "><strong>Nota:</strong> el nombre <code>Theme.MiApp</code> puede variar según cómo se llamara tu proyecto en la Actividad 2.1. No lo cambies si ya funcionaba.</div></div></div>
+<div class="demo-section" id="demo">
+  <div class="demo-title">
+    <h2>🧪 Simulador interactivo: NavHost y back stack</h2>
+    <p>Navega entre Login, Registro y Home y observa cómo cambia la pila de destinos, qué ruta se construye con <code style="background:rgba(255,255,255,.15)">Uri.encode</code> y qué llamadas hace el <code style="background:rgba(255,255,255,.15)">NavController</code>.</p>
+  </div>
+  <div class="demo-grid">
+    <div class="phone-frame"><div class="phone-notch"></div><div class="phone-screen" id="navScreen"></div></div>
+    <div class="demo-side">
+      <div class="logcat-panel">
+        <div class="logcat-head"><span>▤ Back stack</span><span>arriba = pantalla visible</span></div>
+        <div class="stack-view" id="stackView"></div>
+        <div class="route-box" id="routeBox"></div>
+      </div>
+      <div class="logcat-panel">
+        <div class="logcat-head"><span>▤ NavController · Logcat</span><span id="navLogCount">0 eventos</span></div>
+        <div class="logcat-body" id="navLog"></div>
+        <div class="demo-controls">
+          <label class="demo-opt"><input type="checkbox" id="optPop" checked onchange="N.usePop=this.checked"> <span><code style="background:rgba(255,255,255,.12);color:#ffd479">popUpTo(LOGIN) { inclusive = true }</code> al navegar a Home</span></label>
+          <button class="demo-btn" onclick="sysBack()">◀ Atrás del sistema</button>
+          <button class="demo-btn secondary" onclick="navReset()">↺ Reiniciar app</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="demo-hint">Prueba: ① Login → «¿Ya tienes cuenta?» → Registro → ← · ② Registro con datos válidos → Home (mira la ruta con el email codificado) · ③ Atrás del sistema en Home, con y sin <code style="background:rgba(255,255,255,.12)">popUpTo</code> · ④ ⋮ → Acerca de · ⑤ ⋮ → Cerrar sesión (<code style="background:rgba(255,255,255,.12)">popUpTo(0)</code>).</p>
+</div>
+
+<div class="section card" id="s12">
+    <div class="card-head" onclick="toggleCard(this)">
+        <div class="num">12</div>
+        <h2>Pruebas en el emulador</h2>
+        <div class="chev">▾</div>
+    </div>
+    <div class="card-body">
+        <p>Ejecuta la app y comprueba los siguientes <strong>casos de prueba</strong>. Márcalos según los vayas
+            verificando:</p>
+        <ul class="checklist" data-fill="test_f" data-label="test_l" data-suffix="casos verificados">
+            <li><input type="checkbox"><span><strong>1.</strong> Abrir la app → Se muestra Login con foco en
+                    email.</span></li>
+            <li><input type="checkbox"><span><strong>2.</strong> Pulsar "¿Ya tienes cuenta? Inicia sesión" → Navega a
+                    Registro. <span class="badge">📸 captura</span></span></li>
+            <li><input type="checkbox"><span><strong>3.</strong> En Registro, pulsar la flecha atrás → Vuelve a
+                    Login.</span></li>
+            <li><input type="checkbox"><span><strong>4.</strong> En Registro, escribir email inválido y salir → Aparece
+                    error de email.</span></li>
+            <li><input type="checkbox"><span><strong>5.</strong> En Registro, escribir contraseñas que no coinciden →
+                    Aparece error "Las contraseñas no coinciden". <span class="badge">📸 captura</span></span></li>
+            <li><input type="checkbox"><span><strong>6.</strong> En Registro, pulsar CREAR sin aceptar términos →
+                    Aparece error "Debes aceptar los términos".</span></li>
+            <li><input type="checkbox"><span><strong>7.</strong> En Registro, rellenar todo bien y pulsar CREAR → Navega
+                    a Home con el email mostrado. <span class="badge">📸 captura</span></span></li>
+            <li><input type="checkbox"><span><strong>8.</strong> En Home, pulsar el menú ⋮ → Se despliega el menú con
+                    dos opciones.</span></li>
+            <li><input type="checkbox"><span><strong>9.</strong> En Home, pulsar "Acerca de" → Se abre el
+                    <code>AlertDialog</code> con info. <span class="badge">📸 captura</span></span></li>
+            <li><input type="checkbox"><span><strong>10.</strong> En Home, pulsar "Cerrar sesión" → Vuelve a Login y no
+                    se puede volver atrás. <span class="badge">📸 captura</span></span></li>
+            <li><input type="checkbox"><span><strong>11.</strong> En Home, pulsar atrás del sistema → Sale de la app (no
+                    vuelve a Login).</span></li>
+            <li><input type="checkbox"><span><strong>12.</strong> Rotar la pantalla en Registro → El contenido se ve
+                    completo (scroll).</span></li>
+            <li><input type="checkbox"><span><strong>13.</strong> Probar con TalkBack → Todos los iconos se anuncian
+                    correctamente.</span></li>
+        </ul>
+        <div class="progress-track">
+            <div class="progress-fill" id="test_f"></div>
+        </div>
+        <div class="progress-label" id="test_l">0 / 13 casos verificados</div>
+        <p>📸 <strong>Haz capturas de pantalla</strong> de los casos 2, 5, 7, 9 y 10 para el informe.</p>
+        <h3>Casos límite que conviene probar también</h3>
+        <ul>
+            <li><strong>Email con <code>+</code>:</strong> por ejemplo <code>alumno+test@ejemplo.com</code>. Debe llegar
+                correctamente a Home.</li>
+            <li><strong>Rotar la pantalla estando en Home:</strong> el menú debe seguir funcionando.</li>
+            <li><strong>Pulsar atrás desde Registro tras haber navegado varias veces:</strong> debe volver a Login sin
+                problemas.</li>
+        </ul>
+    </div>
+</div>
+<div class="section card" id="s13">
+    <div class="card-head" onclick="toggleCard(this)">
+        <div class="num">13</div>
+        <h2>Errores comunes y soluciones</h2>
+        <div class="chev">▾</div>
+    </div>
+    <div class="card-body">
+        <p>Escribe para filtrar (por error, causa o solución):</p>
+        <div class="lab" style="padding:10px"><input type="text" id="errQ"
+                placeholder="🔎 p. ej. popUpTo, Manifest, OptIn..." oninput="errFilter()"></div>
+        <table id="errTable">
+            <tr>
+                <th>Error</th>
+                <th>Causa probable</th>
+                <th>Solución</th>
+            </tr>
+            <tr>
+                <td><code>Unresolved reference: NavHost</code></td>
+                <td>Falta la dependencia.</td>
+                <td>Añade <code>navigation-compose</code> y sincroniza Gradle.</td>
+            </tr>
+            <tr>
+                <td><code>NavController has not been initialized</code></td>
+                <td>Usas <code>navController</code> fuera del <code>NavHost</code>.</td>
+                <td>Pásalo como parámetro a los composables.</td>
+            </tr>
+            <tr>
+                <td><code>Cannot find a destination that matches route</code></td>
+                <td>La ruta no coincide.</td>
+                <td>Revisa que <code>navigate("...")</code> use exactamente la misma ruta que
+                    <code>composable("...")</code>.</td>
+            </tr>
+            <tr>
+                <td><code>IllegalArgumentException: Navigation destination that matches request cannot be found</code>
+                </td>
+                <td>El argumento está mal formado.</td>
+                <td>Asegúrate de codificar con <code>Uri.encode</code>.</td>
+            </tr>
+            <tr>
+                <td><code>@Composable invocations can only happen from the context of a @Composable function</code></td>
+                <td>Estás llamando a un composable desde fuera.</td>
+                <td>Revisa que <code>AppNavGraph()</code> esté dentro de <code>setContent</code>.</td>
+            </tr>
+            <tr>
+                <td>El diálogo no se cierra</td>
+                <td>Falta <code>onDismissRequest</code>.</td>
+                <td>Añade <code>onDismissRequest = { showDialog = false }</code>.</td>
+            </tr>
+            <tr>
+                <td>El menú no se cierra al pulsar una opción</td>
+                <td>No pones <code>menuExpanded = false</code> en <code>onClick</code>.</td>
+                <td>Añádelo en cada <code>DropdownMenuItem</code>.</td>
+            </tr>
+            <tr>
+                <td>El contenido se solapa con la <code>TopAppBar</code></td>
+                <td>No aplicas <code>innerPadding</code>.</td>
+                <td>Usa <code>Modifier.padding(innerPadding)</code> en el contenido.</td>
+            </tr>
+            <tr>
+                <td><code>HomeActivity not found</code></td>
+                <td>No la has eliminado del Manifest.</td>
+                <td>Bórrala del Manifest y borra el archivo.</td>
+            </tr>
+            <tr>
+                <td><code>Type mismatch: inferred type is () -&gt; Unit but (String) -&gt; Unit was expected</code></td>
+                <td>Cambiaste la firma de <code>LoginScreen</code> pero no actualizaste el <code>Preview</code>.</td>
+                <td>Actualiza el <code>Preview</code> con <code>onLoginSuccess = { _ -&gt; }</code>.</td>
+            </tr>
+            <tr>
+                <td>Al volver atrás desde Home, vuelve a Login</td>
+                <td>No usaste <code>popUpTo</code>.</td>
+                <td>Añade <code>popUpTo(Routes.LOGIN) { inclusive = true }</code>.</td>
+            </tr>
+            <tr>
+                <td><code>@OptIn</code> no reconocido</td>
+                <td>Falta import.</td>
+                <td><code>import androidx.compose.material3.ExperimentalMaterial3Api</code>.</td>
+            </tr>
+            <tr>
+                <td><code>TopAppBar</code> da warning amarillo</td>
+                <td>Es experimental en Material 3.</td>
+                <td>Añade <code>@OptIn(ExperimentalMaterial3Api::class)</code> antes del <code>@Composable</code>.</td>
+            </tr>
+            <tr>
+                <td><code>Unresolved reference: popUpTo</code></td>
+                <td>Falta import o es una función de <code>NavOptionsBuilder</code>.</td>
+                <td>Asegúrate de que <code>popUpTo</code> va dentro del bloque <code>navigate(...) { }</code>.</td>
+            </tr>
+            <tr>
+                <td>La app se cierra al navegar a Home con email</td>
+                <td>Email con caracteres no codificados.</td>
+                <td>Usa <code>Uri.encode(email)</code> en <code>Routes.home(email)</code>.</td>
+            </tr>
+        </table>
+        <p class="small" id="errEmpty" style="display:none">Sin coincidencias.</p>
+    </div>
+</div>
+<div class="section card" id="s14">
+    <div class="card-head" onclick="toggleCard(this)">
+        <div class="num">14</div>
+        <h2>Accesibilidad</h2>
+        <div class="chev">▾</div>
+    </div>
+    <div class="card-body">
+        <p>En esta actividad, la accesibilidad es especialmente importante porque añadimos <strong>nuevos componentes
+                interactivos</strong>:</p>
+        <ul>
+            <li>✅ <strong><code>TopAppBar.navigationIcon</code></strong>: la flecha atrás debe tener
+                <code>contentDescription</code> descriptivo («Volver», no «Botón»).</li>
+            <li>✅ <strong>Menú overflow</strong>: el <code>IconButton</code> de los tres puntos debe tener
+                <code>contentDescription</code> («Abrir menú»).</li>
+            <li>✅ <strong><code>DropdownMenuItem</code></strong>: el texto ya es accesible; no necesitas
+                <code>contentDescription</code>.</li>
+            <li>✅ <strong><code>AlertDialog</code></strong>: TalkBack lee automáticamente el título y el texto.
+                Asegúrate de que el <code>confirmButton</code> tiene texto legible («Aceptar», no «OK»).</li>
+            <li>✅ <strong><code>Checkbox</code></strong>: debe ir acompañado de un <code>Text</code> visible (ya lo hace
+                en Registro).</li>
+            <li>✅ <strong>Contraste</strong>: el texto de error debe cumplir WCAG AA (4.5:1). Usa
+                <code>MaterialTheme.colorScheme.error</code>, que ya cumple.</li>
+            <li>✅ <strong>Tamaño táctil</strong>: los <code>IconButton</code> de Material 3 ya tienen 48dp × 48dp por
+                defecto. No los reduzcas.</li>
+        </ul>
+        <div class="callout "><strong>Prueba con TalkBack:</strong> actívalo en el emulador
+            (<code>Settings &gt; Accessibility &gt; TalkBack</code>) y navega por Login → Registro → Home → menú →
+            diálogo. Comprueba que todos los elementos se anuncian correctamente.</div>
+    </div>
+</div>
+<div class="section card" id="s15">
+    <div class="card-head" onclick="toggleCard(this)">
+        <div class="num">15</div>
+        <h2>Entregables</h2>
+        <div class="chev">▾</div>
+    </div>
+    <div class="card-body">
+        <p>Debes subir al Aula Virtual:</p>
+        <ol>
+            <li><strong>Eenlace al repositorio Git. Debe compilar y ejecutarse.</li>
+            <li><strong>Informe UI/UX</strong> (PDF o Markdown, máx. 3 páginas) con:<ul>
+                    <li><strong>Wireframes:</strong> captura de las tres pantallas (Login, Registro, Home con menú
+                        abierto).</li>
+                    <li><strong>Decisiones de diseño:</strong> Explica con tus palabras por qué <code>NavHost</code> en lugar de
+                        <code>Intent</code> y por qué <code>Scaffold</code></li>
+                    <li><strong>Capturas de pruebas:</strong> al menos los casos 2, 5, 7, 9 y 10 de la tabla de pruebas del emulador (apartado 12 de la guía).</li>
+                    <li><strong>Dificultades encontradas:</strong> qué errores has tenido (si las has tenido) y cómo los has resuelto.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="section card" id="s16">
+    <div class="card-head" onclick="toggleCard(this)">
+        <div class="num">16</div>
+        <h2>Checklist de autoevaluación</h2>
+        <div class="chev">▾</div>
+    </div>
+    <div class="card-body">
+        <p>Antes de entregar, marca cada casilla. Si alguna no la puedes marcar, <strong>no entregues todavía</strong>.
+        </p>
+        <ul class="checklist" data-fill="self_f" data-label="self_l" data-suffix="completado">
+            <li><input type="checkbox"><span>El proyecto compila sin errores.</span></li>
+            <li><input type="checkbox"><span>La app arranca en el emulador.</span></li>
+            <li><input type="checkbox"><span>Se navega de Login a Registro y vuelta.</span></li>
+            <li><input type="checkbox"><span>Se navega de Login a Home con login correcto.</span></li>
+            <li><input type="checkbox"><span>Se navega de Registro a Home con registro correcto.</span></li>
+            <li><input type="checkbox"><span>El email se pasa correctamente de Login/Registro a Home.</span></li>
+            <li><input type="checkbox"><span>Home tiene <code>TopAppBar</code> con título.</span></li>
+            <li><input type="checkbox"><span>Home tiene menú overflow con dos opciones.</span></li>
+            <li><input type="checkbox"><span>"Acerca de" abre un <code>AlertDialog</code>.</span></li>
+            <li><input type="checkbox"><span>"Cerrar sesión" vuelve a Login y no se puede volver atrás.</span></li>
+            <li><input type="checkbox"><span>El botón "atrás" del sistema desde Home sale de la app.</span></li>
+            <li><input type="checkbox"><span>Las validaciones de Registro funcionan (email, contraseña, confirmación,
+                    términos).</span></li>
+            <li><input type="checkbox"><span>Los textos están en <code>strings.xml</code>, referenciados con
+                    <code>stringResource</code>.</span></li>
+            <li><input type="checkbox"><span>He probado en vertical y horizontal.</span></li>
+            <li><input type="checkbox"><span>He probado con TalkBack activado.</span></li>
+            <li><input type="checkbox"><span>He eliminado <code>HomeActivity</code> y su entrada en el Manifest.</span>
+            </li>
+            <li><input type="checkbox"><span>Los <code>@Preview</code> se renderizan en Android Studio.</span></li>
+            <li><input type="checkbox"><span>He hecho capturas para el informe.</span></li>
+            <li><input type="checkbox"><span>El informe explica las decisiones de diseño y navegación.</span></li>
+        </ul>
+        <div class="progress-track">
+            <div class="progress-fill" id="self_f"></div>
+        </div>
+        <div class="progress-label" id="self_l">0 / 19 completado</div>
+    </div>
+</div>
+<!--
+<div class="section card" id="s17"><div class="card-head" onclick="toggleCard(this)"><div class="num">17</div><h2>Rúbrica de evaluación</h2><div class="chev">▾</div></div><div class="card-body"><div class="rubric-row"><div class="rubric-top"><strong>Navegación (CE.a)</strong><span>2.5 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:100%"></div></div><p class="small" style="margin:4px 0 0"><code>NavHost</code> funcional con 3 destinos. Paso de email entre pantallas. Back stack correcto.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Pantalla Registro (CE.b)</strong><span>2.0 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:80%"></div></div><p class="small" style="margin:4px 0 0">UI completa con 3 campos, checkbox y botón. Validaciones equivalentes al Login.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Scaffold + TopAppBar (CE.b)</strong><span>1.5 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:60%"></div></div><p class="small" style="margin:4px 0 0"><code>Scaffold</code> con <code>TopAppBar</code>, <code>innerPadding</code> aplicado. Título y acciones correctas.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Menú overflow + AlertDialog (CE.b)</strong><span>1.5 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:60%"></div></div><p class="small" style="margin:4px 0 0">Menú con dos opciones. Diálogo "Acerca de" funcional.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Paso de datos (CE.g)</strong><span>1.0 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:40%"></div></div><p class="small" style="margin:4px 0 0">Email pasado correctamente de Login/Registro a Home. Codificación con <code>Uri.encode</code>.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Documentación (CE.i)</strong><span>1.0 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:40%"></div></div><p class="small" style="margin:4px 0 0">El informe explica el flujo de navegación, validaciones y muestra capturas.</p></div><div class="rubric-row"><div class="rubric-top"><strong>Calidad del código</strong><span>0.5 pts</span></div><div class="rubric-track"><div class="rubric-fill" style="width:20%"></div></div><p class="small" style="margin:4px 0 0">Código limpio, comentado, constantes de rutas, textos en <code>strings.xml</code>.</p></div><table style="margin-top:18px"><tr><th>Total</th><td><strong>10.0 puntos</strong></td></tr></table></div></div>
+-->
+<div class="section card" id="s18"><div class="card-head" onclick="toggleCard(this)"><div class="num">18</div><h2>Estimación de tiempos</h2><div class="chev">▾</div></div><div class="card-body"><div class="timeline"><div class="tl-row"><div class="tl-label">Lectura de conceptos (NavHost, Scaffold, diálogos)</div><div class="tl-bar-bg"><div class="tl-bar" style="width:55%">30 min</div></div></div><div class="tl-row"><div class="tl-label">Añadir dependencia y sincronizar Gradle</div><div class="tl-bar-bg"><div class="tl-bar" style="width:18%">10 min</div></div></div><div class="tl-row"><div class="tl-label">Crear <code>RegisterScreen.kt</code> con validaciones</div><div class="tl-bar-bg"><div class="tl-bar" style="width:100%">55 min</div></div></div><div class="tl-row"><div class="tl-label">Crear <code>NavGraph.kt</code> y modificar <code>LoginScreen</code></div><div class="tl-bar-bg"><div class="tl-bar" style="width:73%">40 min</div></div></div><div class="tl-row"><div class="tl-label">Modificar <code>HomeScreen</code> con Scaffold, TopAppBar y menú</div><div class="tl-bar-bg"><div class="tl-bar" style="width:73%">40 min</div></div></div><div class="tl-row"><div class="tl-label">Implementar <code>AlertDialog</code></div><div class="tl-bar-bg"><div class="tl-bar" style="width:18%">10 min</div></div></div><div class="tl-row"><div class="tl-label">Eliminar <code>HomeActivity</code> y ajustar Manifest</div><div class="tl-bar-bg"><div class="tl-bar" style="width:18%">10 min</div></div></div><div class="tl-row"><div class="tl-label">Pruebas y depuración</div><div class="tl-bar-bg"><div class="tl-bar" style="width:73%">40 min</div></div></div><div class="tl-row"><div class="tl-label">Documentación UI/UX</div><div class="tl-bar-bg"><div class="tl-bar" style="width:45%">25 min</div></div></div></div><p class="small"><strong>Total estimado: 4 horas (y poco 🙃)</strong></p></div></div>
+<div class="section card" id="s19"><div class="card-head" onclick="toggleCard(this)"><div class="num">19</div><h2>Recursos adicionales</h2><div class="chev">▾</div></div><div class="card-body"><div class="resource-grid"><a class="resource-card" href="https://developer.android.com/develop/ui/compose/navigation" target="_blank" rel="noopener"><h4>Navigation in Compose</h4><span>developer.android.com</span></a><a class="resource-card" href="https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#Scaffold" target="_blank" rel="noopener"><h4>Scaffold</h4><span>developer.android.com</span></a><a class="resource-card" href="https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#TopAppBar" target="_blank" rel="noopener"><h4>TopAppBar</h4><span>developer.android.com</span></a><a class="resource-card" href="https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#DropdownMenu" target="_blank" rel="noopener"><h4>DropdownMenu</h4><span>developer.android.com</span></a><a class="resource-card" href="https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#AlertDialog" target="_blank" rel="noopener"><h4>AlertDialog</h4><span>developer.android.com</span></a><a class="resource-card" href="https://developer.android.com/develop/ui/compose/navigation#nav-with-args" target="_blank" rel="noopener"><h4>Pass arguments between destinations</h4><span>developer.android.com</span></a><a class="resource-card" href="https://material.io/resources/color/" target="_blank" rel="noopener"><h4>Material Design Color Tool</h4><span>material.io</span></a></div><p><strong>Herramientas:</strong> Android Studio (última versión estable) y AVD Manager (emuladores).</p></div></div>
+<div class="section card" id="s20"><div class="card-head" onclick="toggleCard(this)"><div class="num">20</div><h2>Retos adicionales (opcionales)</h2><div class="chev">▾</div></div><div class="card-body"><div class="callout warn"><strong>Regla del reto:</strong> antes de empezar cada uno, haz una <strong>copia de seguridad</strong> del archivo que vas a modificar (o usa Git). Así podrás volver atrás si rompes algo.</div><p class="small">Voluntarios y sin solución paso a paso: solo pistas. Si te atascas, relee la sección correspondiente, consulta la documentación oficial o pregunta en clase.</p><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐</span><h4>Reto 1: Diálogo de confirmación al cerrar sesión</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Fácil</span><span class="badge">📄 <code>HomeScreen.kt</code></span><span class="badge">⏱ 15-20 min</span></p><p>Ahora mismo, al pulsar "Cerrar sesión" en el menú overflow, la sesión se cierra <strong>directamente</strong>. Queremos que aparezca un <code>AlertDialog</code> de confirmación antes de cerrar: "¿Cerrar sesión? Se cerrará tu sesión actual." con botones "Cancelar" y "Aceptar". Solo si el usuario pulsa "Aceptar" se cierra la sesión.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>Necesitas un nuevo estado: <code>var showLogoutDialog by remember { mutableStateOf(false) }</code>. </li><li>El <code>DropdownMenuItem</code> de "Cerrar sesión" ya no debe llamar a <code>onLogout()</code> directamente; debe poner <code>showLogoutDialog = true</code>. </li><li>Añade un segundo <code>if (showLogoutDialog) { AlertDialog(...) }</code> con <code>confirmButton</code> y <code>dismissButton</code>. </li><li>Reutiliza los textos <code>R.string.dialog_cancelar</code> y <code>R.string.dialog_aceptar</code>. </li><li><strong>Ojo:</strong> tendrás dos <code>AlertDialog</code> en la misma pantalla (<code>Acerca de</code> y <code>Cerrar sesión</code>). Asegúrate de que sus estados son independientes. </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A tener <strong>dos diálogos</strong> en la misma pantalla sin que se solapen. </li><li>A gestionar estados booleanos independientes. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐</span><h4>Reto 2: Icono de "Acerca de" en la <code>TopAppBar</code></h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Medio</span><span class="badge">📄 <code>HomeScreen.kt</code></span><span class="badge">⏱ 15-20 min</span></p><p>Además del menú overflow, queremos un <strong>icono directo</strong> de "Acerca de" (<code>Icons.Filled.Info</code>) en la <code>TopAppBar</code>, a la izquierda del menú overflow. Al pulsarlo, debe abrir el mismo <code>AlertDialog</code>. El menú overflow debe seguir teniendo las dos opciones.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>En <code>actions</code>, antes del <code>IconButton</code> del menú, añade otro <code>IconButton</code> con <code>Icons.Filled.Info</code>. </li><li>El <code>onClick</code> de ese icono debe poner <code>showAboutDialog = true</code>. </li><li>Cuida el <code>contentDescription</code> ("Acerca de"). </li><li><strong>Reflexión:</strong> ¿es buena idea duplicar una acción en el icono y en el menú? ¿Por qué sí o por qué no? </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A añadir múltiples acciones a la <code>TopAppBar</code>. </li><li>A reflexionar sobre UX: ¿duplicar acciones o no? --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐</span><h4>Reto 3: Argumento adicional "nombre" en Home</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Medio</span><span class="badge">📄 <code>NavGraph.kt</code>, <code>LoginScreen.kt</code>, <code>RegisterScreen.kt</code>, <code>HomeScreen.kt</code>, <code>strings.xml</code></span><span class="badge">⏱ 30-40 min</span></p><p>Queremos que Home muestre <strong>"¡Bienvenido, [nombre]!"</strong> además del email. El nombre se recogerá en un nuevo campo en Login y Registro. La ruta de Home pasará a ser <code>"home/{email}/{nombre}"</code>.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>Añade un <code>var nombre by remember { mutableStateOf("") }</code> en <code>LoginScreen</code> y <code>RegisterScreen</code>. </li><li>Añade un <code>OutlinedTextField</code> para el nombre (con su <code>stringResource</code>). </li><li>Cambia la ruta de Home: <code>"home/{email}/{nombre}"</code>. </li><li>Declara <strong>dos</strong> <code>navArgument</code>: uno para <code>email</code> y otro para <code>nombre</code>. </li><li>Actualiza <code>Routes.home(email, nombre)</code> para construir la ruta con <code>Uri.encode</code> en ambos. </li><li>En <code>HomeScreen</code>, añade el parámetro <code>userName: String</code> y muéstralo. </li><li><strong>Cuidado:</strong> si el nombre tiene espacios, <code>Uri.encode</code> los convertirá en <code>%20</code>. Al recuperarlos, Android los decodifica automáticamente, pero asegúrate de probarlo. </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A pasar <strong>múltiples argumentos</strong> entre pantallas. </li><li>A modificar la firma de varios composables de forma coherente. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐⭐</span><h4>Reto 4: <code>BottomAppBar</code> con navegación</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Difícil</span><span class="badge">📄 <code>HomeScreen.kt</code>, <code>NavGraph.kt</code></span><span class="badge">⏱ 40-50 min</span></p><p>Añade una <strong><code>BottomAppBar</code></strong> a Home con dos iconos: "Inicio" (<code>Icons.Filled.Home</code>) y "Perfil" (<code>Icons.Filled.Person</code>). Al pulsar "Perfil", debe navegar a una nueva pantalla <code>ProfileScreen</code> (vacía, con un texto). Al pulsar "Inicio", debe volver a Home. La <code>TopAppBar</code> se mantiene.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li><code>Scaffold</code> tiene un parámetro <code>bottomBar</code> que acepta un composable. </li><li>Usa <code>BottomAppBar { IconButton { ... } }</code>. </li><li>Crea una ruta nueva <code>"profile"</code> en <code>NavGraph.kt</code>. </li><li>Crea <code>ProfileScreen.kt</code> con un <code>Scaffold</code> propio (o reutiliza el de Home pasando parámetros). </li><li><strong>Reflexión:</strong> ¿debería <code>ProfileScreen</code> tener su propia <code>TopAppBar</code> o compartir la de Home? ¿Por qué? </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A usar <code>BottomAppBar</code>. </li><li>A estructurar la navegación con múltiples puntos de entrada. </li><li>A decidir cuándo una pantalla debe tener su propio <code>Scaffold</code>. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐⭐</span><h4>Reto 5: Validación en tiempo real con <code>derivedStateOf</code></h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Difícil</span><span class="badge">📄 <code>RegisterScreen.kt</code></span><span class="badge">⏱ 30-40 min</span></p><p>Queremos que el botón "CREAR CUENTA" esté <strong>deshabilitado</strong> hasta que <strong>todos</strong> los campos sean válidos (email válido, contraseña fuerte, confirmación coincide, términos aceptados). Además, queremos mostrar un <strong>contador de caracteres</strong> debajo del campo de contraseña ("8/12 caracteres mínimos"). El contador debe cambiar en tiempo real.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>Usa <code>derivedStateOf</code> para calcular <code>formularioValido</code> a partir de los estados existentes. </li><li>Pasa <code>enabled = formularioValido</code> al <code>Button</code>. </li><li>Para el contador, usa <code>Text("${password.length}/8")</code> con un color condicional (rojo si &lt; 8, verde si ≥ 8). </li><li><strong>Ojo:</strong> <code>derivedStateOf</code> solo recalcula cuando sus dependencias cambian. Asegúrate de que todas las variables que usas están dentro del bloque. </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A usar <code>derivedStateOf</code> para estado derivado. </li><li>A mostrar feedback visual en tiempo real. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐⭐⭐</span><h4>Reto 6: Animaciones de transición entre pantallas</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Muy difícil</span><span class="badge">📄 <code>NavGraph.kt</code></span><span class="badge">⏱ 45-60 min</span></p><p>Queremos que al navegar entre Login, Registro y Home haya <strong>animaciones de transición</strong> (deslizamiento horizontal, fade, etc.). Al ir a Home, la pantalla debe entrar desde la derecha. Al volver, desde la izquierda.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li><code>NavHost</code> acepta parámetros <code>enterTransition</code>, <code>exitTransition</code>, <code>popEnterTransition</code>, <code>popExitTransition</code>. </li><li>Puedes usar <code>slideInHorizontally</code> y <code>slideOutHorizontally</code> de <code>androidx.compose.animation</code>. </li><li>Ejemplo: <pre class="code-kt" data-lang="kt">NavHost(
+    navController = navController,
+    startDestination = Routes.LOGIN,
+    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+    exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) }
+) { ... }</pre></li><li><strong>Cuidado:</strong> las animaciones pueden hacer que la app se sienta lenta si son muy largas. Prueba con 300ms. </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A personalizar transiciones en <code>NavHost</code>. </li><li>A usar la librería <code>androidx.compose.animation</code>. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐⭐⭐</span><h4>Reto 7: Guardar el email con <code>DataStore</code> (persistencia)</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Muy difícil</span><span class="badge">📄 <code>LoginScreen.kt</code>, <code>NavGraph.kt</code>, nuevo <code>UserPreferences.kt</code></span><span class="badge">⏱ 60-90 min</span></p><p>Queremos que, si el usuario marca "Recordar sesión" en el Login, su email se guarde <strong>de forma persistente</strong> (aunque cierre la app). Al volver a abrir la app, el email debe aparecer ya relleno.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>Usa <code>androidx.datastore:datastore-preferences</code>. </li><li>Crea un objeto <code>UserPreferences</code> con un <code>DataStore&lt;Preferences&gt;</code>. </li><li>En <code>LoginScreen</code>, al arrancar (<code>LaunchedEffect(Unit)</code>), lee el email guardado y rellena el campo. </li><li>Al pulsar "Entrar", si el checkbox está marcado, guarda el email. </li><li><strong>Cuidado:</strong> <code>DataStore</code> es asíncrono (usa corrutinas). Necesitarás <code>rememberCoroutineScope()</code> o <code>LaunchedEffect</code>. </li><li><strong>Alternativa más simple:</strong> usa <code>SharedPreferences</code> (síncrono, menos moderno, pero más fácil para empezar). </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A persistir datos en Android. </li><li>A usar corrutinas desde Compose. </li><li>A diferenciar <code>DataStore</code> de <code>SharedPreferences</code>. --- </li></ul></div></div></div><div class="reto-card"><div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span class="reto-stars">⭐⭐⭐⭐⭐</span><h4>Reto 8 ★Bonus: Navegación con <code>hiltViewModel</code> y estado compartido</h4><div class="chev">▾</div></div><div class="reto-body"><p><span class="badge">Extremadamente difícil</span><span class="badge">📄 varios</span><span class="badge">⏱ 90-120 min</span></p><p>En lugar de pasar el email por la ruta, queremos usar un <strong><code>ViewModel</code> compartido</strong> entre Login, Registro y Home. El <code>ViewModel</code> guardará el email del usuario y lo expondrá a todas las pantallas. Al cerrar sesión, se limpia.</p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button><div class="hint-box"><ul><li>Añade <code>androidx.hilt:hilt-navigation-compose</code> y <code>com.google.dagger:hilt-android</code>. </li><li>Crea un <code>UserViewModel</code> con un <code>StateFlow&lt;String&gt;</code> para el email. </li><li>En <code>NavGraph.kt</code>, obtén el <code>ViewModel</code> a nivel del <code>NavHost</code> y pásalo a los composables. </li><li><strong>Alternativa sin Hilt:</strong> crea el <code>ViewModel</code> con <code>viewModel()</code> a nivel del <code>NavHost</code> y pásalo manualmente. </li><li><strong>Reflexión:</strong> ¿qué ventajas tiene un <code>ViewModel</code> compartido frente a pasar argumentos por la ruta? ¿Y desventajas? </li></ul></div><div class="learn"><strong>¿Qué aprenderás?</strong><ul><li>A usar <code>ViewModel</code> con Compose. </li><li>A compartir estado entre pantallas sin pasar por la ruta. </li><li>A valorar cuándo usar cada estrategia. --- </li></ul></div></div></div><h3>¿Cómo se evalúan estos retos?</h3><p>Los retos son <strong>voluntarios</strong> y <strong>no forman parte de la nota base</strong>. Sin embargo, <strong>cada reto completado correctamente</strong> suma <strong>+0.25 puntos</strong> sobre la nota final (máximo +1.0 punto en total). Para que cuente, debes:</p><ol><li>Que funcione en el emulador.</li><li>Añadir al informe una <strong>breve explicación</strong> (5-10 líneas) de qué has cambiado y por qué.</li><li>Incluir una captura del resultado.</li></ol><div class="callout warn"><strong>No se aceptan retos copiados entre compañeros.</strong> Si dos entregas son idénticas, ambos retos se anulan.</div><div class="callout "><strong>Recomendación final:</strong> no intentes hacer todos los retos. Elige <strong>uno o dos</strong> que te llamen la atención y hazlos <strong>bien</strong>. Es mejor entender profundamente un reto que copiar cinco sin saber qué has hecho. Y recuerda: <strong>romper cosas es parte de aprender</strong>. Si algo no funciona, lee el error, busca en la documentación, prueba, y si sigue sin ir, pregunta.</div></div></div>
+<div class="section card" id="anexo"><div class="card-head" onclick="toggleCard(this)"><div class="num">★</div><h2>Anexo: Resumen de cambios respecto a la Actividad 2.1</h2><div class="chev">▾</div></div><div class="card-body"><p>Para que puedas comparar qué ha cambiado exactamente:</p><div class="filters"><button class="filter-chip active" onclick="anexoCols('',this)">Ver ambas</button><button class="filter-chip" onclick="anexoCols('only21',this)">Solo 2.1</button><button class="filter-chip" onclick="anexoCols('only22',this)">Solo 2.2</button></div><table class="anexo"><tr><th>Elemento</th><th>Actividad 2.1</th><th>Actividad 2.2</th></tr><tr><td><strong>Navegación</strong></td><td><code>Intent</code> + <code>startActivity</code></td><td><code>NavHost</code> + <code>NavController</code></td></tr><tr><td><strong>Pantallas</strong></td><td><code>MainActivity</code> (Login) + <code>HomeActivity</code></td><td><code>MainActivity</code> (NavHost) con 3 destinos</td></tr><tr><td><strong>Home</strong></td><td><code>HomeScreen</code> simple con <code>Box</code> + <code>Text</code></td><td><code>HomeScreen</code> con <code>Scaffold</code> + <code>TopAppBar</code> + menú + diálogo</td></tr><tr><td><strong>Registro</strong></td><td>No existía</td><td><code>RegisterScreen</code> con 4 campos y validaciones</td></tr><tr><td><strong>Menú</strong></td><td>No existía</td><td>Menú overflow con 2 opciones</td></tr><tr><td><strong>Diálogo</strong></td><td>No existía</td><td><code>AlertDialog</code> "Acerca de"</td></tr><tr><td><strong>Paso de datos</strong></td><td><code>putExtra</code> / <code>getStringExtra</code></td><td>Argumentos de ruta + <code>Uri.encode</code></td></tr><tr><td><strong><code>MainActivity</code></strong></td><td><code>setContent { LoginScreen(...) }</code></td><td><code>setContent { AppNavGraph() }</code></td></tr><tr><td><strong><code>HomeActivity</code></strong></td><td>Existía</td><td>Eliminada</td></tr><tr><td><strong>Dependencias</strong></td><td>Solo Compose BOM</td><td>+ <code>navigation-compose</code></td></tr><tr><td><strong>Archivos <code>.kt</code></strong></td><td>4</td><td>5 (elimina 1, añade 2)</td></tr></table></div></div></main>
+<footer>Actividad 2.2 · PMDM · 2º DAM — Guía interactiva autocontenida (HTML/CSS/JS; solo las tipografías vienen de Google Fonts).</footer>
+<script>/* ---------- ACCORDION SECTIONS ---------- */
+function toggleCard(head){
+  const card = head.parentElement;
+  card.classList.toggle('open');
+}
+
+/* ---------- SCROLLSPY + PROGRESS BAR ---------- */
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('main .section, .demo-section');
+function onScroll(){
+  const doc = document.documentElement;
+  const scrollTop = doc.scrollTop || document.body.scrollTop;
+  const scrollHeight = doc.scrollHeight - doc.clientHeight;
+  document.getElementById('progressBar').style.width = (scrollHeight>0 ? (scrollTop/scrollHeight*100) : 0) + '%';
+  let current = '';
+  sections.forEach(sec=>{
+    const rect = sec.getBoundingClientRect();
+    if(rect.top < 140) current = sec.id;
+  });
+  navLinks.forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('href') === '#'+current);
+  });
+}
+document.addEventListener('scroll', onScroll);
+onScroll();
+
+/* ---------- COPY TO CLIPBOARD ---------- */
+function copyCode(btn){
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const original = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1600);
+  });
+}
+
+
+/* ---------- SYNTAX HIGHLIGHT (tokenizador) ---------- */
+const escH=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const HL={
+  kt:{rx:/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*")|(@\w+)|\b(package|import|class|object|interface|fun|val|var|const|lateinit|override|private|return|if|else|when|true|false|null|this|by|is|in|as|it|inclusive|nullable)\b|\b([A-Z]\w*)\b|\b(\d+(?:\.\d+)?)\b/g,
+      cls:['tok-com','tok-str','tok-attr','tok-kw','tok-type','tok-num']},
+  xml:{rx:/(<!--[\s\S]*?-->)|("[^"\n]*")|(<\/?[\w.:]+|\/?>)|([\w:.-]+)(?==)/g,
+      cls:['tok-com','tok-str','tok-tag','tok-attr']},
+  toml:{rx:/(#[^\n]*)|("[^"\n]*")|(\[[^\]\n]+\])|(^[\w.-]+)(?=\s*=)/gm,
+      cls:['tok-com','tok-str','tok-type','tok-attr']}
+};
+function hl(raw,lang){
+  const d=HL[lang]; if(!d) return escH(raw);
+  d.rx.lastIndex=0; let out='',last=0,m;
+  while((m=d.rx.exec(raw))){
+    out+=escH(raw.slice(last,m.index));
+    const g=m.slice(1).findIndex(x=>x!==undefined);
+    out+='<span class="'+d.cls[g]+'">'+escH(m[0])+'</span>';
+    last=d.rx.lastIndex;
+  }
+  return out+escH(raw.slice(last));
+}
+function hlAll(root){
+  (root||document).querySelectorAll('pre[data-lang]').forEach(p=>{
+    if(p.dataset.done) return; p.innerHTML=hl(p.textContent,p.dataset.lang); p.dataset.done=1;
+  });
+}
+
+/* ===== Guía 2.2 · interacciones ===== */
+const $=id=>document.getElementById(id);
+function tab(btn,id){const g=btn.closest('.tabgroup');g.querySelectorAll(':scope>.tabs>.tab-btn').forEach(b=>b.classList.remove('active'));g.querySelectorAll(':scope>.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');$(id).classList.add('active');}
+function toggleTree(el){const d=el.parentElement.querySelector(':scope > .fdesc');d.style.display=d.style.display==='block'?'none':'block';}
+function filterTree(st,btn){btn.parentElement.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tree li').forEach(li=>{const s=li.dataset.st;li.classList.toggle('dim',st!=='all'&&s!==st&&s!=='x');});}
+function toggleHint(btn){const b=btn.nextElementSibling;b.classList.toggle('show');btn.textContent=b.classList.contains('show')?'🙈 Ocultar pistas':'💡 Ver pistas (no soluciones)';}
+function anexoCols(c,btn){btn.parentElement.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelector('table.anexo').className='anexo '+c;}
+function errFilter(){const q=$('errQ').value.toLowerCase();let n=0;document.querySelectorAll('#errTable tr').forEach((r,i)=>{if(!i)return;const m=r.textContent.toLowerCase().includes(q);r.style.display=m?'':'none';if(m)n++;});$('errEmpty').style.display=n?'none':'block';}
+function jumpCode(id,marker){const pre=$(id);const lines=pre.textContent.split('\n');const i=lines.findIndex(l=>l.includes(marker));if(i<0)return;const lh=parseFloat(getComputedStyle(pre).lineHeight)||20;pre.scrollTo({top:Math.max(0,i*lh+8),behavior:'smooth'});}
+function expandCode(btn){const pre=btn.closest('.code-wrap').querySelector('pre');pre.classList.toggle('expanded');btn.textContent=pre.classList.contains('expanded')?'Contraer':'Expandir';}
+
+/* checklists genéricas */
+document.querySelectorAll('ul.checklist').forEach(ul=>{
+  const lis=ul.querySelectorAll('li');
+  const upd=()=>{const d=ul.querySelectorAll('input:checked').length;$(ul.dataset.fill).style.width=(d/lis.length*100)+'%';$(ul.dataset.label).textContent=d+' / '+lis.length+' '+ul.dataset.suffix;};
+  lis.forEach(li=>li.addEventListener('click',e=>{const cb=li.querySelector('input');if(e.target!==cb)cb.checked=!cb.checked;li.classList.toggle('checked',cb.checked);upd();}));
+});
+
+/* Scaffold */
+const SC={topBar:['topBar','Barra superior (normalmente un TopAppBar).','topBar = { TopAppBar(title = { Text("Home") }) }'],
+bottomBar:['bottomBar','Barra inferior (navegación, etc.).','bottomBar = { BottomAppBar { /* ... */ } }'],
+floatingActionButton:['floatingActionButton','Botón flotante.','floatingActionButton = { FloatingActionButton(onClick = { }) { /* ... */ } }'],
+snackbarHost:['snackbarHost','Host para mostrar Snackbar.','snackbarHost = { SnackbarHost(snackbarHostState) }'],
+content:['content','El contenido principal. Recibe un PaddingValues que debes aplicar.','{ innerPadding ->\n    Column(modifier = Modifier.padding(innerPadding)) {\n        // contenido\n    }\n}']};
+function scSel(k,el){document.querySelectorAll('.sc-zone').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');const d=SC[k];$('scDetail').innerHTML='<strong>'+d[0]+'</strong> — '+d[1]+'<pre class="code-kt" data-lang="kt">'+escH(d[2])+'</pre>';hlAll($('scDetail'));}
+function scPad(on){$('scContent').classList.toggle('pad',on);const m=$('scMsg');m.className='sc-msg '+(on?'ok':'bad');m.innerHTML=on?'Con <code>innerPadding</code> el contenido empieza justo debajo de la barra superior.':'⚠ Sin <code>innerPadding</code> el contenido se solapa con la <code>TopAppBar</code>: ¡la primera línea ha desaparecido detrás de la barra!';}
+
+/* variantes TopAppBar */
+const TB={s:'Small (TopAppBar): la estándar.',c:'CenterAlignedTopAppBar: título centrado.',m:'MediumTopAppBar: título más grande; se colapsa al hacer scroll.',l:'LargeTopAppBar: título aún más grande; se colapsa al hacer scroll.'};
+function tbVar(v,btn){btn.parentElement.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');$('tbPrev').className='tb-prev '+v;$('tbDesc').textContent=TB[v];}
+
+/* AlertDialog */
+const DA={icon:['icon','No','Icono a la izquierda del título.','icon = { Icon(/* ... */) }'],
+title:['title','No','Título del diálogo.','title = { Text("Acerca de") }'],
+text:['text','No','Cuerpo del diálogo.','text = { Text("MiApp v1.0 ...") }'],
+dismiss:['dismissButton','No','Botón secundario («Cancelar»).','dismissButton = {\n    TextButton(onClick = { showDialog = false }) { Text("Cancelar") }\n}'],
+confirm:['confirmButton','Sí','El botón principal (normalmente «Aceptar»).','confirmButton = {\n    TextButton(onClick = { showDialog = false }) { Text("Aceptar") }\n}'],
+onDismissRequest:['onDismissRequest','Sí','Qué hacer cuando el usuario cierra el diálogo (pulsa fuera o atrás).','onDismissRequest = { showDialog = false }']};
+function daSel(k,el){document.querySelectorAll('.da-part,.da-outside').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');const d=DA[k];$('daDetail').innerHTML='<strong>'+d[0]+'</strong> · obligatorio: <strong>'+d[1]+'</strong> — '+d[2]+'<pre class="code-kt" data-lang="kt">'+escH(d[3])+'</pre>';hlAll($('daDetail'));}
+
+/* mapa de rutas */
+function rgSel(k,btn){document.querySelectorAll('.rg-edge').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');const e=RG[k];['login','register','home'].forEach(n=>{const el=$('rgn_'+n);el.classList.toggle('from',n===e.f);el.classList.toggle('to',n===e.t);});$('rgDetail').innerHTML='<strong>'+e.cb+'</strong> — '+escH(e.txt)+'<pre class="code-kt" data-lang="kt">'+escH(e.code)+'</pre>';hlAll($('rgDetail'));}
+
+/* laboratorio Uri.encode */
+function uriSet(v){$('uriIn').value=v;uriUpd();}
+function uriUpd(){const v=$('uriIn').value,enc=encodeURIComponent(v),risky=/[@\/?&+# ]/.test(v);
+ $('uriOut').innerHTML='<div>Sin codificar: <span class="'+(risky?'bad':'good')+'">navigate("home/'+escH(v)+'")</span> '+(risky?'❌ caracteres reservados → <b>riesgo de fallo</b> en la navegación':'✅')+'</div><div>Con <b>Uri.encode</b>: <span class="good">navigate("home/'+escH(enc)+'")</span> ✅</div><div style="color:#5c5f78">Al recuperarlo con getString("email") obtienes: '+escH(v)+'</div>';}
+uriUpd();
+
+/* ===== SIMULADOR NavHost ===== */
+const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/,PASS_RE=/^(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+const MSG={e:'Introduce un email válido',p:'Mínimo 8 caracteres, una mayúscula y un número',c:'Las contraseñas no coinciden'};
+const N={stack:[],email:'',menu:false,dialog:false,usePop:true};
+let FM,nlogN=0;
+function fmReset(){FM={l:{e:'',p:''},r:{e:'',p:'',c:'',t:false}};}
+const scr=$('navScreen');
+const topR=()=>N.stack[N.stack.length-1];
+const attr=s=>escH(s).replace(/"/g,'&quot;');
+function nlog(t,m){nlogN++;const d=document.createElement('div');d.className='log-'+t;d.textContent=m;$('navLog').appendChild(d);$('navLog').scrollTop=1e6;$('navLogCount').textContent=nlogN+' eventos';}
+const fld=(id,label,val,type,extra)=>'<div class="field'+(val?' filled':'')+'" id="f_'+id+'"><input id="i_'+id+'" type="'+type+'" value="'+attr(val)+'" placeholder=" " autocomplete="off"><label>'+label+'</label>'+(extra||'')+'<div class="field-error-msg"></div></div>';
+const eye=id=>'<span class="eye-toggle" data-eye="'+id+'">👁</span>';
+const sbar='<div class="phone-statusbar"><span>9:41</span><span>▲ ▲ ▮▮▮</span></div>';
+function screenHtml(){
+  const r=topR();
+  if(!r)return '<div class="exit-box"><div style="font-size:2rem">⏻</div><div><b>La app se ha cerrado</b><br>El back stack estaba vacío: la Activity termina.</div><button onclick="navReset()">Abrir la app</button></div>';
+  if(r==='login')return sbar+'<div class="app-logo"></div><div class="app-title">Bienvenido/a</div>'+fld('le','Email',FM.l.e,'text')+fld('lp','Contraseña',FM.l.p,'password',eye('lp'))+'<button class="login-btn enabled" id="btnLogin">ENTRAR</button><span class="forgot-link" id="lnkReg">¿Ya tienes cuenta? Inicia sesión</span>';
+  if(r==='register')return sbar+'<div class="appbar"><span class="ab-btn" id="btnBack" title="Volver">←</span><span class="ab-title">Crear cuenta</span></div>'+fld('re','Email',FM.r.e,'text')+fld('rp','Contraseña',FM.r.p,'password',eye('rp'))+fld('rc','Confirmar contraseña',FM.r.c,'password',eye('rc'))+'<div class="remember-row"><input type="checkbox" id="rt"'+(FM.r.t?' checked':'')+'> Acepto los términos y condiciones</div><div class="err-line" id="termsErr">Debes aceptar los términos</div><button class="login-btn enabled" id="btnReg">CREAR CUENTA</button><span class="forgot-link" id="lnkBack">¿Ya tienes cuenta? Inicia sesión</span>';
+  return sbar+'<div class="appbar"><span class="ab-title">MiApp</span><span class="ab-btn" id="btnMenu" title="Abrir menú">⋮</span>'+(N.menu?'<div class="dd-menu"><div class="dd-item" id="miAbout">Acerca de</div><div class="dd-item" id="miLogout">Cerrar sesión</div></div>':'')+'</div><div class="home-body">'+(N.email?'¡Bienvenido, '+escH(N.email)+'!':'¡Bienvenido!')+'</div>'+(N.dialog?'<div class="dlg-scrim" id="dlgScrim"><div class="dlg"><h4>Acerca de</h4><div>MiApp v1.0<br>Desarrollada por 2º DAM<br>Programación Multimedia y Dispositivos Móviles</div><div class="dlg-actions"><span id="dlgOk">ACEPTAR</span></div></div></div>':'');
+}
+function renderStack(){const s=$('stackView');if(!N.stack.length){s.innerHTML='<div class="stk"><span>(vacío)</span><span>app cerrada</span></div>';return;}
+  s.innerHTML=[...N.stack].reverse().map((r,i)=>'<div class="stk'+(i?'':' top')+'"><span>'+(r==='home'?'home/{email}':r)+'</span><span>'+(i?'CREATED':'RESUMED')+'</span></div>').join('')+'<div class="stk-base">▼ base del back stack</div>';}
+function setErr(id,m){const f=$('f_'+id);f.classList.toggle('error',!!m);f.querySelector('.field-error-msg').textContent=m||'';}
+const vE=id=>{const ok=EMAIL_RE.test($('i_'+id).value.trim());setErr(id,ok?'':MSG.e);return ok;};
+const vP=id=>{const ok=PASS_RE.test($('i_'+id).value);setErr(id,ok?'':MSG.p);return ok;};
+const vC=()=>{const c=$('i_rc').value;const ok=c!==''&&c===$('i_rp').value;setErr('rc',ok?'':MSG.c);return ok;};
+function bind(id,store,key,fn,next){const i=$('i_'+id);
+  i.addEventListener('input',()=>{store[key]=i.value;$('f_'+id).classList.toggle('filled',i.value.length>0);fn(i.value);});
+  i.addEventListener('keydown',e=>{if(e.key==='Enter'||(e.key==='Tab'&&!e.shiftKey&&next)){e.preventDefault();if(next){nlog('sys','ImeAction.Next → focusManager.moveFocus(FocusDirection.Down)');$('i_'+next).focus();}else{nlog('sys','ImeAction.Done → focusManager.clearFocus()');i.blur();}}});}
+function goHome(email){N.email=email;const route='home/'+encodeURIComponent(email);
+  $('routeBox').innerHTML='Routes.home("'+escH(email)+'")<br>→ <b>"'+escH(route)+'"</b>';
+  if(N.usePop){nlog('sys','navigate("'+route+'") { popUpTo(LOGIN) { inclusive = true } }');N.stack.splice(N.stack.indexOf('login'));}
+  else nlog('sys','navigate("'+route+'")');
+  N.stack.push('home');N.menu=false;N.dialog=false;rerender();}
+function wire(){const r=topR();if(!r)return;
+  document.querySelectorAll('[data-eye]').forEach(s=>s.onclick=()=>{const i=$('i_'+s.dataset.eye),sh=i.type==='password';i.type=sh?'text':'password';s.textContent=sh?'🙈':'👁';});
+  if(r==='login'){
+    bind('le',FM.l,'e',v=>{if(v)vE('le');},'lp');bind('lp',FM.l,'p',v=>{if(v)vP('lp');},null);
+    $('btnLogin').onclick=()=>{const a=vE('le'),b=vP('lp');nlog(a&&b?'ok':'err','validarEmail() → '+a+' · validarPassword() → '+b);if(a&&b){nlog('sys','focusManager.clearFocus()');nlog('info','onLoginSuccess("'+FM.l.e.trim()+'")');goHome(FM.l.e.trim());}};
+    $('lnkReg').onclick=()=>{nlog('info','onGoToRegister()');nlog('sys','navigate("register")');N.stack.push('register');rerender();};}
+  if(r==='register'){
+    bind('re',FM.r,'e',v=>{if(v)vE('re');},'rp');
+    bind('rp',FM.r,'p',v=>{if(v)vP('rp');if($('i_rc').value)vC();},'rc');
+    bind('rc',FM.r,'c',v=>{if(v)vC();},null);
+    $('rt').onchange=e=>{FM.r.t=e.target.checked;if(FM.r.t)$('termsErr').style.display='none';};
+    const back=()=>{nlog('info','onBackToLogin()');nlog('sys','popBackStack()');N.stack.pop();rerender();};
+    $('btnBack').onclick=back;$('lnkBack').onclick=back;
+    $('btnReg').onclick=()=>{const a=vE('re'),b=vP('rp'),c=vC(),t=FM.r.t;$('termsErr').style.display=t?'none':'block';nlog(a&&b&&c&&t?'ok':'err','validar → email '+a+' · pass '+b+' · confirm '+c+' · términos '+t);if(a&&b&&c&&t){nlog('sys','focusManager.clearFocus()');nlog('info','onRegisterSuccess("'+FM.r.e.trim()+'")');goHome(FM.r.e.trim());}};}
+  if(r==='home'){
+    $('btnMenu').onclick=()=>{N.menu=!N.menu;nlog('sys','menuExpanded = '+N.menu);rerender();};
+    if(N.menu){
+      $('miAbout').onclick=()=>{N.menu=false;N.dialog=true;nlog('sys','menuExpanded = false · showAboutDialog = true');rerender();};
+      $('miLogout').onclick=()=>{nlog('info','onLogout()');nlog('sys','navigate("login") { popUpTo(0) { inclusive = true } }');N.stack=['login'];N.menu=false;N.email='';fmReset();rerender();};}
+    if(N.dialog){
+      $('dlgOk').onclick=()=>{N.dialog=false;nlog('sys','showAboutDialog = false');rerender();};
+      $('dlgScrim').onclick=e=>{if(e.target.id==='dlgScrim'){N.dialog=false;nlog('sys','onDismissRequest → showAboutDialog = false');rerender();}};}}}
+function rerender(){renderStack();scr.innerHTML=screenHtml();wire();}
+function sysBack(){
+  if(!N.stack.length)return;
+  if(N.dialog){N.dialog=false;nlog('sys','onDismissRequest → showAboutDialog = false');rerender();return;}
+  if(N.menu){N.menu=false;nlog('sys','onDismissRequest → menuExpanded = false');rerender();return;}
+  if(N.stack.length>1){nlog('sys','BackHandler → popBackStack()  (sale "'+topR()+'")');N.stack.pop();}
+  else{nlog('err','back stack con 1 solo destino → la Activity se cierra');N.stack=[];}
+  rerender();}
+function navReset(){N.stack=['login'];N.email='';N.menu=false;N.dialog=false;fmReset();$('navLog').innerHTML='';nlogN=0;$('navLogCount').textContent='0 eventos';
+  $('routeBox').textContent='Routes.home(email) → (aún sin navegar a Home)';
+  nlog('sys','onCreate() → setContent { AppNavGraph() }');nlog('sys','NavHost(startDestination = "login")');rerender();}
+navReset();
+hlAll();
+
+</script></body></html>
