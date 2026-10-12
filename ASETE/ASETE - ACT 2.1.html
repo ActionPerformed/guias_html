@@ -2957,6 +2957,15 @@ foreach ($catalogo as $material) {
             </div>
           </div>
         </div>
+        <div class="tip">
+          <p><strong>Nota sobre resumen():</strong> <span class="inline">resumen()</span> no se usa en el código principal de la guía.
+            Es un reto para practicar la sobrescritura (override). Si quieres verlo funcionando, añádelo tú mismo al
+            <span class="inline">foreach</span> de <span class="inline">index.php</span>:</p>
+          <pre class="code-src" data-lang="php" data-title="index.php"
+            hidden>&lt;li&gt;&lt;?= htmlspecialchars($m-&gt;resumen()) ?&gt;&lt;/li&gt;</pre>
+          <p>Pero no lo busques en el código base: no está, y no pasa nada. Es un ejercicio de diseño, no una pieza del
+            flujo principal.</p>
+        </div>
         <div class="reto" data-reto id="reto-2-2">
           <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
               Reto 2.2</button></div>
@@ -3301,6 +3310,24 @@ class MaterialBiblioteca implements Prestable {
             </div>
           </div>
         </div>
+        <div class="tip">
+          <p><strong>Nota sobre puedePrestarse():</strong> <span class="inline">puedePrestarse()</span> tampoco se usa en el código principal.
+            Es un reto para pensar dónde vive la lógica de negocio: en el objeto, no en el controlador.</p>
+          <p>Si quisieras usarlo de verdad, el sitio natural sería <span class="inline">prestar.php</span>, sustituyendo:</p>
+          <pre class="code-src" data-lang="php" data-title="prestar.php"
+            hidden>if ($material->prestar()) { ... }</pre>
+          <p>por algo como:</p>
+          <pre class="code-src" data-lang="php" data-title="prestar.php"
+            hidden>if (!$material->puedePrestarse()) {
+    $error = 'Este material no se puede prestar.';
+} elseif ($material->prestar()) {
+    $repo->setDisponible($id, false);
+    $repo->registrarPrestamo($id, currentUser()['id']);
+}</pre>
+          <p>Fíjate en lo que aparece: una rama de error. Eso ya es gestión de casos, no solo lógica de dominio.
+            Por eso el código principal se queda con la versión simple: para no meter complejidad que aún no toca.
+            El reto es tuyo, pero no es obligatorio integrarlo.</p>
+        </div>
         <div class="reto" data-reto id="reto-3-3">
           <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
               Reto 3.3</button><span class="reto-sub">Encuentra el error.</span></div>
@@ -3555,6 +3582,21 @@ require __DIR__ . '/includes/header.php';
         <div class="note">
           <p>📌 <b>Fíjate:</b> <span class="inline">fechaFormateada()</span> viene del trait. Se hidrató desde <span
               class="inline">creado_en</span> en el repositorio. <b>El trait deja de ser decorativo.</b></p>
+        </div>
+        <div class="note" style="border-left-color: var(--burgundy); background: var(--burgundy-soft);">
+          <p>📌 <b>Nota sobre fechaFormateada():</b> este método no está definido en <span
+              class="inline">MaterialBiblioteca</span> — viene del trait <span class="inline">TieneFechas</span>, que
+            añadiste en el Bloque 3. Para que funcione en <span class="inline">material.php</span> hacen falta dos cosas:</p>
+          <ol style="margin:8px 0 4px;padding-left:20px">
+            <li>Que <span class="inline">MaterialBiblioteca</span> use el trait: <span class="inline">use TieneFechas,
+                Loggable;</span>.</li>
+            <li>Que <span class="inline">MaterialRepo::hidratar()</span> llame a <span class="inline">setFechaCreacion($fila['creado_en'])</span> tras construir el objeto.</li>
+          </ol>
+          <p>Si ves <code>—</code> en lugar de una fecha, casi siempre es porque falta el paso 2. <b>Compruébalo antes
+              de seguir.</b></p>
+          <pre class="code-src" data-lang="php" data-title="MaterialRepo.php"
+            hidden>// En hidratar(), justo antes del return:
+$material->setFechaCreacion($fila['creado_en'] ?? null);</pre>
         </div>
         <h3>🧪 Retos</h3>
         <div class="reto" data-reto id="reto-4-1">
@@ -3853,14 +3895,16 @@ exit;</pre>
                 class="inline">DVD</span> sobrescribe <span class="inline">diasPrestamo()</span> para devolver 3.</span>
           </li>
           <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
-                class="inline">src/repos/MaterialRepo.php</span> hidrata correctamente cada tipo <b>y la fecha de
-                creación</b>.</span></li>
+                class="inline">src/repos/MaterialRepo.php</span> hidrata correctamente cada tipo y la fecha de creación
+              (<span class="inline">setFechaCreacion($fila['creado_en'])</span>).</span></li>
           <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
                 class="inline">index.php</span> muestra el catálogo usando <span class="inline">mostrarFicha()</span>
               polimórfico.</span></li>
           <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
                 class="inline">material.php</span> muestra la ficha individual con datos específicos del tipo y la fecha
               formateada.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>La ficha
+              individual muestra una fecha real en "Añadido al catálogo" (no <code>—</code>).</span></li>
           <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
                 class="inline">prestar.php</span> marca el material como no disponible y registra el préstamo.</span>
           </li>
