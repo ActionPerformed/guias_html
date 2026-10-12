@@ -2190,6 +2190,7 @@
       <h4>Para terminar</h4>
       <a class="nav-link" href="#errores">Errores comunes</a>
       <a class="nav-link" href="#reflexion">Reflexión</a>
+      <a class="nav-link" href="#estado">Estado de la app</a>
       <a class="nav-link" href="#checklist">Checklist final</a>
       <a class="nav-link" href="#ampliaciones">Ampliaciones</a>
       <a class="nav-link" href="#glosario">Glosario Java → PHP</a>
@@ -3432,6 +3433,17 @@ class Libro extends MaterialBiblioteca {
               class="inline">DVD</span>...) <b>no saben SQL</b>. El repositorio sí. <b>Separación de
               responsabilidades.</b></p>
         </div>
+        <div class="tip">
+          <p><strong>Que significa hidratar?</strong></p>
+          <p>El termino viene del mundo de los ORM (Hibernate en Java, Doctrine en PHP) y se usa para describir una
+            operacion muy concreta:</p>
+          <ul style="margin:6px 0">
+            <li><strong>Hidratar</strong> = rellenar un objeto vacio con los datos que vienen de la BBDD.</li>
+          </ul>
+          <p>La metafora: un objeto recien creado esta seco (sin datos). Al pasarle una fila de BBDD, se
+            hidrata (se llena de contenido). Una vez hidratado, el objeto ya tiene su titulo, autor, ano, etc.,
+            y se comporta como cualquier otro objeto de tu dominio.</p>
+        </div>
         <h3>📊 Diagrama de la capa de persistencia</h3>
         <div class="wdg" id="w-capas" data-w></div>
         <h3>📄 Paso 1: <span class="inline">MaterialRepo</span></h3>
@@ -3872,7 +3884,122 @@ exit;</pre>
         </div>
       </section>
 
-      <section id="checklist">
+      
+      <section id="estado">
+        <div class="sec-head"><span class="sec-num">RES</span>
+          <h2>Estado de la app: que tienes y que te falta</h2>
+        </div>
+        <p>Antes de rellenar el checklist, conviene que veas <strong>que has construido</strong> y <strong>que queda
+            pendiente</strong>. Asi entiendes para que sirven los retos y por que no todos son obligatorios.</p>
+
+        <h3>Lo que ya funciona solo con el codigo base</h3>
+
+        <p><strong>Autenticacion y sesion</strong> (heredado de la actividad anterior):</p>
+        <ul>
+          <li>Login contra BBDD con <span class="inline">password_verify</span>, sesion con <span class="inline">PHPSESSID</span>,
+            cookie <span class="inline">ultimo_email</span>, logout, roles <span class="inline">user</span>/<span
+              class="inline">admin</span> y <span class="inline">admin.php</span> bloqueado a usuarios no admin (403 desde
+            servidor).</li>
+        </ul>
+
+        <p><strong>Catalogo</strong> (nuevo, Bloque 4):</p>
+        <ul>
+          <li>Listado completo desde BBDD con <strong>hidratacion</strong> a objetos del tipo correcto.</li>
+          <li>Ficha individual (<span class="inline">material.php?id=X</span>) con tipo, autor, ano, <strong>antiguedad</strong>,
+            dias de prestamo, <strong>fecha de alta formateada</strong> y estado.</li>
+          <li>Polimorfismo real: <span class="inline"> mostrarFicha()</span> y <span class="inline">tipoMaterial()</span>
+            devuelven cosas distintas segun el tipo, sin que <span class="inline">index.php</span> lo sepa.</li>
+          <li>404 si el <span class="inline">id</span> no existe.</li>
+        </ul>
+
+        <p><strong>Prestamos</strong> (nuevo, Bloque 5):</p>
+        <ul>
+          <li>Boton Pedir prestado visible solo si esta disponible.</li>
+          <li>Al prestar: el objeto decide (<span class="inline">prestar()</span>); si devuelve <span class="inline">true</span>,
+            se actualiza <span class="inline">disponible = 0</span> y se registra en <span class="inline">prestamos</span>.
+          </li>
+          <li>Log en <span class="inline">php-fpm</span> con fecha, clase y mensaje.</li>
+          <li>Redireccion a la ficha tras prestar.</li>
+        </ul>
+
+        <p><strong>Arquitectura POO</strong> (Bloques 14):</p>
+        <ul>
+          <li>Clase base <span class="inline">MaterialBiblioteca</span> con encapsulacion.</li>
+          <li>Herencia: <span class="inline">Libro</span>, <span class="inline">Revista</span>, <span
+              class="inline">DVD</span>.</li>
+          <li>Interfaz <span class="inline">Prestable</span> como contrato.</li>
+          <li>Traits <span class="inline">TieneFechas</span> y <span class="inline">Loggable</span>.</li>
+          <li>Repositorio <span class="inline">MaterialRepo</span> con <span class="inline">findAll()</span>, <span
+              class="inline">findById()</span>, <span class="inline">setDisponible()</span>, <span
+              class="inline">registrarPrestamo()</span> e <span class="inline">hidratar()</span> privado.</li>
+          <li><strong>Ninguna clase de <span class="inline">classes/</span> escribe SQL.</strong></li>
+        </ul>
+
+        <h3>Lo que queda pendiente de retos</h3>
+
+        <p><strong>Retos de bloque (1.x4.x)</strong> amplian el dominio y las consultas, pero <strong>no bloquean el flujo
+            principal</strong>:</p>
+
+        <div class="tw">
+          <table>
+            <tr><th>Reto</th><th>Funcionalidad que anade</th><th>Donde se nota</th></tr>
+            <tr><td class="mono">1.1 (<span class="inline">esAntiguo()</span>)</td><td>Aviso Fondo historico</td><td>Opcional en <span class="inline">material.php</span></td></tr>
+            <tr><td class="mono">1.5 (<span class="inline">editorial</span>)</td><td>Editorial en la ficha</td><td>Opcional en <span class="inline">material.php</span></td></tr>
+            <tr><td class="mono">2.1 (<span class="inline">resumen()</span>)</td><td>Listado mas corto</td><td>Opcional en <span class="inline">index.php</span></td></tr>
+            <tr><td class="mono">2.3 (<span class="inline">Audiolibro</span>)</td><td>Nuevo tipo de material</td><td>Requiere INSERT manual</td></tr>
+            <tr><td class="mono">3.2 (<span class="inline">puedePrestarse()</span>)</td><td>Regla extra antes de prestar</td><td>Opcional en <span class="inline">prestar.php</span></td></tr>
+            <tr><td class="mono">3.5 (<span class="inline">log()</span> fallido)</td><td>Trazar prestamos denegados</td><td></td></tr>
+            <tr><td class="mono">4.1 (<span class="inline">findDisponibles()</span>)</td><td>Vista filtrada</td><td>Pagina o filtro nuevo</td></tr>
+            <tr><td class="mono">4.3 (<span class="inline">findByTipo()</span>)</td><td>Filtro por tipo</td><td>Formulario o enlace</td></tr>
+            <tr><td class="mono">4.4 (<span class="inline">contarPorTipo()</span>)</td><td>Estadisticas</td><td>Pagina de stats</td></tr>
+            <tr><td class="mono">4.6 (<span class="inline">crear()</span>)</td><td>Alta de material</td><td>Formulario + pagina nueva</td></tr>
+          </table>
+        </div>
+
+        <p><strong>Retos de ampliacion (A112)</strong> anaden <strong>funcionalidad real nueva</strong> o refactorizan la
+          arquitectura:</p>
+
+        <div class="tw">
+          <table>
+            <tr><th>Reto</th><th>Funcionalidad</th></tr>
+            <tr><td class="mono">A1</td><td><strong>Devoluciones</strong> (cerrar prestamo y liberar material)</td></tr>
+            <tr><td class="mono">A2</td><td><strong>Historial de prestamos</strong> del usuario logueado</td></tr>
+            <tr><td class="mono">A3</td><td><strong>Limite de 3 prestamos</strong> activos por usuario</td></tr>
+            <tr><td class="mono">A4</td><td><strong>Busqueda</strong> por titulo/autor</td></tr>
+            <tr><td class="mono">A5</td><td><strong>Ordenacion</strong> alfabetica del catalogo</td></tr>
+            <tr><td class="mono">A6</td><td><span class="inline">MaterialBiblioteca</span> abstracta (refactor)</td></tr>
+            <tr><td class="mono">A7</td><td><span class="inline">Audiolibro</span> con jerarquia alternativa (refactor)</td></tr>
+            <tr><td class="mono">A8</td><td><strong>Excepciones de dominio</strong> en lugar de <span class="inline">bool</span> (refactor)</td></tr>
+            <tr><td class="mono">A9</td><td><span class="inline">MaterialFactory</span> (refactor)</td></tr>
+            <tr><td class="mono">A10</td><td>Autoloading con Composer (refactor de infraestructura)</td></tr>
+            <tr><td class="mono">A11</td><td>Adminer en el navegador</td></tr>
+            <tr><td class="mono">A12</td><td><strong>Logs en BBDD</strong> en lugar de <span class="inline">error_log</span></td></tr>
+          </table>
+        </div>
+
+        <div class="tip">
+          <p><strong>En una frase:</strong> <em>Sin retos tienes un catalogo funcional con prestamos de ida, pero no de
+              vuelta.</em></p>
+          <ul style="margin-top:8px">
+            <li>Ver materiales.</li>
+            <li>Pedirlos prestados.</li>
+            <li>Devolverlos <strong>A1</strong>.</li>
+            <li>Filtrar, buscar, ordenar <strong>4.1, 4.3, A4, A5</strong>.</li>
+            <li>Dar de alta materiales desde la web <strong>4.6</strong>.</li>
+            <li>Ver historial <strong>A2</strong>.</li>
+            <li>Limitar prestamos <strong>A3</strong>.</li>
+          </ul>
+          <p style="margin-top:10px"><strong>El flujo minimo del checklist (nota 56) se cubre sin tocar ningun reto.</strong> Los
+            retos 1.x3.x amplian el dominio y el catalogo; los 4.x anaden consultas; los A.x anaden funcionalidad real
+            nueva, sobre todo <strong>A1, A2 y A3</strong>, que son las que convierten la app en algo usable de verdad.
+          </p>
+          <p><strong>Consejo:</strong> si quieres subir nota y no sabes por donde empezar, ve a por <strong>A1
+              (devoluciones)</strong>. Es la ampliacion con mejor relacion esfuerzo/impacto: poca cosa y la app pasa de
+            catalogo de consulta a biblioteca de verdad.</p>
+        </div>
+      </section>
+
+<section id="checklist">
         <div class="sec-head">
           <h2>✅ Checklist final de "terminado"</h2>
         </div>
