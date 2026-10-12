@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MiniApp de Tareas · Guía interactiva del alumnado · DAM</title>
-<meta name="description" content="Guía interactiva: formularios, PDO, sesiones, cookies y roles en PHP. MiniApp de Tareas con login, persistencia en tres niveles y panel de administración.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -100,7 +93,7 @@ th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-ali
 th{background:var(--card-2);font-weight:700;font-size:13.5px}
 td.mono,th.mono{font-family:'JetBrains Mono';font-size:13px}
 
-/* ---------- código ---------- */
+/* ---------- codigo ---------- */
 .code{margin:16px 0}
 .code-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#1A1D17;border:1px solid #11130E;border-bottom:0;padding:7px 12px;font-family:'JetBrains Mono';font-size:12px;color:#B9BCAC}
 .code-head .spacer{flex:1}
@@ -112,7 +105,7 @@ pre.src{margin:0;padding:14px 16px;background:var(--code-bg);color:var(--code-in
 .tok-n{color:var(--n)}.tok-f{color:var(--f)}.tok-t{color:var(--t);font-weight:500}
 pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--code-ink);border:1px solid #11130E;overflow-x:auto;font-size:12px;line-height:1.5}
 
-/* ---------- reveal genérico (retos, piensa un momento) ---------- */
+/* ---------- reveal generico (retos, piensa un momento) ---------- */
 .reveal{margin-top:10px}
 .reveal-btn{font-family:'Work Sans';font-weight:600;font-size:13.5px;cursor:pointer;background:var(--card);border:1px solid var(--line);padding:7px 14px;border-radius:2px;color:var(--olive-2)}
 .reveal-btn:hover{background:var(--card-2);border-color:var(--olive)}
@@ -134,7 +127,7 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
 .reto-check{display:flex;align-items:center;gap:9px;background:transparent;border:0;cursor:pointer;padding:0;font-family:'Work Sans';font-weight:700;font-size:15px;color:var(--ink)}
 .reto-check .box{width:19px;height:19px;flex:none;border:2px solid var(--olive);background:var(--card);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;border-radius:2px}
 .reto.done .box{background:var(--olive)}
-.reto.done .box::after{content:"✓"}
+.reto.done .box::after{content:"\2713"}
 .reto p{margin:0 0 4px}
 
 /* ---------- checklist final ---------- */
@@ -144,7 +137,7 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
 .check li.done{background:var(--olive-soft);border-color:#BDCDAE}
 .check .box{width:18px;height:18px;border:2px solid var(--olive);border-radius:3px;flex:none;margin-top:2px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;background:var(--card)}
 .check li.done .box{background:var(--olive)}
-.check li.done .box::after{content:"✓"}
+.check li.done .box::after{content:"\2713"}
 
 /* ---------- inspector devtools (demo estrella) ---------- */
 .devtools{border:1px solid #11130E;background:#1A1D17;border-radius:5px;overflow:hidden;margin:20px 0;box-shadow:0 18px 40px -26px rgba(6,20,18,.8)}
@@ -217,21 +210,22 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
   main{max-width:none}
 }
 </style>
-</head>
-<body>
+
 <header class="topbar">
-  <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir el índice">☰ Índice</button>
-  <div class="sig"><b>DAM</b> MiniApp de Tareas</div>
-  <div class="spacer"></div>
-  <div class="score" id="score">0 / 34</div>
-  <div class="bar" title="Progreso: retos + checklist final"><span id="barFill"></span></div>
+  <div class="topbar-in">
+    <button class="menu-toggle" id="menuToggle" type="button">☰ Índice</button>
+    <div class="sig"><b>DAM</b> MiniApp de Tareas</div>
+    <div class="spacer"></div>
+    <div class="score" id="score">0 / 34</div>
+    <div class="bar" title="Progreso: retos + checklist final"><span id="barFill"></span></div>
+  </div>
 </header>
 
 <div class="shell">
 <nav class="sidebar" id="sidebar" aria-label="Índice de la guía">
   <h4>Introducción</h4>
   <a class="nav-link" href="#inicio">Qué vas a construir</a>
-  <a class="nav-link" href="#evaluacion">Cómo se evalúa</a>
+  <a class="nav-link" href="#evaluacion">Entregables</a>
   <h4>Bloques</h4>
   <a class="nav-link" href="#bloque-0"><span class="tag">0</span> Entorno</a>
   <a class="nav-link" href="#bloque-1"><span class="tag">1</span> Formularios</a>
@@ -280,24 +274,11 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
 </section>
 
 <section id="evaluacion">
-  <div class="sec-head"><span class="sec-num">00</span><h2>⚖️ Cómo se te va a evaluar</h2></div>
-  <div class="tw">
-  <table>
-    <thead><tr><th style="width:120px">Nivel</th><th>Qué necesitas</th><th style="width:70px">Nota</th></tr></thead>
-    <tbody>
-      <tr><td><b>Mínimo (apto)</b></td><td>Login funcional, sesión, listado de tareas propias, <span class="inline">admin.php</span> bloqueado a usuarios</td><td>5–6</td></tr>
-      <tr><td><b>Notable</b></td><td>Además: cookie «recordarme», validación de errores en formulario, respuestas razonadas a los retos 1.x–3.x</td><td>7–8</td></tr>
-      <tr><td><b>Excelente</b></td><td>Además: retos 4.x resueltos, código limpio con funciones separadas, reflexión completa</td><td>9–10</td></tr>
-    </tbody>
-  </table>
-  </div>
-
   <h3>Entregables</h3>
   <ol>
-    <li>Carpeta <span class="inline">src/</span> comprimida.</li>
-    <li><span class="inline">reflexion.md</span> con respuestas a los retos y a las preguntas del bloque final (genera un borrador al final de esta guía).</li>
+    <li>Enlace a github</li>
+    <li><span class="inline">reflexion.md</span> con respuestas a las preguntas del bloque final (genera un borrador al final de esta guía).</li>
     <li>Capturas de pantalla: dashboard de <span class="inline">user</span>, panel de <span class="inline">admin</span>, DevTools → Application → Cookies (<span class="inline">PHPSESSID</span> y <span class="inline">ultimo_email</span>), DevTools → Network (<span class="inline">Set-Cookie</span> en la respuesta del login).</li>
-    <li>Autoevaluación: te pones una nota del 1 al 10 y la justificas en 2 frases.</li>
   </ol>
 </section>
 
@@ -305,42 +286,42 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
 <section id="bloque-0">
   <div class="sec-head"><span class="sec-num">01</span><h2>🚀 Bloque 0 — Puesta en marcha del entorno</h2><span class="time-badge" style="margin-top:8px">⏱ 15 min</span></div>
 
+  <div class="tip"><h4>🐘 Tu configuración Docker</h4><p style="margin-bottom:0">Apache (<span class="inline">httpd:2.4-alpine</span>) + PHP-FPM (<span class="inline">php:8.2-fpm-alpine</span>) + MariaDB 11, conectados por la red <span class="inline">lamp-network</span>. Servicios: <span class="inline">apache</span>, <span class="inline">php-fpm</span>, <span class="inline">mariadb</span>. Este bloque asume que ya tienes <span class="inline">docker-compose.yml</span>, <span class="inline">apache/</span> y <span class="inline">php/Dockerfile</span> de la configuración base que te ha dado tu profesor — aquí solo los completamos.</p></div>
+
   <h3>Estructura del proyecto</h3>
-  <p>Vas a trabajar en una carpeta <span class="inline">src/</span> que se montará dentro del contenedor como <span class="inline">/var/www/html</span>. Al final tendrás:</p>
+  <p>Vas a trabajar en una carpeta <span class="inline">src/</span> que se monta dentro del contenedor Apache como <span class="inline">/var/www/html</span>. Al final tendrás:</p>
   <div class="code" data-code="b0-arbol"></div>
 
-  <h3>Paso 1: <span class="inline">docker-compose.yml</span></h3>
-  <div class="code" data-code="b0-compose"></div>
+  <h3>✅ Antes de arrancar: <span class="inline">display_errors</span> en PHP</h3>
+  <p>Añade estas dos líneas al final de <span class="inline">php/Dockerfile</span> para poder ver los errores de PHP en pantalla:</p>
+  <div class="code" data-code="b0-dockerfile-php"></div>
+  <p>Y reconstruye:</p>
+  <div class="code" data-code="b0-build"></div>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Sin esto, cuando haya un error verás una pantalla en blanco sin pistas</h4><p style="margin-bottom:0">Es la causa número 1 de frustración al empezar con PHP.</p></div></div>
 
-  <h3>Paso 2: <span class="inline">php.ini</span> (en la raíz, junto al <span class="inline">docker-compose.yml</span>)</h3>
-  <div class="code" data-code="b0-phpini"></div>
-  <div class="banner"><span class="ico">⚠️</span><div><h4>Muy importante</h4><p style="margin-bottom:0">Sin esto, cuando haya un error verás una pantalla en blanco sin pistas. Es la causa número 1 de frustración en PHP.</p></div></div>
-
-  <h3>Paso 3: <span class="inline">.htaccess</span> dentro de <span class="inline">src/</span></h3>
-  <div class="code" data-code="b0-htaccess"></div>
-
-  <h3>Paso 4: Arrancar</h3>
+  <h3>Arrancar los contenedores</h3>
   <div class="code" data-code="b0-arranque"></div>
   <ul>
     <li>App: <span class="inline">http://localhost:8080</span></li>
-    <li>phpMyAdmin: <span class="inline">http://localhost:8081</span> (usuario <span class="inline">dam</span> / <span class="inline">dam</span>)</li>
   </ul>
 
   <h3>🧪 Retos de arranque</h3>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 0.1</button></div>
-    <p>Entra a phpMyAdmin y comprueba que existe la tabla <span class="inline">usuarios</span>. ¿Qué pasa si borras el volumen y vuelves a levantar? (Pista: <span class="inline">docker compose down -v</span>).</p>
+    <p>Comprueba que los tres contenedores están levantados:</p>
+    <div class="code" data-code="b0-ps"></div>
+    <p>Deberías ver <span class="inline">lamp-apache</span>, <span class="inline">lamp-php</span> y <span class="inline">lamp-mariadb</span>. ¿Cuál de ellos tiene un <span class="inline">healthcheck</span> definido?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">Al hacer <span class="inline">docker compose down -v</span> se borra el volumen de MySQL, y al levantar de nuevo se vuelve a ejecutar <span class="inline">sql/init.sql</span> desde cero. Es decir, se reinicia la BBDD. Útil cuando quieres partir de cero durante el desarrollo.</p></div>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Solo <span class="inline">mariadb</span> tiene <span class="inline">healthcheck</span>. Por eso <span class="inline">php-fpm</span> tiene <span class="inline">depends_on: mariadb: condition: service_healthy</span> — espera a que la BBDD esté lista antes de arrancar.</p></div>
     </div>
   </div>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 0.2</button></div>
-    <p>Modifica <span class="inline">index.php</span> con <span class="inline">&lt;?php phpinfo(); ?&gt;</span>. Localiza la línea <span class="inline">Loaded Configuration File</span>. ¿Apunta a tu <span class="inline">php.ini</span>?</p>
+    <p>Crea un <span class="inline">index.php</span> dentro de <span class="inline">src/</span> con <span class="inline">&lt;?php phpinfo(); ?&gt;</span>. Ábrelo en <span class="inline">http://localhost:8080</span>. Localiza la línea <span class="inline">Additional .ini files parsed</span>. ¿Aparece tu <span class="inline">custom.ini</span>?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">Debe apuntar a <span class="inline">/usr/local/etc/php/conf.d/custom.ini</span> (el que has montado como volumen). Si no aparece, revisa la ruta en el <span class="inline">docker-compose.yml</span>.</p></div>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Debe aparecer, así como <span class="inline">display_errors = on</span> en la la seccion Core. Si no está, no has reconstruido la imagen de PHP-FPM después de modificar el Dockerfile.</p></div>
     </div>
   </div>
 </section>
@@ -391,30 +372,50 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     </div>
   </div>
 
-  <p>Antes de crear login.php necesitamos un includes/auth.php mínimo, porque login.php lo va a incluir. En este bloque, la función login() siempre devuelve false — no consulta BBDD todavía. La implementación real la harás en el Bloque 2.</p>
-  <h3>📄 <span class="inline">includes/auth.php</span> (versión stub)</h3>
+  <h3>📄 Paso 1: <span class="inline">includes/auth.php</span> (versión stub)</h3>
+  <p>Antes de crear <span class="inline">login.php</span> necesitamos un <span class="inline">includes/auth.php</span> mínimo, porque <span class="inline">login.php</span> lo va a incluir. <b>En este bloque, la función <span class="inline">login()</span> siempre devuelve <span class="inline">false</span></b> — no consulta BBDD todavía. La implementación real la harás en el Bloque 2.</p>
   <div class="code" data-code="b1-auth-stub"></div>
+  <div class="note"><h4>📌 ¿Por qué un stub?</h4><p style="margin-bottom:0">Para que <span class="inline">login.php</span> no dé error de «fichero no encontrado» y puedas probar la validación del formulario de forma aislada, sin distracciones de BBDD. En el Bloque 2 sustituirás este archivo por la versión real.</p></div>
+  <div class="note"><h4>📌 Aviso</h4><p style="margin-bottom:0">Este código usa <span class="inline">session_start()</span> y <span class="inline">$_SESSION</span>. Todavía no sabemos qué significan esos dos elementos — los veremos en detalle en el Bloque 3. Por ahora, quédate con que sirven para «que el servidor recuerde quién eres entre peticiones».</p></div>
 
-  <h3>📄 <span class="inline">login.php</span> — código inicial</h3>
+  <h3>📄 Paso 2: <span class="inline">login.php</span></h3>
   <div class="code" data-code="b1-login"></div>
-  <div class="note"><h4>📌 Aviso</h4><p style="margin-bottom:0">Este código usa <span class="inline">$_COOKIE['ultimo_email']</span> y <span class="inline">setcookie(...)</span>. Todavía no sabemos qué significan esos dos elementos — los veremos en detalle en el Bloque 3. Por ahora, quédate con que sirven para «recordar el email la próxima vez». Los retos de este bloque se centran solo en el formulario y en <span class="inline">$_POST</span>.</p></div>
+  <div class="note"><h4>📌 Nota</h4><p style="margin-bottom:0">En este bloque <b>no</b> usamos <span class="inline">header.php</span> ni <span class="inline">footer.php</span> porque los crearemos en el Bloque 3. Por eso <span class="inline">login.php</span> incluye su propio HTML completo. En el Bloque 3 refactorizaremos para usar los includes.</p></div>
+  <div class="note"><h4>📌 Aviso</h4><p style="margin-bottom:0">Este código usa <span class="inline">$_COOKIE['ultimo_email']</span> y <span class="inline">setcookie(...)</span>. Todavía no sabemos qué significan esos dos elementos — los veremos en detalle en el Bloque 3. Por ahora, quédate con que sirven para «recordar el email la próxima vez».</p></div>
 
   <h3>🧪 Cómo probar el formulario</h3>
-  <p>Arranca el contenedor (docker compose up -d) y abre http://localhost:8080/login.php. Prueba estos casos:</p>
+  <p>Abre <span class="inline">http://localhost:8080/login.php</span> y prueba estos casos:</p>
   <ol>
-    <li>Enviar vacío → debe mostrar "Rellena todos los campos".</li>
-    <li>Enviar con contraseña de 3 letras → debe mostrar "La contraseña debe tener al menos 6 caracteres".</li>
-    <li>Enviar con datos correctos → debe mostrar "Credenciales incorrectas".</li>
+    <li>Enviar vacío → debe mostrar «Rellena todos los campos».</li>
+    <li>Enviar con contraseña de 3 letras → debe mostrar «La contraseña debe tener al menos 6 caracteres».</li>
+    <li>Enviar con datos correctos → debe mostrar «Credenciales incorrectas».</li>
   </ol>
-  <p>✅ Esto es lo esperado. Como login() siempre devuelve false (es un stub), el formulario nunca deja entrar. Pero la validación sí funciona. En el Bloque 2 haremos que login() consulte la BBDD y permita entrar.</p>
+  <div class="tip"><h4>✅ Esto es lo esperado</h4><p style="margin-bottom:0">Como <span class="inline">login()</span> siempre devuelve <span class="inline">false</span> (es un stub), el formulario nunca deja entrar. Pero la validación sí funciona. En el Bloque 2 haremos que <span class="inline">login()</span> consulte la BBDD y permita entrar.</p></div>
 
   <h3>🧪 Retos</h3>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.1</button></div>
-    <p>Cambia <span class="inline">form method="POST"</span> por <span class="inline">form method="GET"</span>. Observa la URL tras enviar.</p>
+    <p>Sin tocar <span class="inline">login.php</span>, cambia <b>solo</b> el atributo <span class="inline">method</span> del <span class="inline">&lt;form&gt;</span> de <span class="inline">POST</span> a <span class="inline">GET</span>. <b>No toques la línea</b> <span class="inline">if ($_SERVER['REQUEST_METHOD'] === 'POST')</span>. Envía el formulario y observa la URL.</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">La URL muestra <span class="inline">?email=...&password=...</span>. Es mala idea porque: (a) las credenciales quedan en el historial y logs, (b) hay límite de longitud, (c) es cacheable. POST mantiene los datos en el cuerpo.</p></div>
+      <div class="reveal-box" hidden>
+        <p>Al enviar con <span class="inline">method="GET"</span>, la URL muestra <span class="inline">?email=...&password=...</span>.</p>
+        <p>Pero como <span class="inline">login.php</span> sigue comprobando <span class="inline">REQUEST_METHOD === 'POST'</span>, el bloque de validación <b>no se ejecuta</b>. Es decir: el formulario se envía, la URL cambia, pero no aparece ningún mensaje de error (ni de éxito).</p>
+        <p><b>Esto enseña dos cosas de golpe:</b> 1) los datos de un GET son visibles en la URL, los de un POST no; 2) el código PHP y el formulario HTML deben estar de acuerdo en el método.</p>
+        <p style="margin-bottom:0"><b>Por qué es mala idea para un login:</b> la contraseña queda en el historial del navegador, en los logs del servidor y en cualquier proxy intermedio. Además, la URL es cacheable y bookmarkeable.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.1 bis <span style="font-weight:400;color:var(--muted);font-size:13px">(opcional, para quien quiera profundizar)</span></button></div>
+    <p>Ahora cambia también la línea del <span class="inline">if</span> en <span class="inline">login.php</span> para que acepte <span class="inline">GET</span>. ¿Qué mensaje aparece nada más cargar la página, antes incluso de enviar el formulario? ¿Por qué?</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden>
+        <p>Aparece <b>«Rellena todos los campos»</b> directamente al cargar <span class="inline">login.php</span>, sin haber enviado nada.</p>
+        <p><b>Por qué:</b> al escribir la URL en el navegador y pulsar Enter, se hace un <span class="inline">GET /login.php</span> sin parámetros. Como el <span class="inline">if</span> ahora acepta GET, entra al bloque de validación, <span class="inline">$email</span> y <span class="inline">$pass</span> están vacíos, y salta el primer error.</p>
+        <p style="margin-bottom:0">Esto demuestra un problema clásico del GET: no puedes distinguir «primera visita» de «envío del formulario» salvo comprobando si hay parámetros. Con POST, en cambio, la primera visita siempre es un GET limpio y solo hay POST cuando realmente se envía el formulario.</p>
+      </div>
     </div>
   </div>
 
@@ -430,7 +431,13 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.3</button></div>
     <p>Añade validación de que el email contiene <span class="inline">@</span>. ¿Dónde es mejor: cliente o servidor?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">En ambos. Cliente (HTML5 <span class="inline">type="email"</span>) = UX rápida. Servidor (<span class="inline">filter_var($email, FILTER_VALIDATE_EMAIL)</span>) = seguridad real. Nunca confiar solo en el cliente (se puede desactivar con DevTools).</p></div>
+      <div class="reveal-box" hidden>
+        <p>En ambos. Cliente (HTML5 <span class="inline">type="email"</span>) = UX rápida. Servidor (<span class="inline">filter_var($email, FILTER_VALIDATE_EMAIL)</span>) = seguridad real. Nunca confiar solo en el cliente (se puede desactivar con DevTools).</p>
+        <p style="margin:0 0 6px">Pista de implementación en servidor:</p>
+        <pre class="mini-sql">} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $error = 'El email no tiene un formato válido.';
+}</pre>
+      </div>
     </div>
   </div>
 
@@ -441,25 +448,78 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
       <div class="reveal-box" hidden><p style="margin-bottom:0">Devuelve el método HTTP de la petición actual (GET, POST, etc.). Es más robusto porque distingue explícitamente «es un POST» y no depende de si un campo concreto llegó.</p></div>
     </div>
   </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 1.5</button></div>
+    <p>Añade un mensaje de error específico cuando el email esté vacío y otro cuando la contraseña esté vacía (en lugar del genérico «Rellena todos los campos»).</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden>
+        <pre class="mini-sql">if ($email === '') {
+    $error = 'El email es obligatorio.';
+} elseif ($pass === '') {
+    $error = 'La contraseña es obligatoria.';
+} elseif (strlen($pass) < 6) {
+    // ...
+}</pre>
+        <p style="margin-bottom:0"><b>Reflexiona:</b> ¿es mejor UX un mensaje genérico o uno específico? ¿Por qué muchas webs usan el genérico «Credenciales incorrectas» en login? (Pista: no dar pistas a atacantes sobre qué campo existe).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><h4>📌 Estado al terminar el Bloque 1</h4>
+    <p>Al acabar este bloque deberías tener:</p>
+    <pre class="map" style="margin:8px 0">src/
+├── includes/
+│   └── auth.php    ← versión stub
+└── login.php</pre>
+    <p style="margin-bottom:0">Y el formulario debería funcionar en sus tres casos de prueba. <b>Todavía no puedes entrar</b> — eso es lo que haremos en el Bloque 2, cuando sustituyas el stub de <span class="inline">auth.php</span> por la versión real que consulta la BBDD.</p>
+  </div>
+  <div class="banner"><span class="ico">⚠️</span><div><p style="margin-bottom:0">No te preocupes si ves «Credenciales incorrectas» con datos válidos. Es el comportamiento esperado del stub. En el Bloque 2, cuando <span class="inline">login()</span> consulte la BBDD, entrará correctamente.</p></div></div>
 </section>
 
 <!-- ============ BLOQUE 2 ============ -->
 <section id="bloque-2">
   <div class="sec-head"><span class="sec-num">03</span><h2>🗄️ Bloque 2 — Persistencia en BBDD y usuarios</h2><span class="time-badge" style="margin-top:8px">⏱ 60 min</span></div>
 
-  <h3>📄 <span class="inline">sql/init.sql</span></h3>
-  <div class="banner"><span class="ico">⚠️</span><div><h4>Antes de empezar</h4><p>Genera hashes reales con:</p>
-    <div class="code" data-code="b2-genhash"></div>
-    <p style="margin-bottom:0">Pega los resultados en <span class="inline">init.sql</span>. No reutilices hashes de internet — no funcionarán.</p>
-  </div></div>
+  <p>En el Bloque 1 dejamos <span class="inline">includes/auth.php</span> como un stub: <span class="inline">login()</span> siempre devolvía <span class="inline">false</span> y el formulario nunca dejaba entrar. En este bloque vamos a: 1) crear la BBDD con las tablas <span class="inline">usuarios</span> y <span class="inline">tareas</span>; 2) conectar PHP con MariaDB mediante PDO; 3) sustituir el stub de <span class="inline">auth.php</span> por la versión real que consulta la BBDD, verifica el hash y crea la sesión.</p>
+  <p>Al terminar, podrás hacer login con <span class="inline">admin@demo.com</span> / <span class="inline">admin123</span> y <span class="inline">user@demo.com</span> / <span class="inline">user123</span>.</p>
+
+  <h3>📄 Paso 1: <span class="inline">mariadb/init.sql</span></h3>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Ubicación importante</h4><p style="margin-bottom:0">Este fichero <b>NO</b> va dentro de <span class="inline">src/</span>. Va en la carpeta <span class="inline">mariadb/</span>, al mismo nivel que <span class="inline">docker-compose.yml</span>, <span class="inline">apache/</span> y <span class="inline">php/</span>.</p></div></div>
   <div class="code" data-code="b2-initsql"></div>
+  <div class="note"><h4>📌 Importante</h4><p style="margin-bottom:0">El <span class="inline">init.sql</span> solo se ejecuta la primera vez que se crea el volumen <span class="inline">mariadb_data</span>. Si más adelante lo modificas y quieres que se vuelva a ejecutar, tendrás que borrar el volumen (<span class="inline">docker compose down -v</span>) y volver a levantar (<span class="inline">docker compose up -d</span>) — ten cuidado, eso borra también los datos.</p></div>
 
-  <h3>📄 <span class="inline">config/db.php</span></h3>
+  <h3>📄 Paso 2: Generar hashes reales</h3>
+  <p>Los hashes del <span class="inline">init.sql</span> de ejemplo no funcionan — son placeholders. Genera los tuyos propios ejecutando el comando dentro del contenedor <span class="inline">php-fpm</span>:</p>
+  <div class="code" data-code="b2-genhash"></div>
+  <p>Cada comando te devuelve algo como <span class="inline">$2y$10$AbCdEfGhIjKlMnOpQrStUuVvWxYz0123456789ABCDEFGHIJK</span>. Copia cada hash y pégalo en <span class="inline">mariadb/init.sql</span>, sustituyendo el placeholder correspondiente.</p>
+  <div class="tip"><h4>💡 Nota</h4><p style="margin-bottom:0">Los hashes son distintos cada vez que ejecutas el comando, aunque la contraseña sea la misma. Esto es porque <span class="inline">password_hash</span> añade un <i>salt</i> aleatorio. <span class="inline">password_verify</span> es capaz de validarlos igualmente.</p></div>
+  <p>Recuerda: después de pegar los hashes en <span class="inline">init.sql</span>, reinicializa la BBDD para que se ejecute el script actualizado:</p>
+  <div class="code" data-code="b2-reinit"></div>
+
+  <h3>📄 Paso 3: <span class="inline">config/db.php</span></h3>
+  <p>Crea la carpeta <span class="inline">src/config/</span> y dentro este fichero:</p>
   <div class="code" data-code="b2-dbphp"></div>
+  <p>Los datos de conexión (<span class="inline">mariadb</span>, <span class="inline">lamp_db</span>, <span class="inline">lamp_user</span>, <span class="inline">lamp_pass</span>) salen directamente del <span class="inline">docker-compose.yml</span>.</p>
 
-  <h3>📄 <span class="inline">includes/auth.php</span></h3>
-  <div class="note"><h4>📌 De momento, quédate con la idea mínima</h4><p style="margin-bottom:0">En este bloque introducimos <span class="inline">session_start()</span> y <span class="inline">$_SESSION</span>. Por ahora: «el servidor guarda datos asociados a un ID que el navegador lleva consigo; así el servidor recuerda quién eres entre peticiones». El detalle va en el Bloque 3.</p></div>
+  <h3>📄 Paso 4: <span class="inline">includes/auth.php</span> (versión real)</h3>
+  <p>Sustituye <b>por completo</b> el stub del Bloque 1 por esta versión:</p>
   <div class="code" data-code="b2-authphp"></div>
+  <div class="note"><h4>📌 De momento, quédate con la idea mínima</h4><p style="margin-bottom:0">En este bloque introducimos <span class="inline">session_start()</span> y <span class="inline">$_SESSION</span>. Por ahora: «el servidor guarda datos asociados a un ID que el navegador lleva consigo; así el servidor recuerda quién eres entre peticiones». El detalle va en el Bloque 3.</p></div>
+  <div class="note"><h4>📌 No toques <span class="inline">login.php</span></h4><p style="margin-bottom:0">Ya estaba bien desde el Bloque 1. Solo cambia el contenido de <span class="inline">auth.php</span>.</p></div>
+
+  <h3>🧪 Cómo probar</h3>
+  <ol>
+    <li>Reinicia los contenedores para que se ejecute el <span class="inline">init.sql</span> actualizado:
+      <div class="code" data-code="b2-reinit"></div>
+    </li>
+    <li>Comprueba que las tablas existen:
+      <div class="code" data-code="b2-check-tablas"></div>
+    </li>
+    <li>Abre <span class="inline">http://localhost:8080/login.php</span> y prueba: <span class="inline">admin@demo.com</span> / <span class="inline">admin123</span> → debe entrar (aunque <span class="inline">index.php</span> dará 404 porque aún no existe; que redirija ya es señal de éxito); <span class="inline">user@demo.com</span> / <span class="inline">user123</span> → igual; <span class="inline">admin@demo.com</span> / <span class="inline">incorrecta</span> → debe mostrar «Credenciales incorrectas».</li>
+  </ol>
+  <div class="tip"><p style="margin-bottom:0">✅ Si has llegado aquí y el login «funciona» (redirige con credenciales correctas, error con incorrectas), el criterio <b>f)</b> está cubierto y parte del <b>h)</b>.</p></div>
+  <div class="banner"><span class="ico">⚠️</span><div><h4>Si el login siempre falla aunque las credenciales sean correctas</h4><p style="margin-bottom:0">Comprueba que los hashes de <span class="inline">init.sql</span> son reales (no los de ejemplo) · que reiniciaste con <span class="inline">down -v</span> después de pegar los hashes · que <span class="inline">display_errors</span> está activo en el Dockerfile de PHP.</p></div></div>
 
   <h3>🧪 Retos</h3>
 
@@ -467,7 +527,13 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.1</button></div>
     <p>Prueba a introducir <span class="inline">' OR '1'='1</span> como email. ¿Funciona el login? ¿Por qué no?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">No funciona porque <span class="inline">prepare()</span> + <span class="inline">execute()</span> tratan el input como dato, no como SQL. El motor recibe el string literal y lo busca como email, que no existe. Esta es la base de la prevención de inyección SQL.</p></div>
+      <div class="reveal-box" hidden>
+        <p>No funciona porque <span class="inline">prepare()</span> + <span class="inline">execute()</span> tratan el input como dato, no como SQL. El motor recibe el string literal y lo busca como email, que no existe. Esta es la base de la prevención de inyección SQL.</p>
+        <p style="margin:0 0 6px">Si quieres comprobar cómo <b>sí</b> sería vulnerable, sustituye temporalmente el <span class="inline">prepare</span>/<span class="inline">execute</span> por:</p>
+        <pre class="mini-sql">$sql = "SELECT * FROM usuarios WHERE email = '$email'";
+$u = db()->query($sql)->fetch();</pre>
+        <p style="margin-bottom:0">Con esa versión, <span class="inline">' OR '1'='1</span> devolvería el primer usuario y el login pasaría. <b>Vuelve a dejar la versión con <span class="inline">prepare</span> en cuanto lo compruebes.</b></p>
+      </div>
     </div>
   </div>
 
@@ -491,9 +557,49 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.4</button></div>
     <p>¿Por qué usamos <span class="inline">PDO::ATTR_EMULATE_PREPARES => false</span>?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">Fuerza a MySQL a hacer prepared statements reales (en el servidor), no emulados por PHP. Es más seguro y eficiente, y evita ciertos edge cases de escape.</p></div>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Fuerza a MariaDB a hacer prepared statements reales (en el servidor), no emulados por PHP. Es más seguro y eficiente, y evita ciertos edge cases de escape.</p></div>
     </div>
   </div>
+
+  <div class="reto" data-reto>
+    <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 2.5</button></div>
+    <p>Añade un tercer usuario con rol <span class="inline">user</span> desde la CLI de MariaDB. Comprueba que puedes hacer login con él.</p>
+    <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+      <div class="reveal-box" hidden>
+        <p style="margin:0 0 6px"><b>Paso 1:</b> genera el hash:</p>
+        <div class="code" data-code="b2-reto25-hash"></div>
+        <p style="margin:12px 0 6px"><b>Paso 2:</b> insértalo en la BBDD (sustituye <span class="inline">TU_HASH_AQUI</span> por el resultado anterior):</p>
+        <div class="code" data-code="b2-reto25-insert"></div>
+        <p style="margin:12px 0 6px"><b>Paso 3:</b> comprueba que existe:</p>
+        <div class="code" data-code="b2-reto25-check"></div>
+        <p style="margin:12px 0 0"><b>Paso 4:</b> prueba login en <span class="inline">http://localhost:8080/login.php</span> con <span class="inline">maria@demo.com</span> / <span class="inline">maria123</span>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><h4>📌 Estado al terminar el Bloque 2</h4>
+    <p>Al acabar este bloque deberías tener:</p>
+    <pre class="map" style="margin:8px 0">proyecto/
+├── docker-compose.yml
+├── apache/
+│   ├── Dockerfile
+│   └── vhost.conf
+├── php/
+│   └── Dockerfile
+├── mariadb/
+│   └── init.sql        ← con tus hashes reales
+└── src/
+    ├── config/
+    │   └── db.php      ← nuevo
+    ├── includes/
+    │   └── auth.php    ← sustituido por la versión real
+    └── login.php       ← sin cambios respecto al Bloque 1</pre>
+    <p style="margin-bottom:0">En el Bloque 3 profundizaremos en qué son las sesiones, las cookies y las cabeceras HTTP. En el Bloque 4 crearemos las páginas de destino (<span class="inline">index.php</span>, <span class="inline">admin.php</span>) para que el login tenga a dónde llevar.</p>
+  </div>
+
+  <h3>📎 Anexo: comprobar la BBDD sin phpMyAdmin</h3>
+  <p>Tu compose no incluye phpMyAdmin. Estos son los comandos CLI que usarás durante la práctica:</p>
+  <div class="code" data-code="b2-anexo-cli"></div>
 </section>
 
 <!-- ============ BLOQUE 3 ============ -->
@@ -617,6 +723,11 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
   <div class="code" data-code="b3-headerphp"></div>
   <h3>📄 <span class="inline">includes/footer.php</span></h3>
   <div class="code" data-code="b3-footerphp"></div>
+
+  <h3>📄 Refactor de <span class="inline">login.php</span></h3>
+  <p>Ahora que tenemos <span class="inline">header.php</span> y <span class="inline">footer.php</span>, podemos sustituir el HTML completo que había en <span class="inline">login.php</span> por los includes:</p>
+  <div class="code" data-code="b3-login-refactor"></div>
+
   <h3>📄 <span class="inline">logout.php</span></h3>
   <div class="code" data-code="b3-logoutphp"></div>
 
@@ -626,13 +737,13 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.1</button></div>
     <p>Abre DevTools → Network → haz login. Localiza la petición <span class="inline">POST /login.php</span>. Mira la cabecera de respuesta <span class="inline">Set-Cookie</span>. ¿Qué valor tiene <span class="inline">PHPSESSID</span>? ¿Coincide con la cookie que ves en Application → Cookies?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
-      <div class="reveal-box" hidden><p style="margin-bottom:0">Sí, coincide. El servidor envía el ID en <span class="inline">Set-Cookie</span> y el navegador lo guarda. En la siguiente petición (<span class="inline">GET /index.php</span>) aparece en la cabecera <span class="inline">Cookie:</span> de la petición. Puedes comprobarlo en la pestaña Network → clic en <span class="inline">index.php</span> → Headers → Request Headers.</p></div>
+      <div class="reveal-box" hidden><p style="margin-bottom:0">Sí, coincide. El servidor envía el ID en <span class="inline">Set-Cookie</span> y el navegador lo guarda. En la siguiente petición (<span class="inline">GET /index.php</span>) aparece en la cabecera <span class="inline">Cookie:</span> de la petición.</p></div>
     </div>
   </div>
 
   <div class="reto" data-reto>
     <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span> Reto 3.2</button></div>
-    <p>Compara <span class="inline">PHPSESSID</span> con <span class="inline">ultimo_email</span> en DevTools → Application → Cookies. ¿Qué diferencias ves en las columnas <span class="inline">Expires</span> y <span class="inline">HttpOnly</span>?</p>
+    <p>Marca el check de recordar contraseña y haz login. Compara <span class="inline">PHPSESSID</span> con <span class="inline">ultimo_email</span> en DevTools → Application → Cookies. ¿Qué diferencias ves en las columnas <span class="inline">Expires</span> y <span class="inline">HttpOnly</span>?</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
       <div class="reveal-box" hidden><p style="margin-bottom:0"><span class="inline">PHPSESSID</span> caduca «Session» (al cerrar navegador) y tiene <span class="inline">HttpOnly</span> marcado. <span class="inline">ultimo_email</span> caduca en 30 días, contiene el email en claro, y también tiene <span class="inline">HttpOnly</span> porque lo pusimos así.</p></div>
     </div>
@@ -710,9 +821,12 @@ pre.map{margin:16px 0;padding:16px 18px;background:var(--code-bg);color:var(--co
     <p>Añade al <span class="inline">admin.php</span> un contador de tareas por usuario.</p>
     <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
       <div class="reveal-box" hidden>
-        <pre class="mini-sql">SELECT u.id, u.email, u.rol, COUNT(t.id) AS total
+        <p style="margin:0 0 6px">Modifica la consulta principal:</p>
+        <pre class="mini-sql">SELECT u.id, u.email, u.rol, u.creado_en, COUNT(t.id) AS total
 FROM usuarios u LEFT JOIN tareas t ON t.usuario_id = u.id
 GROUP BY u.id</pre>
+        <p style="margin:10px 0 6px">Y añade una columna en la tabla HTML:</p>
+        <pre class="mini-sql">&lt;td&gt;&lt;?= $u['total'] ?&gt;&lt;/td&gt;</pre>
         <p style="margin-bottom:0"><b>¿Por qué LEFT JOIN?</b> Porque hay usuarios sin tareas y queremos que aparezcan con 0.</p>
       </div>
     </div>
@@ -738,8 +852,12 @@ GROUP BY u.id</pre>
     <li>Login como <span class="inline">admin@demo.com</span> / <span class="inline">admin123</span> → ver panel admin → intentar borrar usuario.</li>
     <li>Abrir DevTools → Network → login → inspeccionar <span class="inline">Set-Cookie</span> en la respuesta.</li>
     <li>Abrir DevTools → Application → Cookies → ver <span class="inline">PHPSESSID</span> y <span class="inline">ultimo_email</span>.</li>
-    <li>Consultar phpMyAdmin: ¿las contraseñas están hasheadas?</li>
+    <li>Comprobar en la CLI de MariaDB que las contraseñas están hasheadas:
+      <pre class="mini-sql">docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e "SELECT email, password_hash FROM usuarios;"</pre>
+      Debes ver cadenas que empiezan por <span class="inline">$2y$10$...</span>, no las contraseñas en claro.
+    </li>
   </ol>
+  <div class="tip"><p style="margin-bottom:0">💡 Si algo falla, los errores de PHP aparecen en los logs de <span class="inline">php-fpm</span>, no en los de Apache: <span class="inline">docker compose logs -f php-fpm</span></p></div>
 
   <h3>✍️ Borrador de <span class="inline">reflexion.md</span></h3>
   <p>Responde aquí mismo (mínimo 3 líneas por pregunta) y descarga el borrador al terminar — luego lo revisas y lo entregas como <span class="inline">reflexion.md</span>.</p>
@@ -749,6 +867,7 @@ GROUP BY u.id</pre>
     <button class="btn sec" id="memDownload">Descargar reflexion.md</button>
   </div>
   <div class="mem-preview" id="memPreviewBox"><pre id="memPreviewText"></pre></div>
+
 </section>
 
 <!-- ============ CHECKLIST ============ -->
@@ -762,6 +881,11 @@ GROUP BY u.id</pre>
   <div class="sec-head"><span class="sec-num">08</span><h2>🚀 Ampliaciones opcionales</h2></div>
   <p>Si terminas antes, elige una o varias:</p>
   <div class="grid" id="ampliacionesHost"></div>
+
+  <h4>Añadir Adminer al compose</h4>
+  <p>Para tener interfaz gráfica de BBDD sin phpMyAdmin:</p>
+  <div class="code" data-code="amp-adminer"></div>
+  <p>Accede a <span class="inline">http://localhost:8081</span> con servidor <span class="inline">mariadb</span>, usuario <span class="inline">lamp_user</span>, contraseña <span class="inline">lamp_pass</span>, BBDD <span class="inline">lamp_db</span>.</p>
 </section>
 
 <!-- ============ FLUJO ============ -->
@@ -780,100 +904,62 @@ GROUP BY u.id</pre>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ===== Fragmentos de código (resaltado automático + botón Copiar) ===== */
+/* ===== Fragmentos de código ===== */
 var CODE = {
 
-"b0-arbol": { title: "estructura del proyecto", lang: "text", code: `src/
-├── config/
-│   └── db.php
-├── includes/
-│   ├── auth.php
-│   ├── header.php
-│   └── footer.php
-├── sql/
-│   └── init.sql
-├── login.php
-├── logout.php
-├── index.php
-├── admin.php
-├── tareas.php
-├── style.css
-└── .htaccess` },
+"b0-arbol": { title: "Estructura del proyecto", lang: "text", code: `proyecto/
+├── docker-compose.yml
+├── apache/
+│   ├── Dockerfile
+│   └── vhost.conf
+├── php/
+│   └── Dockerfile
+├── mariadb/
+│   └── init.sql            ← el script SQL va aquí
+└── src/                    ← aquí va el código PHP
+    ├── config/
+    │   └── db.php
+    ├── includes/
+    │   ├── auth.php
+    │   ├── header.php
+    │   └── footer.php
+    ├── login.php
+    ├── logout.php
+    ├── index.php
+    ├── admin.php
+    ├── tareas.php
+    └── .htaccess` },
 
-"b0-compose": { title: "docker-compose.yml", lang: "yaml", code: `services:
-  web:
-    image: php:8.2-apache
-    container_name: miniapp_web
-    ports: ["8080:80"]
-    volumes:
-      - ./src:/var/www/html
-      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
-    depends_on:
-      db:
-        condition: service_healthy
-    command: >
-      bash -c "docker-php-ext-install pdo_mysql && apache2-foreground"
+"b0-dockerfile-php": { title: "php/Dockerfile — display_errors", lang: "dockerfile", code: `RUN echo "display_errors = On" > /usr/local/etc/php/conf.d/custom.ini \\
+    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/custom.ini` },
 
-  db:
-    image: mysql:8.0
-    container_name: miniapp_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: miniapp
-      MYSQL_USER: dam
-      MYSQL_PASSWORD: dam
-    ports: ["3306:3306"]
-    volumes:
-      - ./sql:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 5s
-      retries: 10
+"b0-build": { title: "Reconstruir PHP-FPM", lang: "bash", code: `docker compose build php-fpm
+docker compose up -d` },
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: miniapp_pma
-    ports: ["8081:80"]
-    environment:
-      PMA_HOST: db
-    depends_on: [db]` },
+"b0-arranque": { title: "Arrancar contenedores", lang: "bash", code: `docker compose up -d` },
 
-"b0-phpini": { title: "php.ini", lang: "ini", code: `display_errors = On
-error_reporting = E_ALL
-log_errors = On` },
+"b0-ps": { title: "Ver estado de contenedores", lang: "bash", code: `docker compose ps` },
 
-"b0-htaccess": { title: ".htaccess", lang: "apache", code: `Options -Indexes
-
-<FilesMatch "\\.(sql|ini|md)$">
-  Require all denied
-</FilesMatch>
-
-RedirectMatch 403 ^/config/.*$
-RedirectMatch 403 ^/includes/.*$` },
-
-"b0-arranque": { title: "arrancar el entorno", lang: "bash", code: `docker compose up -d
-docker compose logs -f web    # esperar "Apache/2.4 ... configured"` },
-
-"b1-anatomia-req": { title: "petición HTTP", lang: "text", code: `POST /login.php HTTP/1.1        ← línea de petición (método + ruta + versión)
+"b1-anatomia-req": { title: "Ejemplo de peticion HTTP", lang: "text", code: `POST /login.php HTTP/1.1        ← línea de petición (método + ruta + versión)
 Host: localhost:8080            ← cabeceras (Clave: valor)
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 42
-                                 ← línea en blanco
+                                ← línea en blanco
 email=user@demo.com&password=user123   ← cuerpo (solo en POST)` },
 
-"b1-anatomia-res": { title: "respuesta HTTP", lang: "text", code: `HTTP/1.1 302 Found              ← línea de estado
+"b1-anatomia-res": { title: "Ejemplo de respuesta HTTP", lang: "text", code: `HTTP/1.1 302 Found              ← línea de estado
 Location: /index.php            ← cabeceras de respuesta
 Content-Type: text/html
 
 <html>...                       ← cuerpo` },
 
-"b1-form-html": { title: "formulario mínimo", lang: "html", code: `<form method="POST" action="login.php">
+"b1-form-html": { title: "Formulario minimo HTML", lang: "html", code: `<form method="POST" action="login.php">
   <input type="email" name="email">
   <input type="password" name="password">
   <button>Enviar</button>
 </form>` },
 
-"b1-auth-stub": { title: "includes/auth.php", lang: "pbp", code: `<?php
+"b1-auth-stub": { title: "includes/auth.php — version stub", lang: "php", code: `<?php
 // includes/auth.php — VERSIÓN STUB (se completará en el Bloque 2)
 
 session_start();
@@ -894,7 +980,6 @@ function login(string $email, string $pass): bool {
 function currentUser(): ?array {
     return $_SESSION['user'] ?? null;
 }` },
-
 
 "b1-login": { title: "login.php", lang: "php", code: `<?php
 require_once __DIR__ . '/includes/auth.php';
@@ -958,10 +1043,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 </html>` },
 
-"b2-genhash": { title: "generar hashes reales", lang: "bash", code: `docker compose exec web php -r "echo password_hash('admin123', PASSWORD_DEFAULT), PHP_EOL;"
-docker compose exec web php -r "echo password_hash('user123', PASSWORD_DEFAULT), PHP_EOL;"` },
-
-"b2-initsql": { title: "sql/init.sql", lang: "sql", code: `CREATE TABLE usuarios (
+"b2-initsql": { title: "mariadb/init.sql", lang: "sql", code: `CREATE TABLE usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(100) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
@@ -978,18 +1060,25 @@ CREATE TABLE tareas (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- ⚠️ SUSTITUIR por los hashes generados en tu entorno
+-- ⚠️ SUSTITUIR por los hashes generados en el Paso 2
 INSERT INTO usuarios (email, password_hash, rol) VALUES
 ('admin@demo.com', '$2y$10$REEMPLAZA_CON_TU_HASH_REAL', 'admin'),
 ('user@demo.com',  '$2y$10$REEMPLAZA_CON_TU_HASH_REAL', 'user');` },
+
+"b2-genhash": { title: "Generar hashes de contrasena", lang: "bash", code: `docker compose exec php-fpm php -r "echo password_hash('admin123', PASSWORD_DEFAULT), PHP_EOL;"
+docker compose exec php-fpm php -r "echo password_hash('user123', PASSWORD_DEFAULT), PHP_EOL;"` },
+
+"b2-reinit": { title: "Reiniciar BBDD", lang: "bash", code: `> docker compose down -v     # borra volúmenes (¡cuidado, borra también los datos!)
+> docker compose up -d       # vuelve a ejecutar init.sql
+>` },
 
 "b2-dbphp": { title: "config/db.php", lang: "php", code: `<?php
 function db(): PDO {
     static $pdo = null;
     if ($pdo === null) {
-        $dsn = 'mysql:host=db;dbname=miniapp;charset=utf8mb4';
+        $dsn = 'mysql:host=mariadb;dbname=lamp_db;charset=utf8mb4';
         try {
-            $pdo = new PDO($dsn, 'dam', 'dam', [
+            $pdo = new PDO($dsn, 'lamp_user', 'lamp_pass', [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
@@ -997,13 +1086,15 @@ function db(): PDO {
         } catch (PDOException $e) {
             error_log('DB error: ' . $e->getMessage());
             http_response_code(500);
-            exit('Error de conexión a la base de datos. Revisa que el contenedor "db" esté levantado.');
+            exit('Error de conexión a la base de datos. Revisa que el contenedor "mariadb" esté levantado.');
         }
     }
     return $pdo;
 }` },
 
-"b2-authphp": { title: "includes/auth.php", lang: "php", code: `<?php
+"b2-authphp": { title: "includes/auth.php — version real", lang: "php", code: `<?php
+// includes/auth.php — VERSIÓN REAL (sustituye al stub del Bloque 1)
+
 session_set_cookie_params([
     'httponly' => true,
     'samesite' => 'Lax',
@@ -1059,7 +1150,26 @@ function logout(): void {
     session_destroy();
 }` },
 
-"b3-secuencia": { title: "sesión: ciclo completo", lang: "text", code: `1. Cliente → POST /login.php (email + password)
+"b2-check-tablas": { title: "Comprobar tablas en BBDD", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e "SHOW TABLES; SELECT id, email, rol FROM usuarios;"` },
+
+"b2-reto25-hash": { title: "Generar hash para nuevo usuario", lang: "bash", code: `docker compose exec php-fpm php -r "echo password_hash('maria123', PASSWORD_DEFAULT), PHP_EOL;"` },
+
+"b2-reto25-insert": { title: "Insertar nuevo usuario", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \`
+  "INSERT INTO usuarios (email, password_hash, rol) VALUES ('maria@demo.com', 'TU_HASH_AQUI', 'user');"` },
+
+"b2-reto25-check": { title: "Verificar usuario insertado", lang: "bash", code: `docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e \`
+  "SELECT id, email, rol FROM usuarios;"` },
+
+"b2-anexo-cli": { title: "Comandos CLI de MariaDB", lang: "bash", code: `# Ver usuarios
+docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e "SELECT id, email, rol FROM usuarios;"
+
+# Ver tareas
+docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db -e "SELECT * FROM tareas;"
+
+# Consola interactiva (útil para consultas largas)
+docker compose exec mariadb mariadb -u lamp_user -plamp_pass lamp_db` },
+
+"b3-secuencia": { title: "Secuencia de sesion", lang: "text", code: `1. Cliente → POST /login.php (email + password)
 2. Servidor → verifica → crea "caja" abc123 con los datos del usuario
 3. Servidor → responde: Set-Cookie: PHPSESSID=abc123
 4. Cliente → guarda la cookie
@@ -1072,7 +1182,6 @@ function logout(): void {
 <head>
   <meta charset="UTF-8">
   <title>MiniApp Tareas</title>
-  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <nav>
@@ -1092,6 +1201,63 @@ function logout(): void {
 "b3-footerphp": { title: "includes/footer.php", lang: "php", code: `</main>
 </body>
 </html>` },
+
+"b3-login-refactor": { title: "login.php — con includes", lang: "php", code: `<?php
+require_once __DIR__ . '/includes/auth.php';
+
+$error = '';
+$email = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $pass  = $_POST['password'] ?? '';
+
+    if ($email === '' || $pass === '') {
+        $error = 'Rellena todos los campos.';
+    } elseif (strlen($pass) < 6) {
+        $error = 'La contraseña debe tener al menos 6 caracteres.';
+    } elseif (login($email, $pass)) {
+        if (!empty($_POST['recordarme'])) {
+            setcookie('ultimo_email', $email, [
+                'expires'  => time() + 60 * 60 * 24 * 30,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+        header('Location: index.php');
+        exit;
+    } else {
+        $error = 'Credenciales incorrectas.';
+    }
+}
+
+require __DIR__ . '/includes/header.php';
+?>
+<h1>Iniciar sesión</h1>
+
+<?php if ($error): ?>
+  <p style="color:red"><?= htmlspecialchars($error) ?></p>
+<?php endif; ?>
+
+<form method="POST" action="login.php" novalidate>
+  <label>Email
+    <input type="email" name="email" required
+           value="<?= htmlspecialchars($email ?: ($_COOKIE['ultimo_email'] ?? '')) ?>">
+  </label>
+
+  <label>Contraseña
+    <input type="password" name="password" required minlength="6">
+  </label>
+
+  <label>
+    <input type="checkbox" name="recordarme" value="1"> Recordarme
+  </label>
+
+  <button type="submit">Entrar</button>
+</form>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>` },
 
 "b3-logoutphp": { title: "logout.php", lang: "php", code: `<?php
 require_once __DIR__ . '/includes/auth.php';
@@ -1192,35 +1358,46 @@ $usuarios = db()->query('SELECT id, email, rol, creado_en FROM usuarios ORDER BY
 
 <?php require __DIR__ . '/includes/footer.php'; ?>` },
 
-"b5-flujo": { title: "esquema visual del flujo completo", lang: "text", code: `[Cliente]                          [Servidor PHP]              [MySQL]
-   |                                    |                          |
-   |--- POST /login.php --------------->|                          |
-   |    Content-Type: ...               |                          |
-   |    email=...&password=...          |--- SELECT usuario ------>|
-   |                                    |<-- fila + hash ----------|
-   |                                    | password_verify()        |
-   |                                    | session_regenerate_id()  |
-   |                                    | $_SESSION['user']=...    |
-   |                                    | setcookie(ultimo_email)  |
-   |<-- 302 Found ----------------------|                          |
-   |    Location: /index.php            |                          |
-   |    Set-Cookie: PHPSESSID=abc123    |                          |
-   |    Set-Cookie: ultimo_email=...    |                          |
-   |                                    |                          |
-   |--- GET /index.php ---------------->|                          |
-   |    Cookie: PHPSESSID=abc123        |                          |
-   |    Cookie: ultimo_email=...        | session_start() recupera |
-   |                                    | requireLogin()           |
-   |                                    |--- SELECT tareas ------->|
-   |<-- 200 OK + HTML ------------------|                          |
-   |                                    |                          |
-   |--- GET /admin.php ---------------->|                          |
-   |    Cookie: PHPSESSID=abc123        | requireAdmin()           |
-   |<-- 403 Forbidden ------------------|  (si rol != admin)       |` }
+"amp-adminer": { title: "Adminer — docker-compose.yml", lang: "yaml", code: `adminer:
+      image: adminer
+      container_name: lamp-adminer
+      ports:
+        - "8081:8080"
+      networks:
+        - lamp-network
+      depends_on:
+        - mariadb
+      restart: unless-stopped` },
+
+"b5-flujo": { title: "Esquema del flujo completo", lang: "text", code: `[Cliente]                          [Apache]         [PHP-FPM]              [MariaDB]
+   |                                 |                 |                      |
+   |--- POST /login.php ------------>|                 |                      |
+   |                                 |-- proxy fcgi -->|                      |
+   |                                 |                 |--- SELECT usuario -->|
+   |                                 |                 |<-- fila + hash ------|
+   |                                 |                 | password_verify()    |
+   |                                 |                 | session_regenerate_id|
+   |                                 |                 | $_SESSION['user']=...|
+   |                                 |                 | setcookie(ultimo_email)
+   |<-- 302 Found + Set-Cookie ------|<----------------|                      |
+   |    Location: /index.php         |                 |                      |
+   |    Set-Cookie: PHPSESSID=abc123 |                 |                      |
+   |                                 |                 |                      |
+   |--- GET /index.php ------------->|                 |                      |
+   |    Cookie: PHPSESSID=abc123     |-- proxy fcgi -->|                      |
+   |                                 |                 | session_start()      |
+   |                                 |                 | requireLogin()       |
+   |                                 |                 |--- SELECT tareas --->|
+   |<-- 200 OK + HTML ---------------|<----------------|                      |
+   |                                 |                 |                      |
+   |--- GET /admin.php ------------->|                 |                      |
+   |    Cookie: PHPSESSID=abc123     |-- proxy fcgi -->|                      |
+   |                                 |                 | requireAdmin()       |
+   |<-- 403 Forbidden ---------------|<----------------|  (si rol != admin)   |` },
 
 };
 
-/* ===== Preguntas de reflexión (generador de reflexion.md) ===== */
+/* ===== Preguntas de reflexion ===== */
 var REFLEXION = [
   "Diferencia GET y POST, con un ejemplo de tu código donde usarías cada uno.",
   "¿Qué es una cabecera HTTP? Pon un ejemplo de cabecera de petición y otro de respuesta que hayas visto hoy.",
@@ -1233,22 +1410,21 @@ var REFLEXION = [
   "¿Qué significa que PHPSESSID tenga HttpOnly? ¿Qué ataque mitiga?"
 ];
 
-/* ===== Checklist final de "terminado" ===== */
+/* ===== Checklist final ===== */
 var CHECKLIST = [
   "docker compose up -d levanta sin errores",
   "http://localhost:8080/login.php muestra el formulario",
   "Login con admin@demo.com / user@demo.com de prueba entra en index.php",
   "Login con admin@demo.com entra y ve el enlace «Panel admin»",
   "Un usuario normal intentando admin.php recibe 403",
-  "Crear tarea, marcarla completada, ver que persiste tras recargar",
+  "Crear tarea, marcarla completada, ver que persiste al recargar",
   "Marcar «recordarme» y ver la cookie ultimo_email en DevTools → Application",
   "Ver PHPSESSID en DevTools y comprobar que la petición lo envía en Cookie: (pestaña Network)",
   "logout.php cierra sesión y redirige a login",
-  "Las contraseñas en BBDD están hasheadas (verlo en phpMyAdmin)",
+  "Las contraseñas en BBDD están hasheadas (verlo en la CLI de MariaDB)",
   "He respondido los retos de cada bloque (1.x, 2.x, 3.x, 4.x)",
   "He escrito reflexion.md con las 9 preguntas",
-  "He hecho las capturas de pantalla pedidas (usuario, admin, cookies, network)",
-  "He rellenado la autoevaluación"
+  "He hecho las capturas de pantalla pedidas (usuario, admin, cookies, network)"
 ];
 
 /* ===== Ampliaciones opcionales ===== */
@@ -1266,9 +1442,7 @@ var AMPLIACIONES = [
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-  /* ============================================================
-     RESALTADO DE SINTAXIS (varios lenguajes)
-     ============================================================ */
+  /* === RESALTADO DE SINTAXIS === */
   var PHP_KW = ["and","array","as","break","case","catch","class","const","continue","declare","default","do","echo","else","elseif","empty","exit","finally","fn","for","foreach","function","global","if","isset","list","match","new","null","or","print","return","static","switch","throw","try","unset","use","while","true","false","int","float","string","bool","void","mixed","callable"];
   var PHP_RE = new RegExp([
     "(<\\?php|<\\?=|\\?>)",
@@ -1386,9 +1560,7 @@ var AMPLIACIONES = [
     }
   }
 
-  /* ============================================================
-     UTILIDADES
-     ============================================================ */
+  /* === UTILIDADES === */
   var toastEl = $("#toast"), tt = null;
   function toast(msg) {
     toastEl.textContent = msg; toastEl.classList.add("show");
@@ -1418,9 +1590,7 @@ var AMPLIACIONES = [
     setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 300);
   }
 
-  /* ============================================================
-     BLOQUES DE CÓDIGO
-     ============================================================ */
+  /* === BLOQUES DE CODIGO === */
   $$(".code[data-code]").forEach(function (el) {
     var key = el.getAttribute("data-code");
     var s = CODE[key];
@@ -1438,9 +1608,7 @@ var AMPLIACIONES = [
     el.appendChild(head); el.appendChild(pre);
   });
 
-  /* ============================================================
-     REVEAL GENÉRICO (retos, "piensa un momento")
-     ============================================================ */
+  /* === REVEAL GENERICO === */
   $$(".reveal-btn").forEach(function (btn) {
     var box = btn.nextElementSibling;
     btn.addEventListener("click", function () {
@@ -1451,9 +1619,7 @@ var AMPLIACIONES = [
     });
   });
 
-  /* ============================================================
-     PROGRESO: RETOS + CHECKLIST FINAL
-     ============================================================ */
+  /* === PROGRESO === */
   var totalRetos = $$("[data-reto]").length;
   var hechos = 0, totalChecklist = CHECKLIST.length, total = totalRetos + totalChecklist;
   function updateScore() {
@@ -1470,9 +1636,7 @@ var AMPLIACIONES = [
     });
   });
 
-  /* ============================================================
-     CHECKLIST FINAL
-     ============================================================ */
+  /* === CHECKLIST FINAL === */
   var checklistHost = $("#checklistHost");
   CHECKLIST.forEach(function (texto) {
     var li = document.createElement("li");
@@ -1491,9 +1655,7 @@ var AMPLIACIONES = [
   });
   updateScore();
 
-  /* ============================================================
-     AMPLIACIONES OPCIONALES
-     ============================================================ */
+  /* === AMPLIACIONES === */
   var ampHost = $("#ampliacionesHost");
   AMPLIACIONES.forEach(function (a) {
     var div = document.createElement("div");
@@ -1502,9 +1664,7 @@ var AMPLIACIONES = [
     ampHost.appendChild(div);
   });
 
-  /* ============================================================
-     GENERADOR DE reflexion.md
-     ============================================================ */
+  /* === GENERADOR DE reflexion.md === */
   var reflexionHost = $("#reflexionHost");
   var nombreWrap = document.createElement("div");
   nombreWrap.className = "mem-q";
@@ -1513,13 +1673,13 @@ var AMPLIACIONES = [
   REFLEXION.forEach(function (q, i) {
     var wrap = document.createElement("div");
     wrap.className = "mem-q";
-    wrap.innerHTML = "<label>" + (i + 1) + ". " + esc(q) + "</label><textarea data-mem-q='" + i + "' placeholder='Mínimo 3 líneas...'></textarea>";
+    wrap.innerHTML = "<label>" + (i + 1) + ". " + esc(q) + "</label><textarea data-mem-q='" + i + "' placeholder='Minimo 3 lineas...'></textarea>";
     reflexionHost.appendChild(wrap);
   });
 
   function buildReflexionMd() {
     var nombre = $("#reflexionNombre").value.trim() || "______________________";
-    var lines = ["# Reflexión — MiniApp de Tareas", "", "**Nombre:** " + nombre, ""];
+    var lines = ["# Reflexion — MiniApp de Tareas", "", "**Nombre:** " + nombre, ""];
     REFLEXION.forEach(function (q, i) {
       var ta = $("[data-mem-q='" + i + "']");
       lines.push("## " + (i + 1) + ". " + q, "", (ta.value.trim() || "_(sin responder)_"), "");
@@ -1535,20 +1695,18 @@ var AMPLIACIONES = [
     toast("reflexion.md descargado.");
   });
 
-  /* ============================================================
-     INSPECTOR DEVTOOLS SIMULADO (demo estrella)
-     ============================================================ */
+  /* === INSPECTOR DEVTOOLS SIMULADO === */
   (function () {
     var dtNetwork = $("#dtNetwork"), dtApplication = $("#dtApplication"), dtJsOut = $("#dtJsOut");
-    var cookies = {}; // { PHPSESSID: {value, expires, httpOnly, sameSite}, ultimo_email: {...} }
+    var cookies = {};
     var loggedIn = false;
 
     function renderNetworkEmpty() {
-      dtNetwork.innerHTML = '<p class="dt-empty">Sin peticiones capturadas todavía. Pulsa «Simular login» para generar una.</p>';
+      dtNetwork.innerHTML = '<p class="dt-empty">Sin peticiones capturadas todavia. Pulsa «Simular login» para generar una.</p>';
     }
     function renderApplication() {
       var keys = Object.keys(cookies);
-      if (!keys.length) { dtApplication.innerHTML = '<p class="dt-empty">Sin cookies todavía.</p>'; return; }
+      if (!keys.length) { dtApplication.innerHTML = '<p class="dt-empty">Sin cookies todavia.</p>'; return; }
       var rows = keys.map(function (k) {
         var c = cookies[k];
         return "<tr><td>" + k + "</td><td>" + esc(c.value) + "</td><td>" + c.expires + "</td>" +
@@ -1565,8 +1723,8 @@ var AMPLIACIONES = [
           if (k === "PHPSESSID") loggedIn = false;
           renderApplication();
           var nota = k === "PHPSESSID"
-            ? "Has borrado PHPSESSID: pierdes la sesión. En la app real, la próxima petición te mandaría de vuelta a login."
-            : "Has borrado ultimo_email: sigues logueado (la sesión no depende de esta cookie), pero el campo email del login dejará de precargarse.";
+            ? "Has borrado PHPSESSID: pierdes la sesion. En la app real, la proxima peticion te mandaria de vuelta a login."
+            : "Has borrado ultimo_email: sigues logueado (la sesion no depende de esta cookie), pero el campo email del login dejara de precargarse.";
           dtApplication.insertAdjacentHTML("beforeend", "<div class='dt-note'>" + nota + "</div>");
         });
       });
@@ -1592,7 +1750,7 @@ var AMPLIACIONES = [
       req.innerHTML =
         "<div class='line1'>POST /login.php HTTP/1.1</div>" +
         "<div class='hdr'>Content-Type: <b>application/x-www-form-urlencoded</b></div>" +
-        "<div class='hdr'>Cookie: <span style='color:#6E756B'>(ninguna todavía)</span></div>";
+        "<div class='hdr'>Cookie: <span style='color:#6E756B'>(ninguna todavia)</span></div>";
       dtNetwork.appendChild(req);
       requestAnimationFrame(function () { req.classList.add("show"); });
 
@@ -1609,11 +1767,11 @@ var AMPLIACIONES = [
 
         loggedIn = true;
         cookies.PHPSESSID = { value: "a1b2c3d4e5f6", expires: "Session", httpOnly: true, sameSite: "Lax" };
-        cookies.ultimo_email = { value: "user%40demo.com", expires: "30 días", httpOnly: true, sameSite: "Lax" };
+        cookies.ultimo_email = { value: "user%40demo.com", expires: "30 dias", httpOnly: true, sameSite: "Lax" };
         renderApplication();
 
         dtNetwork.insertAdjacentHTML("beforeend",
-          "<div class='dt-note'>Dos cabeceras <b>Set-Cookie</b>, una por cada cookie. Cambia a la pestaña <b>Application</b> para verlas ya guardadas.</div>");
+          "<div class='dt-note'>Dos cabeceras <b>Set-Cookie</b>, una por cada cookie. Cambia a la pestana <b>Application</b> para verlas ya guardadas.</div>");
       }, 650);
     });
 
@@ -1624,7 +1782,7 @@ var AMPLIACIONES = [
         "<div class='dt-jsline'>&gt; document.cookie<br>&lt; \"" + esc(resultado) + "\"</div>" +
         "<div class='dt-note'>" + (resultado
           ? "Solo aparecen las cookies SIN HttpOnly."
-          : "Cadena vacía: todas las cookies de esta app tienen HttpOnly, así que JavaScript no puede leer ninguna. Así se protege la sesión ante un posible XSS.") +
+          : "Cadena vacia: todas las cookies de esta app tienen HttpOnly, asi que JavaScript no puede leer ninguna. Asi se protege la sesion ante un posible XSS.") +
         "</div>";
     });
 
@@ -1635,9 +1793,7 @@ var AMPLIACIONES = [
     });
   })();
 
-  /* ============================================================
-     NAVEGACIÓN
-     ============================================================ */
+  /* === NAVEGACION === */
   var sidebar = $("#sidebar");
   $("#menuToggle").addEventListener("click", function () { sidebar.classList.toggle("open"); });
   $$(".nav-link").forEach(function (a) { a.addEventListener("click", function () { sidebar.classList.remove("open"); }); });

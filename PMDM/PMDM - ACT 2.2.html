@@ -571,8 +571,9 @@
             display: block;
             text-align: center;
         }
+
         .flip-back code {
-            background: rgba(255,255,255,0.18);
+            background: rgba(255, 255, 255, 0.18);
             color: #fff;
             padding: 1px 5px;
             border-radius: 4px;
@@ -2161,14 +2162,16 @@
                         la Actividad 2.1 (Login con Compose)</strong>. Se asume que ya tienes el proyecto con
                     <code>LoginScreen.kt</code>, <code>HomeScreen.kt</code>, <code>HomeActivity.kt</code> y
                     <code>MainActivity.kt</code> funcionando, con validaciones de email y contraseña, gestión de foco y
-                    navegación por <code>Intent</code>. Si no es así, recupera primero la actividad anterior.</div>
+                    navegación por <code>Intent</code>. Si no es así, recupera primero la actividad anterior.
+                </div>
                 <div class="callout warn"><strong>Importante:</strong> vamos a <strong>migrar de <code>Intent</code> a
                         <code>NavHost</code></strong>. La <code>HomeActivity</code> dejará de ser una Activity
                     independiente y pasará a ser un <strong>destino dentro del grafo de navegación</strong>. Si no
                     entiendes por qué, no te preocupes: lo veremos paso a paso.</div>
                 <p>Vamos a convertir nuestra app de <strong>una sola pantalla funcional (Login)</strong> en una app con
                     <strong>tres pantallas navegables</strong> (Login, Registro, Home) más una estructura de app real:
-                    barra superior, menú de opciones y diálogo informativo.</p>
+                    barra superior, menú de opciones y diálogo informativo.
+                </p>
                 <h3>Flujo de navegación objetivo</h3>
                 <div class="rg-nodes" style="margin:18px 0">
                     <div class="rg-node">LOGIN</div><span class="small">⇄</span>
@@ -2237,14 +2240,16 @@
                         <div class="flip-inner">
                             <div class="flip-front">NavController</div>
                             <div class="flip-back">Objeto que permite navegar entre destinos (<code>navigate</code>,
-                                <code>popBackStack</code>).</div>
+                                <code>popBackStack</code>).
+                            </div>
                         </div>
                     </div>
                     <div class="flip-card" onclick="this.classList.toggle('flipped')">
                         <div class="flip-inner">
                             <div class="flip-front">Ruta (route)</div>
                             <div class="flip-back">Identificador único de una pantalla dentro del grafo. Ej:
-                                <code>"login"</code>.</div>
+                                <code>"login"</code>.
+                            </div>
                         </div>
                     </div>
                     <div class="flip-card" onclick="this.classList.toggle('flipped')">
@@ -2258,7 +2263,8 @@
                             <div class="flip-front">Scaffold</div>
                             <div class="flip-back">Composable que proporciona la estructura Material 3:
                                 <code>topBar</code>, <code>bottomBar</code>, <code>floatingActionButton</code>,
-                                <code>content</code>.</div>
+                                <code>content</code>.
+                            </div>
                         </div>
                     </div>
                     <div class="flip-card" onclick="this.classList.toggle('flipped')">
@@ -2328,7 +2334,8 @@
                 <p>Partimos del proyecto de la Actividad 2.1. Vamos a <strong>añadir</strong>,
                     <strong>modificar</strong> y <strong>eliminar</strong> archivos. Seguimos usando el <strong>mismo
                         paquete plano</strong> <code>com.ejemplo.login</code> (sin subpaquetes <code>navigation/</code>
-                    ni <code>ui/</code>) para no introducir complejidad organizativa innecesaria.</p>
+                    ni <code>ui/</code>) para no introducir complejidad organizativa innecesaria.
+                </p>
                 <div class="filters"><button class="filter-chip active"
                         onclick="filterTree('all',this)">Todos</button><button class="filter-chip"
                         onclick="filterTree('new',this)">Nuevo</button><button class="filter-chip"
@@ -2444,7 +2451,8 @@
                 </table>
                 <div class="callout "><strong>Regla de oro (recordatorio de la Actividad 2.1):</strong> los textos
                     <strong>nunca</strong> se escriben directamente en el código. Siempre van en
-                    <code>strings.xml</code> y se referencian con <code>stringResource(R.string.mi_texto)</code>.</div>
+                    <code>strings.xml</code> y se referencian con <code>stringResource(R.string.mi_texto)</code>.
+                </div>
             </div>
         </div>
         <div class="section card" id="s4">
@@ -2460,13 +2468,15 @@
                 <ul>
                     <li><strong>Cada pantalla es una Activity</strong> → más código repetido, más coste de memoria.</li>
                     <li><strong>Pasar datos</strong> entre Activities es verboso (<code>putExtra</code>,
-                        <code>getStringExtra</code>).</li>
+                        <code>getStringExtra</code>).
+                    </li>
                     <li><strong>No hay control centralizado</strong> del flujo de navegación.</li>
                     <li><strong>Las animaciones</strong> entre pantallas hay que configurarlas una a una.</li>
                 </ul>
                 <p>En Compose, la forma recomendada es <strong><code>NavHost</code></strong>: una <strong>única
                         Activity</strong> que contiene todas las pantallas, y un
-                    <strong><code>NavController</code></strong> que decide cuál mostrar en cada momento.</p>
+                    <strong><code>NavController</code></strong> que decide cuál mostrar en cada momento.
+                </p>
                 <table class="hover-cols">
                     <tr>
                         <th>Intent + Activity</th>
@@ -2515,7 +2525,8 @@ NavHost(navController = navController, startDestination = "login") {
                 </div>
                 <h3>4.3. ¿Qué es un <code>Scaffold</code>?</h3>
                 <p><code>Scaffold</code> proporciona la <strong>estructura visual</strong> de una pantalla Material 3.
-                    <strong>Toca cada zona</strong> del móvil y prueba a desactivar el <code>innerPadding</code>:</p>
+                    <strong>Toca cada zona</strong> del móvil y prueba a desactivar el <code>innerPadding</code>:
+                </p>
                 <div class="sc-wrap">
                     <div class="sc-phone" id="scPhone">
                         <div class="sc-zone sc-top" onclick="scSel('topBar',this)">topBar</div>
@@ -2534,7 +2545,8 @@ NavHost(navController = navController, startDestination = "login") {
                         <div class="sc-msg ok" id="scMsg">Con <code>innerPadding</code> el contenido empieza justo
                             debajo de la barra superior.</div>
                         <div class="sc-detail" id="scDetail">👆 Toca una zona del móvil para ver su parámetro en
-                            <code>Scaffold</code>.</div>
+                            <code>Scaffold</code>.
+                        </div>
                     </div>
                 </div>
                 <table class="">
@@ -2567,7 +2579,8 @@ NavHost(navController = navController, startDestination = "login") {
                 <div class="callout warn"><strong>Importante:</strong> el bloque <code>content</code> recibe un
                     <code>PaddingValues</code> que <strong>hay que aplicar</strong> con
                     <code>Modifier.padding(innerPadding)</code>. Si no lo haces, el contenido se solapará con la
-                    <code>TopAppBar</code>.</div>
+                    <code>TopAppBar</code>.
+                </div>
                 <div class="code-wrap">
                     <div class="code-label"><span>Scaffold básico</span><span><button class="copy-btn"
                                 onclick="copyCode(this)">Copiar</button></span></div>
@@ -2604,10 +2617,12 @@ NavHost(navController = navController, startDestination = "login") {
                 </div>
                 <h3>4.5. ¿Qué es un menú overflow?</h3>
                 <p>Es el menú que aparece al pulsar los tres puntos verticales (<code>⋮</code>) en la
-                    <code>TopAppBar</code>. Se implementa con:</p>
+                    <code>TopAppBar</code>. Se implementa con:
+                </p>
                 <ul>
                     <li>Un <code>IconButton</code> con el icono <code>Icons.Default.MoreVert</code> dentro de
-                        <code>actions</code>.</li>
+                        <code>actions</code>.
+                    </li>
                     <li>Un <code>DropdownMenu</code> con <code>DropdownMenuItem</code> para cada opción.</li>
                     <li>Un estado <code>var menuExpanded by remember { mutableStateOf(false) }</code> que controla si el
                         menú está abierto o cerrado.</li>
@@ -2626,7 +2641,8 @@ NavHost(navController = navController, startDestination = "login") {
                 </div>
                 <div class="sc-detail" id="daDetail" style="margin-top:10px">👆 Elige una parte del diálogo.</div>
                 <p><strong>Se controla con estado:</strong>
-                    <code>var showDialog by remember { mutableStateOf(false) }</code>.</p>
+                    <code>var showDialog by remember { mutableStateOf(false) }</code>.
+                </p>
                 <h3>4.7. ¿Cómo se pasan datos entre pantallas?</h3>
                 <p><strong>1. Argumentos en la ruta (recomendado para datos simples):</strong></p>
                 <div class="code-wrap">
@@ -2651,7 +2667,8 @@ navController.navigate("home/$email")</pre>
                     (<code>@</code>, <code>/</code>, etc.), hay que <strong>codificarlo</strong> con
                     <code>Uri.encode(email)</code> antes de meterlo en la ruta. Si no, la navegación fallará. Ejemplo:
                     <code>alumno@ejemplo.com</code> contiene <code>@</code>, un carácter reservado en las URIs.
-                    (Pruébalo en el laboratorio de la sección 10.)</div>
+                    (Pruébalo en el laboratorio de la sección 10.)
+                </div>
                 <h3>4.8. Ciclo de vida en navegación</h3>
                 <p>Cuando navegas de Login a Home:</p>
                 <ul>
@@ -2716,7 +2733,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
                 <div class="callout warn"><strong>Importante:</strong> después de modificar
                     <code>build.gradle.kts</code>, pulsa <strong>«Sync Now»</strong> en la barra amarilla que aparece
                     arriba. Si no sincronizas, Android Studio no reconocerá <code>NavHost</code>,
-                    <code>rememberNavController</code>, etc.</div>
+                    <code>rememberNavController</code>, etc.
+                </div>
                 <p><strong>Verificación:</strong> si al escribir <code>import androidx.navigation.compose.NavHost</code>
                     el editor no se queja, la dependencia está bien.</p>
                 <div class="callout "><strong>Nota sobre versiones:</strong> si tu proyecto usa una versión de Compose
@@ -2724,7 +2742,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
                     <code>navigation-compose</code> más antigua (2.7.x). Si al sincronizar te da error de
                     compatibilidad, baja la versión hasta que encaje con tu BOM. La versión exacta no importa para esta
                     actividad; lo importante es que <code>NavHost</code> y <code>rememberNavController</code> estén
-                    disponibles.</div>
+                    disponibles.
+                </div>
             </div>
         </div>
         <div class="section card" id="s6">
@@ -3063,7 +3082,8 @@ fun RegisterScreenPreview() {
                     mensajes de error se pasaban como <code>String</code> directamente en el código. En esta actividad
                     <strong>mantenemos la misma aproximación</strong> para no introducir complejidad adicional con
                     <code>stringResource</code> dentro de funciones no-composable. Si quieres mejorarlo, en los retos
-                    verás cómo externalizarlos.</div>
+                    verás cómo externalizarlos.
+                </div>
                 <h3>6.3. Recursos: <code>strings.xml</code></h3>
                 <p>Añade estas cadenas a <code>res/values/strings.xml</code> (junto a las de la Actividad 2.1):</p>
                 <div class="code-wrap">
@@ -3098,7 +3118,8 @@ fun RegisterScreenPreview() {
                 </div>
                 <div class="callout "><strong>Nota sobre <code>\n</code>:</strong> en <code>strings.xml</code>,
                     <code>\n</code> se interpreta como salto de línea. Es la forma correcta de meter saltos de línea en
-                    recursos de texto.</div>
+                    recursos de texto.
+                </div>
             </div>
         </div>
         <div class="section card" id="s7">
@@ -3112,14 +3133,16 @@ fun RegisterScreenPreview() {
                 <p>Un <code>NavHost</code> se compone de:</p>
                 <ul>
                     <li>Un <strong><code>NavController</code></strong> (creado con
-                        <code>rememberNavController()</code>).</li>
+                        <code>rememberNavController()</code>).
+                    </li>
                     <li>Una <strong><code>startDestination</code></strong> (la ruta inicial).</li>
                     <li>Un <strong>bloque</strong> con las rutas (<code>composable("ruta") { ... }</code>).</li>
                 </ul>
                 <p>Cada <code>composable</code> recibe: <strong><code>route</code></strong> (identificador único),
                     <strong><code>arguments</code></strong> (opcional, lista de <code>navArgument</code>) y
                     <strong><code>content</code></strong> (lambda que recibe un <code>NavBackStackEntry</code> y
-                    devuelve el composable de la pantalla).</p>
+                    devuelve el composable de la pantalla).
+                </p>
                 <h3>7.2. <code>NavGraph.kt</code> completo</h3>
                 <p>Primero, el <strong>mapa de rutas</strong>. Pulsa una transición para ver su código:</p>
                 <div class="rg-nodes">
@@ -3337,7 +3360,8 @@ fun LoginScreenPreview() {
                     sigues los retos), recuerda que <code>TopAppBar</code> requiere
                     <code>@OptIn(ExperimentalMaterial3Api::class)</code>. En esta actividad, <code>LoginScreen</code> no
                     usa <code>TopAppBar</code>, así que no lo necesita. <strong>Solo <code>RegisterScreen</code> y
-                        <code>HomeScreen</code> lo requieren.</strong></p>
+                        <code>HomeScreen</code> lo requieren.</strong>
+                </p>
             </div>
         </div>
         <div class="section card" id="s8">
@@ -3581,7 +3605,8 @@ fun HomeScreenPreview() {
                 </table>
                 <div class="callout "><strong>Regla de oro:</strong> un <code>AlertDialog</code>
                     <strong>siempre</strong> se controla con un estado booleano. No se muestra «porque sí»; se muestra
-                    cuando el estado es <code>true</code>.</div>
+                    cuando el estado es <code>true</code>.
+                </div>
                 <h3>9.2. Variante con dos botones</h3>
                 <p>Si quieres un diálogo de confirmación (con «Cancelar» y «Aceptar»):</p>
                 <div class="code-wrap">
@@ -3640,10 +3665,12 @@ fun HomeScreenPreview() {
                     <li><strong>Declara el <code>navArgument</code></strong> en el <code>composable</code>. Si no lo
                         haces, <code>arguments</code> será <code>null</code>.</li>
                     <li><strong>Proporciona un valor por defecto</strong> (<code>defaultValue = ""</code>) para evitar
-                        <code>null</code> inesperados.</li>
+                        <code>null</code> inesperados.
+                    </li>
                     <li><strong>No uses argumentos para objetos complejos.</strong> Para eso, usa un
                         <code>ViewModel</code> compartido o serializa a JSON. Para esta actividad, con String es
-                        suficiente.</li>
+                        suficiente.
+                    </li>
                 </ol>
                 <p>🧪 <strong>Laboratorio <code>Uri.encode</code>:</strong> escribe un email (o elige un ejemplo) y mira
                     qué ruta se construye con y sin codificar.</p>
@@ -3752,7 +3779,8 @@ class MainActivity : ComponentActivity() {
                     </tr>
                     <tr>
                         <td><code>MainActivity</code> llamaba a <code>LoginScreen</code> y navegaba con
-                            <code>Intent</code>.</td>
+                            <code>Intent</code>.
+                        </td>
                         <td><code>MainActivity</code> solo llama a <code>AppNavGraph()</code>.</td>
                     </tr>
                     <tr>
@@ -3983,7 +4011,8 @@ class MainActivity : ComponentActivity() {
                         <td><code>TopAppBar</code> da warning amarillo</td>
                         <td>Es experimental en Material 3.</td>
                         <td>Añade <code>@OptIn(ExperimentalMaterial3Api::class)</code> antes del
-                            <code>@Composable</code>.</td>
+                            <code>@Composable</code>.
+                        </td>
                     </tr>
                     <tr>
                         <td><code>Unresolved reference: popUpTo</code></td>
@@ -4228,7 +4257,8 @@ class MainActivity : ComponentActivity() {
             <div class="card-body">
                 <div class="callout warn"><strong>Regla del reto:</strong> antes de empezar cada uno, haz una
                     <strong>copia de seguridad</strong> del archivo que vas a modificar (o usa Git). Así podrás volver
-                    atrás si rompes algo.</div>
+                    atrás si rompes algo.
+                </div>
                 <p class="small">Voluntarios y sin solución paso a paso: solo pistas. Si te atascas, relee la sección
                     correspondiente, consulta la documentación oficial o pregunta en clase.</p>
                 <div class="reto-card">
@@ -4243,19 +4273,23 @@ class MainActivity : ComponentActivity() {
                         <p>Ahora mismo, al pulsar "Cerrar sesión" en el menú overflow, la sesión se cierra
                             <strong>directamente</strong>. Queremos que aparezca un <code>AlertDialog</code> de
                             confirmación antes de cerrar: "¿Cerrar sesión? Se cerrará tu sesión actual." con botones
-                            "Cancelar" y "Aceptar". Solo si el usuario pulsa "Aceptar" se cierra la sesión.</p><button
-                            class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
+                            "Cancelar" y "Aceptar". Solo si el usuario pulsa "Aceptar" se cierra la sesión.
+                        </p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
                         <div class="hint-box">
                             <ul>
                                 <li>Necesitas un nuevo estado:
-                                    <code>var showLogoutDialog by remember { mutableStateOf(false) }</code>. </li>
+                                    <code>var showLogoutDialog by remember { mutableStateOf(false) }</code>.
+                                </li>
                                 <li>El <code>DropdownMenuItem</code> de "Cerrar sesión" ya no debe llamar a
                                     <code>onLogout()</code> directamente; debe poner
-                                    <code>showLogoutDialog = true</code>. </li>
+                                    <code>showLogoutDialog = true</code>.
+                                </li>
                                 <li>Añade un segundo <code>if (showLogoutDialog) { AlertDialog(...) }</code> con
-                                    <code>confirmButton</code> y <code>dismissButton</code>. </li>
+                                    <code>confirmButton</code> y <code>dismissButton</code>.
+                                </li>
                                 <li>Reutiliza los textos <code>R.string.dialog_cancelar</code> y
-                                    <code>R.string.dialog_aceptar</code>. </li>
+                                    <code>R.string.dialog_aceptar</code>.
+                                </li>
                                 <li><strong>Ojo:</strong> tendrás dos <code>AlertDialog</code> en la misma pantalla
                                     (<code>Acerca de</code> y <code>Cerrar sesión</code>). Asegúrate de que sus estados
                                     son independientes. </li>
@@ -4286,7 +4320,8 @@ class MainActivity : ComponentActivity() {
                         <div class="hint-box">
                             <ul>
                                 <li>En <code>actions</code>, antes del <code>IconButton</code> del menú, añade otro
-                                    <code>IconButton</code> con <code>Icons.Filled.Info</code>. </li>
+                                    <code>IconButton</code> con <code>Icons.Filled.Info</code>.
+                                </li>
                                 <li>El <code>onClick</code> de ese icono debe poner <code>showAboutDialog = true</code>.
                                 </li>
                                 <li>Cuida el <code>contentDescription</code> ("Acerca de"). </li>
@@ -4314,19 +4349,22 @@ class MainActivity : ComponentActivity() {
                                 <code>strings.xml</code></span><span class="badge">⏱ 30-40 min</span></p>
                         <p>Queremos que Home muestre <strong>"¡Bienvenido, [nombre]!"</strong> además del email. El
                             nombre se recogerá en un nuevo campo en Login y Registro. La ruta de Home pasará a ser
-                            <code>"home/{email}/{nombre}"</code>.</p><button class="reveal-btn"
-                            onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
+                            <code>"home/{email}/{nombre}"</code>.
+                        </p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
                         <div class="hint-box">
                             <ul>
                                 <li>Añade un <code>var nombre by remember { mutableStateOf("") }</code> en
-                                    <code>LoginScreen</code> y <code>RegisterScreen</code>. </li>
+                                    <code>LoginScreen</code> y <code>RegisterScreen</code>.
+                                </li>
                                 <li>Añade un <code>OutlinedTextField</code> para el nombre (con su
-                                    <code>stringResource</code>). </li>
+                                    <code>stringResource</code>).
+                                </li>
                                 <li>Cambia la ruta de Home: <code>"home/{email}/{nombre}"</code>. </li>
                                 <li>Declara <strong>dos</strong> <code>navArgument</code>: uno para <code>email</code> y
                                     otro para <code>nombre</code>. </li>
                                 <li>Actualiza <code>Routes.home(email, nombre)</code> para construir la ruta con
-                                    <code>Uri.encode</code> en ambos. </li>
+                                    <code>Uri.encode</code> en ambos.
+                                </li>
                                 <li>En <code>HomeScreen</code>, añade el parámetro <code>userName: String</code> y
                                     muéstralo. </li>
                                 <li><strong>Cuidado:</strong> si el nombre tiene espacios, <code>Uri.encode</code> los
@@ -4365,7 +4403,8 @@ class MainActivity : ComponentActivity() {
                                 <li>Crea <code>ProfileScreen.kt</code> con un <code>Scaffold</code> propio (o reutiliza
                                     el de Home pasando parámetros). </li>
                                 <li><strong>Reflexión:</strong> ¿debería <code>ProfileScreen</code> tener su propia
-                                    <code>TopAppBar</code> o compartir la de Home? ¿Por qué? </li>
+                                    <code>TopAppBar</code> o compartir la de Home? ¿Por qué?
+                                </li>
                             </ul>
                         </div>
                         <div class="learn"><strong>¿Qué aprenderás?</strong>
@@ -4390,8 +4429,8 @@ class MainActivity : ComponentActivity() {
                             <strong>todos</strong> los campos sean válidos (email válido, contraseña fuerte,
                             confirmación coincide, términos aceptados). Además, queremos mostrar un <strong>contador de
                                 caracteres</strong> debajo del campo de contraseña ("8/12 caracteres mínimos"). El
-                            contador debe cambiar en tiempo real.</p><button class="reveal-btn"
-                            onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
+                            contador debe cambiar en tiempo real.
+                        </p><button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas (no soluciones)</button>
                         <div class="hint-box">
                             <ul>
                                 <li>Usa <code>derivedStateOf</code> para calcular <code>formularioValido</code> a partir
@@ -4429,9 +4468,11 @@ class MainActivity : ComponentActivity() {
                             <ul>
                                 <li><code>NavHost</code> acepta parámetros <code>enterTransition</code>,
                                     <code>exitTransition</code>, <code>popEnterTransition</code>,
-                                    <code>popExitTransition</code>. </li>
+                                    <code>popExitTransition</code>.
+                                </li>
                                 <li>Puedes usar <code>slideInHorizontally</code> y <code>slideOutHorizontally</code> de
-                                    <code>androidx.compose.animation</code>. </li>
+                                    <code>androidx.compose.animation</code>.
+                                </li>
                                 <li>Ejemplo:
                                     <pre class="code-kt" data-lang="kt">NavHost(
     navController = navController,
@@ -4464,13 +4505,15 @@ class MainActivity : ComponentActivity() {
                                 class="badge">⏱ 60-90 min</span></p>
                         <p>Queremos que, si el usuario marca "Recordar sesión" en el Login, su email se guarde
                             <strong>de forma persistente</strong> (aunque cierre la app). Al volver a abrir la app, el
-                            email debe aparecer ya relleno.</p><button class="reveal-btn" onclick="toggleHint(this)">💡
+                            email debe aparecer ya relleno.
+                        </p><button class="reveal-btn" onclick="toggleHint(this)">💡
                             Ver pistas (no soluciones)</button>
                         <div class="hint-box">
                             <ul>
                                 <li>Usa <code>androidx.datastore:datastore-preferences</code>. </li>
                                 <li>Crea un objeto <code>UserPreferences</code> con un
-                                    <code>DataStore&lt;Preferences&gt;</code>. </li>
+                                    <code>DataStore&lt;Preferences&gt;</code>.
+                                </li>
                                 <li>En <code>LoginScreen</code>, al arrancar (<code>LaunchedEffect(Unit)</code>), lee el
                                     email guardado y rellena el campo. </li>
                                 <li>Al pulsar "Entrar", si el checkbox está marcado, guarda el email. </li>
@@ -4506,11 +4549,13 @@ class MainActivity : ComponentActivity() {
                         <div class="hint-box">
                             <ul>
                                 <li>Añade <code>androidx.hilt:hilt-navigation-compose</code> y
-                                    <code>com.google.dagger:hilt-android</code>. </li>
+                                    <code>com.google.dagger:hilt-android</code>.
+                                </li>
                                 <li>Crea un <code>UserViewModel</code> con un <code>StateFlow&lt;String&gt;</code> para
                                     el email. </li>
                                 <li>En <code>NavGraph.kt</code>, obtén el <code>ViewModel</code> a nivel del
-                                    <code>NavHost</code> y pásalo a los composables. </li>
+                                    <code>NavHost</code> y pásalo a los composables.
+                                </li>
                                 <li><strong>Alternativa sin Hilt:</strong> crea el <code>ViewModel</code> con
                                     <code>viewModel()</code> a nivel del <code>NavHost</code> y pásalo manualmente.
                                 </li>
@@ -4543,7 +4588,8 @@ class MainActivity : ComponentActivity() {
                     <strong>uno o dos</strong> que te llamen la atención y hazlos <strong>bien</strong>. Es mejor
                     entender profundamente un reto que copiar cinco sin saber qué has hecho. Y recuerda: <strong>romper
                         cosas es parte de aprender</strong>. Si algo no funciona, lee el error, busca en la
-                    documentación, prueba, y si sigue sin ir, pregunta.</div>
+                    documentación, prueba, y si sigue sin ir, pregunta.
+                </div>
             </div>
         </div>
         <div class="section card" id="anexo">

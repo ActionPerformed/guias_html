@@ -55,26 +55,28 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | Guía | Descripción |
 |------|-------------|
 | [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Introducción a la seguridad |
-| [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Seguridad en sistemas de información |
-| [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Ejercicio práctico de introducción |
-| [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP (Apache + PHP + MariaDB) con Docker |
-| [ASETE - ACT 1.3 vs.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3%20vs.html) | Actividad 1.3 — MiniApp de Tareas (Docker LAMP: Apache + PHP-FPM + MariaDB) |
+| [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Banco de pruebas PHP para 2º ASIR/DAM |
+| [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Mini-Biblioteca PHP para 2º DAM |
+| [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP con Docker |
+| [ASETE - ACT 1.3.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3.html) | Actividad 1.3 — Login con PHP (sesiones y roles) |
+| [ASETE - ACT 2.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%202.1.html) | Actividad 2.1 — MiniApp de Biblioteca (POO en PHP) |
 
 ### IAW (Implantación de Aplicaciones Web)
 
 | Guía | Descripción |
 |------|-------------|
 | [IAW - UT1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT1.html) | UT1 — Implantación de aplicaciones web |
-| [IAW - ACT 1.1.html](https://actionperformed.github.io/guias_html/IAW/Actividad%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
+| [IAW - ACT 1.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
 | [IAW - ACT 2.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%202.1.html) | Actividad 2.1 — Instalación y securización de WordPress sobre LEMP |
+| [IAW - ACT 3.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%203.1.html) | Actividad 3.1 — Proyecto de personalización integral de WordPress |
 
 
 ### PMDM (Programación Multimedia y Dispositivos Móviles)
 
 | Guía | Descripción |
 |------|-------------|
-| [PMDM - UT1 - Kotlin.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) | UT1 — Kotlin para desarrollo Android |
-| [PDMD - UT1 - Android.html](https://actionperformed.github.io/guias_html/PMDM/PDMD%20-%20UT1%20-%20Android.html) | UT1 — Fundamentos de desarrollo Android |
+| [PMDM - UT1 - Kotlin.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) | UT1 — Kotlin desde Cero para desarrollo Android |
+| [PMDM - UT1 - Android.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20UT1%20-%20Android.html) | UT1 — Fundamentos de desarrollo Android |
 | [PMDM - ACT 1.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%201.1.html) | Actividad 1.1 — Introducción a Android Studio y Kotlin |
 | [PMDM - ACT 2.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.1.html) | Actividad 2.1 — Pantalla de Login con Jetpack Compose — simulación interactiva en el navegador |
 | [PMDM - ACT 2.2.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.2.html) | Actividad 2.2 — NavHost, Registro, Scaffold y Dialogos — amplía la actividad 2.1 de login |

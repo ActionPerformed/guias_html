@@ -1,0 +1,3908 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto de personalización integral de WordPress · ASIR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-panel: #111823;
+      --bg-panel-2: #161f2b;
+      --bg-raised: #1b2532;
+      --border: #223042;
+      --border-soft: #1a2431;
+      --grid-line: rgba(120, 170, 220, 0.055);
+      --text: #e7edf3;
+      --text-dim: #93a6ba;
+      --text-faint: #5b6b7d;
+      --docker: #2496ed;
+      --docker-dim: #12365a;
+      --nginx: #2ecc71;
+      --nginx-dim: #123a26;
+      --mariadb: #e0a23a;
+      --mariadb-dim: #4a3212;
+      --pma: #f2954a;
+      --pma-dim: #4a2f12;
+      --wp: #4fb3e8;
+      --wp-dim: #123450;
+      --wpvol: #4fd1c5;
+      --wpvol-dim: #0f3a36;
+      --volume: #b28cf5;
+      --volume-dim: #2c2148;
+      --danger: #f2555a;
+      --danger-dim: #4a1618;
+      --radius-s: 6px;
+      --radius-m: 10px;
+      --radius-l: 16px;
+      --font-head: 'Space Grotesk', sans-serif;
+      --font-body: 'IBM Plex Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    ::selection {
+      background: var(--docker-dim);
+      color: #fff;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--font-head);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0 0 .5em;
+    }
+
+    p {
+      margin: 0 0 1em;
+      color: var(--text-dim);
+      max-width: 72ch;
+    }
+
+    code,
+    pre,
+    .mono {
+      font-family: var(--font-mono);
+    }
+
+    code {
+      background: var(--bg-raised);
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      color: var(--nginx);
+      font-size: .88em;
+    }
+
+    a {
+      color: var(--docker);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--docker);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 18px;
+      height: 56px;
+      background: rgba(11, 15, 20, 0.86);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      background: var(--wp);
+      box-shadow: 0 0 10px var(--wp);
+      flex: none;
+    }
+
+    .topbar .sep {
+      color: var(--text-faint);
+      font-weight: 400;
+    }
+
+    .topbar .subject {
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      display: none;
+    }
+
+    @media(min-width:720px) {
+      .topbar .subject {
+        display: inline;
+      }
+    }
+
+    .ver-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--wp-dim);
+      color: var(--wp);
+      border: 1px solid var(--wp);
+      flex: none;
+    }
+
+    .menu-btn {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 7px 11px;
+      border-radius: var(--radius-s);
+      cursor: pointer;
+    }
+
+    @media(min-width:960px) {
+      .menu-btn {
+        display: none;
+      }
+    }
+
+    .progress-track {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      height: 2px;
+      width: 100%;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--docker), var(--wp), var(--nginx));
+      transition: width .1s linear;
+    }
+
+    .shell {
+      display: flex;
+      max-width: 1180px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+
+    .toc {
+      width: 252px;
+      flex: none;
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      padding: 26px 14px 40px 18px;
+      border-right: 1px solid var(--border-soft);
+      display: none;
+    }
+
+    @media(min-width:960px) {
+      .toc {
+        display: block;
+      }
+    }
+
+    .toc-title {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: .06em;
+      color: var(--text-faint);
+      margin: 0 0 10px 8px;
+      text-transform: uppercase;
+    }
+
+    .toc a {
+      display: block;
+      padding: 5px 8px;
+      border-radius: var(--radius-s);
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 12.4px;
+      border-left: 2px solid transparent;
+      margin-bottom: 1px;
+    }
+
+    .toc a:hover {
+      color: var(--text);
+      background: var(--bg-panel);
+    }
+
+    .toc a.active {
+      color: var(--text);
+      border-left-color: var(--wp);
+      background: var(--bg-panel);
+      font-weight: 500;
+    }
+
+    .toc .num {
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      margin-right: 6px;
+    }
+
+    .toc-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+    }
+
+    .toc-drawer.open {
+      display: block;
+    }
+
+    .toc-drawer .backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+    }
+
+    .toc-drawer .panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 78%;
+      max-width: 320px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      overflow-y: auto;
+    }
+
+    .toc-drawer .panel a {
+      display: block;
+      padding: 9px 10px;
+      border-radius: var(--radius-s);
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .toc-drawer .panel a:hover,
+    .toc-drawer .panel a.active {
+      background: var(--bg-raised);
+      color: var(--text);
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 0 18px;
+    }
+
+    .content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 0 80px;
+    }
+
+    .titleblock {
+      margin: 40px 0 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-l);
+      background: var(--bg-panel);
+      overflow: hidden;
+    }
+
+    .tb-top {
+      padding: 26px 26px 18px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .tb-top .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: var(--wp);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-top .eyebrow .blink {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--wp);
+      animation: blink 1.6s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .25;
+      }
+    }
+
+    .tb-top h1 {
+      font-size: clamp(23px, 3.4vw, 33px);
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .tb-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media(min-width:600px) {
+      .tb-meta {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .tb-cell {
+      padding: 14px 18px;
+      border-right: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .tb-cell:last-child {
+      border-right: none;
+    }
+
+    .tb-cell .k {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: .06em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .tb-cell .v {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    section.block {
+      scroll-margin-top: 72px;
+      margin-bottom: 52px;
+    }
+
+    .block-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .block-head .idx {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-faint);
+      flex: none;
+    }
+
+    .block-head h2 {
+      font-size: 21px;
+      margin: 0;
+    }
+
+    .criterio-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--wp);
+      background: var(--wp-dim);
+      border: 1px solid var(--wp);
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-l);
+      padding: 22px 24px;
+    }
+
+    .panel+.panel {
+      margin-top: 14px;
+    }
+
+    .panel h3 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .panel h4 {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-m);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.2px;
+    }
+
+    thead th {
+      text-align: left;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 10.8px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 9px 13px;
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 9px 13px;
+      border-bottom: 1px solid var(--border-soft);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody td strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .code-block {
+      position: relative;
+      margin: 16px 0;
+      border-radius: var(--radius-m);
+      border: 1px solid var(--border);
+      background: #0a0e13;
+      overflow: hidden;
+    }
+
+    .code-block .cb-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 15px;
+      overflow-x: auto;
+      font-size: 12.6px;
+      line-height: 1.6;
+      color: #d3e0ec;
+    }
+
+    .code-block .cmt {
+      color: #5b6b7d;
+    }
+
+    .code-block .hl {
+      background: rgba(79, 179, 232, 0.14);
+      border-left: 2px solid var(--wp);
+      display: inline-block;
+      width: 100%;
+      margin: 0 -15px;
+      padding: 0 15px 0 13px;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 3px 9px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      border-color: var(--text-dim);
+    }
+
+    .copy-btn.copied {
+      color: var(--nginx);
+      border-color: var(--nginx);
+    }
+
+    .tabs {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .tab-nav {
+      display: flex;
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab-nav button {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-faint);
+      background: transparent;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-nav button.active {
+      color: var(--text);
+      border-bottom-color: var(--wp);
+      background: var(--bg-panel);
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 14px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel .code-block {
+      margin: 0;
+    }
+
+    .accordion {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .acc-item+.acc-item {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .acc-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-panel-2);
+      border: none;
+      color: var(--text);
+      text-align: left;
+      padding: 13px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .acc-trigger:hover {
+      background: var(--bg-raised);
+    }
+
+    .acc-trigger .chev {
+      transition: transform .2s ease;
+      color: var(--text-faint);
+      flex: none;
+    }
+
+    .acc-item.open .acc-trigger .chev {
+      transform: rotate(180deg);
+    }
+
+    .acc-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .25s ease;
+    }
+
+    .acc-panel-inner {
+      padding: 4px 16px 16px;
+    }
+
+    .tip {
+      border-left: 3px solid var(--mariadb);
+      background: var(--mariadb-dim);
+      border-radius: 0 var(--radius-m) var(--radius-m) 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 13.3px;
+    }
+
+    .tip strong {
+      color: var(--mariadb);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .tip p {
+      margin: 0;
+      color: #e9d9b8;
+    }
+
+    .important {
+      border-left: 3px solid var(--danger);
+      background: var(--danger-dim);
+      border-radius: 0 var(--radius-m) var(--radius-m) 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 13.3px;
+    }
+
+    .important strong {
+      color: var(--danger);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .important p {
+      margin: 0;
+      color: #f7d7d8;
+    }
+
+    /* capture-required badge */
+    .capture {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px dashed var(--pma);
+      background: var(--pma-dim);
+      border-radius: var(--radius-m);
+      padding: 10px 14px;
+      margin: 14px 0;
+    }
+
+    .capture .cam {
+      font-size: 16px;
+      flex: none;
+      line-height: 1;
+    }
+
+    .capture p {
+      margin: 0;
+      color: #fbd9b8;
+      font-size: 12.8px;
+    }
+
+    .capture strong {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--pma);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* self-check component */
+    .selfcheck {
+      border: 1px solid var(--docker);
+      border-radius: var(--radius-m);
+      background: var(--docker-dim);
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .sc-q {
+      display: flex;
+      gap: 10px;
+      padding: 14px 16px;
+      align-items: flex-start;
+    }
+
+    .sc-q .sc-icon {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--docker);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid var(--docker);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      background: var(--bg-panel);
+    }
+
+    .sc-q p {
+      margin: 0;
+      color: #cfe4fb;
+      font-size: 13.8px;
+      font-weight: 500;
+    }
+
+    .sc-actions {
+      padding: 0 16px 14px;
+    }
+
+    .sc-reveal-btn {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      padding: 7px 13px;
+      border-radius: var(--radius-s);
+      border: 1px solid var(--docker);
+      background: transparent;
+      color: var(--docker);
+      cursor: pointer;
+    }
+
+    .sc-reveal-btn:hover {
+      background: var(--docker);
+      color: #fff;
+    }
+
+    .sc-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+      background: var(--bg-panel);
+    }
+
+    .sc-answer-inner {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(36, 150, 237, 0.3);
+      font-size: 13.4px;
+    }
+
+    .sc-answer-inner p {
+      margin: 0;
+      color: var(--text-dim);
+    }
+
+    .sc-answer-inner strong {
+      color: var(--nginx);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    ul.plain,
+    ol.plain {
+      margin: 12px 0;
+      padding-left: 22px;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    ul.plain li,
+    ol.plain li {
+      margin-bottom: 6px;
+    }
+
+    .step-list {
+      margin: 0 0 12px;
+      padding-left: 22px;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .step-list li {
+      margin-bottom: 5px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 7px 0;
+    }
+
+    .check-row input[type=checkbox] {
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg-panel);
+      cursor: pointer;
+      flex: none;
+      margin-top: 2px;
+      position: relative;
+    }
+
+    .check-row input[type=checkbox]:checked {
+      background: var(--nginx);
+      border-color: var(--nginx);
+    }
+
+    .check-row input[type=checkbox]:checked::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid #06210f;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .check-row label {
+      font-size: 13.6px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .check-row input[type=checkbox]:checked~label {
+      color: var(--text-faint);
+    }
+
+    .progress-mini {
+      height: 5px;
+      border-radius: 3px;
+      background: var(--bg-raised);
+      overflow: hidden;
+      margin: 6px 0 16px;
+    }
+
+    .progress-mini-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--docker), var(--wp));
+      transition: width .3s ease;
+    }
+
+    .topology-wrap {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-l);
+      background: var(--bg-panel-2);
+      padding: 20px;
+      margin: 16px 0;
+    }
+
+    .topology-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .topo-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      fill: var(--text-dim);
+    }
+
+    .topo-node-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      fill: #fff;
+    }
+
+    .crit-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 14px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .crit-row:last-child {
+      border-bottom: none;
+    }
+
+    .crit-name {
+      font-size: 13.4px;
+      color: var(--text);
+    }
+
+    .crit-indicator {
+      grid-column: 1/2;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .crit-weight {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--wp);
+      text-align: right;
+    }
+
+    .crit-bar-track {
+      grid-column: 1/-1;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--bg-raised);
+      overflow: hidden;
+    }
+
+    .crit-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--docker), var(--wp));
+    }
+
+    /* SIGNATURE DEMO: boot sequencer */
+    .boot-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-l);
+      background: radial-gradient(circle at 15% 0%, rgba(79, 179, 232, 0.09), transparent 55%), var(--bg-panel);
+      padding: 22px;
+      margin: 18px 0;
+    }
+
+    .boot-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .boot-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .boot-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--wp);
+      box-shadow: 0 0 8px var(--wp);
+      animation: blink 2s infinite;
+    }
+
+    .boot-title span {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .boot-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-s);
+      overflow: hidden;
+    }
+
+    .boot-toggle button {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 7px 12px;
+      background: var(--bg-raised);
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+    }
+
+    .boot-toggle button.active {
+      background: var(--wp);
+      color: #07202e;
+    }
+
+    .boot-lanes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .boot-lane {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .boot-lane-name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .boot-track {
+      position: relative;
+      height: 34px;
+      background: #0a0e13;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      overflow: hidden;
+    }
+
+    .boot-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: var(--border);
+      transition: width .25s linear, background .25s ease;
+    }
+
+    .boot-fill.starting {
+      background: var(--mariadb);
+    }
+
+    .boot-fill.healthy {
+      background: var(--nginx);
+    }
+
+    .boot-fill.waiting {
+      background: var(--bg-raised);
+    }
+
+    .boot-fill.error {
+      background: var(--danger);
+    }
+
+    .boot-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .boot-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .sim-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 9px 14px;
+      border-radius: var(--radius-s);
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .sim-btn:hover {
+      border-color: var(--wp);
+    }
+
+    .sim-btn.primary {
+      background: var(--wp-dim);
+      border-color: var(--wp);
+      color: var(--wp);
+    }
+
+    .sim-btn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .boot-log {
+      margin-top: 12px;
+      background: #070a0e;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 11.4px;
+      color: var(--text-dim);
+      min-height: 60px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .boot-log .log-line {
+      margin-bottom: 3px;
+    }
+
+    .boot-log .log-line.ok {
+      color: var(--nginx);
+    }
+
+    .boot-log .log-line.warn {
+      color: var(--danger);
+    }
+
+    .boot-log .log-line.sys {
+      color: var(--text-faint);
+    }
+
+    .boot-log .log-line.hop {
+      color: var(--wp);
+    }
+
+    footer {
+      border-top: 1px solid var(--border-soft);
+      padding: 34px 18px 60px;
+      text-align: center;
+    }
+
+    footer p {
+      margin: 0 auto;
+      max-width: 60ch;
+      font-size: 13px;
+      color: var(--text-faint);
+    }
+
+    footer .next-practice {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--wp);
+      color: var(--wp);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-faint);
+    }
+
+
+    /* ===== Guía 3: añadidos ===== */
+    :root {
+      --l1: #2ecc71;
+      --l2: #e0a23a;
+      --l3: #f2555a;
+    }
+
+    .cap-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--pma);
+      color: var(--pma);
+      background: var(--pma-dim);
+      flex: none;
+      white-space: nowrap;
+    }
+
+    .route {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 12px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    .route .rk {
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-size: 10px;
+      margin-right: 2px;
+    }
+
+    .route span.node {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      border-radius: 5px;
+      color: var(--text);
+    }
+
+    .route span.arr {
+      color: var(--wp);
+    }
+
+    .see {
+      display: flex;
+      gap: 10px;
+      border-left: 3px solid var(--wp);
+      background: var(--wp-dim);
+      border-radius: 0 var(--radius-m) var(--radius-m) 0;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .see strong {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--wp);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .see p {
+      margin: 0;
+      color: #c9e4f6;
+      font-size: 13px;
+    }
+
+    .crit-chip {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wp);
+      background: var(--wp-dim);
+      border: 1px solid var(--wp);
+      border-radius: 5px;
+      padding: 1px 8px;
+      text-decoration: none;
+    }
+
+    a.crit-chip:hover {
+      background: var(--wp);
+      color: #06202e;
+    }
+
+    .quote {
+      border-left: 3px solid var(--text-faint);
+      padding: 4px 14px;
+      margin: 10px 0 16px;
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 13.4px;
+    }
+
+    .capture .cap-done {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: none;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .capture .cap-done input {
+      accent-color: var(--nginx);
+      cursor: pointer;
+    }
+
+    .capture.done {
+      border-color: var(--nginx);
+      background: var(--nginx-dim);
+    }
+
+    .capture.done strong {
+      color: var(--nginx);
+    }
+
+    .capture.done p {
+      color: #bfe9cf;
+    }
+
+    /* levels */
+    .level-picker {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    @media(min-width:720px) {
+      .level-picker {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .lvl-card {
+      text-align: left;
+      border: 1.5px solid var(--border);
+      background: var(--bg-panel-2);
+      border-radius: var(--radius-m);
+      padding: 16px;
+      cursor: pointer;
+      color: var(--text);
+      font-family: var(--font-body);
+      transition: border-color .2s, transform .2s;
+    }
+
+    .lvl-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .lvl-card .ln {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lvl-card .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .lvl-card h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .lvl-card p {
+      font-size: 12.6px;
+      margin-bottom: 8px;
+    }
+
+    .lvl-card ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12.4px;
+      color: var(--text-dim);
+    }
+
+    .lvl-card[data-l="1"] .dot {
+      background: var(--l1);
+    }
+
+    .lvl-card[data-l="2"] .dot {
+      background: var(--l2);
+    }
+
+    .lvl-card[data-l="3"] .dot {
+      background: var(--l3);
+    }
+
+    .lvl-card.sel[data-l="1"] {
+      border-color: var(--l1);
+      background: var(--nginx-dim);
+    }
+
+    .lvl-card.sel[data-l="2"] {
+      border-color: var(--l2);
+      background: var(--mariadb-dim);
+    }
+
+    .lvl-card.sel[data-l="3"] {
+      border-color: var(--l3);
+      background: var(--danger-dim);
+    }
+
+    .lvl-step {
+      position: relative;
+      transition: opacity .25s;
+    }
+
+    .lvl-step .lvl-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      border: 1px solid;
+    }
+
+    .lvl-step[data-min="2"] .lvl-badge {
+      color: var(--l2);
+      border-color: var(--l2);
+    }
+
+    .lvl-step[data-min="3"] .lvl-badge {
+      color: var(--l3);
+      border-color: var(--l3);
+    }
+
+    .lvl-step.off {
+      opacity: .38;
+    }
+
+    .lvl-step.off .lvl-badge::after {
+      content: " · no requerido en tu nivel";
+    }
+
+    .lvl-note {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    /* planner */
+    .planner {
+      display: flex;
+      height: 46px;
+      border-radius: var(--radius-s);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin: 14px 0 8px;
+    }
+
+    .plan-seg {
+      border: none;
+      border-right: 1px solid var(--bg);
+      color: #06151f;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: filter .2s;
+    }
+
+    .plan-seg:hover,
+    .plan-seg.sel {
+      filter: brightness(1.25);
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+    }
+
+    .plan-info {
+      background: var(--bg-panel-2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-m);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+      min-height: 52px;
+    }
+
+    .plan-info strong {
+      color: var(--text);
+    }
+
+    /* roles explorer */
+    .roles-wrap {
+      display: grid;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    @media(min-width:760px) {
+      .roles-wrap {
+        grid-template-columns: 200px 1fr;
+      }
+    }
+
+    .role-btns {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    @media(min-width:760px) {
+      .role-btns {
+        flex-direction: column;
+      }
+    }
+
+    .role-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: left;
+      padding: 9px 12px;
+      border-radius: var(--radius-s);
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .role-btn.active {
+      border-color: var(--wp);
+      color: var(--wp);
+      background: var(--wp-dim);
+    }
+
+    .wp-mock {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+      background: #0a0e13;
+      min-height: 250px;
+    }
+
+    .wp-side {
+      background: #1d2327;
+      padding: 8px 0;
+    }
+
+    .wp-side div {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: #c3c4c7;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .wp-side div.off {
+      opacity: .22;
+      text-decoration: line-through;
+    }
+
+    .wp-main {
+      padding: 16px;
+    }
+
+    .wp-main h4 {
+      color: var(--text);
+      font-family: var(--font-head);
+      font-size: 14px;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    .perm {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 12.6px;
+      color: var(--text-dim);
+    }
+
+    .perm:last-child {
+      border-bottom: none;
+    }
+
+    .perm .v {
+      font-family: var(--font-mono);
+    }
+
+    .perm .v.y {
+      color: var(--nginx);
+    }
+
+    .perm .v.n {
+      color: var(--danger);
+    }
+
+    .perm .v.p {
+      color: var(--mariadb);
+    }
+
+    /* plugin map */
+    .crit-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0;
+    }
+
+    .crit-filter button {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .crit-filter button.active {
+      border-color: var(--wp);
+      background: var(--wp-dim);
+      color: var(--wp);
+    }
+
+    .plug-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media(min-width:620px) {
+      .plug-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .plug {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-m);
+      padding: 13px 15px;
+      background: var(--bg-panel-2);
+      transition: opacity .2s, border-color .2s;
+    }
+
+    .plug.dim {
+      opacity: .25;
+    }
+
+    .plug.hit {
+      border-color: var(--wp);
+      box-shadow: 0 0 0 1px var(--wp) inset;
+    }
+
+    .plug h4 {
+      font-family: var(--font-head);
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .plug .fn {
+      font-size: 12.2px;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .plug .chips {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    /* generic mock window */
+    .mock {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-l);
+      background: var(--bg-panel);
+      padding: 20px;
+      margin: 18px 0;
+    }
+
+    .mock-head {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--wp);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 4px;
+    }
+
+    .mock-sub {
+      font-size: 12.8px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 9px 14px;
+      border-radius: var(--radius-s);
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: var(--wp);
+    }
+
+    .btn.primary {
+      background: var(--wp-dim);
+      border-color: var(--wp);
+      color: var(--wp);
+    }
+
+    .btn.ok {
+      background: var(--nginx-dim);
+      border-color: var(--nginx);
+      color: var(--nginx);
+    }
+
+    .btn.danger {
+      background: var(--danger-dim);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .btn:disabled,
+    .btn.locked {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .shake {
+      animation: shake .35s;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-5px);
+      }
+
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    .modal {
+      border: 1px solid var(--wp);
+      border-radius: var(--radius-m);
+      background: var(--bg-panel-2);
+      padding: 14px 16px;
+      margin: 12px 0;
+      display: none;
+    }
+
+    .modal.show {
+      display: block;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 4px;
+      background: var(--bg-raised);
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .bar>i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--docker), var(--wp));
+      transition: width .15s linear;
+    }
+
+    .bk-list {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .bk-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      background: var(--bg-panel-2);
+      font-size: 12.5px;
+      color: var(--text-dim);
+    }
+
+    .bk-item .tags {
+      display: flex;
+      gap: 5px;
+    }
+
+    .bk-item .tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--wpvol-dim);
+      color: var(--wpvol);
+    }
+
+    .bk-item .sp {
+      flex: 1;
+    }
+
+    .msg {
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      margin-top: 8px;
+      color: var(--text-dim);
+      min-height: 16px;
+    }
+
+    .msg.warn {
+      color: var(--pma);
+    }
+
+    .msg.err {
+      color: var(--danger);
+    }
+
+    .msg.ok {
+      color: var(--nginx);
+    }
+
+    .chk {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 6px 0;
+    }
+
+    .chk input {
+      accent-color: var(--wp);
+    }
+
+    /* child lab */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media(min-width:820px) {
+      .lab-grid {
+        grid-template-columns: 260px 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-faint);
+    }
+
+    .field input,
+    .field select {
+      background: #0a0e13;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-s);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      padding: 8px 10px;
+    }
+
+    .field input:focus {
+      outline: 2px solid var(--wp);
+    }
+
+    .theme-card {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-m);
+      padding: 14px;
+      background: var(--bg-panel-2);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .theme-card .thumb {
+      width: 64px;
+      height: 46px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--docker), var(--wp));
+      flex: none;
+    }
+
+    .theme-card.bad {
+      border-color: var(--danger);
+      background: var(--danger-dim);
+    }
+
+    .theme-card.bad .thumb {
+      background: repeating-linear-gradient(45deg, #3a1114, #3a1114 6px, #4a1618 6px, #4a1618 12px);
+    }
+
+    .theme-card.ok {
+      border-color: var(--nginx);
+    }
+
+    .theme-card h4 {
+      font-family: var(--font-head);
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 14px;
+      color: var(--text);
+      margin: 0 0 2px;
+    }
+
+    .theme-card p {
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .cascade {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      margin: 10px 0;
+    }
+
+    .cascade span.b {
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text-dim);
+    }
+
+    .cascade span.b.p {
+      border-color: var(--docker);
+      color: var(--docker);
+    }
+
+    .cascade span.b.c {
+      border-color: var(--nginx);
+      color: var(--nginx);
+    }
+
+    /* rss lab */
+    .rss-ctrl {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .rss-ctrl label {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+
+    .rss-ctrl input[type=range] {
+      accent-color: var(--wp);
+    }
+
+    .seg {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-s);
+      overflow: hidden;
+    }
+
+    .seg button {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      padding: 7px 12px;
+      background: var(--bg-raised);
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+    }
+
+    .seg button.active {
+      background: var(--wp);
+      color: #06202e;
+    }
+
+    .feed-pre {
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    /* updates gate */
+    .upd-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      background: var(--bg-panel-2);
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .upd-row .st {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--pma);
+    }
+
+    .upd-row.done .st {
+      color: var(--nginx);
+    }
+
+    /* log lab */
+    .log-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .log-filter button {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .log-filter button.active {
+      border-color: var(--wp);
+      color: var(--wp);
+      background: var(--wp-dim);
+    }
+
+    .logbox {
+      background: #070a0e;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      padding: 6px;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .logline {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .logline:hover {
+      background: var(--bg-raised);
+    }
+
+    .logline.sel {
+      background: var(--wp-dim);
+      color: #fff;
+    }
+
+    .logline.sus {
+      border-left: 2px solid var(--danger);
+    }
+
+    .log-decode {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .log-decode div {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      padding: 7px 10px;
+      background: var(--bg-panel-2);
+    }
+
+    .log-decode .k {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+    }
+
+    .log-decode .v {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .stats div {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-s);
+      padding: 8px 10px;
+      background: var(--bg-panel-2);
+    }
+
+    .stats .n {
+      font-family: var(--font-head);
+      font-size: 20px;
+      color: var(--wp);
+    }
+
+    .stats .l {
+      font-size: 11.5px;
+      color: var(--text-faint);
+    }
+
+    .sus-reason {
+      margin-top: 8px;
+      font-size: 12.4px;
+      color: var(--pma);
+      min-height: 18px;
+    }
+
+    /* search + calc */
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      margin-bottom: 10px;
+    }
+
+    .search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .calc-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 46px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 12.8px;
+      color: var(--text-dim);
+    }
+
+    .calc-row input[type=range] {
+      accent-color: var(--wp);
+      width: 100%;
+    }
+
+    .calc-row .sc {
+      font-family: var(--font-mono);
+      color: var(--wp);
+      text-align: right;
+    }
+
+    .calc-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .calc-total .big {
+      font-family: var(--font-head);
+      font-size: 30px;
+      color: var(--wp);
+    }
+
+    .act-prog {
+      display: grid;
+      grid-template-columns: 90px 1fr 50px;
+      gap: 10px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin: 6px 0;
+    }
+
+    .act-prog .bar {
+      margin: 0;
+    }
+
+    .hide {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span class="brand-dot"></span>WordPress<span class="sep">/</span>Proyecto</div>
+    <span class="ver-pill">Práctica 3</span>
+    <span class="cap-pill" id="capPill">📸 0/0</span>
+    <span class="subject">Implantación de Aplicaciones Web · 2º ASIR</span>
+    <button class="menu-btn" id="menuBtn">☰ Índice</button>
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <div class="toc-drawer" id="tocDrawer">
+    <div class="backdrop" id="tocBackdrop"></div>
+    <div class="panel" id="tocDrawerPanel"></div>
+  </div>
+
+  <div class="shell">
+    <nav class="toc" id="tocDesktop">
+      <p class="toc-title">Contenidos</p>
+    </nav>
+    <main>
+      <div class="content">
+
+        <div class="titleblock">
+          <div class="tb-top">
+            <div class="eyebrow"><span class="blink"></span>GUÍA PRÁCTICA 3 · CONTINÚA LA PRÁCTICA 2</div>
+            <h1>Proyecto de personalización integral de WordPress</h1>
+          </div>
+          <div class="tb-meta">
+            <div class="tb-cell">
+              <div class="k">Módulo</div>
+              <div class="v">Implant. Apps Web</div>
+            </div>
+            <div class="tb-cell">
+              <div class="k">Curso</div>
+              <div class="v">2º ASIR</div>
+            </div>
+            <div class="tb-cell">
+              <div class="k">Duración</div>
+              <div class="v">8 h trabajo</div>
+            </div>
+            <div class="tb-cell">
+              <div class="k">Versión</div>
+              <div class="v">3.0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 01 -->
+        <section class="block" id="encargo" data-title="El encargo del cliente">
+          <div class="block-head"><span class="idx">01</span>
+            <h2>Introducción: el encargo del cliente</h2>
+          </div>
+          <div class="panel">
+            <p>Imagina que un cliente te contrata para crear su sitio web. El cliente te da libertad para elegir la
+              temática, pero exige una serie de <strong style="color:var(--text)">requisitos funcionales</strong> que
+              debes cumplir.</p>
+            <p>Tu trabajo es doble: por un lado, crear un sitio que refleje la esencia del proyecto; por otro,
+              asegurarte de que cumple <strong style="color:var(--text)">todos</strong> los requisitos técnicos.</p>
+            <p style="font-size:12.5px;color:var(--text-faint);">Pulsa la letra de cada criterio para saltar a su
+              actividad.</p>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Requisito</th>
+                    <th>Criterio</th>
+                    <th>Actividad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Configurar los módulos del gestor</td>
+                    <td><a class="crit-chip" href="#act9">a)</a></td>
+                    <td>Actividad 9</td>
+                  </tr>
+                  <tr>
+                    <td>Gestionar usuarios con distintos perfiles</td>
+                    <td><a class="crit-chip" href="#act1">b)</a></td>
+                    <td>Actividad 1</td>
+                  </tr>
+                  <tr>
+                    <td>Integrar módulos según necesidades</td>
+                    <td><a class="crit-chip" href="#act2">c)</a></td>
+                    <td>Actividad 2</td>
+                  </tr>
+                  <tr>
+                    <td>Realizar copias de seguridad</td>
+                    <td><a class="crit-chip" href="#act3">d)</a></td>
+                    <td>Actividad 3</td>
+                  </tr>
+                  <tr>
+                    <td>Importar y exportar contenidos</td>
+                    <td><a class="crit-chip" href="#act4">e)</a></td>
+                    <td>Actividad 4</td>
+                  </tr>
+                  <tr>
+                    <td>Gestionar plantillas</td>
+                    <td><a class="crit-chip" href="#act5">f)</a></td>
+                    <td>Actividad 5</td>
+                  </tr>
+                  <tr>
+                    <td>Integrar sindicación de contenidos</td>
+                    <td><a class="crit-chip" href="#act6">g)</a></td>
+                    <td>Actividad 6</td>
+                  </tr>
+                  <tr>
+                    <td>Realizar actualizaciones</td>
+                    <td><a class="crit-chip" href="#act7">h)</a></td>
+                    <td>Actividad 7</td>
+                  </tr>
+                  <tr>
+                    <td>Obtener informes de acceso</td>
+                    <td><a class="crit-chip" href="#act8">i)</a></td>
+                    <td>Actividad 8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tip"><strong>Cómo usar esta guía</strong>
+              <p>Cada marca 📸 es una evidencia para tu informe: márcala como «hecha» cuando la tengas y el contador de
+                la barra superior irá subiendo. Los pasos de Nivel 2 y 3 se atenúan según el nivel que elijas en el
+                siguiente apartado.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 -->
+        <section class="block" id="niveles" data-title="Los tres niveles de libertad">
+          <div class="block-head"><span class="idx">02</span>
+            <h2>Los tres niveles de libertad</h2>
+          </div>
+          <div class="panel">
+            <p>Elige tu nivel. La guía se adapta: los pasos que no te corresponden se atenúan.</p>
+            <div class="level-picker" id="levelPicker">
+              <button class="lvl-card sel" data-l="1">
+                <div class="ln"><span class="dot"></span>Nivel 1 · Guiado</div>
+                <h3>Paso a paso</h3>
+                <p>Para quien prefiere instrucciones paso a paso.</p>
+                <ul>
+                  <li>Temática sugerida: <strong style="color:var(--text)">blog de recetas sencillas</strong></li>
+                  <li>Tema: <strong style="color:var(--text)">Twenty Twenty-Four</strong></li>
+                  <li>Plugins indicados en la guía</li>
+                  <li>El informe documenta los pasos</li>
+                </ul>
+              </button>
+              <button class="lvl-card" data-l="2">
+                <div class="ln"><span class="dot"></span>Nivel 2 · Semilibre</div>
+                <h3>Identidad propia</h3>
+                <p>Para quien quiere identidad propia sin complicaciones.</p>
+                <ul>
+                  <li>Tú eliges la <strong style="color:var(--text)">temática</strong></li>
+                  <li>Tú eliges el <strong style="color:var(--text)">tema visual</strong> (gratuito)</li>
+                  <li>Tú eliges los <strong style="color:var(--text)">plugins</strong> (si cumplen la función)</li>
+                  <li>Justificas tus elecciones en el informe</li>
+                </ul>
+              </button>
+              <button class="lvl-card" data-l="3">
+                <div class="ln"><span class="dot"></span>Nivel 3 · Libre con retos</div>
+                <h3>Más allá</h3>
+                <p>Para quien tiene experiencia y quiere ir más lejos.</p>
+                <ul>
+                  <li>Todo lo del Nivel 2</li>
+                  <li>Retos: <strong style="color:var(--text)">child theme</strong>, CSS propio, formulario de contacto
+                  </li>
+                  <li>Justificación técnica elaborada</li>
+                </ul>
+              </button>
+            </div>
+            <div class="lvl-note" id="lvlNote">Nivel seleccionado: 1 · Guiado. Ejemplo de temática: blog de recetas de
+              cocina tradicional.</div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Temáticas de ejemplo (Nivel 2)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Blog de viajes · portafolio de fotografía · revista de cine · guía de videojuegos</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="capture" data-act="a0"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Captura de tu decisión de nivel (pantallazo del informe donde lo indicas).</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 PLANIFICADOR -->
+        <section class="block" id="planificacion" data-title="Planificación de las 8 horas">
+          <div class="block-head"><span class="idx">03</span>
+            <h2>Planificación de las 8 horas</h2>
+          </div>
+          <div class="panel">
+            <p>Reparto <strong style="color:var(--text)">orientativo</strong> del tiempo entre actividades (no figura en
+              el documento original: es una propuesta para organizarte). Pulsa un tramo para ver qué toca.</p>
+            <div class="planner" id="planner"></div>
+            <div class="plan-info" id="planInfo">Pulsa un tramo de la barra.</div>
+            <div class="tip" style="margin-bottom:0"><strong>Consejo</strong>
+              <p>La Actividad 5 (plantillas) es la que más tiempo suele llevar, y la de copias de seguridad (3) debe
+                estar hecha <em>antes</em> de actualizar (7). Reserva la última franja para montar el informe con las
+                capturas.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 04 ACT 1 -->
+        <section class="block" id="act1" data-title="Act. 1 · Usuarios y perfiles">
+          <div class="block-head"><span class="idx">04</span>
+            <h2>Actividad 1: Gestión de usuarios y perfiles</h2>
+          </div>
+          <div class="criterio-tag">Criterio b) · «Se han creado y gestionado usuarios con distintos perfiles.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Analiza los roles de WordPress</h3>
+            <p style="font-size:13.4px;">WordPress tiene cinco roles por defecto:</p>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rol</th>
+                    <th>Puede publicar</th>
+                    <th>Edita entradas de otros</th>
+                    <th>Gestiona plugins</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Administrador</strong></td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Editor</strong></td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Autor</strong></td>
+                    <td>✅ (solo suyas)</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Colaborador</strong></td>
+                    <td>❌ (envía a revisión)</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Suscriptor</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mock" style="margin-top:6px">
+              <div class="mock-head">Explorador de roles</div>
+              <div class="mock-sub">Elige un rol y mira qué permisos tiene y qué ve en su menú. <span
+                  style="color:var(--text-faint)">Esquema simplificado: verifícalo tú en el Paso 3 con sesiones
+                  reales.</span></div>
+              <div class="roles-wrap">
+                <div class="role-btns" id="roleBtns"></div>
+                <div class="wp-mock">
+                  <div class="wp-side" id="wpSide"></div>
+                  <div class="wp-main">
+                    <h4 id="roleTitle"></h4>
+                    <div id="rolePerms"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Usuarios</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Una tabla con los usuarios existentes, sus nombres, emails, roles y número de entradas. Arriba hay un
+                  botón «Añadir nuevo».</p>
+              </div>
+            </div>
+            <div class="capture" data-act="a1"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla <code>Usuarios → Añadir nuevo</code> mostrando el desplegable de roles.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Paso 2 · Crea al menos 3 usuarios con roles distintos</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Usuarios</span><span class="arr">›</span><span
+                class="node">Añadir nuevo</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un formulario con campos para nombre de usuario, email, contraseña, nombre, apellidos y un
+                  desplegable de roles.</p>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Rol</th>
+                    <th>Nombre de usuario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Editor</td>
+                    <td><code>editor</code></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>Autor</td>
+                    <td><code>autor1</code></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>Colaborador</td>
+                    <td><code>colaborador1</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="font-size:13.4px;">Asigna a cada uno un rol distinto y una contraseña segura.</p>
+            <div class="capture" data-act="a1"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Lista de usuarios mostrando los tres roles diferentes.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Paso 3 · Verifica los permisos de cada rol</h3>
+            <p style="font-size:13.4px;">Inicia sesión con cada usuario (usa una <strong
+                style="color:var(--text)">ventana de incógnito</strong>) y comprueba qué puede hacer cada uno.</p>
+            <div class="capture" data-act="a1"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Escritorio de al menos uno de los usuarios no administradores, mostrando las diferencias de menú.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel lvl-step" data-min="3">
+            <span class="lvl-badge">Nivel 3</span>
+            <h3>Paso 4 · Crea un rol personalizado</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Plugins</span><span class="arr">›</span><span class="node">Añadir
+                nuevo</span></div>
+            <p style="font-size:13.4px;">Busca e instala <strong style="color:var(--text)">User Role Editor</strong>.
+              Después:</p>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Usuarios</span><span class="arr">›</span><span class="node">User
+                Role Editor</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un desplegable de roles existentes y una matriz de permisos (checkboxes) por categorías: Entradas,
+                  Páginas, Medios, Comentarios, etc.</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Crea un rol nuevo llamado <code>redactor_jefe</code> con estos permisos:</p>
+            <ul class="plain">
+              <li>✅ Editar entradas</li>
+              <li>✅ Publicar entradas</li>
+              <li>✅ Editar entradas de otros</li>
+              <li>❌ Gestionar temas</li>
+              <li>❌ Gestionar plugins</li>
+            </ul>
+            <div class="capture" data-act="a1"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Rol personalizado creado en User Role Editor.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 05 ACT 2 -->
+        <section class="block" id="act2" data-title="Act. 2 · Plugins">
+          <div class="block-head"><span class="idx">05</span>
+            <h2>Actividad 2: Integración de módulos (plugins)</h2>
+          </div>
+          <div class="criterio-tag">Criterio c) · «Se han integrado módulos atendiendo a requerimientos de
+            funcionalidad.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Selecciona los plugins necesarios</h3>
+            <p style="font-size:13.4px;">Debes instalar <strong style="color:var(--text)">al menos un plugin por cada
+                funcionalidad</strong>.</p>
+            <div class="mock" style="margin-top:6px">
+              <div class="mock-head">Mapa de plugins ↔ criterios</div>
+              <div class="mock-sub">Pulsa un criterio y se iluminan los plugins que lo cubren.</div>
+              <div class="crit-filter" id="critFilter"></div>
+              <div class="plug-grid" id="plugGrid"></div>
+            </div>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Plugins</span><span class="arr">›</span><span class="node">Añadir
+                nuevo</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Una barra de búsqueda, pestañas (Destacados, Populares, Recomendados, Favoritos) y una cuadrícula de
+                  plugins con botones «Instalar ahora».</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Para cada plugin: busca su nombre, pulsa <strong
+                style="color:var(--text)">Instalar ahora</strong> y luego <strong
+                style="color:var(--text)">Activar</strong>.</p>
+            <div class="capture" data-act="a2"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Lista de plugins instalados y activos.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Configura cada plugin</h3>
+            <p style="font-size:13.4px;">Dedica unos minutos a la configuración básica de cada uno:</p>
+            <ul class="plain">
+              <li><strong style="color:var(--text)">Wordfence:</strong> configura el email de alertas y activa el
+                firewall.</li>
+              <li><strong style="color:var(--text)">UpdraftPlus:</strong> configura una copia de seguridad inicial.</li>
+              <li><strong style="color:var(--text)">Import WP:</strong> familiarízate con su interfaz.</li>
+              <li><strong style="color:var(--text)">Aegra Site Monitor:</strong> completa el asistente.</li>
+            </ul>
+            <div class="capture" data-act="a2"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de configuración de al menos dos plugins.</p>
+              </div>
+            </div>
+            <h3 style="margin-top:16px;">Paso 3 · Documenta tu elección</h3>
+            <p style="font-size:13.4px;margin-bottom:0;">En el informe, explica <strong style="color:var(--text)">por
+                qué elegiste cada plugin</strong> y qué funcionalidad cubre.</p>
+          </div>
+        </section>
+
+        <!-- 06 ACT 3 -->
+        <section class="block" id="act3" data-title="Act. 3 · Copias de seguridad">
+          <div class="block-head"><span class="idx">06</span>
+            <h2>Actividad 3: Copias de seguridad</h2>
+          </div>
+          <div class="criterio-tag">Criterio d) · «Se han realizado copias de seguridad de los contenidos.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Realiza una copia de seguridad completa</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">UpdraftPlus</span><span class="arr">›</span><span
+                class="node">Backup/Restore</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un botón azul «Backup Now». Al pulsarlo se abre un modal con dos checkboxes: «Incluir archivos» y
+                  «Incluir base de datos». Marca ambos y pulsa <strong>Backup Now</strong>. Puede tardar varios minutos.
+                </p>
+              </div>
+            </div>
+
+            <div class="mock">
+              <div class="mock-head">Simulador · flujo de UpdraftPlus</div>
+              <div class="mock-sub">Ensaya el flujo antes de hacerlo en tu WordPress. Prueba a desmarcar una casilla y
+                mira el aviso.</div>
+              <button class="btn primary" id="bkOpen">Backup Now</button>
+              <div class="modal" id="bkModal">
+                <label class="chk"><input type="checkbox" id="bkFiles" checked> Incluir archivos en la copia</label>
+                <label class="chk"><input type="checkbox" id="bkDb" checked> Incluir base de datos en la copia</label>
+                <button class="btn ok" id="bkGo">Backup Now</button>
+                <div class="bar" id="bkBar" style="display:none"><i id="bkFill"></i></div>
+              </div>
+              <div class="msg" id="bkMsg"></div>
+              <div class="bk-list" id="bkList"></div>
+            </div>
+            <div class="capture" data-act="a3"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de backup completado con éxito.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Documenta el proceso de restauración</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">UpdraftPlus</span><span
+                class="arr">›</span><span class="node">Backup/Restore</span><span class="arr">›</span><span
+                class="node">Existing backups</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Una lista de copias con botones «Restore», «Delete» y «Download». <strong>No la restaures</strong>,
+                  solo documenta cómo se haría.</p>
+              </div>
+            </div>
+            <div class="capture" data-act="a3"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Backups existentes con las opciones de restauración visibles.</p>
+              </div>
+            </div>
+            <h3 style="margin-top:16px;">Paso 3 · Crea un segundo punto de restauración</h3>
+            <p style="font-size:13.4px;">Antes de hacer cambios importantes (por ejemplo, antes de actualizar plugins),
+              crea otra copia de seguridad.</p>
+            <div class="capture" data-act="a3"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Las dos copias de seguridad en la lista.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 07 ACT 4 -->
+        <section class="block" id="act4" data-title="Act. 4 · Importar y exportar">
+          <div class="block-head"><span class="idx">07</span>
+            <h2>Actividad 4: Importación y exportación de contenidos</h2>
+          </div>
+          <div class="criterio-tag">Criterio e) · «Se han importado y exportado contenidos en distintos formatos.»</div>
+          <div class="panel">
+            <div class="cascade" style="margin-top:0">
+              <span class="b p">Sitio WordPress</span><span style="color:var(--wp)">→ exportar →</span><span
+                class="b c">archivo .xml</span><span style="color:var(--wp)">→ importar →</span><span class="b p">Sitio
+                WordPress</span>
+            </div>
+            <h3>Paso 1 · Exporta tus contenidos actuales</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Herramientas</span><span class="arr">›</span><span
+                class="node">Exportar</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Radio buttons para elegir qué exportar (Todo el contenido, Entradas, Páginas, Medios) y un botón
+                  «Descargar archivo de exportación».</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Selecciona <strong style="color:var(--text)">Todo el contenido</strong> y pulsa
+              el botón. WordPress generará un archivo XML con todas tus entradas, páginas, categorías y etiquetas.</p>
+            <div class="capture" data-act="a4"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de exportación y del archivo XML descargado.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Importa contenidos desde otro sitio</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Herramientas</span><span class="arr">›</span><span
+                class="node">Importar</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Una lista de importadores (WordPress, Blogger, Tumblr, etc.). Si el de WordPress no está instalado,
+                  aparece un enlace «Instalar ahora».</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Instálalo, ejecútalo y sube el XML que exportaste en el Paso 1. Asigna los
+              contenidos a un usuario existente.</p>
+            <div class="important"><strong>Si da error 413</strong>
+              <p>Es el límite de subida de Nginx: revisa <code>client_max_body_size</code> en
+                <code>config/nginx/default.conf</code> (ver «Nota sobre Nginx» al final).
+              </p>
+            </div>
+            <div class="capture" data-act="a4"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Proceso de importación completado.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel lvl-step" data-min="2">
+            <span class="lvl-badge">Nivel 2 y 3</span>
+            <h3>Paso 3 · Exporta en otro formato</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Import WP</span><span class="arr">›</span><span
+                class="node">Export</span></div>
+            <p style="font-size:13.4px;">Usa el plugin <strong style="color:var(--text)">Import WP</strong> para
+              exportar tus entradas en formato <strong style="color:var(--text)">CSV o JSON</strong>.</p>
+            <div class="capture" data-act="a4"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Archivo CSV/JSON generado y de la interfaz del plugin.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 08 ACT 5 -->
+        <section class="block" id="act5" data-title="Act. 5 · Plantillas y child theme">
+          <div class="block-head"><span class="idx">08</span>
+            <h2>Actividad 5: Gestión de plantillas y child theme</h2>
+          </div>
+          <div class="criterio-tag">Criterio f) · «Se han gestionado plantillas.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Instala un tema acorde a tu temática</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Apariencia</span><span class="arr">›</span><span
+                class="node">Temas</span><span class="arr">›</span><span class="node">Añadir nuevo</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Una galería de temas con previsualizaciones, filtros por características (Blog, Portafolio, Negocios)
+                  y un botón «Instalar» en cada uno.</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Busca un tema gratuito que se ajuste a tu temática. Pulsa <strong
+                style="color:var(--text)">Instalar</strong> y luego <strong style="color:var(--text)">Activar</strong>.
+            </p>
+            <div class="capture" data-act="a5"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Tema activo en la lista de temas.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Personaliza el tema</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Apariencia</span><span
+                class="arr">›</span><span class="node">Personalizar</span><span class="node"
+                style="border-style:dashed">o Editor del sitio</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un panel lateral con opciones (Identidad del sitio, Colores, Tipografías, Menús, Cabecera) y una
+                  previsualización en vivo a la derecha.</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Personaliza al menos:</p>
+            <ul class="plain">
+              <li><strong style="color:var(--text)">Logotipo</strong> (si el tema lo permite)</li>
+              <li><strong style="color:var(--text)">Colores</strong> principales</li>
+              <li><strong style="color:var(--text)">Tipografía</strong></li>
+              <li><strong style="color:var(--text)">Menú de navegación</strong></li>
+            </ul>
+            <div class="capture" data-act="a5"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de personalización con los cambios aplicados.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel lvl-step" data-min="3">
+            <span class="lvl-badge">Nivel 3</span>
+            <h3>Paso 3 · Crea un child theme</h3>
+            <p style="font-size:13.4px;"><strong style="color:var(--text)">Contexto para ASIR:</strong> un child theme
+              es una carpeta que hereda el diseño del tema padre pero permite modificaciones sin perderlas al
+              actualizar. Solo necesitas <strong style="color:var(--text)">dos archivos</strong>: <code>style.css</code>
+              y <code>functions.php</code>.</p>
+            <p style="font-size:13.4px;"><strong style="color:var(--text)">No necesitas saber PHP.</strong> El código de
+              <code>functions.php</code> es una plantilla estándar que solo debes copiar y pegar, cambiando el nombre
+              del tema padre.
+            </p>
+
+            <div class="mock">
+              <div class="mock-head">Laboratorio · child theme</div>
+              <div class="mock-sub">Rellena los campos y obtén los archivos y comandos. Prueba a escribir
+                <code>Twenty Twenty-Four</code> en «Template» y mira qué pasa.
+              </div>
+              <div class="lab-grid">
+                <div>
+                  <div class="field"><label>Carpeta del tema hijo</label><input id="cFolder" value="mi-tema-child">
+                  </div>
+                  <div class="field"><label>Theme Name</label><input id="cName" value="Mi Tema Child"></div>
+                  <div class="field"><label>Author</label><input id="cAuthor" value="Tu Nombre"></div>
+                  <div class="field"><label>Template (carpeta del padre)</label><input id="cTemplate"
+                      value="twentytwentyfour"></div>
+                  <div class="field"><label>Temas padre instalados (carpetas)</label>
+                    <select id="cInstalled">
+                      <option>twentytwentyfour</option>
+                      <option>twentytwentythree</option>
+                      <option>twentytwentytwo</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <div class="theme-card" id="themeCard">
+                    <div class="thumb"></div>
+                    <div>
+                      <h4 id="tcName"></h4>
+                      <p id="tcMsg"></p>
+                    </div>
+                  </div>
+                  <div class="cascade"><span class="b p">1 · style.css del padre</span><span
+                      style="color:var(--wp)">→</span><span class="b c">2 · style.css del hijo (sobrescribe)</span>
+                  </div>
+                  <div class="code-block">
+                    <div class="cb-head"><span>style.css</span><button class="copy-btn" data-copy="gCss">Copiar</button>
+                    </div>
+                    <pre id="gCss"></pre>
+                  </div>
+                </div>
+              </div>
+              <div class="code-block">
+                <div class="cb-head"><span>functions.php</span><button class="copy-btn" data-copy="gPhp">Copiar</button>
+                </div>
+                <pre id="gPhp"></pre>
+              </div>
+              <div class="code-block">
+                <div class="cb-head"><span>powershell · crear carpeta (Paso 3.1)</span><button class="copy-btn"
+                    data-copy="gCmd">Copiar</button></div>
+                <pre id="gCmd"></pre>
+              </div>
+            </div>
+
+            <div class="important"><strong>Importante</strong>
+              <p>La línea <code>Template:</code> debe coincidir <strong>exactamente</strong> con el nombre de la carpeta
+                del tema padre. Con Twenty Twenty-Four, la carpeta es <code>twentytwentyfour</code>.</p>
+            </div>
+
+            <div class="accordion">
+              <div class="acc-item"><button class="acc-trigger"><span>Paso 3.2 · Dónde crear
+                    <code>style.css</code></span><span class="chev">▾</span></button>
+                <div class="acc-panel">
+                  <div class="acc-panel-inner">
+                    <div class="route"><span class="rk">Ruta</span><span class="node">Apariencia</span><span
+                        class="arr">›</span><span class="node">Editor de archivos del tema</span><span class="node"
+                        style="border-style:dashed">si está disponible</span></div>
+                    <p style="font-size:13px;">…o mediante <code>docker exec</code>. Usa el contenido de
+                      <code>style.css</code> generado arriba.
+                    </p>
+                    <div class="tip"><strong>Alternativa (añadida a la guía)</strong>
+                      <p>Escribir archivos con <code>docker exec</code> desde PowerShell es incómodo. Puedes crearlos en
+                        tu equipo y copiarlos:
+                        <code>docker cp style.css mi-wordpress:/var/www/html/wp-content/themes/mi-tema-child/</code>. Si
+                        WordPress no puede escribir en la carpeta, ejecuta
+                        <code>docker exec mi-wordpress chown -R www-data:www-data /var/www/html/wp-content/themes/mi-tema-child</code>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="acc-item"><button class="acc-trigger"><span>Paso 3.3 · Qué hace <code>functions.php</code>
+                    (para ASIR)</span><span class="chev">▾</span></button>
+                <div class="acc-panel">
+                  <div class="acc-panel-inner">
+                    <p style="font-size:13px;">Este código le dice a WordPress: «carga primero el CSS del tema padre,
+                      luego el del hijo, para que el hijo pueda sobrescribir estilos». Por eso el segundo
+                      <code>wp_enqueue_style</code> declara <code>array('parent-style')</code> como dependencia.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="acc-item"><button class="acc-trigger"><span>Paso 3.4 · Activa el child theme</span><span
+                    class="chev">▾</span></button>
+                <div class="acc-panel">
+                  <div class="acc-panel-inner">
+                    <div class="route"><span class="rk">Ruta</span><span class="node">Apariencia</span><span
+                        class="arr">›</span><span class="node">Temas</span></div>
+                    <p style="font-size:13px;">Busca «Mi Tema Child» y pulsa <strong
+                        style="color:var(--text)">Activar</strong>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="capture" data-act="a5"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Child theme activo en la lista de temas.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 09 ACT 6 -->
+        <section class="block" id="act6" data-title="Act. 6 · Sindicación RSS">
+          <div class="block-head"><span class="idx">09</span>
+            <h2>Actividad 6: Sindicación de contenidos (RSS)</h2>
+          </div>
+          <div class="criterio-tag">Criterio g) · «Se han integrado funcionalidades de sindicación.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Verifica el feed RSS nativo</h3>
+            <p style="font-size:13.4px;">WordPress genera automáticamente un feed RSS. Accede a:</p>
+            <div class="code-block">
+              <div class="cb-head"><span>url</span><button class="copy-btn" data-copy="feedUrl">Copiar</button></div>
+              <pre id="feedUrl">http://localhost:8080/feed/</pre>
+            </div>
+            <p style="font-size:13.4px;">Deberías ver un XML con tus entradas más recientes.</p>
+            <div class="capture" data-act="a6"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Feed RSS en el navegador.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Personaliza el feed</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Ajustes</span><span class="arr">›</span><span
+                class="node">Lectura</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Las opciones «Para cada artículo en el feed, mostrar» (Texto completo / Resumen) y «Número de
+                  elementos en el feed».</p>
+              </div>
+            </div>
+            <p style="font-size:13.4px;">Configura: <strong style="color:var(--text)">Texto completo</strong> y <strong
+                style="color:var(--text)">10</strong> elementos.</p>
+
+            <div class="mock">
+              <div class="mock-head">Laboratorio · efecto de los ajustes del feed</div>
+              <div class="mock-sub">Mueve el control y cambia el modo: el XML de ejemplo se regenera (entradas
+                ficticias).</div>
+              <div class="rss-ctrl">
+                <div class="seg" id="rssMode"><button class="active" data-m="full">Texto completo</button><button
+                    data-m="sum">Resumen</button></div>
+                <label>Elementos: <strong id="rssNVal" style="color:var(--wp)">10</strong> <input type="range" id="rssN"
+                    min="1" max="10" value="10"></label>
+              </div>
+              <div class="code-block" style="margin:0">
+                <div class="cb-head"><span>xml · /feed/ (ejemplo)</span></div>
+                <pre class="feed-pre" id="feedOut"></pre>
+              </div>
+            </div>
+            <div class="capture" data-act="a6"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Ajustes de Lectura con la configuración del feed.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel lvl-step" data-min="3">
+            <span class="lvl-badge">Nivel 3</span>
+            <h3>Paso 3 · Integra un agregador de feeds</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Plugins</span><span class="arr">›</span><span class="node">Añadir
+                nuevo</span></div>
+            <p style="font-size:13.4px;">Instala <strong style="color:var(--text)">WPeMatico RSS Feed Fetcher</strong> y
+              configura una campaña que importe automáticamente entradas de otro sitio RSS a tu WordPress.</p>
+            <div class="capture" data-act="a6"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Campaña configurada en WPeMatico.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10 ACT 7 -->
+        <section class="block" id="act7" data-title="Act. 7 · Actualizaciones">
+          <div class="block-head"><span class="idx">10</span>
+            <h2>Actividad 7: Actualizaciones</h2>
+          </div>
+          <div class="criterio-tag">Criterio h) · «Se han realizado actualizaciones.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Revisa el estado de las actualizaciones</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Actualizaciones</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Secciones para «WordPress», «Temas» y «Plugins». Cada una muestra qué tiene actualizaciones
+                  pendientes y un botón «Actualizar ahora».</p>
+              </div>
+            </div>
+            <div class="capture" data-act="a7"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de actualizaciones mostrando qué hay pendiente.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Actualiza todo (con copia de seguridad previa)</h3>
+            <p style="font-size:13.4px;">Antes de actualizar, <strong style="color:var(--text)">crea una copia de
+                seguridad</strong> (Actividad 3). Luego actualiza, por este orden: núcleo de WordPress → temas →
+              plugins.</p>
+            <div class="mock">
+              <div class="mock-head">Simulador · puerta de seguridad antes de actualizar</div>
+              <div class="mock-sub">Intenta actualizar sin copia previa.</div>
+              <label class="chk"><input type="checkbox" id="updBk"> He creado una copia de seguridad previa (Actividad
+                3)</label>
+              <div id="updRows"></div>
+              <div class="msg" id="updMsg"></div>
+            </div>
+            <div class="capture" data-act="a7"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Pantalla de actualizaciones completadas con éxito.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 3 · Verifica que todo funciona</h3>
+            <div class="check-row"><input type="checkbox" id="u1"><label for="u1">El sitio público carga
+                correctamente.</label></div>
+            <div class="check-row"><input type="checkbox" id="u2"><label for="u2">El panel de administración es
+                accesible.</label></div>
+            <div class="check-row"><input type="checkbox" id="u3"><label for="u3">Los plugins siguen activos.</label>
+            </div>
+            <div class="capture" data-act="a7"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Sitio público funcionando después de las actualizaciones.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11 ACT 8 -->
+        <section class="block" id="act8" data-title="Act. 8 · Informes de acceso">
+          <div class="block-head"><span class="idx">11</span>
+            <h2>Actividad 8: Informes de acceso</h2>
+          </div>
+          <div class="criterio-tag">Criterio i) · «Se han obtenido informes de acceso.»</div>
+          <div class="panel">
+            <h3>Paso 1 · Accede a los datos de tráfico</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Aegra Site Monitor</span><span class="arr">›</span><span
+                class="node">Traffic</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un panel con gráficos de páginas vistas, orígenes de tráfico, dispositivos y países.</p>
+              </div>
+            </div>
+            <div class="capture" data-act="a8"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Panel de tráfico con datos.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 2 · Revisa los logs de acceso de Nginx</h3>
+            <div class="code-block">
+              <div class="cb-head"><span>powershell</span><button class="copy-btn" data-copy="logCmd">Copiar</button>
+              </div>
+              <pre id="logCmd">docker exec -it mi-nginx cat /var/log/nginx/access.log</pre>
+            </div>
+            <p style="font-size:13.4px;">Verás todas las peticiones HTTP con IP, fecha, método, ruta y código de estado.
+            </p>
+            <div class="tip"><strong>Si el comando no muestra nada (añadido a la guía)</strong>
+              <p>En la imagen oficial de Nginx, <code>access.log</code> redirige a la salida estándar del contenedor,
+                así que <code>cat</code> puede salir vacío. En ese caso usa <code>docker logs mi-nginx</code> o
+                <code>docker compose logs nginx</code>.
+              </p>
+            </div>
+
+            <div class="mock">
+              <div class="mock-head">Laboratorio · leer un access.log</div>
+              <div class="mock-sub">Log de <strong>ejemplo</strong> (ficticio, no es el tuyo). Pulsa una línea para
+                descomponerla; filtra y busca lo sospechoso.</div>
+              <div class="log-filter" id="logFilter"></div>
+              <div class="logbox" id="logBox"></div>
+              <div class="log-decode" id="logDecode"></div>
+              <div class="sus-reason" id="susReason"></div>
+              <div class="stats" id="logStats"></div>
+            </div>
+            <div class="capture" data-act="a8"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Logs de acceso de Nginx.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Paso 3 · Documenta los hallazgos</h3>
+            <p style="font-size:13.4px;">En el informe, responde:</p>
+            <ul class="plain">
+              <li>¿Cuántos visitantes únicos has tenido?</li>
+              <li>¿Qué páginas son las más visitadas?</li>
+              <li>¿Hay intentos de acceso sospechosos en los logs?</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 12 ACT 9 -->
+        <section class="block" id="act9" data-title="Act. 9 · Configuración avanzada">
+          <div class="block-head"><span class="idx">12</span>
+            <h2>Actividad 9: Configuración avanzada de módulos</h2>
+          </div>
+          <div class="criterio-tag">Criterio a) · «Se han adaptado y configurado los módulos del gestor de contenidos.»
+          </div>
+          <div class="panel">
+            <h3>Paso 1 · Configura los ajustes de WordPress</h3>
+            <div class="route"><span class="rk">Ruta</span><span class="node">Escritorio</span><span
+                class="arr">›</span><span class="node">Ajustes</span></div>
+            <div class="see">
+              <div><strong>Qué verás</strong>
+                <p>Un submenú con: Generales, Escritura, Lectura, Comentarios, Medios, Enlaces permanentes, Privacidad.
+                </p>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pantalla</th>
+                    <th>Qué revisar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Generales</strong></td>
+                    <td>Título, descripción, URL del sitio</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Escritura</strong></td>
+                    <td>Categoría por defecto, formato de fecha</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lectura</strong></td>
+                    <td>Página de inicio, entradas por página</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Comentarios</strong></td>
+                    <td>Moderación, avatares</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Medios</strong></td>
+                    <td>Tamaños de imagen</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Enlaces permanentes</strong></td>
+                    <td>Estructura de URLs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="capture" data-act="a9"><span class="cam">📸</span>
+              <div><strong>Captura requerida</strong>
+                <p>Al menos tres pantallas de ajustes configuradas.</p>
+              </div>
+            </div>
+            <h3 style="margin-top:16px;">Paso 2 · Documenta la configuración de cada plugin</h3>
+            <p style="font-size:13.4px;">Para cada plugin instalado, documenta en el informe:</p>
+            <ul class="plain">
+              <li>Qué hace.</li>
+              <li>Qué configuración has aplicado.</li>
+              <li>Por qué es importante para tu proyecto.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 13 PROBLEMAS -->
+        <section class="block" id="problemas" data-title="Solución de problemas">
+          <div class="block-head"><span class="idx">13</span>
+            <h2>Solución de problemas frecuentes</h2>
+          </div>
+          <div class="panel">
+            <div class="search"><span>🔍</span><input id="probSearch"
+                placeholder="Filtra por síntoma, causa o solución…"></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Problema</th>
+                    <th>Causa probable</th>
+                    <th>Solución</th>
+                  </tr>
+                </thead>
+                <tbody id="probBody">
+                  <tr>
+                    <td>Usuario no puede publicar</td>
+                    <td>Rol mal asignado</td>
+                    <td>Edita el usuario y verifica su rol</td>
+                  </tr>
+                  <tr>
+                    <td>Plugin no aparece en el menú</td>
+                    <td>No está activado</td>
+                    <td>Ve a Plugins y pulsa «Activar»</td>
+                  </tr>
+                  <tr>
+                    <td>Backup falla</td>
+                    <td>Espacio insuficiente en el servidor</td>
+                    <td>Libera espacio o guarda el backup en tu equipo</td>
+                  </tr>
+                  <tr>
+                    <td>Child theme no aparece</td>
+                    <td>Línea <code>Template:</code> incorrecta</td>
+                    <td>Verifica que coincide con la carpeta del tema padre</td>
+                  </tr>
+                  <tr>
+                    <td>Feed RSS vacío</td>
+                    <td>No hay entradas publicadas</td>
+                    <td>Publica al menos una entrada</td>
+                  </tr>
+                  <tr>
+                    <td>Actualización falla</td>
+                    <td>Permisos de archivos</td>
+                    <td>Verifica permisos del volumen <code>wordpress_data</code></td>
+                  </tr>
+                  <tr>
+                    <td>Error 413 al importar XML</td>
+                    <td>Límite de Nginx</td>
+                    <td>Aumenta <code>client_max_body_size</code> en <code>default.conf</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 14 ENTREGA -->
+        <section class="block" id="entrega" data-title="Entrega del informe">
+          <div class="block-head"><span class="idx">14</span>
+            <h2>Entrega del informe</h2>
+          </div>
+          <div class="panel">
+            <p>El producto a evaluar es un <strong style="color:var(--text)">informe técnico</strong> que documente todo
+              el proceso.</p>
+            <h3>Contenido del informe</h3>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r1"><label for="r1"><strong
+                  style="color:var(--text)">Portada:</strong> nombre, módulo, fecha, temática elegida, nivel de
+                libertad.</label></div>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r2"><label for="r2"><strong
+                  style="color:var(--text)">Índice.</strong></label></div>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r3"><label for="r3"><strong
+                  style="color:var(--text)">Capturas de pantalla</strong> de cada paso marcado con 📸.</label></div>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r4"><label for="r4"><strong
+                  style="color:var(--text)">Explicación</strong> de cada captura.</label></div>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r5"><label for="r5"><strong
+                  style="color:var(--text)">Justificación de decisiones:</strong> por qué elegiste ese tema, esos
+                plugins, esa configuración.</label></div>
+            <div class="check-row"><input type="checkbox" class="rep-chk" id="r6"><label for="r6"><strong
+                  style="color:var(--text)">Reflexión final:</strong> ¿qué has aprendido? ¿qué dificultades has
+                encontrado?</label></div>
+            <div class="progress-mini">
+              <div class="progress-mini-fill" id="repProg"></div>
+            </div>
+            <h3>Formato</h3>
+            <ul class="plain">
+              <li>Documento en PDF o Markdown.</li>
+              <li>Capturas <strong style="color:var(--text)">integradas</strong> en el documento.</li>
+              <li>Cada captura con un pie de foto explicativo.</li>
+            </ul>
+            <h3 style="margin-top:16px;">Tus capturas por actividad</h3>
+            <div id="actProg"></div>
+          </div>
+        </section>
+
+        <!-- 15 EVALUACIÓN -->
+        <section class="block" id="evaluacion" data-title="Criterios de evaluación">
+          <div class="block-head"><span class="idx">15</span>
+            <h2>Criterios de evaluación</h2>
+          </div>
+          <div class="panel">
+            <div id="critBars"></div>
+            <p style="font-size:12.5px;color:var(--text-faint);margin-top:8px;">El informe no pondera por separado: se
+              valora con «documentación clara, capturas explicadas, reflexión».</p>
+            <h3 style="margin-top:18px;">Baremo diferenciado por nivel</h3>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nivel</th>
+                    <th>Requisitos adicionales</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong style="color:var(--l1)">Nivel 1</strong></td>
+                    <td>Child theme <strong>no obligatorio</strong>. Se evalúa tema padre personalizado.</td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color:var(--l2)">Nivel 2</strong></td>
+                    <td>Child theme <strong>no obligatorio</strong>. Se valora justificación de elecciones.</td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color:var(--l3)">Nivel 3</strong></td>
+                    <td>Child theme <strong>obligatorio</strong>. Se evalúa CSS personalizado y justificación técnica.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="mock">
+            <div class="mock-head">Calculadora de autoevaluación</div>
+            <div class="mock-sub">Puntúa de 0 a 10 cada criterio según lo que has conseguido; verás tu nota orientativa
+              ponderada.</div>
+            <div id="calcRows"></div>
+            <div class="calc-total"><span>Nota orientativa (sobre 10)</span><span class="big" id="calcTotal">0.0</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 16 RECURSOS -->
+        <section class="block" id="recursos" data-title="Recursos y nota sobre Nginx">
+          <div class="block-head"><span class="idx">16</span>
+            <h2>Recursos de referencia</h2>
+          </div>
+          <div class="panel">
+            <h3>Plugins recomendados</h3>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Función</th>
+                    <th>Plugin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Seguridad</td>
+                    <td>Wordfence Security</td>
+                  </tr>
+                  <tr>
+                    <td>Backup</td>
+                    <td>UpdraftPlus</td>
+                  </tr>
+                  <tr>
+                    <td>Import/Export</td>
+                    <td>Import WP</td>
+                  </tr>
+                  <tr>
+                    <td>RSS</td>
+                    <td>WPeMatico RSS Feed Fetcher</td>
+                  </tr>
+                  <tr>
+                    <td>Monitorización</td>
+                    <td>Aegra Site Monitor</td>
+                  </tr>
+                  <tr>
+                    <td>Roles</td>
+                    <td>User Role Editor</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>Documentación oficial</h3>
+            <ul class="plain">
+              <li>WordPress Codex: <code>codex.wordpress.org</code></li>
+              <li>WordPress Support: <code>wordpress.org/support</code></li>
+              <li>WP-CLI: <code>developer.wordpress.com/docs/wp-cli</code></li>
+            </ul>
+            <div class="important"><strong>Nota sobre Nginx</strong>
+              <p>Durante esta actividad <strong>no necesitas modificar la configuración de Nginx</strong>: todo se hace
+                desde la administración de WordPress. Si al importar un XML grande recibes un <strong>error 413</strong>
+                (Request Entity Too Large), revisa <code>client_max_body_size</code> en
+                <code>config/nginx/default.conf</code>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <p>Guía práctica 3 · Implantación de Aplicaciones Web · 2º ASIR — proyecto de personalización integral de WordPress.
+    </p>
+    <span class="next-practice">← Continúa de la Práctica 2: WordPress sobre LEMP</span>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+      /* TOC */
+      var sections = Array.prototype.slice.call(document.querySelectorAll('section.block[id]'));
+      var tocDesktop = document.getElementById('tocDesktop');
+      var tocDrawerPanel = document.getElementById('tocDrawerPanel');
+      sections.forEach(function (sec, i) {
+        var title = sec.getAttribute('data-title') || sec.id;
+        var num = String(i + 1).padStart(2, '0');
+        var a1 = document.createElement('a');
+        a1.href = '#' + sec.id; a1.dataset.target = sec.id;
+        a1.innerHTML = '<span class="num">' + num + '</span>' + title;
+        tocDesktop.appendChild(a1);
+        tocDrawerPanel.appendChild(a1.cloneNode(true));
+      });
+
+      var menuBtn = document.getElementById('menuBtn');
+      var drawer = document.getElementById('tocDrawer');
+      var backdrop = document.getElementById('tocBackdrop');
+      function closeDrawer() { drawer.classList.remove('open'); }
+      menuBtn.addEventListener('click', function () { drawer.classList.add('open'); });
+      backdrop.addEventListener('click', closeDrawer);
+      tocDrawerPanel.addEventListener('click', function (e) { if (e.target.closest('a')) closeDrawer(); });
+
+      var allTocLinks = document.querySelectorAll('.toc a, .toc-drawer a');
+      var progressBar = document.getElementById('progressBar');
+      function onScroll() {
+        var scrollY = window.scrollY;
+        var docH = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (docH > 0 ? (scrollY / docH * 100) : 0) + '%';
+        var current = sections[0] ? sections[0].id : null;
+        for (var i = 0; i < sections.length; i++) {
+          var rect = sections[i].getBoundingClientRect();
+          if (rect.top <= 110) { current = sections[i].id; }
+        }
+        allTocLinks.forEach(function (a) { a.classList.toggle('active', a.dataset.target === current); });
+      }
+      document.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var el = document.getElementById(btn.getAttribute('data-copy'));
+          if (!el) return;
+          navigator.clipboard.writeText(el.innerText).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+            setTimeout(function () { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+          });
+        });
+      });
+
+      document.querySelectorAll('.acc-trigger').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+          var item = trigger.closest('.acc-item');
+          var panel = item.querySelector('.acc-panel');
+          var isOpen = item.classList.contains('open');
+          if (isOpen) { panel.style.maxHeight = null; item.classList.remove('open'); }
+          else { item.classList.add('open'); panel.style.maxHeight = panel.scrollHeight + 'px'; }
+        });
+        if (trigger.closest('.acc-item').classList.contains('open')) {
+          var panel = trigger.closest('.acc-item').querySelector('.acc-panel');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+
+      document.querySelectorAll('.tabs').forEach(function (tabGroup) {
+        var buttons = tabGroup.querySelectorAll('.tab-nav button');
+        buttons.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            buttons.forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            tabGroup.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+            document.getElementById(btn.dataset.tab).classList.add('active');
+          });
+        });
+      });
+
+
+
+      /* ---------- captures: checkbox + counters ---------- */
+      var caps = Array.prototype.slice.call(document.querySelectorAll('.capture'));
+      caps.forEach(function (c) {
+        var l = document.createElement('label'); l.className = 'cap-done';
+        l.innerHTML = '<input type="checkbox"> Hecha';
+        c.appendChild(l);
+        l.querySelector('input').addEventListener('change', function (e) { c.classList.toggle('done', e.target.checked); updateCaps(); });
+      });
+      var ACTS = { a0: 'Nivel', a1: 'Act. 1', a2: 'Act. 2', a3: 'Act. 3', a4: 'Act. 4', a5: 'Act. 5', a6: 'Act. 6', a7: 'Act. 7', a8: 'Act. 8', a9: 'Act. 9' };
+      function activeCaps() { return caps.filter(function (c) { return !c.closest('.lvl-step.off'); }); }
+      function updateCaps() {
+        var act = activeCaps(), done = act.filter(function (c) { return c.classList.contains('done'); }).length;
+        document.getElementById('capPill').textContent = '📸 ' + done + '/' + act.length;
+        var box = document.getElementById('actProg'); box.innerHTML = '';
+        Object.keys(ACTS).forEach(function (k) {
+          var a = act.filter(function (c) { return c.dataset.act === k; });
+          var d = a.filter(function (c) { return c.classList.contains('done'); }).length;
+          var pct = a.length ? d / a.length * 100 : 0;
+          var r = document.createElement('div'); r.className = 'act-prog';
+          r.innerHTML = '<span>' + ACTS[k] + '</span><div class="bar"><i style="width:' + pct + '%"></i></div><span>' + d + '/' + a.length + '</span>';
+          box.appendChild(r);
+        });
+      }
+
+      /* ---------- level picker ---------- */
+      var level = 1;
+      var LNOTE = { 1: 'Nivel seleccionado: 1 · Guiado. Ejemplo de temática: blog de recetas de cocina tradicional.', 2: 'Nivel seleccionado: 2 · Semilibre. Eliges temática, tema y plugins, y justificas tus elecciones.', 3: 'Nivel seleccionado: 3 · Libre con retos. Child theme obligatorio, CSS propio y justificación técnica.' };
+      function applyLevel() {
+        document.querySelectorAll('.lvl-card').forEach(function (b) { b.classList.toggle('sel', +b.dataset.l === level); });
+        document.querySelectorAll('.lvl-step').forEach(function (s) { s.classList.toggle('off', level < +s.dataset.min); });
+        document.getElementById('lvlNote').textContent = LNOTE[level];
+        updateCaps();
+      }
+      document.querySelectorAll('.lvl-card').forEach(function (b) { b.addEventListener('click', function () { level = +b.dataset.l; applyLevel(); }); });
+
+      /* ---------- planner ---------- */
+      var PLAN = [
+        { n: 'Act. 1', t: 'Usuarios y perfiles', h: 0.75, c: '#2ecc71', d: 'Analizar roles, crear 3 usuarios, comprobar permisos en incógnito (+ rol personalizado en Nivel 3).' },
+        { n: 'Act. 2', t: 'Plugins', h: 1, c: '#4fb3e8', d: 'Instalar y configurar un plugin por funcionalidad. Piensa ya en cómo justificarlos.' },
+        { n: 'Act. 3', t: 'Copias de seguridad', h: 0.75, c: '#b28cf5', d: 'Copia completa, documentar restauración (sin restaurar) y segundo punto de restauración.' },
+        { n: 'Act. 4', t: 'Importar/exportar', h: 0.75, c: '#4fd1c5', d: 'Exportar XML, importarlo y (Niveles 2-3) exportar CSV/JSON con Import WP.' },
+        { n: 'Act. 5', t: 'Plantillas', h: 1.5, c: '#e0a23a', d: 'Instalar y personalizar tema; en Nivel 3, child theme. Suele ser la actividad más larga.' },
+        { n: 'Act. 6', t: 'RSS', h: 0.5, c: '#f2954a', d: 'Verificar el feed, ajustarlo y (Nivel 3) montar una campaña en WPeMatico.' },
+        { n: 'Act. 7', t: 'Actualizaciones', h: 0.75, c: '#f2555a', d: 'Con copia previa: núcleo, temas y plugins; después verificar el sitio.' },
+        { n: 'Act. 8', t: 'Informes de acceso', h: 0.5, c: '#8fd3ff', d: 'Panel de tráfico, logs de Nginx y análisis de hallazgos.' },
+        { n: 'Act. 9', t: 'Config. avanzada', h: 0.75, c: '#c7f0a8', d: 'Revisar Ajustes y documentar la configuración de cada plugin.' },
+        { n: 'Informe', t: 'Montaje del informe', h: 0.75, c: '#d3e0ec', d: 'Ordenar capturas, pies de foto, justificaciones y reflexión final.' }
+      ];
+      var planner = document.getElementById('planner'), planInfo = document.getElementById('planInfo');
+      PLAN.forEach(function (p, i) {
+        var b = document.createElement('button'); b.className = 'plan-seg'; b.style.flex = p.h; b.style.background = p.c; b.textContent = p.n.replace('Act. ', 'A');
+        b.addEventListener('click', function () {
+          document.querySelectorAll('.plan-seg').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel');
+          planInfo.innerHTML = '<strong>' + p.n + ' · ' + p.t + '</strong> — ' + p.h + ' h (orientativo). ' + p.d;
+        });
+        planner.appendChild(b);
+      });
+
+      /* ---------- roles explorer ---------- */
+      var ROLES = {
+        'Administrador': { menu: [1, 1, 1, 1, 1, 1], perm: ['y', 'y', 'y'], txt: 'Control total del sitio.' },
+        'Editor': { menu: [1, 1, 1, 0, 0, 0], perm: ['y', 'y', 'n'], txt: 'Gestiona todo el contenido, pero no la configuración técnica.' },
+        'Autor': { menu: [1, 0, 1, 0, 0, 0], perm: ['p', 'n', 'n'], txt: 'Publica y gestiona solo sus propias entradas.' },
+        'Colaborador': { menu: [1, 0, 0, 0, 0, 0], perm: ['n', 'n', 'n'], txt: 'Escribe entradas, pero las envía a revisión.' },
+        'Suscriptor': { menu: [0, 0, 0, 0, 0, 0], perm: ['n', 'n', 'n'], txt: 'Solo gestiona su perfil.' }
+      };
+      var MENU = ['Entradas', 'Páginas', 'Medios', 'Apariencia', 'Plugins', 'Usuarios'];
+      var PERMS = ['Puede publicar', 'Edita entradas de otros', 'Gestiona plugins'];
+      var PV = { y: '✅ Sí', n: '❌ No', p: '✅ Solo suyas' };
+      var roleBtns = document.getElementById('roleBtns');
+      function showRole(name) {
+        var r = ROLES[name];
+        document.querySelectorAll('.role-btn').forEach(function (b) { b.classList.toggle('active', b.textContent === name); });
+        var side = '<div>🏠 Escritorio</div>';
+        MENU.forEach(function (m, i) { side += '<div class="' + (r.menu[i] ? '' : 'off') + '">▪ ' + m + '</div>'; });
+        side += '<div>👤 Perfil</div>';
+        document.getElementById('wpSide').innerHTML = side;
+        document.getElementById('roleTitle').textContent = name + ' — ' + r.txt;
+        document.getElementById('rolePerms').innerHTML = PERMS.map(function (p, i) { return '<div class="perm"><span>' + p + '</span><span class="v ' + r.perm[i] + '">' + PV[r.perm[i]] + '</span></div>'; }).join('');
+      }
+      Object.keys(ROLES).forEach(function (n) {
+        var b = document.createElement('button'); b.className = 'role-btn'; b.textContent = n;
+        b.addEventListener('click', function () { showRole(n); }); roleBtns.appendChild(b);
+      });
+      showRole('Administrador');
+
+      /* ---------- plugin map ---------- */
+      var CRITS = { a: 'Módulos', b: 'Usuarios', c: 'Integrar módulos', d: 'Copias', e: 'Import/Export', f: 'Plantillas', g: 'Sindicación', h: 'Actualizaciones', i: 'Informes' };
+      var PLUGS = [
+        { n: 'Wordfence Security', f: 'Seguridad', c: ['a', 'c'] },
+        { n: 'UpdraftPlus', f: 'Copias de seguridad', c: ['d'] },
+        { n: 'Import WP', f: 'Importación/exportación', c: ['e'] },
+        { n: 'WPeMatico RSS Feed Fetcher', f: 'Sindicación RSS', c: ['g'] },
+        { n: 'Aegra Site Monitor', f: 'Monitorización / informes', c: ['i'] },
+        { n: 'WPForms Lite', f: 'Formulario de contacto (opcional)', c: ['c'] },
+        { n: 'User Role Editor', f: 'Roles personalizados (Nivel 3)', c: ['b'] }
+      ];
+      var cf = document.getElementById('critFilter'), pg = document.getElementById('plugGrid'), curCrit = null;
+      function renderPlugs() {
+        pg.innerHTML = '';
+        PLUGS.forEach(function (p) {
+          var d = document.createElement('div'); d.className = 'plug' + (curCrit ? (p.c.indexOf(curCrit) > -1 ? ' hit' : ' dim') : '');
+          d.innerHTML = '<h4>' + p.n + '</h4><div class="fn">' + p.f + '</div><div class="chips">' + p.c.map(function (k) { return '<span class="crit-chip">' + k + ')</span>'; }).join('') + '</div>';
+          pg.appendChild(d);
+        });
+        cf.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.dataset.k === curCrit); });
+      }
+      Object.keys(CRITS).forEach(function (k) {
+        var b = document.createElement('button'); b.dataset.k = k; b.textContent = k + ') ' + CRITS[k];
+        b.addEventListener('click', function () { curCrit = (curCrit === k) ? null : k; renderPlugs(); }); cf.appendChild(b);
+      });
+      renderPlugs();
+
+      /* ---------- backup simulator ---------- */
+      var bkModal = document.getElementById('bkModal'), bkMsg = document.getElementById('bkMsg'), bkList = document.getElementById('bkList');
+      var bkBar = document.getElementById('bkBar'), bkFill = document.getElementById('bkFill'), bkN = 0, bkBusy = false;
+      document.getElementById('bkOpen').addEventListener('click', function () { bkModal.classList.toggle('show'); });
+      document.getElementById('bkGo').addEventListener('click', function () {
+        if (bkBusy) return;
+        var f = document.getElementById('bkFiles').checked, d = document.getElementById('bkDb').checked;
+        if (!f && !d) { bkMsg.className = 'msg err'; bkMsg.textContent = 'Marca al menos una casilla: sin archivos ni base de datos no hay copia.'; return; }
+        bkBusy = true; bkBar.style.display = 'block'; bkFill.style.width = '0%'; bkMsg.className = 'msg'; bkMsg.textContent = 'Realizando copia…';
+        var p = 0, t = setInterval(function () {
+          p += 8 + Math.random() * 10; bkFill.style.width = Math.min(p, 100) + '%';
+          if (p >= 100) {
+            clearInterval(t); bkBusy = false; bkN++;
+            var tags = (f ? '<span class="tag">archivos</span>' : '') + (d ? '<span class="tag">base de datos</span>' : '');
+            var it = document.createElement('div'); it.className = 'bk-item';
+            it.innerHTML = '<strong style="color:var(--text)">Copia #' + bkN + '</strong><div class="tags">' + tags + '</div><span class="sp"></span><button class="btn" data-a="restore">Restore</button><button class="btn" data-a="download">Download</button><button class="btn danger" data-a="delete">Delete</button>';
+            bkList.prepend(it); bkBar.style.display = 'none'; bkModal.classList.remove('show');
+            if (f && d) { bkMsg.className = 'msg ok'; bkMsg.textContent = 'Copia completa realizada con éxito.'; }
+            else { bkMsg.className = 'msg warn'; bkMsg.textContent = 'Copia INCOMPLETA: falta ' + (f ? 'la base de datos (sin ella no recuperas entradas ni usuarios)' : 'los archivos (sin ellos pierdes temas, plugins y medios)') + '.'; }
+          }
+        }, 120);
+      });
+      bkList.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        if (b.dataset.a === 'restore') { bkMsg.className = 'msg warn'; bkMsg.textContent = 'No la restaures: solo documenta cómo se haría (captura de las opciones visibles).'; }
+        if (b.dataset.a === 'download') { bkMsg.className = 'msg'; bkMsg.textContent = 'Descarga la copia a tu equipo: así no dependes del espacio del servidor.'; }
+        if (b.dataset.a === 'delete') { b.closest('.bk-item').remove(); bkMsg.className = 'msg'; bkMsg.textContent = 'Copia eliminada.'; }
+      });
+
+      /* ---------- child theme lab ---------- */
+      var cF = document.getElementById('cFolder'), cN = document.getElementById('cName'), cA = document.getElementById('cAuthor'), cT = document.getElementById('cTemplate'), cI = document.getElementById('cInstalled');
+      function genChild() {
+        var folder = cF.value.trim() || 'mi-tema-child', name = cN.value.trim() || 'Mi Tema Child', author = cA.value.trim() || 'Tu Nombre', tpl = cT.value.trim();
+        var fn = folder.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase();
+        var installed = Array.prototype.map.call(cI.options, function (o) { return o.value; });
+        var ok = installed.indexOf(tpl) > -1;
+        document.getElementById('gCss').textContent = '/*\nTheme Name: ' + name + '\nDescription: Child theme de ' + (tpl || '?') + '\nAuthor: ' + author + '\nTemplate: ' + tpl + '\nVersion: 1.0.0\n*/\n\n/* Aquí van tus estilos personalizados */\nbody {\n    background-color: #f0f0f0;\n}';
+        document.getElementById('gPhp').textContent = "<?php\n// Esta función carga los estilos del tema padre y del child theme\nfunction " + fn + "_enqueue_styles() {\n    // Carga el CSS del tema padre\n    wp_enqueue_style(\n        'parent-style',\n        get_template_directory_uri() . '/style.css'\n    );\n\n    // Carga el CSS del child theme (se aplica después)\n    wp_enqueue_style(\n        'child-style',\n        get_stylesheet_directory_uri() . '/style.css',\n        array('parent-style')\n    );\n}\nadd_action('wp_enqueue_scripts', '" + fn + "_enqueue_styles');";
+        document.getElementById('gCmd').textContent = 'docker exec -it mi-wordpress mkdir -p /var/www/html/wp-content/themes/' + folder;
+        var card = document.getElementById('themeCard');
+        card.className = 'theme-card ' + (ok ? 'ok' : 'bad');
+        document.getElementById('tcName').textContent = name;
+        document.getElementById('tcMsg').textContent = ok ? 'Tema hijo válido: hereda de «' + tpl + '». Ya puedes activarlo.' : 'Tema roto: no existe la carpeta de tema padre «' + tpl + '». Template debe coincidir exactamente con una carpeta de wp-content/themes.';
+      }
+      [cF, cN, cA, cT].forEach(function (i) { i.addEventListener('input', genChild); });
+      cI.addEventListener('change', function () { cT.value = cI.value; genChild(); });
+      genChild();
+
+      /* ---------- RSS lab ---------- */
+      var POSTS = ['Tortilla de patatas jugosa', 'Lentejas de la abuela', 'Fabada asturiana paso a paso', 'Arroz con leche cremoso', 'Pisto con huevo', 'Croquetas de jamón', 'Merluza a la sidra', 'Pote asturiano', 'Tarta de queso al horno', 'Sopa de ajo castellana'];
+      var rssMode = 'full', rssNEl = document.getElementById('rssN');
+      function renderFeed() {
+        var n = +rssNEl.value; document.getElementById('rssNVal').textContent = n;
+        var x = '<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n<channel>\n  <title>Mi WordPress ASIR</title>\n  <link>http://localhost:8080</link>\n';
+        for (var i = 0; i < n; i++) {
+          x += '  <item>\n    <title>' + POSTS[i] + '</title>\n    <link>http://localhost:8080/receta-' + (i + 1) + '/</link>\n';
+          x += rssMode === 'full' ? '    <content:encoded>Ingredientes… preparación completa paso a paso… consejos finales y variantes.</content:encoded>\n' : '    <description>Ingredientes y primeros pasos […]</description>\n';
+          x += '  </item>\n';
+        }
+        x += '</channel>\n</rss>';
+        document.getElementById('feedOut').textContent = x;
+      }
+      rssNEl.addEventListener('input', renderFeed);
+      document.querySelectorAll('#rssMode button').forEach(function (b) {
+        b.addEventListener('click', function () { rssMode = b.dataset.m; document.querySelectorAll('#rssMode button').forEach(function (x) { x.classList.toggle('active', x === b); }); renderFeed(); });
+      });
+      renderFeed();
+
+      /* ---------- updates gate ---------- */
+      var UP = ['Núcleo de WordPress', 'Temas', 'Plugins'], updRows = document.getElementById('updRows'), updMsg = document.getElementById('updMsg'), updDone = {};
+      UP.forEach(function (u, i) {
+        var r = document.createElement('div'); r.className = 'upd-row';
+        r.innerHTML = '<div>' + (i + 1) + '. ' + u + ' <span class="st">· pendiente</span></div><button class="btn locked">Actualizar ahora</button>';
+        var btn = r.querySelector('button');
+        btn.addEventListener('click', function () {
+          if (!document.getElementById('updBk').checked) { btn.classList.add('shake'); setTimeout(function () { btn.classList.remove('shake'); }, 400); updMsg.className = 'msg err'; updMsg.textContent = 'Stop: primero la copia de seguridad (Actividad 3). Si la actualización rompe algo, sin copia no hay vuelta atrás.'; return; }
+          for (var j = 0; j < i; j++) { if (!updDone[j]) { updMsg.className = 'msg warn'; updMsg.textContent = 'Orden recomendado: núcleo → temas → plugins. Actualiza antes «' + UP[j] + '».'; return; } }
+          updDone[i] = true; r.classList.add('done'); r.querySelector('.st').textContent = '· actualizado ✓'; btn.disabled = true;
+          updMsg.className = 'msg ok'; updMsg.textContent = Object.keys(updDone).length === 3 ? 'Todo actualizado. Ahora el Paso 3: verifica que el sitio funciona.' : UP[i] + ' actualizado.';
+        });
+        updRows.appendChild(r);
+      });
+      document.getElementById('updBk').addEventListener('change', function (e) { updRows.querySelectorAll('button').forEach(function (b) { b.classList.toggle('locked', !e.target.checked); }); });
+
+      /* ---------- log lab ---------- */
+      var LOG = [
+        ['172.18.0.1', '11/Oct/2026:10:15:32', 'GET', '/', 200, 'Mozilla/5.0'],
+        ['172.18.0.1', '11/Oct/2026:10:15:32', 'GET', '/wp-content/themes/twentytwentyfour/style.css', 200, 'Mozilla/5.0'],
+        ['172.18.0.1', '11/Oct/2026:10:15:40', 'GET', '/blog/', 200, 'Mozilla/5.0'],
+        ['192.168.1.34', '11/Oct/2026:10:17:03', 'GET', '/', 200, 'Mobile Safari'],
+        ['192.168.1.34', '11/Oct/2026:10:17:15', 'GET', '/receta-tortilla/', 200, 'Mobile Safari'],
+        ['172.18.0.1', '11/Oct/2026:10:18:21', 'GET', '/feed/', 200, 'Mozilla/5.0'],
+        ['172.18.0.1', '11/Oct/2026:10:18:22', 'GET', '/favicon.ico', 404, 'Mozilla/5.0'],
+        ['203.0.113.45', '11/Oct/2026:10:21:07', 'POST', '/wp-login.php', 200, 'python-requests/2.31', 1],
+        ['203.0.113.45', '11/Oct/2026:10:21:08', 'POST', '/wp-login.php', 200, 'python-requests/2.31', 1],
+        ['203.0.113.45', '11/Oct/2026:10:21:08', 'POST', '/wp-login.php', 200, 'python-requests/2.31', 1],
+        ['203.0.113.45', '11/Oct/2026:10:21:09', 'POST', '/wp-login.php', 200, 'python-requests/2.31', 1],
+        ['203.0.113.45', '11/Oct/2026:10:21:12', 'GET', '/xmlrpc.php', 403, 'python-requests/2.31', 2],
+        ['198.51.100.7', '11/Oct/2026:10:24:40', 'GET', '/.env', 404, 'curl/8.4.0', 3]
+      ];
+      var REASON = { 1: 'Varios POST seguidos a /wp-login.php desde la misma IP y con user-agent de script: patrón típico de fuerza bruta.', 2: 'Petición a xmlrpc.php: objetivo habitual de ataques. Aquí Nginx responde 403 (bloqueado) gracias a la configuración de la Práctica 2.', 3: 'Sondeo de /.env buscando credenciales expuestas. Responde 404, pero indica reconocimiento automatizado.' };
+      var logBox = document.getElementById('logBox'), logFilter = document.getElementById('logFilter'), logDecode = document.getElementById('logDecode'), curF = 'all';
+      var FILT = { all: 'Todas', err: 'Errores 4xx', post: 'POST', sus: 'Sospechosas' };
+      function logTxt(l) { return l[0] + ' - - [' + l[1] + ' +0000] "' + l[2] + ' ' + l[3] + ' HTTP/1.1" ' + l[4] + ' "' + l[5] + '"'; }
+      function renderLog() {
+        logBox.innerHTML = '';
+        LOG.forEach(function (l) {
+          if (curF === 'err' && l[4] < 400) return; if (curF === 'post' && l[2] !== 'POST') return; if (curF === 'sus' && !l[6]) return;
+          var d = document.createElement('div'); d.className = 'logline' + (l[6] ? ' sus' : ''); d.textContent = logTxt(l);
+          d.addEventListener('click', function () {
+            logBox.querySelectorAll('.logline').forEach(function (x) { x.classList.remove('sel'); }); d.classList.add('sel');
+            logDecode.innerHTML = [['IP cliente', l[0]], ['Fecha', l[1]], ['Método', l[2]], ['Ruta', l[3]], ['Estado', l[4]], ['User-agent', l[5]]].map(function (k) { return '<div><div class="k">' + k[0] + '</div><div class="v">' + k[1] + '</div></div>'; }).join('');
+            document.getElementById('susReason').textContent = l[6] ? '⚠ ' + REASON[l[6]] : '';
+          });
+          logBox.appendChild(d);
+        });
+        logFilter.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.dataset.f === curF); });
+      }
+      Object.keys(FILT).forEach(function (k) { var b = document.createElement('button'); b.dataset.f = k; b.textContent = FILT[k]; b.addEventListener('click', function () { curF = k; renderLog(); }); logFilter.appendChild(b); });
+      renderLog();
+      (function () {
+        var ips = {}, paths = {};
+        LOG.forEach(function (l) { ips[l[0]] = 1; if (l[2] === 'GET' && l[4] === 200) { paths[l[3]] = (paths[l[3]] || 0) + 1; } });
+        var top = Object.keys(paths).filter(function (p) { return p.indexOf('/wp-content') !== 0; }).sort(function (a, b) { return paths[b] - paths[a]; })[0];
+        document.getElementById('logStats').innerHTML = [[LOG.length, 'peticiones'], [Object.keys(ips).length, 'IPs únicas'], [LOG.filter(function (l) { return l[6]; }).length, 'sospechosas'], [top, 'ruta más pedida (200)']].map(function (s) { return '<div><div class="n" style="' + (typeof s[0] === 'string' ? 'font-size:15px' : '') + '">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>'; }).join('');
+      })();
+
+      /* ---------- troubleshooting filter ---------- */
+      document.getElementById('probSearch').addEventListener('input', function (e) {
+        var q = e.target.value.toLowerCase();
+        document.querySelectorAll('#probBody tr').forEach(function (r) { r.classList.toggle('hide', q && r.textContent.toLowerCase().indexOf(q) < 0); });
+      });
+
+      /* ---------- report checklist ---------- */
+      var repChks = document.querySelectorAll('.rep-chk');
+      repChks.forEach(function (c) { c.addEventListener('change', function () { var n = 0; repChks.forEach(function (x) { if (x.checked) n++; }); document.getElementById('repProg').style.width = (n / repChks.length * 100) + '%'; }); });
+
+      /* ---------- criteria bars + calculator ---------- */
+      var CR = [['a)', 'Adaptar y configurar módulos', 15, 'Plugins instalados, configurados y documentados'], ['b)', 'Crear y gestionar usuarios', 15, 'Al menos 3 usuarios con roles distintos'], ['c)', 'Integrar módulos por funcionalidad', 15, 'Al menos un plugin por funcionalidad requerida'], ['d)', 'Copias de seguridad', 15, 'Copia completa realizada y restauración documentada'], ['e)', 'Importar y exportar contenidos', 10, 'Exportación e importación en al menos 2 formatos'], ['f)', 'Gestionar plantillas', 10, 'Tema instalado, activado y personalizado'], ['g)', 'Sindicación', 5, 'Feed RSS verificado y configurado'], ['h)', 'Actualizaciones', 10, 'WordPress, temas y plugins actualizados'], ['i)', 'Informes de acceso', 5, 'Datos de tráfico obtenidos y documentados']];
+      document.getElementById('critBars').innerHTML = CR.map(function (c) { return '<div class="crit-row"><div class="crit-name"><span class="crit-chip" style="margin-right:6px">' + c[0] + '</span>' + c[1] + '</div><div class="crit-weight">' + c[2] + '%</div><div class="crit-indicator">' + c[3] + '</div><div class="crit-bar-track"><div class="crit-bar-fill" style="width:' + (c[2] / 15 * 100) + '%"></div></div></div>'; }).join('');
+      var calcRows = document.getElementById('calcRows');
+      CR.forEach(function (c, i) {
+        var r = document.createElement('div'); r.className = 'calc-row';
+        r.innerHTML = '<span>' + c[0] + ' ' + c[1] + ' <span style="color:var(--text-faint)">(' + c[2] + '%)</span></span><input type="range" min="0" max="10" step="1" value="0" data-w="' + c[2] + '"><span class="sc">0</span>';
+        calcRows.appendChild(r);
+      });
+      calcRows.addEventListener('input', function (e) {
+        e.target.parentNode.querySelector('.sc').textContent = e.target.value;
+        var t = 0; calcRows.querySelectorAll('input').forEach(function (i) { t += (+i.dataset.w) * (+i.value) / 100; });
+        document.getElementById('calcTotal').textContent = t.toFixed(1);
+      });
+
+      applyLevel();
+    })();
+  </script>
+</body>
+
+</html>
