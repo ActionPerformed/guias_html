@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Git para FP · Línea de metro DAM/DAW/ASIR</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;600;800&family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5fb;--card:#fff;--ink:#14183a;--mut:#58607f;--ln:#d5daf0;--b:#2f6fed;--m:#e0359c;--g:#0f9d63;--o:#e07f00;--code:#14183a;--cf:#e8ecff}
+[data-theme=dark]{--bg:#0f1230;--card:#181c44;--ink:#e9ecff;--mut:#9aa3d6;--ln:#2a306a;--b:#6b9bff;--m:#ff6fc0;--g:#3dd598;--o:#ffb04a;--code:#0a0c24}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 'Red Hat Display',system-ui,sans-serif}
+code,pre,.mono{font-family:'Red Hat Mono',ui-monospace,monospace}
+a{color:var(--b)}
+#bar{position:fixed;top:0;left:0;height:4px;width:0;background:linear-gradient(90deg,var(--b),var(--m),var(--g),var(--o));z-index:50}
+header{padding:56px 24px 40px;max-width:1100px;margin:auto}
+h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.05;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+.lead{max-width:60ch;color:var(--mut);font-size:1.1rem}
+.top{position:fixed;top:12px;right:14px;z-index:40;display:flex;gap:8px}
+button{font:inherit;cursor:pointer}
+.btn{border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 14px;font-weight:600}
+.btn:hover,.btn:focus-visible{background:var(--ink);color:var(--bg)}
+:focus-visible{outline:3px solid var(--m);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:230px 1fr;gap:32px;max-width:1100px;margin:auto;padding:0 24px 80px}
+nav{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;padding-left:18px;border-left:5px solid var(--b)}
+nav a{display:block;position:relative;text-decoration:none;color:var(--mut);font-size:.88rem;padding:3px 0;font-weight:600}
+nav a:before{content:"";position:absolute;left:-27px;top:11px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:3px solid var(--b)}
+nav a.on{color:var(--ink)}nav a.on:before{background:var(--m);border-color:var(--m);transform:scale(1.3)}
+section{position:relative;margin:0 0 44px;padding-top:8px}
+h2{font-size:1.7rem;margin:0 0 14px;font-weight:800;display:flex;gap:12px;align-items:center}
+h2 span{flex:none;width:38px;height:38px;border-radius:50%;background:var(--b);color:#fff;display:grid;place-items:center;font-size:1rem}
+section:nth-of-type(4n+2) h2 span{background:var(--m)}section:nth-of-type(4n+3) h2 span{background:var(--g)}section:nth-of-type(4n) h2 span{background:var(--o)}
+h3{margin:22px 0 8px;font-size:1.15rem}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px 20px;margin:12px 0}
+.warn,.tip{border-left:6px solid var(--o);background:var(--card);border-radius:4px 14px 14px 4px;padding:12px 18px;margin:14px 0}
+.warn{border-color:var(--m)}.tip{border-color:var(--g)}
+.warn b:first-child{color:var(--m)}
+pre{position:relative;background:var(--code);color:var(--cf);border-radius:12px;padding:14px 16px;overflow:auto;font-size:.88rem;line-height:1.5;margin:10px 0}
+pre .c{color:#8b95d8}
+.cp{position:absolute;top:6px;right:6px;font-size:.72rem;background:#ffffff22;color:#fff;border:0;border-radius:6px;padding:2px 8px}
+code{background:var(--ln);padding:1px 6px;border-radius:5px;font-size:.88em}pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--ln);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--card);position:sticky;top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.tt{border-bottom:2px dotted var(--m);cursor:help;font-style:normal;position:relative}
+.tt:hover:after,.tt:focus:after{content:attr(data-tip);position:absolute;left:0;top:125%;z-index:30;width:max-content;max-width:260px;background:var(--ink);color:var(--bg);padding:8px 10px;border-radius:8px;font-size:.82rem;line-height:1.4;font-weight:400}
+.flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.zone{border:2px dashed var(--ln);border-radius:14px;padding:10px;min-height:96px;text-align:center;background:var(--card)}
+.zone.act{border-color:var(--b);border-style:solid}
+.zone small{color:var(--mut);display:block}
+.file{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:8px;background:var(--m);color:#fff;font-family:'Red Hat Mono',monospace;font-size:.85rem;animation:pop .35s}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.fs button,.chips button{margin:3px;border:2px solid var(--ln);background:var(--card);color:var(--ink);border-radius:10px;padding:5px 10px;font-family:'Red Hat Mono',monospace;font-size:.82rem;text-align:left}
+.fs button:hover,.chips button:hover{border-color:var(--b)}
+#fsv{margin-top:8px;min-height:64px}
+.ok{color:var(--g);font-weight:800}.ko{color:var(--m);font-weight:800}
+.lab{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+#term{background:var(--code);color:var(--cf);border-radius:12px;padding:12px;height:300px;overflow:auto;font:.85rem/1.5 'Red Hat Mono',monospace}
+#term .l{white-space:pre-wrap}#term .e{color:#ff8db8}#term .p{color:#7fe0b0}
+#cmd{width:100%;background:transparent;border:0;border-top:1px solid #ffffff33;color:#fff;font:inherit;padding:6px 0;outline:0;margin-top:6px}
+#graph{background:var(--card);border:1px solid var(--ln);border-radius:12px;overflow:auto;min-height:170px}
+#chal li{list-style:none;padding:3px 0}#chal{padding:0;margin:8px 0}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:18px;height:18px}
+.chk input:checked+span{text-decoration:line-through;color:var(--mut)}
+.prog{height:10px;border-radius:9px;background:var(--ln);overflow:hidden}.prog i{display:block;height:100%;width:0;background:var(--g);transition:width .3s}
+.ft{font-size:.8rem;color:var(--mut);text-align:center;padding:30px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}nav{display:none}.lab,.flow{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+</style></head><body>
+<div id="bar"></div>
+<div class="top"><button class="btn" id="th" aria-label="Cambiar tema claro/oscuro">◐ Tema</button></div>
+<header>
+<p class="mono" style="color:var(--m);font-weight:500;margin:0">FP · DAM / DAW / ASIR · v2</p>
+<h1>Git, línea a línea:<br>de tu primer commit a tu primer PR</h1>
+<p class="lead">Qué es Git, dónde guardar tus repositorios y los comandos del día a día. Practica en el simulador integrado (terminal + grafo de commits) y marca el checklist antes de tu primer <code>push</code>.</p>
+</header>
+<div class="wrap">
+<nav id="nav"></nav>
+<main>
+
+<section id="s1"><h2><span>1</span>¿Qué es Git?</h2>
+<p><b>Git</b> es un sistema de control de versiones distribuido creado por Linus Torvalds en 2005. Guarda el historial de cambios de tu proyecto para que puedas: volver atrás si algo se rompe, trabajar en paralelo con compañeros, experimentar en ramas y saber quién cambió qué, cuándo y por qué.</p>
+<h3>Vocabulario mínimo</h3>
+<div class="grid">
+<div class="card"><b>Repositorio</b><br>Carpeta gestionada por Git; el historial vive en <code>.git</code>.</div>
+<div class="card"><b>Commit</b><br>«Foto» del proyecto en un momento, con un hash.</div>
+<div class="card"><b>Rama (branch)</b><br>Línea de trabajo independiente. La principal: <code>main</code>.</div>
+<div class="card"><b>HEAD</b><br>Puntero a dónde estás ahora.</div>
+<div class="card"><b>Remoto</b><br>Copia en un servidor (GitHub, GitLab…).</div>
+<div class="card"><b>Merge</b><br>Fusionar una rama en otra. Si Git no puede, hay <b>conflicto</b>.</div>
+</div>
+<div class="warn"><b>⚠️ Aviso:</b> la carpeta <code>.git</code> contiene TODO el historial. <b>No la borres ni la edites a mano. Jamás.</b></div>
+<h3>Los 3 estados de un archivo (pruébalo)</h3>
+<div class="flow" id="flow">
+<div class="zone act" id="z0"><b>Working directory</b><small>editas</small><div id="f0"></div></div>
+<div class="zone" id="z1"><b>Staging area</b><small>git add</small><div id="f1"></div></div>
+<div class="zone" id="z2"><b>Repositorio .git</b><small>git commit</small><div id="f2"></div></div>
+</div>
+<button class="btn" id="fb">✏️ Modificar archivo</button>
+<p class="mono" id="fm" style="color:var(--mut);font-size:.85rem"></p>
+<h3>¿Por qué importa?</h3>
+<table><tr><th>Ciclo</th><th>Ejemplo típico versionado</th></tr>
+<tr><td><b>DAM</b></td><td>Java/Kotlin + Spring Boot, app Android</td></tr>
+<tr><td><b>DAW</b></td><td>Node + React, API PHP/Laravel</td></tr>
+<tr><td><b>ASIR</b></td><td>Scripts Bash, Dockerfiles, Ansible, configs Nginx</td></tr></table>
+<p>Es una competencia transversal en casi todas las ofertas de empleo IT, y GitHub es tu carta de presentación.</p>
+</section>
+
+<section id="s2"><h2><span>2</span>Instalación y configuración</h2>
+<table><tr><th>SO</th><th>Cómo</th></tr>
+<tr><td>Windows</td><td>Instalador de git-scm.com (incluye Git Bash)</td></tr>
+<tr><td>Linux</td><td><code>sudo apt install git</code></td></tr>
+<tr><td>macOS</td><td><code>brew install git</code> o Xcode Command Line Tools</td></tr></table>
+<pre><code>git --version
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+git config --global init.defaultBranch main
+git config --global core.editor "code --wait"   # opcional
+git config --list</code></pre>
+<div class="tip"><b>💡 Recomendación FP:</b> aprende primero la <b>terminal</b>. VS Code (Ctrl+Shift+G), IntelliJ, Android Studio, GitHub Desktop o GitKraken están muy bien, pero si no entiendes lo que hacen por debajo, no sabrás resolver conflictos.</div>
+</section>
+
+<section id="s3"><h2><span>3</span>¿Dónde guardo mi repo local? ⭐</h2>
+<div class="card"><b>Regla de oro:</b> un repositorio = una carpeta de proyecto. Todo lo de dentro se versiona; lo de fuera no. Nunca metas un repo dentro de otro.</div>
+<div class="warn"><b>⚠️ Aviso:</b> <b>no guardes repos en OneDrive, Google Drive ni Dropbox.</b> Sincronizan en tiempo real y pueden corromper <code>.git</code>.</div>
+<h3>Simulador: elige una ubicación</h3>
+<div class="fs" id="fs"></div>
+<div class="card" id="fsv">👆 Pulsa una carpeta para ver el veredicto.</div>
+<h3>Estructura típica</h3>
+<pre><code>mi-proyecto/        <span class="c">← raíz del repositorio</span>
+├── .git/           <span class="c">← oculta, historial (NO TOCAR)</span>
+├── .gitignore      <span class="c">← qué ignorar</span>
+├── README.md       <span class="c">← descripción</span>
+└── src/            <span class="c">← tu código</span></code></pre>
+<p><b>¿Varios equipos?</b> El repo es portable (copia la carpeta con <code>.git</code>) o, mejor, usa <code>git clone</code> en cada equipo. No subas <code>.git</code> a un ZIP compartido si hay datos sensibles.</p>
+<pre><code>mkdir -p ~/dev/practica-git      <span class="c"># Windows: mkdir C:\dev\practica-git</span>
+cd ~/dev/practica-git
+git init</code></pre>
+</section>
+
+<section id="s4"><h2><span>4</span>Flujo de trabajo básico</h2>
+<pre><code>1. git status          <span class="c"># ¿qué ha cambiado?</span>
+2. git add &lt;archivo&gt;   <span class="c"># preparo cambios</span>
+3. git commit -m "..." <span class="c"># confirmo</span>
+4. git push            <span class="c"># subo al remoto</span></code></pre>
+<pre><code>git init                          <span class="c"># desde cero</span>
+git clone https://github.com/usuario/repo.git   <span class="c"># crea la carpeta solo</span>
+git add archivo.txt | carpeta/ | .
+git commit -m "Añade función de login"
+git log --oneline --graph</code></pre>
+<div class="tip"><b>Buenos mensajes:</b> imperativo («Añade login»), primera línea ≤ 50 caracteres, explica el qué y el por qué. Ej.: <code>fix: corregir validación de email</code></div>
+<h3>Deshacer</h3>
+<pre><code>git restore archivo.txt            <span class="c"># descarta cambios del working dir</span>
+git restore --staged archivo.txt   <span class="c"># saca del staging, sin perder cambios</span>
+git reset --soft HEAD~1            <span class="c"># deshace el último commit, mantiene cambios</span>
+git reset --hard HEAD~1            <span class="c"># ⚠️ BORRA el commit y sus cambios</span></code></pre>
+</section>
+
+<section id="lab"><h2><span>🧪</span>Laboratorio: terminal + grafo</h2>
+<p>Terminal simulada (sin riesgo). Escribe comandos o usa los botones. Soporta <code>git init, status, add, commit -m, branch, switch [-c], checkout, merge, log --oneline, remote add, push, pull, clone</code>, además de <code>touch &lt;archivo&gt;</code> para crear/modificar archivos.</p>
+<div class="chips" id="chips"></div>
+<div class="lab"><div><div id="term" aria-live="polite"></div><input id="cmd" placeholder="$ escribe un comando y pulsa Enter" autocomplete="off" spellcheck="false" aria-label="Terminal"></div>
+<div><div id="graph"></div><ul id="chal"></ul><button class="btn" id="rs">↺ Reiniciar</button></div></div>
+</section>
+
+<section id="s5"><h2><span>5</span>Ramas (branches)</h2>
+<pre><code>git branch                  <span class="c"># listar</span>
+git switch -c nueva-rama    <span class="c"># crear Y cambiarse</span>
+git switch main             <span class="c"># volver (checkout es el equivalente antiguo)</span>
+git merge nueva-rama        <span class="c"># fusionar en la actual</span>
+git branch -d nueva-rama    <span class="c"># borrar si ya está fusionada</span></code></pre>
+<p>Si hay <b>conflicto</b>, edita los archivos, busca <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>, decide qué queda y luego <code>git add archivo</code> + <code>git commit</code>.</p>
+<h3>Guardar a medias: stash</h3>
+<pre><code>git stash          <span class="c"># guarda cambios temporalmente</span>
+git stash list     <span class="c"># ver guardados</span>
+git stash pop      <span class="c"># recupera el último y lo borra</span>
+git stash apply    <span class="c"># recupera sin borrarlo</span>
+git stash drop     <span class="c"># borra el último</span></code></pre>
+</section>
+
+<section id="s6"><h2><span>6</span>Repositorios remotos</h2>
+<pre><code>git remote add origin https://github.com/usuario/repo.git
+git remote -v
+git push -u origin main   <span class="c"># primera vez</span>
+git push                  <span class="c"># después</span>
+git pull                  <span class="c"># fetch + merge</span>
+git fetch                 <span class="c"># solo trae</span></code></pre>
+</section>
+
+<section id="s7"><h2><span>7</span>Autenticación: HTTPS vs SSH ⭐</h2>
+<div class="grid">
+<div class="card"><b>HTTPS</b> (fácil al inicio)<p>Pide usuario y <b>token personal (PAT)</b>, no la contraseña: <i>Settings → Developer settings → Tokens</i>. Usa Git Credential Manager; <code>credential.helper store</code> lo guarda en texto plano ⚠️.</p><span class="ok">✔ rápido</span> · <span class="ko">✘ tokens que caducan</span></div>
+<div class="card"><b>SSH</b> (recomendado a medio plazo)<p>No pide credenciales nunca más y es más seguro.</p><span class="ok">✔ seguro</span> · <span class="ko">✘ setup inicial más lento</span></div></div>
+<pre><code>ssh-keygen -t ed25519 -C "tu@email.com"
+cat ~/.ssh/id_ed25519.pub      <span class="c"># pégala en GitHub → Settings → SSH and GPG keys</span>
+ssh -T git@github.com          <span class="c"># probar</span>
+git clone git@github.com:usuario/repo.git
+git remote set-url origin git@github.com:usuario/repo.git   <span class="c"># pasar un repo de HTTPS a SSH</span></code></pre>
+</section>
+
+<section id="s8"><h2><span>8</span>Colaborar: forks y Pull Requests ⭐</h2>
+<h3>Con permisos de escritura</h3>
+<pre><code>1. git clone &lt;url&gt;
+2. git switch -c feature/mi-tarea
+3. ... editar, add, commit ...
+4. git push -u origin feature/mi-tarea
+5. Abrir Pull Request hacia main → compañero revisa → Merge
+6. git switch main &amp;&amp; git pull</code></pre>
+<h3>Con fork (sin permisos)</h3>
+<p>① <b>Fork</b> en GitHub → ② clona <i>tu fork</i> → ③ rama, commits y push a tu fork → ④ <b>Compare &amp; pull request</b> al original → ⑤ el mantenedor acepta o pide cambios.</p>
+<pre><code>git remote add upstream https://github.com/original/repo.git
+git fetch upstream &amp;&amp; git switch main
+git merge upstream/main &amp;&amp; git push origin main</code></pre>
+</section>
+
+<section id="s9"><h2><span>9</span>Chuleta de consulta rápida</h2>
+<input id="q" class="btn" style="width:100%;border-radius:10px;margin-bottom:8px;font-weight:400" placeholder="🔎 Filtra comandos (p. ej. log, stash, tag)…" aria-label="Filtrar chuleta">
+<table id="ch"><tr><th>Comando</th><th>Para qué sirve</th></tr></table>
+</section>
+
+<section id="s10"><h2><span>10</span>Errores comunes y salidas</h2>
+<table id="er"><tr><th>Situación</th><th>Solución</th></tr></table>
+<h3>.gitignore de ejemplo</h3>
+<pre><code>node_modules/  vendor/        <span class="c"># dependencias</span>
+dist/  build/  target/  *.class
+*.log  *.tmp  .DS_Store
+.env  .env.local  *.key       <span class="c"># secretos y config local</span>
+.vscode/  .idea/  *.iml
+__pycache__/  *.pyc  venv/    <span class="c"># Python (ASIR)</span></code></pre>
+<div class="warn"><b>⚠️ Binarios y archivos grandes:</b> Git no es para imágenes pesadas, vídeos, BBDD ni <code>.zip</code>. Si hace falta, usa <b>Git LFS</b>.</div>
+</section>
+
+<section id="s11"><h2><span>11</span>Alias y atajos ⭐</h2>
+<pre><code>git config --global alias.st "status"
+git config --global alias.co "checkout"
+git config --global alias.br "branch"
+git config --global alias.ci "commit"
+git config --global alias.lg "log --oneline --graph --all --decorate"
+git config --global alias.undo "reset --soft HEAD~1"</code></pre>
+<p>Uso: <code>git st</code> · <code>git lg</code> (historial bonito) · <code>git undo</code> (deshace el último commit manteniendo cambios).</p>
+</section>
+
+<section id="s12"><h2><span>12</span>Buenas prácticas</h2>
+<ol>
+<li><b>Commits pequeños y frecuentes:</b> un commit = un cambio lógico.</li>
+<li><b>Mensajes claros</b>, piensa en tu «yo» del futuro.</li>
+<li><b>Nunca subas secretos</b> (contraseñas, tokens, <code>.env</code>).</li>
+<li><b>Ramas</b> para nuevas funcionalidades: <code>feature/login</code>.</li>
+<li><b><code>pull</code> antes de <code>push</code></b> para evitar conflictos.</li>
+<li><b><code>.gitignore</code> desde el principio</b> (¡sobre todo con <code>node_modules</code>!).</li>
+<li><b>Aprende a leer los conflictos</b>; no borres archivos a lo loco.</li>
+<li><b>Publica tus prácticas en GitHub:</b> es tu portfolio.</li>
+<li><b>No toques <code>.git</code> a mano.</b></li>
+<li><b>Carpeta dedicada</b> (<code>~/dev</code>, <code>C:\dev</code>): nunca Escritorio, Descargas ni OneDrive.</li>
+<li><b>Un repo = un proyecto.</b></li>
+<li><b><code>git reflog</code> antes de entrar en pánico:</b> casi todo se recupera.</li></ol>
+</section>
+
+<section id="s13"><h2><span>13</span>Checklist antes del primer push ⭐</h2>
+<div class="prog"><i id="p13"></i></div><p class="mono" id="t13" style="font-size:.85rem"></p>
+<div id="c13" data-p="p13" data-t="t13"></div>
+</section>
+
+<section id="s14"><h2><span>14</span>Nombres de ramas</h2>
+<table><tr><th>Prefijo</th><th>Uso</th></tr>
+<tr><td><code>main</code> / <code>master</code></td><td>Rama estable</td></tr>
+<tr><td><code>develop</code></td><td>Integración (GitFlow)</td></tr>
+<tr><td><code>feature/xxx</code></td><td>Nueva funcionalidad</td></tr>
+<tr><td><code>fix/xxx</code></td><td>Corrección de bug</td></tr>
+<tr><td><code>hotfix/xxx</code></td><td>Arreglo urgente en producción</td></tr>
+<tr><td><code>docs/xxx</code></td><td>Solo documentación</td></tr></table>
+</section>
+
+<section id="s15"><h2><span>15</span>Flujo completo de un vistazo</h2>
+<pre><code>0. cd ~/dev (o C:\dev)        <span class="c"># carpeta raíz de proyectos</span>
+1. git clone &lt;url&gt;  (o git init)
+2. editar archivos
+3. git status
+4. git add .
+5. git commit -m "mensaje"
+6. git switch -c feature/loquesea
+7. ... trabajar, add, commit ...
+8. git switch main
+9. git pull
+10. git merge feature/loquesea
+11. git push</code></pre>
+</section>
+
+<section id="s16"><h2><span>16</span>Recursos</h2>
+<ul>
+<li><a href="https://git-scm.com/book/es/v2" target="_blank" rel="noopener">📘 Pro Git (libro gratuito, en español)</a></li>
+<li><a href="https://learngitbranching.js.org/?locale=es_ES" target="_blank" rel="noopener">🎮 Learn Git Branching (interactivo)</a></li>
+<li><a href="https://skills.github.com/" target="_blank" rel="noopener">🐙 GitHub Skills</a></li>
+<li><a href="https://git-scm.com/docs" target="_blank" rel="noopener">📄 Documentación oficial</a></li>
+<li><a href="https://docs.github.com/es/authentication/connecting-to-github-with-ssh" target="_blank" rel="noopener">🔐 Guía oficial de SSH con GitHub</a></li>
+<li>🎥 Canales: Midu Dev, MoureDev, Fazt Code.</li></ul>
+</section>
+
+<section id="s17"><h2><span>17</span>Ejercicio propuesto</h2>
+<p>Marca cada paso al completarlo. Los pasos 3-11 puedes ensayarlos antes en el laboratorio.</p>
+<div class="prog"><i id="p17"></i></div><p class="mono" id="t17" style="font-size:.85rem"></p>
+<div id="c17" data-p="p17" data-t="t17"></div>
+</section>
+</main></div>
+<div class="ft">Guía básica de Git para FP · v2 · archivo autónomo (sin dependencias salvo la tipografía de Google Fonts)</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+// tema
+const root=document.documentElement;
+root.dataset.theme=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+$('#th').onclick=()=>{root.dataset.theme=root.dataset.theme=='dark'?'light':'dark';drawG()};
+// nav + progreso scroll
+const titles=$$('section').map(s=>[s.id,s.querySelector('h2').textContent.replace(/^\S+/,'').trim()||'']);
+$('#nav').innerHTML=$$('section').map(s=>`<a href="#${s.id}">${s.querySelector('h2').lastChild.textContent}</a>`).join('');
+const links=$$('#nav a');
+addEventListener('scroll',()=>{
+ $('#bar').style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+ let cur=0;$$('section').forEach((s,i)=>{if(s.getBoundingClientRect().top<140)cur=i});
+ links.forEach((a,i)=>a.classList.toggle('on',i==cur))},{passive:true});
+// copiar
+$$('pre').forEach(p=>{const b=document.createElement('button');b.className='cp';b.textContent='Copiar';
+ b.onclick=()=>{navigator.clipboard.writeText(p.innerText.replace(/Copiar$/,'').trim()).then(()=>{b.textContent='¡Copiado!';setTimeout(()=>b.textContent='Copiar',1400)})};p.append(b)});
+// tooltips
+const TIPS={commit:'Foto del estado del proyecto en un momento concreto, identificada por un hash.',HEAD:'Puntero que indica en qué commit/rama estás ahora.',staging:'Zona intermedia (index) donde preparas los cambios antes de confirmarlos.','.git':'Carpeta oculta con TODO el historial. No tocar.',reflog:'Registro de todo lo que ha movido HEAD, incluso commits «perdidos».',rama:'Línea de trabajo independiente.',merge:'Fusionar los cambios de una rama en otra.',stash:'Cajón temporal para cambios sin commitear.',remoto:'Copia del repositorio en un servidor.',hash:'Identificador único de un commit (p. ej. a1b2c3d).',fork:'Copia de un repo ajeno en tu cuenta de GitHub.',upstream:'Nombre habitual del repo original al que hiciste fork.',PAT:'Personal Access Token: sustituye a la contraseña en HTTPS.'};
+$$('section').forEach(sec=>{const seen=new Set();
+ const w=document.createTreeWalker(sec,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('pre,code,h2,h3,button,th,script,.tt,input')?2:1});
+ const ns=[];while(w.nextNode())ns.push(w.currentNode);
+ ns.forEach(n=>{for(const t in TIPS){if(seen.has(t))continue;
+  const m=n.data.match(new RegExp('(^|[^\\w.])('+t.replace('.','\\.')+')(?!\\w)','i'));
+  if(m){seen.add(t);const i=m.index+m[1].length,r=n.splitText(i),a=r.splitText(t.length);
+   const e=document.createElement('i');e.className='tt';e.tabIndex=0;e.dataset.tip=TIPS[t];e.textContent=r.data;r.replaceWith(e);break}}})});
+// 3 estados
+let st=-1;const fb=$('#fb'),FM=['Archivo modificado en tu carpeta de trabajo.','Preparado con git add: entrará en el próximo commit.','Confirmado con git commit: ya está en el historial.'];
+fb.onclick=()=>{st=(st+1)%4;
+ if(st==3){st=-1;[0,1,2].forEach(i=>{$('#f'+i).innerHTML='';$('#z'+i).classList.toggle('act',i==0)});$('#fm').textContent='';fb.textContent='✏️ Modificar archivo';return}
+ [0,1,2].forEach(i=>{$('#f'+i).innerHTML=i==st?'<span class="file">app.js</span>':'';$('#z'+i).classList.toggle('act',i==st)});
+ $('#fm').textContent=FM[st];fb.textContent=['➕ git add app.js','✔ git commit','↺ Reiniciar'][st]};
+// simulador de carpetas
+const FS=[['~/dev/practica-git',1,'Ruta corta, sin espacios y con carpeta raíz dedicada.'],['C:\\dev\\mi-proyecto',1,'Convención profesional en Windows.'],['~/Proyectos/dam-springboot-tienda',1,'Carpeta raíz de proyectos + una subcarpeta por proyecto.'],['Escritorio (Desktop)',0,'Se llena, se desordena y algunos servicios de sincronización lo mueven solos.'],['Descargas',0,'Se borra con frecuencia.'],['OneDrive / Google Drive / Dropbox',0,'⚠️ PELIGRO REAL: sincronizan en tiempo real y pueden corromper .git.'],['Dentro de otro proyecto (mi-app/otro-repo)',0,'Creas repos anidados sin querer.'],['Unidad de red lenta',0,'Git hace muchas operaciones pequeñas de I/O: va lentísimo.'],['C:\\Users\\José Luis\\Mis Prácticas',0,'Espacios y acentos dan problemas con scripts y SSH.'],['C:\\Program Files\\ o /usr',0,'Requiere administrador y rompe el sistema.']];
+$('#fs').innerHTML=FS.map((f,i)=>`<button data-i="${i}">📁 ${f[0]}</button>`).join('');
+$('#fs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const f=FS[b.dataset.i];
+ $('#fsv').innerHTML=(f[1]?'<span class="ok">✅ Buena elección.</span> ':'<span class="ko">❌ Evítala.</span> ')+f[2]};
+// chuleta y errores
+const CH=[['git status','Ver estado actual'],['git log --oneline','Historial compacto'],['git log --oneline --graph --all','TODO el grafo de ramas'],['git diff','Cambios no preparados'],['git diff --staged','Cambios preparados'],['git show <hash>','Detalle de un commit'],['git branch -a','Ramas locales y remotas'],['git remote -v','Ver remotos'],['git blame archivo','Quién escribió cada línea'],['git reflog','⭐ Todo lo que has hecho (incluso commits «perdidos»)'],['git tag v1.0.0','Etiquetar un commit'],['git tag -a v1.0.0 -m "Release 1.0"','Etiqueta anotada'],['git push --tags','Subir etiquetas'],['git stash list','Ver cambios guardados'],['git config --list','Ver configuración'],['git count-objects -vH','Tamaño del repo']];
+const rows=(a,c)=>a.map(r=>`<tr><td>${c?'<code>'+r[0].replace(/</g,'&lt;')+'</code>':r[0]}</td><td>${r[1]}</td></tr>`).join('');
+$('#ch').insertAdjacentHTML('beforeend',rows(CH,1));
+$('#q').oninput=e=>$$('#ch tr:not(:first-child)').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(e.target.value.toLowerCase()));
+const ER=[['Me equivoqué en el mensaje del commit','<code>git commit --amend -m "nuevo mensaje"</code>'],['Deshacer un commit ya subido','<code>git revert &lt;hash&gt;</code> (commit inverso, seguro)'],['Añadí un archivo que no quería','<code>git restore --staged archivo</code>'],['Borré un archivo por error','<code>git restore archivo</code>'],['Estoy en la rama equivocada con cambios','<code>git stash</code> → <code>git switch rama-correcta</code> → <code>git stash pop</code>'],['Conflicto en merge','Editar, <code>git add</code>, <code>git commit</code>'],['Quiero ignorar archivos','Crear <code>.gitignore</code> con los patrones'],['Perdí un commit con reset --hard','<code>git reflog</code> → localizar hash → <code>git reset --hard &lt;hash&gt;</code>'],['Subí un archivo con contraseñas','<b>Cambia la contraseña YA</b>, luego <code>git filter-repo</code> o BFG para borrarlo del historial'],['El repo dentro de OneDrive se corrompe','Mover el repo fuera de OneDrive']];
+$('#er').insertAdjacentHTML('beforeend',rows(ER,0));
+// checklists
+const L13=['Estoy en la carpeta correcta del proyecto (<code>~/dev/mi-proyecto</code>).','Tengo un <code>README.md</code> con descripción, instalación y uso.','Tengo un <code>.gitignore</code> adaptado al lenguaje.','<b>No hay archivos con contraseñas, tokens ni claves</b> (<code>.env</code>, <code>credentials.json</code>…).','No hay carpetas pesadas (<code>node_modules</code>, <code>target</code>, <code>dist</code>…).','He hecho al menos un commit con mensaje descriptivo.','El repo remoto está creado en GitHub <b>y vacío</b> (sin README).','He añadido el remoto: <code>git remote add origin &lt;url&gt;</code>.','He hecho <code>git push -u origin main</code>.','Compruebo en el navegador que todo está subido.'];
+const L17=['Crea la carpeta raíz de proyectos (<code>C:\\dev\\</code> o <code>~/dev/</code>).','Dentro, crea <code>practica-git</code>.','Inicializa un repo con <code>git init</code>.','Crea un <code>README.md</code> con tu nombre.','Haz tu primer commit.','Crea la rama <code>feature/saludo</code> y añade <code>saludo.txt</code>.','Commit y merge a <code>main</code>.','Crea un <code>.gitignore</code> para tu lenguaje.','Sube el proyecto a GitHub (SSH si puedes).','Provoca un conflicto a propósito (misma línea en dos ramas) y resuélvelo.','Haz <code>git reflog</code> y localiza un commit «perdido».'];
+[['#c13',L13],['#c17',L17]].forEach(([id,l])=>{const c=$(id);
+ c.innerHTML=l.map(t=>`<label class="chk"><input type="checkbox"><span>${t}</span></label>`).join('');
+ const up=()=>{const a=$$(id+' input'),n=a.filter(x=>x.checked).length;$('#'+c.dataset.p).style.width=n/a.length*100+'%';
+  $('#'+c.dataset.t).textContent=n+' / '+a.length+(n==a.length?' ¡Listo! 🚀':'')};
+ c.onchange=up;up()});
+// ===== Simulador Git =====
+const LC=['var(--b)','var(--m)','var(--g)','var(--o)'];let S;
+const init=()=>({init:0,files:{},cm:[],br:{},head:'main',lanes:['main'],remote:0,pushed:{}});
+const hx=()=>Math.random().toString(16).slice(2,9);
+const gc=id=>S.cm.find(c=>c.id==id);
+function anc(a,b){const st=[b],seen=new Set;while(st.length){const x=st.pop();if(x==a)return 1;if(seen.has(x))continue;seen.add(x);const c=gc(x);c&&st.push(...c.p)}return 0}
+const tip=()=>S.br[S.head]||null;
+const T=$('#term');
+function out(t,k=''){const d=document.createElement('div');d.className='l '+k;d.textContent=t;T.append(d);T.scrollTop=1e9}
+function mk(msg,p){const c={id:hx(),msg,p,lane:S.head};S.cm.push(c);if(!S.lanes.includes(S.head))S.lanes.push(S.head);S.br[S.head]=c.id;return c}
+function run(line){
+ out('$ '+line,'p');const t=line.match(/"[^"]*"|\S+/g)||[];if(!t.length)return;
+ const E=m=>out(m,'e');
+ if(t[0]=='clear'){T.innerHTML='';return}
+ if(t[0]=='help'){out('git init|status|add|commit -m|branch|switch [-c]|checkout|merge|log --oneline|remote add|push|pull|clone · touch <archivo> · clear');return}
+ if(t[0]=='touch'){if(!t[1])return E('touch: falta el nombre del archivo');S.files[t[1]]=S.files[t[1]]?'modified':'untracked';out('(archivo '+t[1]+(S.files[t[1]]=='modified'?' modificado)':' creado)'));return}
+ if(t[0]!='git')return E(t[0]+': comando no reconocido (escribe help)');
+ const c=t[1],a=t.slice(2);
+ if(c=='init'){S.init=1;return out('Initialized empty Git repository in .git/')}
+ if(c=='clone'){S=init();S.init=1;S.remote=1;S.files={'README.md':'committed'};const k={id:hx(),msg:'Initial commit',p:[],lane:'main'};S.cm=[k];S.br.main=k.id;S.pushed.main=k.id;return out("Cloning into 'repositorio'... done.")}
+ if(!S.init)return E('fatal: not a git repository (or any of the parent directories): .git');
+ const F=Object.keys(S.files);
+ if(c=='status'){out('On branch '+S.head);const g=s=>F.filter(f=>S.files[f]==s);
+  [['staged','Changes to be committed'],['modified','Changes not staged for commit'],['untracked','Untracked files']].forEach(([s,h])=>g(s).length&&out(h+':\n  '+g(s).join('\n  ')));
+  if(!F.some(f=>S.files[f]!='committed'))out('nothing to commit, working tree clean')}
+ else if(c=='add'){if(!a[0])return E('Nothing specified, nothing added.');
+  const x=a[0]=='.'?F:[a[0]];if(a[0]!='.'&&!S.files[a[0]])return E("fatal: pathspec '"+a[0]+"' did not match any files");
+  x.forEach(f=>{if(S.files[f]!='committed')S.files[f]='staged'})}
+ else if(c=='commit'){const i=a.indexOf('-m');if(i<0||!a[i+1])return E('Falta el mensaje: git commit -m "mensaje"');
+  const s=F.filter(f=>S.files[f]=='staged');if(!s.length)return E('nothing to commit (usa git add antes)');
+  const k=mk(a[i+1].replace(/"/g,''),tip()?[tip()]:[]);s.forEach(f=>S.files[f]='committed');out('['+S.head+' '+k.id+'] '+k.msg+'\n '+s.length+' file(s) changed')}
+ else if(c=='branch'){if(!a[0])return out(Object.keys(S.br).map(b=>(b==S.head?'* ':'  ')+b).join('\n')||'(sin ramas: haz un commit)');
+  if(!tip())return E('fatal: haz primero un commit');if(S.br[a[0]])return E("fatal: la rama '"+a[0]+"' ya existe");S.br[a[0]]=tip()}
+ else if(c=='switch'||c=='checkout'){const n=a.filter(x=>x[0]!='-').pop(),nw=a.includes('-c')||a.includes('-b');
+  if(!n)return E('Indica la rama');if(nw){if(!tip())return E('fatal: haz primero un commit');if(S.br[n])return E("fatal: la rama '"+n+"' ya existe");S.br[n]=tip()}
+  else if(!S.br[n])return E("fatal: invalid reference: "+n);S.head=n;out("Switched to"+(nw?' a new':'')+" branch '"+n+"'")}
+ else if(c=='merge'){const o=S.br[a[0]],h=tip();if(!o)return E("merge: "+a[0]+" - no es una rama");
+  if(o==h||anc(o,h))return out('Already up to date.');
+  if(anc(h,o)){S.br[S.head]=o;return out('Fast-forward')}
+  const k=mk("Merge branch '"+a[0]+"'",[h,o]);out("Merge made by the 'ort' strategy ("+k.id+")")}
+ else if(c=='log'){if(!tip())return E("fatal: your current branch has no commits yet");
+  S.cm.filter(k=>anc(k.id,tip())).reverse().forEach(k=>out(k.id+' '+k.msg))}
+ else if(c=='remote'){if(a[0]=='add'){S.remote=1;out('(remoto origin añadido)')}else out(S.remote?'origin':'')}
+ else if(c=='push'){if(!S.remote)return E("fatal: 'origin' does not appear to be a git repository (usa git remote add origin <url>)");
+  if(!tip())return E('error: no hay commits que subir');S.pushed[S.head]=tip();out('To origin\n * '+S.head+' -> '+S.head)}
+ else if(c=='pull'||c=='fetch')S.remote?out('Already up to date.'):E('fatal: no hay remoto configurado');
+ else E("git: '"+c+"' no está soportado en el simulador");
+}
+const CH_=[['Reto','…']];
+const RETOS=[['Inicializar el repo (git init)',()=>S.init],['Primer commit en main',()=>S.cm.length>0],['Crear una rama nueva',()=>Object.keys(S.br).some(b=>b!='main')],['Hacer un commit en esa rama',()=>S.cm.some(k=>k.lane!='main')],['Fusionarla en main (merge)',()=>S.br.main&&S.cm.some(k=>k.lane!='main'&&anc(k.id,S.br.main))],['Añadir remoto y git push -u origin main',()=>!!S.pushed.main]];
+const CHIPS=['git init','touch README.md','git add .','git commit -m "Primer commit"','git switch -c feature/saludo','touch saludo.txt','git commit -m "Añade saludo"','git switch main','git merge feature/saludo','git remote add origin url','git push -u origin main','git status','git log --oneline'];
+$('#chips').innerHTML=CHIPS.map(c=>`<button>${c}</button>`).join('');
+$('#chips').onclick=e=>{if(e.target.tagName=='BUTTON'){run(e.target.textContent);after()}};
+$('#cmd').onkeydown=e=>{if(e.key=='Enter'){run(e.target.value);e.target.value='';after()}};
+$('#rs').onclick=()=>{S=init();T.innerHTML='';out('Terminal lista. Escribe help para ver los comandos.');after()};
+function after(){drawG();$('#chal').innerHTML=RETOS.map(r=>`<li>${r[1]()?'<span class="ok">✔</span>':'○'} ${r[0]}</li>`).join('')}
+function drawG(){if(!S)return;const g=$('#graph');if(!S.cm.length){g.innerHTML='<p style="padding:20px;color:var(--mut)">El grafo aparecerá cuando hagas tu primer commit.</p>';return}
+ const X=i=>40+i*62,Y=l=>34+S.lanes.indexOf(l)*50,W=X(S.cm.length)+80,H=40+S.lanes.length*50+20;let s='';
+ S.cm.forEach((k,i)=>k.p.forEach(p=>{const j=S.cm.findIndex(x=>x.id==p),q=S.cm[j];s+=`<path d="M${X(j)} ${Y(q.lane)}C${X(j)+30} ${Y(q.lane)} ${X(i)-30} ${Y(k.lane)} ${X(i)} ${Y(k.lane)}" stroke="${LC[S.lanes.indexOf(k.lane)%4]}" stroke-width="4" fill="none"/>`}));
+ S.cm.forEach((k,i)=>{const col=LC[S.lanes.indexOf(k.lane)%4];s+=`<circle cx="${X(i)}" cy="${Y(k.lane)}" r="9" fill="var(--card)" stroke="${col}" stroke-width="4"/><text x="${X(i)}" y="${Y(k.lane)+26}" font-size="9" text-anchor="middle" fill="var(--mut)" font-family="Red Hat Mono">${k.id.slice(0,5)}</text>`});
+ Object.entries(S.br).forEach(([b,id])=>{const i=S.cm.findIndex(x=>x.id==id),y=Y(S.cm[i].lane)-(b==S.head?36:20)+((Object.keys(S.br).indexOf(b))%2)*0;const hd=b==S.head;
+  s+=`<text x="${X(i)}" y="${Y(S.cm[i].lane)-16}" font-size="11" font-weight="700" text-anchor="middle" fill="${hd?'var(--m)':'var(--ink)'}" font-family="Red Hat Mono" transform="translate(0 ${-Object.keys(S.br).filter(o=>S.br[o]==id).indexOf(b)*13})">${hd?'HEAD→':''}${b}${S.pushed[b]==id?' ☁':''}</text>`});
+ g.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Grafo de commits">${s}</svg>`}
+S=init();out('Terminal lista. Escribe help para ver los comandos.');after();
+dispatchEvent(new Event('scroll'));
+</script></body></html>

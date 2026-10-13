@@ -43,6 +43,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [guia-ia-fp.html](https://actionperformed.github.io/guias_html/guia-ia-fp.html) | La IA como Herramienta de Estudio (FP) — IA para Formación Profesional |
 | [guia-que-ia-usar.html](https://actionperformed.github.io/guias_html/guia-que-ia-usar.html) | Qué IA Usar para Cada Tarea — comparativa visual de herramientas de IA |
 | [guia_linux.html](https://actionperformed.github.io/guias_html/guia_linux.html) | Introducción a Linux — sistema de archivos, permisos, terminal para 1º DAW |
+| [guia_git.html](https://actionperformed.github.io/guias_html/guia_git.html) | Git para FP — línea de metro DAM/DAW/ASIR |
 | [guia_lean.html](https://actionperformed.github.io/guias_html/guia_lean.html) | Introducción a Lean — lenguaje donde las demostraciones matemáticas se escriben, se verifican y nunca mienten |
 | [guia_sql.html](https://actionperformed.github.io/guias_html/guia_sql.html) | SQL — consultas, joins, subconsultas y diseño de bases de datos relacionales |
 | [guia_valor_vs_referencia.html](https://actionperformed.github.io/guias_html/guia_valor_vs_referencia.html) | Valor vs Referencia — Java y PHP comparados con simuladores interactivos |
