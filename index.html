@@ -115,7 +115,7 @@
     }
 
     .hero h1 em {
-      font-style: italic;
+      font-style: normal;
       color: var(--cyan);
     }
 
@@ -163,38 +163,66 @@
       margin: 40px auto;
     }
 
-    .hero-image {
+    .hero-card {
       display: flex;
-      justify-content: center;
-      margin: 36px 0 40px;
-    }
-
-    .hero-image img {
-      max-width: 320px;
-      width: 100%;
-      border-radius: 6px;
+      align-items: stretch;
+      gap: 0;
+      max-width: 700px;
+      margin: 36px auto 40px;
       border: 1px solid var(--line);
-      box-shadow:
-        0 4px 24px rgba(0,0,0,.5),
-        0 0 0 1px rgba(79,209,197,.08),
-        0 0 40px rgba(79,209,197,.06);
-      transition: transform .3s, box-shadow .3s;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: box-shadow .2s;
     }
 
-    .hero-image img:hover {
-      transform: scale(1.02);
-      box-shadow:
-        0 8px 32px rgba(0,0,0,.6),
-        0 0 0 1px rgba(79,209,197,.2),
-        0 0 60px rgba(79,209,197,.12);
+    .hero-card:hover {
+      box-shadow: 0 8px 32px rgba(79,209,197,.12);
     }
 
-    .hero-image figcaption {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 12.5px;
-      color: var(--muted);
+    .hero-card-img {
+      flex: 0 0 50%;
+      overflow: hidden;
+    }
+
+    .hero-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .3s;
+    }
+
+    .hero-card:hover .hero-card-img img {
+      transform: scale(1.03);
+    }
+
+    .hero-card-text {
+      flex: 1;
+      padding: 28px 24px;
+      background: rgba(79,209,197,.05);
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .hero-card-text blockquote {
+      margin: 0;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 17px;
       font-style: italic;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .hero-card-text cite {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 12.5px;
+      font-style: normal;
+      color: var(--muted);
     }
 
     .hero-mission {
@@ -501,6 +529,14 @@
       .hero-stats { gap: 20px; }
       .buscador-wrap { margin-left: 0; margin-right: 0; }
       .guias-grid { grid-template-columns: 1fr; }
+      .hero-card {
+        flex-direction: column;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .hero-card-img { flex: none; height: 200px; }
+      .hero-card-img img { object-position: center top; }
+      .hero-card-text { padding: 20px 16px; }
     }
   </style>
 </head>
@@ -509,7 +545,7 @@
   <!-- ── Hero ── -->
   <header class="hero">
     <div class="hero-badge">DAM · DAW · ASIR</div>
-    <h1>Guías Didácticas <em>Interactivas</em></h1>
+    <h1>Guías Didácticas <span>Interactivas</span></h1>
     <p class="hero-tagline">Conocimiento que se explora, no solo se lee. Cápsulas HTML autocontenidas para aprender haciendo.</p>
 
     <div class="hero-stats">
@@ -529,10 +565,15 @@
 
     <div class="hero-divider"></div>
 
-    <figure class="hero-image">
-      <img src="assets/pizarra.png" alt="Profesor explicando en una pizarra" loading="eager">
-      <figcaption>Aprender haciendo, no solo leyendo</figcaption>
-    </figure>
+    <div class="hero-card">
+      <div class="hero-card-img">
+        <img src="assets/pizarra.png" alt="Profesor explicando en una pizarra" loading="eager">
+      </div>
+      <div class="hero-card-text">
+        <blockquote>"Aprender haciendo,<br>no solo leyendo."</blockquote>
+        <cite>El conocimiento es un derecho fundamental</cite>
+      </div>
+    </div>
 
     <p class="hero-mission">
       <strong>El conocimiento es un derecho fundamental, no un privilegio.</strong>
