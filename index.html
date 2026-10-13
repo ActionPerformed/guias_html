@@ -163,6 +163,40 @@
       margin: 40px auto;
     }
 
+    .hero-image {
+      display: flex;
+      justify-content: center;
+      margin: 36px 0 40px;
+    }
+
+    .hero-image img {
+      max-width: 320px;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      box-shadow:
+        0 4px 24px rgba(0,0,0,.5),
+        0 0 0 1px rgba(79,209,197,.08),
+        0 0 40px rgba(79,209,197,.06);
+      transition: transform .3s, box-shadow .3s;
+    }
+
+    .hero-image img:hover {
+      transform: scale(1.02);
+      box-shadow:
+        0 8px 32px rgba(0,0,0,.6),
+        0 0 0 1px rgba(79,209,197,.2),
+        0 0 60px rgba(79,209,197,.12);
+    }
+
+    .hero-image figcaption {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
     .hero-mission {
       font-size: 15px;
       color: var(--muted);
@@ -494,6 +528,11 @@
     </div>
 
     <div class="hero-divider"></div>
+
+    <figure class="hero-image">
+      <img src="assets/pizarra.png" alt="Profesor explicando en una pizarra" loading="eager">
+      <figcaption>Aprender haciendo, no solo leyendo</figcaption>
+    </figure>
 
     <p class="hero-mission">
       <strong>El conocimiento es un derecho fundamental, no un privilegio.</strong>
