@@ -182,7 +182,7 @@
     }
 
     .hero-card-img {
-      flex: 0 0 50%;
+      flex: 0 0 25%;
       overflow: hidden;
     }
 
@@ -223,6 +223,18 @@
       font-size: 12.5px;
       font-style: normal;
       color: var(--muted);
+    }
+
+    .hero-card-mission {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .hero-card-mission strong {
+      color: var(--ink);
+      font-weight: 600;
     }
 
     .hero-mission {
@@ -534,7 +546,7 @@
         margin-left: 0;
         margin-right: 0;
       }
-      .hero-card-img { flex: none; height: 200px; }
+      .hero-card-img { flex: none; height: 160px; }
       .hero-card-img img { object-position: center top; }
       .hero-card-text { padding: 20px 16px; }
     }
@@ -571,14 +583,12 @@
       </div>
       <div class="hero-card-text">
         <blockquote>"Aprender haciendo,<br>no solo leyendo."</blockquote>
-        <cite>El conocimiento es un derecho fundamental</cite>
+        <p class="hero-card-mission">
+          <strong>El conocimiento es un derecho fundamental, no un privilegio.</strong>
+          Estas guías nacen de esa convicción: cada una es una cápsula informativa portable — un archivo HTML que carga consigo todo lo necesario para funcionar sin servidores, sin instalaciones, sin dependencias.
+        </p>
       </div>
     </div>
-
-    <p class="hero-mission">
-      <strong>El conocimiento es un derecho fundamental, no un privilegio.</strong>
-      Estas guías nacen de esa convicción: cada una es una cápsula informativa portable — un archivo HTML que carga consigo todo lo necesario para funcionar sin servidores, sin instalaciones, sin dependencias.
-    </p>
   </header>
 
   <!-- ── Buscador + Filtros ── -->
