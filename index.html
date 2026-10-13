@@ -827,9 +827,8 @@
         chip.classList.add('active');
         filtroActivo = chip.dataset.cat;
         aplicarFiltro();
-        // Scroll al contenido de guías
-        const primera = document.querySelector('.categoria:not([hidden])');
-        if (primera) primera.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Scroll al buscador
+        document.querySelector('.buscador-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
 
