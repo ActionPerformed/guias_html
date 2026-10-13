@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guías Didácticas Interactivas — DAM · DAW · ASIR</title>
+  <meta name="description" content="Cápsulas informativas portable para aprender haciendo. Guías HTML autocontenidas sobre CSS, Redes, PHP, Git, SQL, y más.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #0A1826;
+      --card: #112233;
+      --card-2: #0D1B2A;
+      --ink: #E0E8F0;
+      --muted: #6B8CAE;
+      --line: #1E3A5F;
+      --line-soft: #162B44;
+      --cyan: #4FD1C5;
+      --cyan-2: #38B2AC;
+      --amber: #E8A33D;
+      --amber-soft: #F6E0A0;
+      --blue: #60A5FA;
+      --blue-soft: #DBEAFE;
+      --green: #68D391;
+      --red: #FC8181;
+      --code-bg: #061018;
+      --shadow: 0 8px 32px rgba(0,0,0,.5);
+      --cat-generales: #E8A33D;
+      --cat-asete: #FC8181;
+      --cat-iaw: #68D391;
+      --cat-pmdm: #60A5FA;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Work Sans', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      background-image:
+        linear-gradient(rgba(30,58,95,.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,58,95,.3) 1px, transparent 1px);
+      background-size: 40px 40px;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    h1, h2, .serif {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-weight: 400;
+      letter-spacing: -.005em;
+    }
+
+    h3, h4 {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+      text-underline-offset: 3px;
+    }
+
+    a:hover { color: var(--cyan-2); }
+
+    :focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    code, pre, kbd {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    /* ── Header / Hero ── */
+    .hero {
+      text-align: center;
+      padding: 80px 20px 60px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      background: rgba(79,209,197,.12);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--cyan);
+    }
+
+    .hero-tagline {
+      font-size: clamp(16px, 2.5vw, 19px);
+      color: var(--muted);
+      max-width: 56ch;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 600;
+    }
+
+    .hero-divider {
+      width: 60px;
+      height: 2px;
+      background: var(--line);
+      margin: 40px auto;
+    }
+
+    .hero-mission {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 60ch;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .hero-mission strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ── Buscador + Filtros ── */
+    .buscador-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+
+    .buscador-wrap {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 16px;
+      max-width: 600px;
+      margin: 0 auto 20px;
+    }
+
+    .buscador-wrap:focus-within {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(79,209,197,.12);
+    }
+
+    .buscador-icon {
+      color: var(--muted);
+      font-size: 18px;
+      flex-none;
+    }
+
+    #buscador {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--ink);
+      font-family: 'Work Sans', sans-serif;
+      font-size: 15px;
+    }
+
+    #buscador::placeholder { color: var(--muted); }
+
+    .filtros {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 99px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .chip:hover {
+      border-color: var(--muted);
+      color: var(--ink);
+    }
+
+    .chip.active {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: #061018;
+    }
+
+    .chip[data-cat="generales"].active { background: var(--cat-generales); border-color: var(--cat-generales); }
+    .chip[data-cat="asete"].active { background: var(--cat-asete); border-color: var(--cat-asete); }
+    .chip[data-cat="iaw"].active { background: var(--cat-iaw); border-color: var(--cat-iaw); }
+    .chip[data-cat="pmdm"].active { background: var(--cat-pmdm); border-color: var(--cat-pmdm); }
+
+    /* ── Main content ── */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .no-results.show { display: block; }
+
+    .no-results h3 {
+      font-size: 20px;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    /* ── Categoría ── */
+    .categoria {
+      margin-bottom: 56px;
+    }
+
+    .categoria[hidden] { display: none; }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-none;
+    }
+
+    .cat-header h2 {
+      font-size: 22px;
+    }
+
+    .cat-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-left: auto;
+    }
+
+    /* ── Grid de tarjetas ── */
+    .guias-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Tarjeta ── */
+    .tarjeta {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tarjeta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cat-color, var(--cyan));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .tarjeta:hover {
+      transform: translateY(-4px);
+      border-color: var(--cyan);
+      box-shadow: 0 8px 24px rgba(79,209,197,.12);
+    }
+
+    .tarjeta:hover::before {
+      opacity: 1;
+    }
+
+    .tarjeta .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,.06);
+      color: var(--cat-color, var(--cyan));
+      border: 1px solid currentColor;
+      text-transform: uppercase;
+    }
+
+    .tarjeta h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .tarjeta p {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    .tarjeta .arrow {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      color: var(--muted);
+      font-size: 16px;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .2s, transform .2s;
+    }
+
+    .tarjeta:hover .arrow {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--cyan);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    footer p { margin: 0 0 10px; }
+
+    .footer-license {
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+
+    .footer-license span {
+      color: var(--cyan);
+    }
+
+    .footer-credit {
+      font-size: 13px;
+    }
+
+    .footer-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-links a:hover { color: var(--cyan); }
+
+    /* ── Animaciones de entrada ── */
+    .tarjeta {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .tarjeta.visible {
+      animation: fadeUp .35s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .hero { padding: 60px 16px 40px; }
+      .hero-stats { gap: 20px; }
+      .buscador-wrap { margin-left: 0; margin-right: 0; }
+      .guias-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="hero-badge">DAM · DAW · ASIR</div>
+    <h1>Guías Didácticas <em>Interactivas</em></h1>
+    <p class="hero-tagline">Conocimiento que se explora, no solo se lee. Cápsulas HTML autocontenidas para aprender haciendo.</p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" id="stat-guias">31</span>
+        <span class="stat-label">Guías</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Categorías</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Ciclos FP</span>
+      </div>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <p class="hero-mission">
+      <strong>El conocimiento es un derecho fundamental, no un privilegio.</strong>
+      Estas guías nacen de esa convicción: cada una es una cápsula informativa portable — un archivo HTML que carga consigo todo lo necesario para funcionar sin servidores, sin instalaciones, sin dependencias.
+    </p>
+  </header>
+
+  <!-- ── Buscador + Filtros ── -->
+  <section class="buscador-section">
+    <div class="buscador-wrap">
+      <span class="buscador-icon">&#128269;</span>
+      <input
+        type="text"
+        id="buscador"
+        placeholder="Busca una guía... (ej: git, css, wordpress)"
+        autocomplete="off"
+        spellcheck="false"
+      >
+    </div>
+
+    <div class="filtros" role="group" aria-label="Filtrar por categoría">
+      <button class="chip active" data-cat="todas">Todas</button>
+      <button class="chip" data-cat="generales">Generales</button>
+      <button class="chip" data-cat="asete">ASETE</button>
+      <button class="chip" data-cat="iaw">IAW</button>
+      <button class="chip" data-cat="pmdm">PMDM</button>
+    </div>
+  </section>
+
+  <!-- ── Guías ── -->
+  <main class="container">
+
+    <div class="no-results" id="no-results">
+      <h3>No hay resultados</h3>
+      <p>Prueba con otro término de búsqueda o cambia el filtro.</p>
+    </div>
+
+    <!-- Guías Generales -->
+    <section class="categoria" data-cat="generales">
+      <div class="cat-header">
+        <div class="cat-dot" style="background:var(--cat-generales)"></div>
+        <h2>Guías Generales</h2>
+        <span class="cat-count" id="count-generales">0</span>
+      </div>
+      <div class="guias-grid" id="grid-generales"></div>
+    </section>
+
+    <!-- ASETE -->
+    <section class="categoria" data-cat="asete">
+      <div class="cat-header">
+        <div class="cat-dot" style="background:var(--cat-asete)"></div>
+        <h2>ASETE</h2>
+        <span class="cat-count" id="count-asete">0</span>
+      </div>
+      <div class="guias-grid" id="grid-asete"></div>
+    </section>
+
+    <!-- IAW -->
+    <section class="categoria" data-cat="iaw">
+      <div class="cat-header">
+        <div class="cat-dot" style="background:var(--cat-iaw)"></div>
+        <h2>IAW</h2>
+        <span class="cat-count" id="count-iaw">0</span>
+      </div>
+      <div class="guias-grid" id="grid-iaw"></div>
+    </section>
+
+    <!-- PMDM -->
+    <section class="categoria" data-cat="pmdm">
+      <div class="cat-header">
+        <div class="cat-dot" style="background:var(--cat-pmdm)"></div>
+        <h2>PMDM</h2>
+        <span class="cat-count" id="count-pmdm">0</span>
+      </div>
+      <div class="guias-grid" id="grid-pmdm"></div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p class="footer-license">
+      <span>&#9670;</span> Libre y gratuito. <span>Comparte, crea, adapta.</span>
+    </p>
+    <p class="footer-credit">
+      Contenido generado con IA + revisión humana &mdash; Archivo HTML único, sin dependencias
+    </p>
+    <div class="footer-links">
+      <a href="https://github.com/actionperformed/guias_html" target="_blank" rel="noopener">Repositorio</a>
+      <a href="README.md">Índice completo</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Datos de guías ──
+    const GUIAS = {
+      generales: [
+        { archivo: "guia_css_daw.html", titulo: "Dominando CSS", descripcion: "Selectores, box model, flexbox y animaciones para 2º DAW" },
+        { archivo: "guia_redes_daw.html", titulo: "Fundamentos de Redes", descripcion: "OSI, TCP/IP, IPv4, subredes y VLSM para 1º DAW" },
+        { archivo: "guia_react_encuesta.html", titulo: "Encuesta en React", descripcion: "Hooks, componentes y app de votaciones en tiempo real" },
+        { archivo: "guia_responsive_bootstrap.html", titulo: "Web Responsive", descripcion: "De web fija a responsive con Bootstrap y diseño adaptable" },
+        { archivo: "guia_batch_windows.html", titulo: "Scripts Batch", descripcion: "Automatización en Windows con .BAT y CMD" },
+        { archivo: "guia_prompts.html", titulo: "Prompts que Funcionan", descripcion: "Entrenamiento de 4 semanas en ingeniería de prompts" },
+        { archivo: "guia-ia-bachillerato.html", titulo: "IA para el Bachillerato", descripcion: "La IA como herramienta de estudio — EBAU y técnicas de estudio" },
+        { archivo: "guia-ia-fp.html", titulo: "IA para la FP", descripcion: "La IA como herramienta de estudio para Formación Profesional" },
+        { archivo: "guia-que-ia-usar.html", titulo: "Qué IA Usar", descripcion: "Comparativa visual de herramientas de IA por tarea" },
+        { archivo: "guia_linux.html", titulo: "Introducción a Linux", descripcion: "Sistema de archivos, permisos y terminal para 1º DAW" },
+        { archivo: "guia_git.html", titulo: "Git para FP", descripcion: "Línea de metro DAM/DAW/ASIR — control de versiones" },
+        { archivo: "guia_lean.html", titulo: "Introducción a Lean", descripcion: "Lenguaje donde las demostraciones matemáticas se verifican y nunca mienten" },
+        { archivo: "guia_sql.html", titulo: "SQL", descripcion: "Consultas, joins, subconsultas y diseño de bases de datos relacionales" },
+        { archivo: "guia_latex.html", titulo: "LaTeX", descripcion: "Composición tipográfica, fórmulas matemáticas y documentos técnicos" },
+        { archivo: "guia_php.html", titulo: "PHP", descripcion: "Programación del lado del servidor, formularios y conexión a BD" },
+        { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo" },
+      ],
+      asete: [
+        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Introducción", descripcion: "Introducción a la seguridad informática" },
+        { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Entorno PHP para 2º ASIR/DAM" },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP para 2º DAM" },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker" },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.3.html", titulo: "ACT 1.3 — Login con PHP", descripcion: "Login con sesiones y roles en PHP" },
+        { archivo: "ASETE/ASETE%20-%20ACT%202.1.html", titulo: "ACT 2.1 — MiniApp Biblioteca", descripcion: "MiniApp de Biblioteca con POO en PHP" },
+      ],
+      iaw: [
+        { archivo: "IAW/IAW%20-%20UT1.html", titulo: "UT1 — Implantación", descripcion: "Implantación de aplicaciones web" },
+        { archivo: "IAW/IAW%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Stack LEMP", descripcion: "Despliegue de un stack LEMP (Nginx + MariaDB) con Docker" },
+        { archivo: "IAW/IAW%20-%20ACT%202.1.html", titulo: "ACT 2.1 — WordPress", descripcion: "Instalación y securización de WordPress sobre LEMP" },
+        { archivo: "IAW/IAW%20-%20ACT%203.1.html", titulo: "ACT 3.1 — WordPress Integral", descripcion: "Proyecto de personalización integral de WordPress" },
+      ],
+      pmdm: [
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Kotlin.html", titulo: "UT1 — Kotlin desde Cero", descripcion: "Kotlin desde cero para desarrollo Android" },
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Android.html", titulo: "UT1 — Fundamentos Android", descripcion: "Fundamentos de desarrollo Android" },
+        { archivo: "PMDM/PMDM%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Android Studio", descripcion: "Introducción a Android Studio y Kotlin" },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.1.html", titulo: "ACT 2.1 — Login con Compose", descripcion: "Pantalla de Login con Jetpack Compose — simulación interactiva" },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.2.html", titulo: "ACT 2.2 — NavHost y Diálogos", descripcion: "NavHost, Registro, Scaffold y Diálogos — amplía login" },
+      ],
+    };
+
+    // Mapeo de categoría → color CSS
+    const CAT_COLORS = {
+      generales: '#E8A33D',
+      asete: '#FC8181',
+      iaw: '#68D391',
+      pmdm: '#60A5FA',
+    };
+
+    const BASE_URL = 'https://actionperformed.github.io/guias_html/';
+
+    // ── Renderizar tarjetas ──
+    function crearTarjeta(guia, cat) {
+      const a = document.createElement('a');
+      a.className = 'tarjeta';
+      a.href = BASE_URL + guia.archivo;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.style.setProperty('--cat-color', CAT_COLORS[cat]);
+
+      a.innerHTML = `
+        <span class="badge">${cat === 'generales' ? 'General' : cat.toUpperCase()}</span>
+        <h3>${guia.titulo}</h3>
+        <p>${guia.descripcion}</p>
+        <span class="arrow">&#8594;</span>
+      `;
+
+      return a;
+    }
+
+    // Renderizar todas las guías en sus grids
+    Object.keys(GUIAS).forEach(cat => {
+      const grid = document.getElementById(`grid-${cat}`);
+      const countEl = document.getElementById(`count-${cat}`);
+      countEl.textContent = GUIAS[cat].length;
+
+      GUIAS[cat].forEach((guia, i) => {
+        const tarjeta = crearTarjeta(guia, cat);
+        grid.appendChild(tarjeta);
+
+        // Animación staggered
+        setTimeout(() => {
+          tarjeta.classList.add('visible');
+        }, 80 * i + Math.random() * 40);
+      });
+    });
+
+    // Actualizar contador total
+    const total = Object.values(GUIAS).reduce((sum, arr) => sum + arr.length, 0);
+    document.getElementById('stat-guias').textContent = total;
+
+    // ── Filtrado ──
+    let filtroActivo = 'todas';
+    let terminoBusqueda = '';
+
+    function aplicarFiltro() {
+      let totalVisible = 0;
+
+      Object.keys(GUIAS).forEach(cat => {
+        const seccion = document.querySelector(`.categoria[data-cat="${cat}"]`);
+        const tarjetas = seccion.querySelectorAll('.tarjeta');
+        let visiblesEnCat = 0;
+
+        tarjetas.forEach(tarjeta => {
+          // Texto de la tarjeta
+          const texto = (
+            tarjeta.querySelector('h3').textContent + ' ' +
+            tarjeta.querySelector('p').textContent
+          ).toLowerCase();
+
+          const coincideCat = filtroActivo === 'todas' || filtroActivo === cat;
+          const coincideBusqueda = terminoBusqueda === '' ||
+            texto.includes(terminoBusqueda.toLowerCase());
+
+          if (coincideCat && coincideBusqueda) {
+            tarjeta.style.display = '';
+            visiblesEnCat++;
+          } else {
+            tarjeta.style.display = 'none';
+          }
+        });
+
+        if (visiblesEnCat === 0) {
+          seccion.hidden = true;
+        } else {
+          seccion.hidden = false;
+          // Actualizar contador visible
+          document.getElementById(`count-${cat}`).textContent = visiblesEnCat;
+        }
+
+        totalVisible += visiblesEnCat;
+      });
+
+      // Mostrar / ocultar mensaje sin resultados
+      const noResults = document.getElementById('no-results');
+      if (totalVisible === 0) {
+        noResults.classList.add('show');
+      } else {
+        noResults.classList.remove('show');
+      }
+    }
+
+    // Filtro por categoría (chips)
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        filtroActivo = chip.dataset.cat;
+        aplicarFiltro();
+      });
+    });
+
+    // Búsqueda en tiempo real
+    const buscadorInput = document.getElementById('buscador');
+    let debounceTimer;
+
+    buscadorInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        terminoBusqueda = buscadorInput.value.trim();
+        aplicarFiltro();
+      }, 150);
+    });
+
+    // Limpiar búsqueda con Escape
+    buscadorInput.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        buscadorInput.value = '';
+        terminoBusqueda = '';
+        aplicarFiltro();
+      }
+    });
+  </script>
+</body>
+</html>
