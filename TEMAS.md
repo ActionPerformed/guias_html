@@ -163,11 +163,11 @@ La plantilla base soporta estos lenguajes:
 | `yaml` | `hlYAML()` | Keys, values, comentarios |
 | `bash` | `hlGeneric({lineComment:"#"})` | Scripts shell |
 | `text` | `hlText()` | Texto con marcadores `←` |
-| `js` | `hlGeneric({...})` | JavaScript (añadido) |
-| `css` | `hlGeneric({...})` | Selectores, propiedades |
-| `kotlin` | `hlGeneric({...})` | Kotlin keywords |
-| `python` | `hlGeneric({...})` | Python keywords |
-| `json` | `hlGeneric({...})` | JSON nativo |
+| `js` / `javascript` | `hlGeneric()` | JS keywords, comentarios `//` y `/* */` |
+| `css` | `hlGeneric()` | Selectores, propiedades, comentarios `/* */` |
+| `kotlin` / `kt` | `hlGeneric()` | Kotlin keywords, comentarios `//` |
+| `python` / `py` | `hlGeneric()` | Python keywords, comentarios `#` |
+| `json` | `hlGeneric({json:true})` | JSON con keys en color distinto |
 
 ### Cómo añadir un nuevo highlighter
 

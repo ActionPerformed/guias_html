@@ -43,6 +43,26 @@
       --shadow: 0 12px 30px -22px rgba(34, 32, 27, .7);
     }
 
+    /* Skip link */
+    .skip-link {
+      position: fixed;
+      top: -100px;
+      left: 16px;
+      z-index: 9999;
+      background: var(--olive);
+      color: #fff;
+      padding: 8px 16px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 0 0 4px 4px;
+      transition: top .2s;
+    }
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid var(--burgundy);
+      outline-offset: 2px;
+    }
+
     * {
       box-sizing: border-box
     }
@@ -2161,6 +2181,7 @@
 </head>
 
 <body>
+  <a class="skip-link" href="#main">Saltar al contenido principal</a>
   <header class="topbar">
     <div class="topbar-in">
       <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir el índice">☰ Índice</button>
@@ -2197,7 +2218,7 @@
       <a class="nav-link" href="#flujo">Esquema del flujo</a>
     </nav>
 
-    <main>
+    <main id="main">
 
       <section id="inicio" class="hero">
         <div class="hero-kicker">Guía interactiva del alumnado · 2º DAM · Continuación de la MiniApp de Tareas</div>
