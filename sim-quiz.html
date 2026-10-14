@@ -1,0 +1,64 @@
+<!--
+  QUIZ COMPONENTE — Copia este bloque en cualquier guía
+  Usa data-respuesta para marcar la correcta:
+  data-respuesta="b"
+-->
+<style>
+.quiz{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.quiz-q{font-weight:700;font-size:15px}
+.quiz-opts{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{text-align:left;padding:9px 14px;border:1px solid var(--line);background:var(--card);border-radius:4px;cursor:pointer;font-family:inherit;font-size:14.5px;color:var(--ink);transition:border-color .15s,background .15s}
+.quiz-opt:hover{border-color:var(--accent)}
+.quiz-opt.seleccionada{border-color:var(--accent);background:rgba(79,209,197,.08)}
+.quiz-opt.correcta{border-color:var(--green);background:rgba(104,211,145,.12)}
+.quiz-opt.incorrecta{border-color:var(--red);background:rgba(252,129,129,.1)}
+.quiz-feedback{margin-top:4px;font-size:13.5px;padding:8px 12px;border-radius:4px;display:none}
+.quiz-feedback.ok{background:rgba(104,211,145,.1);border:1px solid var(--green);color:var(--green)}
+.quiz-feedback.fail{background:rgba(252,129,129,.08);border:1px solid var(--red);color:var(--red)}
+.quiz-feedback.show{display:block}
+</style>
+
+<div class="quiz" data-json='[{"pregunta":"Ejemplo: ¿Qué método HTTP se usa para crear un recurso?","opciones":["GET","POST","PUT","DELETE"],"respuesta":"b","explicacion":"POST crea un recurso nuevo en el servidor."}]'>
+  <div class="quiz-q"></div>
+  <div class="quiz-opts"></div>
+  <div class="quiz-feedback"></div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.quiz').forEach(function(quiz){
+    var data = JSON.parse(quiz.dataset.json || '[]');
+    if(!data.length) return;
+    var item = data[0];
+    quiz.querySelector('.quiz-q').textContent = item.pregunta;
+    var optsEl = quiz.querySelector('.quiz-opts');
+    var fbEl = quiz.querySelector('.quiz-feedback');
+    var letters = ['a','b','c','d'];
+    item.opciones.forEach(function(opt,i){
+      var btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = letters[i] + '. ' + opt;
+      btn.dataset.letter = letters[i];
+      btn.addEventListener('click',function(){
+        if(btn.classList.contains('seleccionada')) return;
+        optsEl.querySelectorAll('.quiz-opt').forEach(function(o){o.classList.remove('seleccionada')});
+        btn.classList.add('seleccionada');
+        var correcta = item.respuesta === letters[i];
+        if(correcta){
+          btn.classList.add('correcta');
+          fbEl.textContent = '✓ ' + item.explicacion;
+          fbEl.className = 'quiz-feedback ok show';
+        } else {
+          btn.classList.add('incorrecta');
+          optsEl.querySelectorAll('.quiz-opt').forEach(function(o){
+            if(o.dataset.letter === item.respuesta) o.classList.add('correcta');
+          });
+          fbEl.textContent = '✗ ' + item.explicacion;
+          fbEl.className = 'quiz-feedback fail show';
+        }
+      });
+      optsEl.appendChild(btn);
+    });
+  });
+})();
+</script>
