@@ -7,6 +7,7 @@ Uso:
 """
 
 import argparse
+import html
 import json
 import sys
 import os
@@ -25,18 +26,32 @@ def load_file(path):
 
 def slug(text):
     """Convierte texto a id para anclas."""
-    return text.lower().replace(" ", "-").replace("ñ", "n").replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u").replace("¿", "").replace("?", "").replace("¡", "").replace("!", "").replace(":", "").replace(",", "").replace(".", "").strip("-")
+    import unicodedata
+    # Normaliza y elimina acentos
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
+    text = text.lower()
+    # Elimina todo lo que no sea alfanumérico o espacio, luego espacios a guiones
+    import re
+    text = re.sub(r"[^a-z0-9\s-]", "", text)
+    text = re.sub(r"[\s_]+", "-", text).strip("-")
+    return text
 
 
 def build_code_array(code_snippets):
     """Genera el objeto CODE de JavaScript."""
+    def safe(code):
+        # Neutraliza ${} para que no se interprete como template literal JS
+        code = code.replace("\\", "\\\\").replace("`", "\\`")
+        code = code.replace("${", "${''+")
+        return code
     lines = ["var CODE = {"]
     for key, entry in code_snippets.items():
         lang = entry.get("lang", "text")
         title = entry.get("title", key)
-        code = entry.get("code", "")
-        safe = code.replace("\\", "\\\\").replace("`", "\\`").replace("${", "${")
-        lines.append(f'  "{key}": {{ title: "{title}", lang: "{lang}", code: `{safe}` }},')
+        title_esc = title.replace("\\", "\\\\").replace('"', '\\"')
+        code = safe(entry.get("code", ""))
+        lines.append(f'  "{key}": {{ title: "{title_esc}", lang: "{lang}", code: `{code}` }},')
     lines.append("};")
     return "\n".join(lines)
 
@@ -49,7 +64,7 @@ def build_nav_items(bloques):
         titulo = b.get("titulo", f"Bloque {i+1}")
         anchor = b.get("anchor") or slug(titulo)
         tag = b.get("tag", num)
-        navs.append(f'  <a class="nav-link" href="#{anchor}"><span class="tag">{tag}</span> {titulo}</a>')
+        navs.append(f'  <a class="nav-link" href="#{anchor}"><span class="tag">{html.escape(tag)}</span> {html.escape(titulo)}</a>')
     return "\n".join(navs)
 
 
@@ -130,12 +145,26 @@ def build_content(bloques):
 def generate(theme, title, sig, yaml_file, output_file):
     # Cargar plantilla y tema
     template = load_file(TEMPLATE_FILE)
-    tema_file = TEMAS_DIR / f"{theme}.css"
+    # Acepta nombre de tema (busca en temas/) o ruta directa a archivo CSS
+    if theme and (theme.startswith("/") or theme.startswith("\\") or ":" in theme or "\\" in theme or theme.endswith(".css")):
+        tema_file = Path(theme)
+    else:
+        tema_file = TEMAS_DIR / f"{theme}.css"
     if not tema_file.exists():
-        print(f"ERROR: Tema '{theme}' no encontrado en {TEMAS_DIR}")
-        print(f"Temas disponibles: {[t.name for t in TEMAS_DIR.glob('*.css')]}")
+        print(f"ERROR: Tema '{theme}' no encontrado.")
+        print(f"Temas disponibles en {TEMAS_DIR}:")
+        for t in sorted(TEMAS_DIR.glob("*.css")):
+            print(f"  - {t.stem}")
         sys.exit(1)
     css_theme = load_file(tema_file)
+
+    # Validar esquema mínimo del contenido
+    if not isinstance(data, dict):
+        print("ERROR: El archivo de contenido debe ser un objeto JSON/YAML válido.")
+        sys.exit(1)
+    if "bloques" not in data and not data.get("meta", {}).get("title"):
+        print("ERROR: El contenido debe tener 'meta.title' o 'bloques'.")
+        sys.exit(1)
 
     # Cargar contenido JSON
     if yaml_file:
@@ -240,8 +269,7 @@ def main():
     parser.add_argument("--title", default="Nueva Guía", help="Título de la guía")
     parser.add_argument("--sig", default="DAM", help="Sigla del ciclo (DAM, DAW, ASIR...)")
     parser.add_argument("--theme", default="paper_cream",
-                        choices=["paper_cream", "dark_modern", "blueprint", "matrix"],
-                        help="Tema visual")
+                        help="Nombre de tema (paper_cream, dark_modern, blueprint, matrix, light_academic) o ruta a archivo CSS")
     parser.add_argument("--yaml", type=Path, help="Fichero YAML con el contenido")
     parser.add_argument("--output", type=Path, default=Path("guia.html"), help="Fichero de salida")
     parser.add_argument("--list-themes", action="store_true", help="Lista los temas disponibles")

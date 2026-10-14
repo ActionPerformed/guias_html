@@ -1,0 +1,294 @@
+<!-- ============================================
+     SIMULADOR: Constructor de Petición HTTP
+     Construye GET/POST/PUT/PATCH/DELETE paso a paso
+     ============================================ -->
+<style>
+.sim-req{--r-blue:#1d4ed8;--r-green:#15803d;--r-red:#b91c1c;--r-amber:#d97706;--r-gray:#374151;border:1px solid #cbd5e1;background:#fff;border-radius:8px;margin:20px 0;overflow:hidden;font-size:14px}
+.sim-req-header{padding:12px 16px;background:linear-gradient(135deg,#1d4ed8,#1e40af);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sim-req-header::before{content:'📡';font-size:16px}
+.sim-req-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.sim-req-body{grid-template-columns:1fr}}
+.sim-req-controls{display:flex;flex-direction:column;gap:10px}
+.sim-req-row{display:flex;flex-direction:column;gap:4px}
+.sim-req-row label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;font-family:'Work Sans',sans-serif}
+.sim-req-row input,.sim-req-row select,.sim-req-row textarea{padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;background:#fafafa;transition:border-color .2s}
+.sim-req-row input:focus,.sim-req-row select:focus,.sim-req-row textarea:focus{outline:none;border-color:var(--r-blue);background:#fff}
+.sim-req-row textarea{resize:vertical;min-height:60px}
+.sim-req-methods{display:flex;gap:4px;flex-wrap:wrap}
+.method-btn{padding:6px 12px;border:1.5px solid #e2e8f0;background:#fafafa;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;color:#374151}
+.method-btn:hover{border-color:var(--r-blue);color:var(--r-blue)}
+.method-btn.active{background:var(--r-blue);color:#fff;border-color:var(--r-blue)}
+.method-btn.method-get.active{background:var(--r-green);border-color:var(--r-green)}
+.method-btn.method-post.active{background:var(--r-blue);border-color:var(--r-blue)}
+.method-btn.method-put.active{background:var(--r-amber);border-color:var(--r-amber)}
+.method-btn.method-patch.active{background:#7c3aed;border-color:#7c3aed}
+.method-btn.method-delete.active{background:var(--r-red);border-color:var(--r-red)}
+.sim-req-headers-list{min-height:40px;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 8px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.header-chip{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.header-chip span{color:#64748b;font-family:'Work Sans',sans-serif;font-size:11px}
+.header-chip .del-h{background:none;border:none;color:#94a3b8;cursor:pointer;padding:0;font-size:14px;line-height:1;margin-left:2px}
+.header-chip .del-h:hover{color:var(--r-red)}
+.sim-req-preview{border:1.5px solid #e2e8f0;border-radius:6px;overflow:hidden;background:#f8fafc}
+.sim-req-preview-header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1e293b;color:#e2e8f0;font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #334155}
+.sim-req-preview-header::before{content:'RAW';background:#ef4444;padding:2px 6px;border-radius:3px;font-size:10px}
+.sim-req-preview pre{margin:0;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;color:#1e293b;max-height:300px;overflow:auto;white-space:pre-wrap;background:#f8fafc}
+.sim-req-actions{display:flex;gap:8px;margin-top:4px}
+.sim-req-send{flex:1;padding:10px;background:var(--r-blue);color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:13.5px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.sim-req-send:hover{background:#1e40af}
+.sim-req-send:disabled{background:#94a3b8;cursor:not-allowed}
+.sim-req-reset{padding:10px 14px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;cursor:pointer}
+.sim-req-reset:hover{background:#e2e8f0}
+.sim-req-response{margin-top:16px;border:1.5px solid #e2e8f0;border-radius:6px;overflow:hidden;grid-column:1/-1}
+.sim-req-resp-header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;font-size:12.5px;font-weight:600}
+.sim-req-resp-header .status-badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.status-2xx{background:#dcfce7;color:#15803d}
+.status-3xx{background:#dbeafe;color:#1d4ed8}
+.status-4xx{background:#fef3c7;color:#d97706}
+.status-5xx{background:#fee2e2;color:#b91c1c}
+.sim-req-resp-body{padding:14px;background:#f8fafc}
+.sim-req-resp-body pre{margin:0;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;white-space:pre-wrap;background:#f8fafc}
+.sim-req-resp-explain{margin-top:8px;font-size:13px;color:#475569;padding:10px 12px;background:#f1f5f9;border-radius:6px;border-left:3px solid var(--r-blue)}
+</style>
+
+<div class="sim-req" id="simRequest">
+  <div class="sim-req-header">Constructor de Petición HTTP</div>
+  <div class="sim-req-body">
+
+    <div class="sim-req-controls">
+      <!-- Método -->
+      <div class="sim-req-row">
+        <label>Método</label>
+        <div class="sim-req-methods">
+          <button class="method-btn method-get active" data-method="GET">GET</button>
+          <button class="method-btn method-post" data-method="POST">POST</button>
+          <button class="method-btn method-put" data-method="PUT">PUT</button>
+          <button class="method-btn method-patch" data-method="PATCH">PATCH</button>
+          <button class="method-btn method-delete" data-method="DELETE">DELETE</button>
+        </div>
+      </div>
+
+      <!-- Ruta -->
+      <div class="sim-req-row">
+        <label>Ruta</label>
+        <input type="text" id="reqPath" value="/api/usuarios/42" placeholder="/api/recurso">
+      </div>
+
+      <!-- Cabeceras -->
+      <div class="sim-req-row">
+        <label>Cabeceras</label>
+        <div class="sim-req-headers-list" id="headersList">
+          <div class="header-chip" data-h="Host: miweb.com"><span>Host:</span> miweb.com <button class="del-h" onclick="this.parentElement.remove();updateReq()">×</button></div>
+          <div class="header-chip" data-h="Accept: application/json"><span>Accept:</span> application/json <button class="del-h" onclick="this.parentElement.remove();updateReq()">×</button></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <select id="headerKey" style="flex:1;font-size:12px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'JetBrains Mono',monospace;background:#fafafa">
+            <option value="">Añadir cabecera...</option>
+            <option>Content-Type</option>
+            <option>Authorization</option>
+            <option>User-Agent</option>
+            <option>Accept-Language</option>
+            <option>Accept-Encoding</option>
+            <option>Cache-Control</option>
+            <option>Cookie</option>
+            <option>Origin</option>
+            <option>Referer</option>
+            <option>X-API-Key</option>
+          </select>
+          <input type="text" id="headerVal" placeholder="valor" style="flex:1;font-size:12px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'JetBrains Mono',monospace;background:#fafafa">
+          <button onclick="addHeader()" style="padding:5px 10px;background:#1d4ed8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">+</button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="sim-req-row" id="bodyRow">
+        <label>Body (solo POST/PUT/PATCH)</label>
+        <textarea id="reqBody" placeholder='{"nombre":"Ana","email":"ana@miweb.com"}'>{"nombre":"Ana","email":"ana@miweb.com"}</textarea>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div>
+      <div class="sim-req-preview">
+        <div class="sim-req-preview-header">Petición cruda</div>
+        <pre id="reqPreview">GET /api/usuarios/42 HTTP/1.1
+Host: miweb.com
+Accept: application/json</pre>
+      </div>
+      <div class="sim-req-actions">
+        <button class="sim-req-send" id="reqSendBtn">
+          <span>▸</span> Enviar petición
+        </button>
+        <button class="sim-req-reset" onclick="resetReq()">Limpiar</button>
+      </div>
+    </div>
+
+    <!-- Response -->
+    <div class="sim-req-response" id="respBox" style="display:none">
+      <div class="sim-req-resp-header">
+        Respuesta
+        <span class="status-badge" id="statusBadge">200 OK</span>
+      </div>
+      <div class="sim-req-resp-body">
+        <pre id="respBody">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id":42,"nombre":"Ana","email":"ana@miweb.com"}</pre>
+        <div class="sim-req-resp-explain" id="respExplain"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var sim = document.getElementById("simRequest");
+  if(!sim) return;
+
+  var method = "GET";
+  var pathEl = document.getElementById("reqPath");
+  var bodyEl = document.getElementById("reqBody");
+  var bodyRow = document.getElementById("bodyRow");
+  var previewEl = document.getElementById("reqPreview");
+  var respBox = document.getElementById("respBox");
+  var statusBadge = document.getElementById("statusBadge");
+  var respBodyEl = document.getElementById("respBody");
+  var respExplain = document.getElementById("respExplain");
+
+  var statusMap = {
+    GET: [
+      { code: 200, text: "200 OK", desc: "El recurso se ha encontrado y se devuelve.", color: "2xx" },
+      { code: 301, text: "301 Moved Permanently", desc: "El recurso está en otra URL. El cliente debería ir alla.", color: "3xx" },
+      { code: 304, text: "304 Not Modified", desc: "Puedes usar tu caché. El recurso no ha cambiado.", color: "3xx" },
+      { code: 404, text: "404 Not Found", desc: "El recurso no existe en ese servidor.", color: "4xx" },
+      { code: 500, text: "500 Internal Server Error", desc: "Algo ha fallado en el servidor.", color: "5xx" },
+    ],
+    POST: [
+      { code: 201, text: "201 Created", desc: "Recurso creado con éxito.", color: "2xx" },
+      { code: 200, text: "200 OK", desc: "La petición se procesó correctamente.", color: "2xx" },
+      { code: 400, text: "400 Bad Request", desc: "La petición está mal formada o falta algo.", color: "4xx" },
+      { code: 401, text: "401 Unauthorized", desc: "No has enviado credenciales válidas.", color: "4xx" },
+      { code: 409, text: "409 Conflict", desc: "Conflicto: el recurso ya existe o el estado no es coherente.", color: "4xx" },
+      { code: 422, text: "422 Unprocessable Entity", desc: "Los datos se entienden pero no pasan la validación.", color: "4xx" },
+    ],
+    PUT: [
+      { code: 200, text: "200 OK", desc: "Recurso actualizado correctamente.", color: "2xx" },
+      { code: 204, text: "204 No Content", desc: "Actualizado, pero no devuelve body.", color: "2xx" },
+      { code: 400, text: "400 Bad Request", desc: "La petición está mal formada.", color: "4xx" },
+      { code: 404, text: "404 Not Found", desc: "El recurso a reemplazar no existe.", color: "4xx" },
+    ],
+    PATCH: [
+      { code: 200, text: "200 OK", desc: "Cambios aplicados.", color: "2xx" },
+      { code: 400, text: "400 Bad Request", desc: "Petición mal formada.", color: "4xx" },
+      { code: 404, text: "404 Not Found", desc: "Recurso no encontrado.", color: "4xx" },
+    ],
+    DELETE: [
+      { code: 204, text: "204 No Content", desc: "Borrado con éxito. Sin body en la respuesta.", color: "2xx" },
+      { code: 200, text: "200 OK", desc: "Borrado, y el servidor devuelve body.", color: "2xx" },
+      { code: 404, text: "404 Not Found", desc: "El recurso a borrar no existía.", color: "4xx" },
+    ],
+  };
+
+  function updateReq() {
+    var path = pathEl.value.trim() || "/";
+    var headers = [];
+    sim.querySelectorAll(".header-chip").forEach(function(chip){
+      var h = chip.getAttribute("data-h");
+      if(h) headers.push(h);
+    });
+
+    var lines = [method + " " + path + " HTTP/1.1"];
+    headers.forEach(function(h){ lines.push(h); });
+    lines.push("");
+
+    var body = bodyEl.value.trim();
+    if(body && (method === "POST" || method === "PUT" || method === "PATCH")) {
+      // Content-Length automático si hay body
+      if(!headers.some(function(h){ return h.toLowerCase().startsWith("content-length"); })) {
+        lines[lines.length-1] = "Content-Length: " + body.length;
+      }
+      lines.push("");
+      lines.push(body);
+    }
+
+    previewEl.textContent = lines.join("\n");
+  }
+
+  function addHeader() {
+    var key = document.getElementById("headerKey").value;
+    var val = document.getElementById("headerVal").value.trim();
+    if(!key) return;
+    var chip = document.createElement("div");
+    chip.className = "header-chip";
+    chip.setAttribute("data-h", key + ": " + val);
+    chip.innerHTML = "<span>" + key + ":</span> " + val + ' <button class="del-h" onclick="this.parentElement.remove();updateReq()">×</button>';
+    document.getElementById("headersList").appendChild(chip);
+    document.getElementById("headerKey").value = "";
+    document.getElementById("headerVal").value = "";
+    updateReq();
+  }
+
+  function resetReq() {
+    document.getElementById("headersList").innerHTML = "";
+    bodyEl.value = "";
+    pathEl.value = "/api/usuarios/42";
+    respBox.style.display = "none";
+    updateReq();
+  }
+
+  function getStatus(method) {
+    var opts = statusMap[method] || statusMap.GET;
+    return opts[0]; // por defecto el primero (200/201/204)
+  }
+
+  function sendReq() {
+    var opts = getStatus(method);
+    var code = opts.code;
+    var color = opts.color;
+    var statusClass = "status-" + color;
+
+    statusBadge.className = "status-badge " + statusClass;
+    statusBadge.textContent = opts.text;
+
+    var bodyResp = "";
+    if(code === 201) bodyResp = '{"id":99,"mensaje":"Recurso creado"}';
+    else if(code === 200 && method === "DELETE") bodyResp = '{"mensaje":"Recurso borrado"}';
+    else if(code === 200) bodyResp = '{"id":42,"nombre":"Ana","email":"ana@miweb.com"}';
+    else if(code === 204) bodyResp = "(sin contenido)";
+    else if(code === 400) bodyResp = '{"error":"Bad Request","mensaje":"Faltan campos obligatorios"}';
+    else if(code === 401) bodyResp = '{"error":"Unauthorized","mensaje":"Credenciales no válidas"}';
+    else if(code === 404) bodyResp = '{"error":"Not Found","mensaje":"El recurso no existe"}';
+    else if(code === 409) bodyResp = '{"error":"Conflict","mensaje":"El recurso ya existe"}';
+    else if(code === 422) bodyResp = '{"error":"Unprocessable Entity","mensaje":"El email no es válido"}';
+    else if(code === 500) bodyResp = '{"error":"Internal Server Error","mensaje":"Error interno del servidor"}';
+    else if(code === 301) bodyResp = '{"error":"Moved Permanently","mensaje":"Redirigiendo..."}';
+    else bodyResp = '{"status":"ok"}';
+
+    respBodyEl.textContent = "HTTP/1.1 " + opts.text + "\nContent-Type: application/json\n\n" + bodyResp;
+    respExplain.textContent = opts.desc;
+    respBox.style.display = "block";
+  }
+
+  // Method buttons
+  sim.querySelectorAll(".method-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      sim.querySelectorAll(".method-btn").forEach(function(b){b.classList.remove("active");});
+      btn.classList.add("active");
+      method = btn.getAttribute("data-method");
+      // Mostrar/ocultar body
+      bodyRow.style.display = (method === "POST" || method === "PUT" || method === "PATCH") ? "flex" : "none";
+      updateReq();
+    });
+  });
+
+  // Auto-update
+  pathEl.addEventListener("input", updateReq);
+  bodyEl.addEventListener("input", updateReq);
+
+  // Send
+  document.getElementById("reqSendBtn").addEventListener("click", sendReq);
+
+  // Init
+  updateReq();
+})();
+</script>

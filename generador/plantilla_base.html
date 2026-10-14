@@ -108,14 +108,44 @@ var AMPLIACIONES = {{AMPLIACIONES}};
   }
 
   var SQL_KW = ["CREATE","TABLE","INT","AUTO_INCREMENT","PRIMARY","KEY","VARCHAR","UNIQUE","NOT","NULL","DEFAULT","ENUM","TIMESTAMP","CURRENT_TIMESTAMP","FOREIGN","REFERENCES","ON","DELETE","CASCADE","INSERT","INTO","VALUES","SELECT","FROM","WHERE","UPDATE","SET","GROUP","BY","LEFT","JOIN","AS","COUNT","TINYINT","ORDER","DESC","AND","OR","LIMIT","OFFSET"];
+  var JS_KW = ["const","let","var","function","return","if","else","for","while","do","switch","case","break","continue","new","this","class","extends","constructor","static","super","import","export","default","from","async","await","try","catch","finally","throw","typeof","instanceof","null","undefined","true","false","in","of","yield","delete","void"];
+  var PY_KW = ["def","class","import","from","return","if","elif","else","for","while","break","continue","pass","try","except","finally","raise","with","as","lambda","yield","global","nonlocal","True","False","None","and","or","not","in","is","assert","del","async","await","print"];
+  var KT_KW = ["fun","val","var","class","object","interface","enum","sealed","data","companion","init","constructor","by","lazy","lateinit","vararg","suspend","override","open","abstract","final","inner","out","in","when","if","else","for","while","do","return","break","continue","throw","try","catch","finally","import","as","is","null","true","false","this","super","it","package","private","protected","public","internal"];
+  var CSS_KW = ["@media","@keyframes","@import","@font-face","@supports","@charset","@namespace","@page","@counter-style","@property"];
+
   function hlGeneric(code, cfg) {
     var out = "", i = 0, n = code.length;
     while (i < n) {
       var c = code[i];
+      // Comentario de bloque /* ... */
+      if (cfg.blockComment && code.slice(i, i + 2) === "/*") {
+        var j = code.indexOf("*/", i + 2);
+        if (j < 0) j = n; else j += 2;
+        out += '<span class="tok-c">' + esc(code.slice(i, j)) + "</span>";
+        i = j; continue;
+      }
+      // Comentario de línea
       if (cfg.lineComment && code.startsWith(cfg.lineComment, i)) { var j = code.indexOf("\n", i); if (j < 0) j = n; out += '<span class="tok-c">' + esc(code.slice(i, j)) + "</span>"; i = j; continue; }
-      if (c === "'" || c === '"') { var q = c, j2 = i + 1; while (j2 < n && code[j2] !== q) { if (code[j2] === "\\") j2++; j2++; } j2 = Math.min(j2 + 1, n); out += '<span class="tok-s">' + esc(code.slice(i, j2)) + "</span>"; i = j2; continue; }
-      if (/[A-Za-z_]/.test(c)) { var j3 = i; while (j3 < n && /[A-Za-z0-9_]/.test(code[j3])) j3++; var w = code.slice(i, j3); if (cfg.keywords && cfg.keywords.indexOf(w.toUpperCase()) >= 0) out += '<span class="tok-k">' + esc(w) + "</span>"; else out += esc(w); i = j3; continue; }
-      if (/[0-9]/.test(c)) { var j4 = i; while (j4 < n && /[0-9.]/.test(code[j4])) j4++; out += '<span class="tok-n">' + esc(code.slice(i, j4)) + "</span>"; i = j4; continue; }
+      // Strings (doble o simple, o backtick en JS)
+      if (c === '"' || c === "'" || c === '`') { var q = c, j2 = i + 1; while (j2 < n && code[j2] !== q) { if (code[j2] === "\\") j2++; j2++; } j2 = Math.min(j2 + 1, n); out += '<span class="tok-s">' + esc(code.slice(i, j2)) + "</span>"; i = j2; continue; }
+      // JSON key: "key":
+      if (cfg.json && c === '"') {
+        var q2 = '"', j3 = i + 1;
+        while (j3 < n && code[j3] !== q2) { if (code[j3] === "\\") j3++; j3++; }
+        j3 = Math.min(j3 + 1, n);
+        var key = code.slice(i, j3);
+        var after = code.slice(j3).match(/^\s*/)[0];
+        var rest = j3 + after.length;
+        var next = code[rest];
+        out += '<span class="tok-f">' + esc(key) + '</span>' + esc(after);
+        i = rest;
+        if (next === ":") { out += esc(":"); i++; }
+        continue;
+      }
+      // Palabras clave
+      if (/[A-Za-z_]/.test(c)) { var j4 = i; while (j4 < n && /[A-Za-z0-9_]/.test(code[j4])) j4++; var w = code.slice(i, j4); if (cfg.keywords && cfg.keywords.indexOf(w) >= 0) out += '<span class="tok-k">' + esc(w) + "</span>"; else out += esc(w); i = j4; continue; }
+      // Números
+      if (/[0-9]/.test(c)) { var j5 = i; while (j5 < n && /[0-9.]/.test(code[j5])) j5++; out += '<span class="tok-n">' + esc(code.slice(i, j5)) + "</span>"; i = j5; continue; }
       out += esc(c); i++;
     }
     return out;
@@ -143,6 +173,11 @@ var AMPLIACIONES = {{AMPLIACIONES}};
       case "yaml": return hlYAML(code);
       case "bash": return hlGeneric(code, { lineComment: "#" });
       case "text": return hlText(code);
+      case "js": case "javascript": return hlGeneric(code, { keywords: JS_KW, lineComment: "//", blockComment: "/*" });
+      case "python": case "py": return hlGeneric(code, { keywords: PY_KW, lineComment: "#" });
+      case "kotlin": case "kt": return hlGeneric(code, { keywords: KT_KW, lineComment: "//" });
+      case "css": return hlGeneric(code, { keywords: CSS_KW, blockComment: "/*" });
+      case "json": return hlGeneric(code, { json: true });
       default: return hlPHP(code);
     }
   }

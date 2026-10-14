@@ -1,0 +1,184 @@
+<!-- ============================================
+     SIMULADOR: Descomponedor de URL
+     Alta carga visual: cada parte en color, explicación inline
+     ============================================ -->
+<style>
+.sim-url{--url-bg:#f0ede6;--url-fg:#1a1a1a;--url-accent:#3e5233;--url-blue:#2563eb;--url-red:#dc2626;--url-amber:#d97706;--url-green:#059669;--url-purple:#7c3aed;border:1px solid #ccc;background:#fff;border-radius:8px;margin:20px 0;overflow:hidden;font-size:14px}
+.sim-url-header{padding:12px 16px;background:linear-gradient(135deg,#3e5233,#2d3e27);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sim-url-header::before{content:'🔗';font-size:16px}
+.sim-url-body{padding:16px}
+.sim-url-input-wrap{display:flex;gap:8px;margin-bottom:14px}
+.sim-url-input{flex:1;padding:9px 12px;border:2px solid #ccc;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;background:#fafaf8;transition:border-color .2s}
+.sim-url-input:focus{outline:none;border-color:var(--url-accent);background:#fff}
+.sim-url-btn{padding:9px 16px;background:var(--url-accent);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap;transition:background .2s}
+.sim-url-btn:hover{background:#2d3e27}
+.sim-url-display{background:var(--url-bg);border-radius:6px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;margin-bottom:12px;min-height:56px;word-break:break-all;border:1px solid #e0ddd5}
+.sim-url-display .p-esquema{color:var(--url-blue);font-weight:700}
+.sim-url-display .p-host{color:var(--url-green);font-weight:700}
+.sim-url-display .p-puerto{color:var(--url-amber)}
+.sim-url-display .p-user{color:var(--url-purple)}
+.sim-url-display .p-path{color:var(--url-fg)}
+.sim-url-display .p-query{color:var(--url-red)}
+.sim-url-display .p-fragment{color:#6b7280}
+.sim-url-legend{margin-bottom:12px}
+.sim-url-legend h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;margin:0 0 6px;font-family:'Work Sans',sans-serif}
+.sim-url-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+.sim-url-legend-item{display:flex;align-items:center;gap:6px;font-size:12.5px}
+.sim-url-legend-dot{width:10px;height:10px;border-radius:2px;flex:none}
+.dot-esquema{background:var(--url-blue)}
+.dot-host{background:var(--url-green)}
+.dot-puerto{background:var(--url-amber)}
+.dot-user{background:var(--url-purple)}
+.dot-path{background:#555}
+.dot-query{background:var(--url-red)}
+.dot-fragment{background:#aaa}
+.sim-url-explain{border-top:1px solid #e0ddd5;padding-top:10px}
+.sim-url-explain h4{font-size:12.5px;color:#444;margin:0 0 6px}
+.sim-url-explain p{font-size:13px;color:#555;margin:0;line-height:1.5}
+.sim-url-example{margin-top:8px;font-size:12px;color:#888;font-family:'JetBrains Mono',monospace}
+@media(max-width:600px){.sim-url-legend-grid{grid-template-columns:1fr 1fr}.sim-url-input-wrap{flex-direction:column}}
+</style>
+
+<div class="sim-url" id="simUrl">
+  <div class="sim-url-header">Descomponedor de URL</div>
+  <div class="sim-url-body">
+    <div class="sim-url-input-wrap">
+      <input type="text" class="sim-url-input" id="urlInput"
+             value="https://api.miweb.com:8443/v1/usuarios/42?campos=nombre,email#perfil"
+             placeholder="Pega una URL aqui...">
+      <button class="sim-url-btn" id="urlAnalyze">Analizar</button>
+    </div>
+
+    <div class="sim-url-display" id="urlDisplay">
+      <span class="p-esquema">https://</span><span class="p-host">api.miweb.com</span><span class="p-puerto">:8443</span><span class="p-path">/v1/usuarios/42</span><span class="p-query">?campos=nombre,email</span><span class="p-fragment">#perfil</span>
+    </div>
+
+    <div class="sim-url-legend">
+      <h4>Partes de la URL</h4>
+      <div class="sim-url-legend-grid">
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-esquema"></span><span>Esquema</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-host"></span><span>Host</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-puerto"></span><span>Puerto</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-user"></span><span>Usuario:pass</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-path"></span><span>Path</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-query"></span><span>Query</span></div>
+        <div class="sim-url-legend-item"><span class="sim-url-legend-dot dot-fragment"></span><span>Fragmento</span></div>
+      </div>
+    </div>
+
+    <div class="sim-url-explain" id="urlExplain">
+      <h4>¿Qué es cada parte?</h4>
+      <p id="urlExplainText">Pulsa "Analizar" con una URL para ver la descripción de cada parte.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var sim = document.getElementById("simUrl");
+  if(!sim) return;
+  var input = document.getElementById("urlInput");
+  var display = document.getElementById("urlDisplay");
+  var explainText = document.getElementById("urlExplainText");
+
+  var partDescs = {
+    esquema: "<b>Esquema</b> — indica el protocolo. <code>https</code> = seguro (cifrado), <code>http</code> = texto plano.",
+    host: "<b>Host</b> — el servidor. Puede ser un dominio (<code>miweb.com</code>) o una IP (<code>192.168.1.1</code>). Lo resuelve el DNS.",
+    puerto: "<b>Puerto</b> — puerta de entrada al servidor. Por defecto: 80 (HTTP) o 443 (HTTPS). Si es distinto, va tras el host.",
+    user: "<b>Credenciales</b> — <code>usuario:password@</code> antes del host. Opcional, solo en casos muy específicos (FTP, proxies). Las contraseñas en texto plano son una mala práctica.",
+    path: "<b>Path</b> — ruta al recurso en el servidor. Identifica qué quieres (ej: <code>/v1/usuarios/42</code> = usuario con ID 42).",
+    query: "<b>Query string</b> — parámetros adicionales tras <code>?</code>. Separados por <code>&</code>. Para filtros, búsqueda, paginación. Quedan visibles en la URL y en logs.",
+    fragment: "<b>Fragmento</b> — ancla interna tras <code>#</code>. <b>El servidor nunca lo recibe.</b> El navegador lo usa para hacer scroll a una sección de la página."
+  };
+
+  function parseURL(url) {
+    var result = { esquema: "", host: "", puerto: "", user: "", path: "", query: "", fragment: "" };
+    if (!url) return result;
+
+    // Fragmento
+    var fragIdx = url.indexOf("#");
+    if (fragIdx >= 0) { result.fragment = url.slice(fragIdx + 1); url = url.slice(0, fragIdx); }
+
+    // Query string
+    var queryIdx = url.indexOf("?");
+    if (queryIdx >= 0) { result.query = url.slice(queryIdx + 1); url = url.slice(0, queryIdx); }
+
+    // Esquema + resto
+    var schemeEnd = url.indexOf("://");
+    if (schemeEnd >= 0) {
+      result.esquema = url.slice(0, schemeEnd);
+      url = url.slice(schemeEnd + 3);
+    }
+
+    // Puerto y path
+    var pathIdx = url.indexOf("/");
+    var portIdx = url.indexOf(":");
+    var atIdx = url.indexOf("@");
+
+    // Usuario:password@
+    if (atIdx >= 0) {
+      result.user = url.slice(0, atIdx);
+      url = url.slice(atIdx + 1);
+    }
+
+    // Puerto
+    portIdx = url.indexOf(":");
+    pathIdx = url.indexOf("/");
+    if (portIdx >= 0 && (pathIdx < 0 || portIdx < pathIdx)) {
+      var rest = url.slice(portIdx + 1);
+      var nextSlash = rest.indexOf("/");
+      if (nextSlash < 0) nextSlash = rest.length;
+      result.puerto = rest.slice(0, nextSlash);
+      url = url.slice(0, portIdx) + rest.slice(nextSlash);
+    }
+
+    // Host (lo que queda antes del primer /)
+    pathIdx = url.indexOf("/");
+    if (pathIdx < 0) pathIdx = url.length;
+    result.host = url.slice(0, pathIdx);
+    result.path = url.slice(pathIdx);
+
+    return result;
+  }
+
+  function buildDisplay(parts) {
+    var html = "";
+    function esc(s) { return s?s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"):""; }
+
+    if (parts.esquema) html += '<span class="p-esquema">' + esc(parts.esquema) + '://</span>';
+    if (parts.user) html += '<span class="p-user">' + esc(parts.user) + '@</span>';
+    if (parts.host) html += '<span class="p-host">' + esc(parts.host) + '</span>';
+    if (parts.puerto) html += '<span class="p-puerto">:' + esc(parts.puerto) + '</span>';
+    if (parts.path) html += '<span class="p-path">' + esc(parts.path) + '</span>';
+    if (parts.query) html += '<span class="p-query">?' + esc(parts.query) + '</span>';
+    if (parts.fragment) html += '<span class="p-fragment">#' + esc(parts.fragment) + '</span>';
+
+    return html || '<span style="color:#999">URL vacia</span>';
+  }
+
+  function buildExplain(parts) {
+    var lines = [];
+    if (parts.esquema) lines.push(partDescs.esquema);
+    if (parts.user) lines.push(partDescs.user);
+    if (parts.host) lines.push(partDescs.host);
+    if (parts.puerto) lines.push(partDescs.puerto);
+    if (parts.path) lines.push(partDescs.path);
+    if (parts.query) lines.push(partDescs.query);
+    if (parts.fragment) lines.push(partDescs.fragment);
+    return lines.join("<br><br>");
+  }
+
+  function analyze() {
+    var url = input.value.trim();
+    var parts = parseURL(url);
+    display.innerHTML = buildDisplay(parts);
+    explainText.innerHTML = buildExplain(parts) || "No se detectaron partes reconocibles.";
+  }
+
+  input.addEventListener("input", analyze);
+  document.getElementById("urlAnalyze").addEventListener("click", analyze);
+  input.addEventListener("keydown", function(e){ if(e.key==="Enter") analyze(); });
+
+  analyze();
+})();
+</script>

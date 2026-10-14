@@ -1,0 +1,199 @@
+<!-- ============================================
+     SIMULADOR: Códigos de Estado HTTP — El juego
+     4 escenarios, el alumno elige el código correcto
+     ============================================ -->
+<style>
+.sim-codes{--c-green:#15803d;--c-blue:#1d4ed8;--c-amber:#d97706;--c-red:#b91c1c;--c-purple:#7c3aed;--c-gray:#64748b;border:1px solid #cbd5e1;background:#fff;border-radius:8px;margin:20px 0;overflow:hidden;font-size:14px}
+.sim-codes-header{padding:12px 16px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sim-codes-header::before{content:'?';font-size:18px;background:#fff;color:#6d28d9;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.sim-codes-body{padding:16px}
+.sim-codes-scenarios{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.scenario-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .2s}
+.scenario-card:hover{border-color:var(--c-purple);background:#faf5ff}
+.scenario-card.open{border-color:var(--c-purple);border-width:2px;background:#faf5ff}
+.scenario-title{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600;color:#1e293b}
+.scenario-title::before{content:'Escenario ' attr(data-n);font-size:11px;color:var(--c-purple);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-right:8px;white-space:nowrap}
+.scenario-num{background:var(--c-purple);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.scenario-desc{margin-top:6px;font-size:13px;color:#475569;line-height:1.5;padding-left:10px;border-left:2px solid #e2e8f0}
+.scenario-card.open .scenario-desc{border-left-color:var(--c-purple)}
+.scenario-options{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.opt-btn{padding:6px 12px;border:1.5px solid #e2e8f0;background:#fff;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;color:#374151}
+.opt-btn:hover{border-color:var(--c-purple);color:var(--c-purple);background:#faf5ff}
+.opt-btn.correct{background:#dcfce7;color:var(--c-green);border-color:var(--c-green);cursor:default}
+.opt-btn.wrong{background:#fee2e2;color:var(--c-red);border-color:var(--c-red);cursor:default}
+.opt-btn.chosen{background:var(--c-purple);color:#fff;border-color:var(--c-purple)}
+.scenario-feedback{margin-top:8px;padding:10px 12px;border-radius:6px;font-size:13px;line-height:1.5;display:none}
+.feedback-ok{background:#dcfce7;color:var(--c-green);border-left:3px solid var(--c-green)}
+.feedback-err{background:#fee2e2;color:var(--c-red);border-left:3px solid var(--c-red)}
+.scenario-expl{font-size:12.5px;color:#64748b;margin-top:6px;font-style:italic}
+.sim-codes-score{margin-top:14px;padding:12px 14px;background:#f1f5f9;border-radius:8px;border:1.5px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600}
+.sim-codes-score-label{color:#64748b;font-family:'Work Sans',sans-serif}
+.sim-codes-score-val{font-family:'JetBrains Mono',monospace;color:var(--c-purple);font-size:15px}
+.sim-codes-score-val span{color:#94a3b8;font-size:12px;font-weight:400}
+</style>
+
+<div class="sim-codes" id="simCodes">
+  <div class="sim-codes-header">Codigos de Estado HTTP — El Quiz</div>
+  <div class="sim-codes-body">
+
+    <p style="font-size:13px;color:#64748b;margin:0 0 12px">Haz clic en un escenario para abrirlo. Elige el codigo de estado HTTP correcto para cada situacion.</p>
+
+    <div class="sim-codes-scenarios">
+
+      <!-- Escenario 1 -->
+      <div class="scenario-card" data-sc="1" data-correct="201">
+        <div class="scenario-title" data-n="1">
+          <span>Recurso creado correctamente</span>
+          <span class="scenario-num">1</span>
+        </div>
+        <div class="scenario-desc" style="display:none">
+          <p>Un cliente envia una peticion POST al endpoint <code>/api/usuarios</code> con los datos de un nuevo usuario en el body. El servidor crea el usuario en la base de datos y devuelve la respuesta.</p>
+          <div class="scenario-options">
+            <button class="opt-btn" data-code="200">200 OK</button>
+            <button class="opt-btn" data-code="201">201 Created</button>
+            <button class="opt-btn" data-code="204">204 No Content</button>
+            <button class="opt-btn" data-code="301">301 Moved</button>
+            <button class="opt-btn" data-code="400">400 Bad Request</button>
+            <button class="opt-btn" data-code="404">404 Not Found</button>
+          </div>
+          <div class="scenario-feedback"></div>
+        </div>
+      </div>
+
+      <!-- Escenario 2 -->
+      <div class="scenario-card" data-sc="2" data-correct="401">
+        <div class="scenario-title" data-n="2">
+          <span>Cliente no autenticado</span>
+          <span class="scenario-num">2</span>
+        </div>
+        <div class="scenario-desc" style="display:none">
+          <p>Un cliente intenta acceder a <code>/api/perfil</code> sin enviar ninguna cabecera de autenticacion (ni token, ni sesion, ni cookie). El servidor rechaza la peticion.</p>
+          <div class="scenario-options">
+            <button class="opt-btn" data-code="200">200 OK</button>
+            <button class="opt-btn" data-code="301">301 Moved</button>
+            <button class="opt-btn" data-code="403">403 Forbidden</button>
+            <button class="opt-btn" data-code="401">401 Unauthorized</button>
+            <button class="opt-btn" data-code="404">404 Not Found</button>
+            <button class="opt-btn" data-code="500">500 Server Error</button>
+          </div>
+          <div class="scenario-feedback"></div>
+        </div>
+      </div>
+
+      <!-- Escenario 3 -->
+      <div class="scenario-card" data-sc="3" data-correct="404">
+        <div class="scenario-title" data-n="3">
+          <span>Recurso no encontrado</span>
+          <span class="scenario-num">3</span>
+        </div>
+        <div class="scenario-desc" style="display:none">
+          <p>Un cliente pide <code>/api/productos/99999</code> pero no existe ningun producto con ID 99999 en la base de datos.</p>
+          <div class="scenario-options">
+            <button class="opt-btn" data-code="200">200 OK</button>
+            <button class="opt-btn" data-code="201">201 Created</button>
+            <button class="opt-btn" data-code="204">204 No Content</button>
+            <button class="opt-btn" data-code="400">400 Bad Request</button>
+            <button class="opt-btn" data-code="404">404 Not Found</button>
+            <button class="opt-btn" data-code="500">500 Server Error</button>
+          </div>
+          <div class="scenario-feedback"></div>
+        </div>
+      </div>
+
+      <!-- Escenario 4 -->
+      <div class="scenario-card" data-sc="4" data-correct="503">
+        <div class="scenario-title" data-n="4">
+          <span>Servidor no disponible</span>
+          <span class="scenario-num">4</span>
+        </div>
+        <div class="scenario-desc" style="display:none">
+          <p>El servidor de la API esta en mantenimiento. No puede atender ninguna peticion. Debe responder de forma que el cliente sepa que es temporal y debe reintentar.</p>
+          <div class="scenario-options">
+            <button class="opt-btn" data-code="200">200 OK</button>
+            <button class="opt-btn" data-code="301">301 Moved</button>
+            <button class="opt-btn" data-code="403">403 Forbidden</button>
+            <button class="opt-btn" data-code="500">500 Server Error</button>
+            <button class="opt-btn" data-code="502">502 Bad Gateway</button>
+            <button class="opt-btn" data-code="503">503 Service Unavailable</button>
+          </div>
+          <div class="scenario-feedback"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sim-codes-score">
+      <span class="sim-codes-score-label">Puntuacion</span>
+      <span class="sim-codes-score-val"><span id="codesScore">0</span> / 4 <span>aciertos</span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var sim = document.getElementById("simCodes");
+  if(!sim) return;
+
+  var score = 0;
+  var answered = {};
+  var descriptions = {
+    200: "200 OK: la peticion tuvo exito. El servidor devuelve el recurso solicitado.",
+    201: "201 Created: el recurso se creo con exito. Se devuelve tras un POST que crea algo nuevo.",
+    204: "204 No Content: exito, pero no devuelve body. Tipico de DELETE o actualizaciones.",
+    301: "301 Moved Permanently: redireccion permanente. El recurso esta en otra URL para siempre.",
+    400: "400 Bad Request: la peticion esta mal formada o tiene parametros incorrectos.",
+    401: "401 Unauthorized: el cliente no esta autenticado. Debe enviar credenciales (token, sesion...).",
+    403: "403 Forbidden: autenticado pero sin permisos para acceder a este recurso.",
+    404: "404 Not Found: el recurso no existe en el servidor. Ni en otra URL (no es redireccion).",
+    500: "500 Internal Server Error: fallo interno del servidor. No es culpa del cliente.",
+    502: "502 Bad Gateway: el servidor acting como proxy/gateway recibio una respuesta invalida de otro servidor.",
+    503: "503 Service Unavailable: el servidor esta temporalmente fuera de servicio (mantenimiento, sobrecarga). El cliente debe reintentar."
+  };
+
+  // Toggle cards
+  sim.querySelectorAll(".scenario-card").forEach(function(card){
+    card.querySelector(".scenario-title").addEventListener("click", function(){
+      var desc = card.querySelector(".scenario-desc");
+      if(card.classList.contains("open")){
+        card.classList.remove("open");
+        desc.style.display = "none";
+      } else {
+        card.classList.add("open");
+        desc.style.display = "block";
+      }
+    });
+
+    // Option buttons
+    card.querySelectorAll(".opt-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var scId = card.getAttribute("data-sc");
+        if(answered[scId]) return; // ya respondido
+        answered[scId] = true;
+
+        var correct = card.getAttribute("data-correct");
+        var chosen = btn.getAttribute("data-code");
+        var feedback = card.querySelector(".scenario-feedback");
+        var desc = card.querySelector(".scenario-desc");
+
+        card.querySelectorAll(".opt-btn").forEach(function(b){
+          b.disabled = true;
+          if(b.getAttribute("data-code") === correct) b.classList.add("correct");
+          else if(b === btn && chosen !== correct) b.classList.add("wrong");
+        });
+
+        if(chosen === correct){
+          score++;
+          feedback.className = "scenario-feedback feedback-ok";
+          feedback.innerHTML = "<strong>Correcto!</strong> " + (descriptions[correct] || "") + '<div class="scenario-expl">Pulsa en otro escenario para continuar.</div>';
+        } else {
+          feedback.className = "scenario-feedback feedback-err";
+          feedback.innerHTML = "<strong>Incorrecto.</strong> La respuesta correcta era <strong>" + correct + "</strong>. " + (descriptions[correct] || "") + '<div class="scenario-expl">Pulsa en otro escenario para continuar.</div>';
+        }
+        feedback.style.display = "block";
+
+        document.getElementById("codesScore").textContent = score;
+      });
+    });
+  });
+})();
+</script>
