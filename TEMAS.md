@@ -241,3 +241,10 @@ Y en el CSS:
 | `dark_modern.css` | Negro GitHub-like | Dark |
 | `paper_cream.css` | Cuaderno crema, líneas horizontales | Light |
 | `matrix.css` | Terminal verde `matrix` | Dark |
+| `light_academic.css` | Académico claro, azul profesional | Light |
+
+## Componentes reutilizables
+
+| Archivo | Descripción |
+|---------|-------------|
+| `sim-quiz.html` | Quiz autocontenido con feedback inmediato a/b/c/d |
