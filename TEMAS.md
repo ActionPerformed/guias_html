@@ -243,8 +243,32 @@ Y en el CSS:
 | `matrix.css` | Terminal verde `matrix` | Dark |
 | `light_academic.css` | Académico claro, azul profesional | Light |
 
-## Componentes reutilizables
+## Componentes reutilizables (simuladores)
+
+Los simuladores son componentes HTML/CSS/JS autocontenidos en `generador/componentes/sim-*.html`. Se cargan automáticamente si se referencian con `tipo: componente` en el YAML/JSON.
+
+### Simuladores disponibles
+
+| Archivo | Qué hace | Cómo referenciarlo en YAML |
+|---------|----------|---------------------------|
+| `sim-url.html` | Descompone una URL en todas sus partes con colores y explicaciones | `tipo: componente, nombre: sim-url` |
+| `sim-request.html` | Constructor interactivo de peticiones HTTP (GET/POST/PUT/PATCH/DELETE) | `tipo: componente, nombre: sim-request` |
+| `sim-codes.html` | Quiz de códigos de estado HTTP con 4 escenarios | `tipo: componente, nombre: sim-codes` |
+
+### Ejemplo de bloque YAML
+
+```yaml
+bloques:
+  - titulo: "La URL descompuesta"
+    tipo: componente
+    nombre: sim-url
+    sec_num: "2"
+```
+
+El generador (`generate.py`) busca en `generador/componentes/sim-*.html` todos los archivos matching `sim-*.html` y extrae automáticamente su CSS, JS y HTML para inyectarlo en la guía. Si el componente existe, se usa; si no, se ignora sin error.
+
+## Componentes reutilizables (legados)
 
 | Archivo | Descripción |
 |---------|-------------|
-| `sim-quiz.html` | Quiz autocontenido con feedback inmediato a/b/c/d |
+| `sim-quiz.html` | Quiz autocontenido con feedback inmediato a/b/c/d (no cargado automáticamente) |

@@ -7,10 +7,10 @@ Uso:
 """
 
 import argparse
-import html
+import html as h
 import json
+import re
 import sys
-import os
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
@@ -27,21 +27,89 @@ def load_file(path):
 def slug(text):
     """Convierte texto a id para anclas."""
     import unicodedata
-    # Normaliza y elimina acentos
     text = unicodedata.normalize("NFD", text)
     text = "".join(c for c in text if unicodedata.category(c) != "Mn")
     text = text.lower()
-    # Elimina todo lo que no sea alfanumérico o espacio, luego espacios a guiones
-    import re
-    text = re.sub(r"[^a-z0-9\s-]", "", text)
-    text = re.sub(r"[\s_]+", "-", text).strip("-")
+    import re as _re
+    text = _re.sub(r"[^a-z0-9\s-]", "", text)
+    text = _re.sub(r"[\s_]+", "-", text).strip("-")
     return text
 
 
+# ---------------------------------------------------------------------------
+# Simulators — carga y extracción de CSS/JS/HTML desde componentes/
+# ---------------------------------------------------------------------------
+_SIMULATORS = {}  # name -> {css, js, html}
+
+
+def _extract_component(content):
+    """Extrae CSS, JS y HTML de un archivo de componente."""
+    css = ""
+    js = ""
+    body = content
+    # Extraer <style>...</style>
+    m = re.search(r'<style>([\s\S]*?)</style>', content)
+    if m:
+        css = m.group(1).strip()
+        body = body[:m.start()] + body[m.end():]
+    # Extraer <script>...</script> (solo el primero, el del componente)
+    m = re.search(r'<script>\s*\(function\(\)\s*\{([\s\S]*?)\}\)\(\)\s*;\s*</script>', body)
+    if m:
+        js = m.group(1).strip()
+    # Quitar comentarios HTML
+    body = re.sub(r'<!--[\s\S]*?-->', '', body)
+    body = body.strip()
+    return css, js, body
+
+
+def load_simulators():
+    """Carga todos los componentes de simulador desde COMPONENTES_DIR."""
+    global _SIMULATORS
+    _SIMULATORS = {}
+    if not COMPONENTES_DIR.exists():
+        return
+    for f in COMPONENTES_DIR.glob("sim-*.html"):
+        name = f.stem  # "sim-url", "sim-request", ...
+        try:
+            content = load_file(f)
+            css, js, body = _extract_component(content)
+            _SIMULATORS[name] = {"css": css, "js": js, "html": body}
+        except Exception as e:
+            print(f"  [WARN] No se pudo cargar {f.name}: {e}")
+
+
+def get_simulator(name):
+    """Devuelve el dict {css, js, html} de un simulador o None."""
+    return _SIMULATORS.get(name)
+
+
+def build_simulators_css():
+    """Concats todo el CSS de simuladores en un solo <style>."""
+    css_parts = []
+    for sim in _SIMULATORS.values():
+        if sim["css"]:
+            css_parts.append(sim["css"])
+    if not css_parts:
+        return ""
+    return "<style>\n" + "\n\n".join(css_parts) + "\n</style>"
+
+
+def build_simulators_js():
+    """Envuelve todo el JS de simuladores en un <script> autocontenido."""
+    js_parts = []
+    for name, sim in _SIMULATORS.items():
+        if sim["js"]:
+            js_parts.append(f"/* === {name} === */\n{sim['js']}")
+    if not js_parts:
+        return ""
+    return "<script>\n(function(){\n" + "\n\n".join(js_parts) + "\n})();\n</script>"
+
+
+# ---------------------------------------------------------------------------
+# Code array
+# ---------------------------------------------------------------------------
 def build_code_array(code_snippets):
-    """Genera el objeto CODE de JavaScript."""
     def safe(code):
-        # Neutraliza ${} para que no se interprete como template literal JS
         code = code.replace("\\", "\\\\").replace("`", "\\`")
         code = code.replace("${", "${''+")
         return code
@@ -56,20 +124,24 @@ def build_code_array(code_snippets):
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------------------
+# Nav items
+# ---------------------------------------------------------------------------
 def build_nav_items(bloques):
-    """Genera los items de navegación del sidebar."""
     navs = []
     for i, b in enumerate(bloques):
         num = b.get("numero", str(i + 1))
         titulo = b.get("titulo", f"Bloque {i+1}")
         anchor = b.get("anchor") or slug(titulo)
         tag = b.get("tag", num)
-        navs.append(f'  <a class="nav-link" href="#{anchor}"><span class="tag">{html.escape(tag)}</span> {html.escape(titulo)}</a>')
+        navs.append(f'  <a class="nav-link" href="#{anchor}"><span class="tag">{h.escape(tag)}</span> {h.escape(titulo)}</a>')
     return "\n".join(navs)
 
 
+# ---------------------------------------------------------------------------
+# Content
+# ---------------------------------------------------------------------------
 def build_content(bloques):
-    """Genera el HTML de los bloques de contenido."""
     html_parts = []
     for b in bloques:
         tipo = b.get("tipo", "texto")
@@ -78,12 +150,10 @@ def build_content(bloques):
         icono = b.get("icono", "📋")
         tiempo = b.get("tiempo", "")
         contenido = b.get("contenido", "")
-
         sec_num = b.get("sec_num", "")
 
         html_parts.append(f'<section id="{anchor}">')
 
-        # Cabecera de sección
         head_parts = [f'<span class="sec-num">{sec_num}</span>']
         if titulo:
             head_parts.append(f"<h2>{icono} {titulo}</h2>")
@@ -91,7 +161,6 @@ def build_content(bloques):
             head_parts.append(f'<span class="time-badge">⏱ {tiempo}</span>')
         html_parts.append(f'  <div class="sec-head">{"".join(head_parts)}</div>')
 
-        # Contenido según tipo
         if tipo == "texto":
             html_parts.append(f"  {contenido}")
 
@@ -129,10 +198,14 @@ def build_content(bloques):
             html_parts.append(f"  </div>")
 
         elif tipo == "componente":
-            # Componente pre-hecho incluido inline
             comp_name = b.get("nombre", "")
-            html_parts.append(f"  <!-- componente: {comp_name} -->")
-            html_parts.append(b.get("html", ""))
+            sim = get_simulator(comp_name)
+            if sim:
+                html_parts.append(f"  <!-- simulador: {comp_name} -->")
+                html_parts.append(f"  {sim['html']}")
+            else:
+                html_parts.append(f"  <!-- componente: {comp_name} (no encontrado) -->")
+                html_parts.append(b.get("html", ""))
 
         else:
             html_parts.append(f"  {contenido}")
@@ -142,7 +215,10 @@ def build_content(bloques):
     return "\n".join(html_parts)
 
 
-def generate(theme, title, sig, yaml_file, output_file):
+# ---------------------------------------------------------------------------
+# Generate
+# ---------------------------------------------------------------------------
+def generate(theme, title, sig, yaml_file, output_file, data=None):
     # Cargar plantilla y tema
     template = load_file(TEMPLATE_FILE)
     # Acepta nombre de tema (busca en temas/) o ruta directa a archivo CSS
@@ -158,22 +234,13 @@ def generate(theme, title, sig, yaml_file, output_file):
         sys.exit(1)
     css_theme = load_file(tema_file)
 
-    # Validar esquema mínimo del contenido
-    if not isinstance(data, dict):
-        print("ERROR: El archivo de contenido debe ser un objeto JSON/YAML válido.")
-        sys.exit(1)
-    if "bloques" not in data and not data.get("meta", {}).get("title"):
-        print("ERROR: El contenido debe tener 'meta.title' o 'bloques'.")
-        sys.exit(1)
-
-    # Cargar contenido JSON
+    # Cargar contenido JSON/YAML
     if yaml_file:
         yaml_path = str(yaml_file)
         if yaml_path.endswith(".json"):
             with open(yaml_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
         else:
-            # Intentar YAML si está disponible
             try:
                 import yaml
                 with open(yaml_file, "r", encoding="utf-8") as f:
@@ -183,8 +250,16 @@ def generate(theme, title, sig, yaml_file, output_file):
                 print("   Instálalo con: pip install pyyaml")
                 print("   O usa un archivo .json en su lugar.")
                 sys.exit(1)
-    else:
+    elif data is None:
         data = {"bloques": []}
+
+    # Validar esquema mínimo del contenido
+    if not isinstance(data, dict):
+        print("ERROR: El archivo de contenido debe ser un objeto JSON/YAML válido.")
+        sys.exit(1)
+    if "bloques" not in data and not data.get("meta", {}).get("title"):
+        print("ERROR: El contenido debe tener 'meta.title' o 'bloques'.")
+        sys.exit(1)
 
     # Metadatos
     meta = data.get("meta", {})
@@ -197,6 +272,9 @@ def generate(theme, title, sig, yaml_file, output_file):
     intro_anchor = meta.get("intro_anchor", "Inicio")
     sec_num_checklist = meta.get("sec_num_checklist", str(len(data.get("bloques", [])) + 1))
     sec_num_ampliaciones = meta.get("sec_num_ampliaciones", str(len(data.get("bloques", [])) + 2))
+
+    # Simulators (carga componentes sim-*.html de componentes/)
+    load_simulators()
 
     # Contenido
     bloques = data.get("bloques", [])
@@ -225,6 +303,11 @@ def generate(theme, title, sig, yaml_file, output_file):
     total_check = len(checklist)
     total = total_rets + total_check
 
+    # Simulators CSS y JS
+    simulators_css = build_simulators_css()
+    simulators_js = build_simulators_js()
+    simulators_html = simulators_css + "\n" + simulators_js
+
     # Reemplazar placeholders
     replacements = {
         "{{TITLE}}": title,
@@ -245,6 +328,7 @@ def generate(theme, title, sig, yaml_file, output_file):
         "{{CHECKLIST}}": checklist_js,
         "{{AMPLIACIONES}}": ampliaciones_js,
         "{{CUSTOM_JS}}": custom_js,
+        "{{SIMULATORS}}": simulators_html,
     }
 
     output = template

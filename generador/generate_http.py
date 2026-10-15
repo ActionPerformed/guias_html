@@ -8,16 +8,17 @@ Uso:
   python generate_http.py --theme blueprint
   python generate_http.py --help
 """
-import argparse, json, re, html as h
+import argparse, json, re, html as h, sys
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
+sys.path.insert(0, str(SCRIPT_DIR))
+
+# Importar utilidades de generate.py (simulators, slug, etc.)
+import generate as gen
 DEFAULT_MD = SCRIPT_DIR.parent / "temp" / "guia http.md"
 DEFAULT_OUT = SCRIPT_DIR.parent / "guia_http.html"
 BLUEPRINT = SCRIPT_DIR / "temas" / "blueprint.css"
-SIM_URL = SCRIPT_DIR / "componentes" / "sim-url.html"
-SIM_REQ = SCRIPT_DIR / "componentes" / "sim-request.html"
-SIM_CODES = SCRIPT_DIR / "componentes" / "sim-codes.html"
 
 def read(path):
     with open(path, encoding="utf-8") as f:
@@ -326,22 +327,13 @@ def main():
 
     md = read(args.input)
     tema_css = read(args.theme)
-    sim_url = read(SIM_URL)
-    sim_req = read(SIM_REQ)
-    sim_codes = read(SIM_CODES)
-    sim_url = read(SIM_URL)
-    sim_req = read(SIM_REQ)
-    sim_codes = read(SIM_CODES)
+    gen.load_simulators()
 
     # Extraer solo el CSS+HTML+JS de cada simulador
     def extract_body(html):
         # Quitar comentarios版权
         html = re.sub(r'<!--[\s\S]*?-->', '', html)
         return html.strip()
-
-    sim_url_body = extract_body(sim_url)
-    sim_req_body = extract_body(sim_req)
-    sim_codes_body = extract_body(sim_codes)
 
     # Construir secciones
     sections_html, code_blocks = build_sections(md)
@@ -370,14 +362,6 @@ def main():
     sections_out = []
     for idx, sec_html in enumerate(sections_html, 1):
         sections_out.append(f'<section id="sec-{idx}">\n{sec_html}\n</section>')
-
-    # Inyectar simuladores en secciones 2, 4, 9
-    if len(sections_out) >= 2:
-        sections_out[1] = sections_out[1] + "\n" + sim_url_body
-    if len(sections_out) >= 4:
-        sections_out[3] = sections_out[3] + "\n" + sim_req_body
-    if len(sections_out) >= 9:
-        sections_out[8] = sections_out[8] + "\n" + sim_codes_body
 
     content_html = "\n".join(sections_out)
 
@@ -434,6 +418,8 @@ def main():
         "{{CODE_ARRAY}}": code_js,
         "{{CHECKLIST}}": checklist_js,
         "{{AMPLIACIONES}}": ampliaciones_js,
+        "{{SIMULATORS}}": gen.build_simulators_css() + "\n" + gen.build_simulators_js(),
+        "{{CUSTOM_JS}}": "",
         "{{CUSTOM_JS}}": "",
     }
 

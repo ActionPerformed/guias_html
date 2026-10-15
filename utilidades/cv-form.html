@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV Alumno · Formulario FCT</title>
+<meta name="description" content="Formulario para generar tu CV profesional en formato Markdown.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #0A1826;
+  --card: #112233;
+  --card-2: #0D1B2A;
+  --ink: #E0E8F0;
+  --muted: #6B8CAE;
+  --line: #1E3A5F;
+  --cyan: #4FD1C5;
+  --cyan-2: #38B2AC;
+  --amber: #E8A33D;
+  --green: #68D391;
+  --red: #FC8181;
+  --shadow: 0 4px 16px rgba(0,0,0,.45);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::before { transition: none !important; } }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Work Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.62;
+  background-image: linear-gradient(rgba(30,58,95,.3) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(30,58,95,.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+  padding: 0 0 80px;
+}
+h1, h2, h3, h4 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; letter-spacing: -.005em; line-height: 1.16; }
+h1 { font-size: clamp(28px, 5vw, 46px); margin-bottom: 10px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; font-family: 'Work Sans', sans-serif; font-weight: 700; letter-spacing: -.01em; margin-bottom: 10px; }
+h4 { font-size: 14px; font-family: 'Work Sans', sans-serif; font-weight: 700; letter-spacing: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; border-radius: 2px; }
+a { color: var(--cyan); }
+code, pre { font-family: 'JetBrains Mono', monospace; }
+
+.wrap { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Header ── */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(10,24,38,.92); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.topbar .sig { font-family: 'Instrument Serif'; font-size: 18px; color: var(--ink); }
+.topbar .sig b {
+  font-family: 'Work Sans'; font-weight: 700; font-size: 11.5px;
+  background: var(--cyan); color: #061018; padding: 2px 8px;
+  border-radius: 2px; margin-right: 8px; vertical-align: 2px;
+  letter-spacing: .04em;
+}
+.topbar .spacer { flex: 1; }
+.topbar .badge {
+  font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted);
+  border: 1px solid var(--line); padding: 3px 10px; border-radius: 99px;
+}
+
+.intro { padding: 36px 0 28px; border-bottom: 1px dashed var(--line); margin-bottom: 28px; }
+.intro p { color: var(--muted); font-size: 15.5px; max-width: 60ch; }
+.intro .updated {
+  margin-top: 10px; font-family: 'JetBrains Mono'; font-size: 12.5px; color: var(--muted);
+  border: 1px solid var(--line); background: var(--card); display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border-radius: 4px;
+}
+.intro .updated input {
+  background: transparent; border: none; color: var(--ink);
+  font-family: 'JetBrains Mono'; font-size: 12.5px; width: 100px;
+}
+
+/* ── Section ── */
+section { margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px dashed var(--line); }
+section:last-of-type { border-bottom: none; }
+.sec-label {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+}
+.sec-num {
+  font-family: 'JetBrains Mono'; font-size: 11px; color: var(--cyan);
+  border: 1px solid var(--cyan); padding: 2px 8px; border-radius: 2px;
+  background: transparent; flex: none;
+}
+
+/* ── Field groups ── */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 13.5px; font-weight: 600;
+  color: var(--muted); margin-bottom: 5px; text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.field label span { color: var(--red); margin-left: 2px; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="url"],
+input[type="month"], select, textarea {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink);
+  font-family: 'Work Sans'; font-size: 15px; border-radius: 4px;
+  transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--cyan);
+}
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .6; }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+select { cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B8CAE' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+select option { background: var(--card-2); }
+
+/* Radio/checkbox pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill-group label.pill {
+  font-size: 13.5px; font-weight: 600; text-transform: none; letter-spacing: 0;
+  padding: 6px 14px; border: 1px solid var(--line); border-radius: 4px;
+  cursor: pointer; transition: all .15s; background: var(--card); color: var(--ink);
+}
+.pill-group label.pill input[type="radio"],
+.pill-group label.pill input[type="checkbox"] { display: none; }
+.pill-group label.pill:has(input:checked) {
+  background: var(--cyan); color: #061018; border-color: var(--cyan);
+}
+.pill-group label.pill:hover { border-color: var(--cyan); }
+
+/* Grid layouts */
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .row2, .row3 { grid-template-columns: 1fr; } }
+
+/* Proyecto block */
+.proyecto {
+  border: 1px solid var(--line); background: var(--card-2);
+  border-radius: 6px; padding: 16px 18px; margin-bottom: 16px;
+}
+.proyecto h3 { color: var(--cyan); font-size: 14px; margin-bottom: 12px; }
+.proyecto .del-btn {
+  float: right; font-size: 12px; background: transparent; border: 1px solid var(--line);
+  color: var(--muted); padding: 2px 10px; border-radius: 3px; cursor: pointer;
+  font-family: 'Work Sans';
+}
+.proyecto .del-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* Experiencia block */
+.experiencia {
+  border: 1px solid var(--line); background: var(--card-2);
+  border-radius: 6px; padding: 16px 18px; margin-bottom: 14px;
+}
+.experiencia h3 { color: var(--amber); font-size: 14px; margin-bottom: 12px; }
+
+/* Competencia row */
+.comp-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px;
+  align-items: center; margin-bottom: 8px;
+}
+.comp-row .skill-name { font-size: 14.5px; }
+.comp-row select { width: auto; min-width: 160px; padding: 5px 28px 5px 10px; font-size: 13.5px; }
+
+/* Level badge */
+.level-badge {
+  display: inline-block; font-family: 'JetBrains Mono'; font-size: 11px;
+  padding: 2px 7px; border-radius: 3px; font-weight: 700;
+}
+.level-Básico { background: rgba(79,209,197,.1); color: var(--cyan); border: 1px solid var(--cyan); }
+.level-Intermedio { background: rgba(232,163,61,.15); color: var(--amber); border: 1px solid var(--amber); }
+.level-Avanzado { background: rgba(104,211,145,.15); color: var(--green); border: 1px solid var(--green); }
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 20px; }
+.btn {
+  font-family: 'Work Sans'; font-weight: 700; font-size: 14.5px; cursor: pointer;
+  padding: 10px 20px; border-radius: 4px; border: none; transition: background .15s;
+}
+.btn-primary { background: var(--cyan); color: #061018; }
+.btn-primary:hover { background: var(--cyan-2); }
+.btn-secondary { background: var(--card); color: var(--cyan); border: 1px solid var(--line); }
+.btn-secondary:hover { border-color: var(--cyan); background: var(--card-2); }
+.btn-add {
+  background: transparent; color: var(--cyan); border: 1px dashed var(--cyan);
+  font-size: 13.5px; padding: 7px 16px;
+}
+.btn-add:hover { background: rgba(79,209,197,.08); border-style: solid; }
+.btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+/* ── Output ── */
+.output-wrap { display: none; margin-top: 24px; }
+.output-wrap.show { display: block; }
+.output-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.output-header h3 { margin: 0; font-size: 15px; }
+.copy-btn {
+  font-family: 'Work Sans'; font-size: 13px; font-weight: 600;
+  background: var(--card); border: 1px solid var(--line); color: var(--cyan);
+  padding: 5px 14px; border-radius: 4px; cursor: pointer;
+}
+.copy-btn:hover { border-color: var(--cyan); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+.download-btn {
+  font-family: 'Work Sans'; font-size: 13px; font-weight: 600;
+  background: var(--cyan); border: none; color: #061018;
+  padding: 5px 14px; border-radius: 4px; cursor: pointer;
+  text-decoration: none;
+}
+.download-btn:hover { background: var(--cyan-2); }
+textarea.output {
+  width: 100%; min-height: 500px; padding: 14px 16px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
+  color: var(--ink); font-family: 'JetBrains Mono'; font-size: 13px;
+  line-height: 1.6; resize: vertical;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  z-index: 90; background: var(--cyan); color: #061018;
+  padding: 10px 20px; font-size: 14px; border-radius: 4px;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+  font-weight: 700;
+}
+.toast.show { opacity: 1; }
+
+/* ── Footer ── */
+.foot {
+  border-top: 1px solid var(--line); margin-top: 50px;
+  padding-top: 18px; color: var(--muted); font-size: 13.5px;
+  text-align: center;
+}
+
+/* ── Helpers ── */
+.placeholder-hint {
+  font-size: 12px; color: var(--muted); margin-top: 3px;
+  font-style: italic;
+}
+.optional-tag {
+  font-size: 11px; background: var(--card); border: 1px solid var(--line);
+  color: var(--muted); padding: 1px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono'; margin-left: 6px; text-transform: none;
+  letter-spacing: 0; font-weight: 400;
+}
+.section-note {
+  font-size: 13.5px; color: var(--muted); margin-bottom: 14px;
+  font-style: italic; padding: 8px 12px; background: var(--card);
+  border-left: 3px solid var(--line); border-radius: 0 4px 4px 0;
+}
+
+@media (max-width: 600px) {
+  .row2, .row3 { grid-template-columns: 1fr; }
+  .comp-row { grid-template-columns: 1fr; }
+  .comp-row select { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="sig"><b>CV</b> Formulario FCT</div>
+  <div class="spacer"></div>
+  <div class="badge">ASIR · 2º</div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <h1>Tu CV Profesional</h1>
+    <p>Rellena este formulario y genera tu CV en formato Markdown, listo para enviar a empresas o al departamento de FCT de tu centro.</p>
+  </div>
+
+<form id="cvForm" novalidate>
+
+  <!-- 1. Perfil Profesional -->
+  <section>
+    <div class="sec-label"><span class="sec-num">1</span><h2>Perfil Profesional</h2></div>
+    <div class="field">
+      <label for="perfil">Resumen profesional</label>
+      <textarea id="perfil" rows="4" placeholder="2-4 líneas sobre quién eres, qué estudias, qué área técnica te interesa y qué buscas. Ejemplo: 'Estudiante de 2º del Grado Superior en ASIR, con especial interés en la administración de sistemas Linux, la virtualización y la seguridad informática. Busca realizar las prácticas FCT en un entorno donde pueda aplicar y ampliar sus conocimientos en infraestructura y soporte TIC.'"></textarea>
+      <div class="placeholder-hint">Este texto aparece justo debajo de tu nombre en el CV. Haz que cuente quién eres.</div>
+    </div>
+  </section>
+
+  <!-- 2. Cabecera e Identificación -->
+  <section>
+    <div class="sec-label"><span class="sec-num">2</span><h2>Cabecera e Identificación</h2></div>
+    <div class="field">
+      <label for="perfilAcademico">Perfil Académico</label>
+      <input type="text" id="perfilAcademico" value="Estudiante de Grado Superior en Administración de Sistemas Informáticos en Red (ASIR)">
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label for="puestoAula">Puesto en el aula</label>
+      <input type="text" id="puestoAula" placeholder="Ej. 2_ASIR_55 (donde 55 es tu puesto en el aula) ">
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label for="emailTutor">Email del tutor/a</label>
+      <input type="email" id="emailTutor" placeholder="tutor@mail.com (el mío, NO el vuestro)">
+    </div>
+  </section>
+
+  <!-- 3. Proyectos Destacados -->
+  <section>
+    <div class="sec-label"><span class="sec-num">4</span><h2>Proyectos Destacados</h2></div>
+    <p class="section-note">Los proyectos de clase son tu mejor carta de presentación. Incluye 2-3 proyectos. Si borras uno, guarda antes lo que hayas escrito.</p>
+    <div id="proyectosContainer"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-add" id="addProyecto">+ Añadir proyecto</button>
+    </div>
+  </section>
+
+  <!-- 4. Experiencia Laboral -->
+  <section>
+    <div class="sec-label"><span class="sec-num">5</span><h2>Experiencia Laboral en el Sector</h2></div>
+    <p class="section-note">Apartado opcional. Rellénalo solo si has trabajado previamente en informática, sistemas, redes o soporte técnico.</p>
+    <div id="experienciasContainer"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-add" id="addExperiencia">+ Añadir experiencia</button>
+    </div>
+    <div class="field" id="noExperienciaField" style="display:none">
+      <div class="section-note">Sin experiencia laboral previa en el sector. Los proyectos académicos reflejados en el apartado 3 constituyen su principal carta de presentación.</div>
+    </div>
+  </section>
+
+  <!-- 6. Competencias Técnicas -->
+  <section id="compSection">
+    <div class="sec-label"><span class="sec-num">6</span><h2>Competencias Técnicas</h2></div>
+    <p class="section-note">Básico → visto en clase.<br>Intermedio → usado en prácticas o proyectos.<br>Avanzado → podría usarlo en entorno real con supervisión mínima.</p>
+    <div class="row2" style="margin-bottom:16px">
+      <div class="field">
+        <label for="areaFortaleza">Área de mayor fortaleza</label>
+        <input type="text" id="areaFortaleza" placeholder="Ej. Redes y sistemas Linux">
+      </div>
+      <div class="field">
+        <label for="areaDesarrollo">Área en desarrollo</label>
+        <input type="text" id="areaDesarrollo" placeholder="Ej. Cloud y seguridad">
+      </div>
+    </div>
+
+    <!-- Sistemas Operativos -->
+    <h4>Sistemas Operativos</h4>
+    <div class="comp-row"><span class="skill-name">Windows Server</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Linux (Debian/Ubuntu/CentOS)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Redes -->
+    <h4 style="margin-top:16px">Redes y Comunicaciones</h4>
+    <div class="comp-row"><span class="skill-name">Configuración de switches y routers</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">VLANs, enrutamiento y NAT</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Servicios de red (DNS, DHCP, HTTP, FTP)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Herramientas de monitorización (Wireshark, Nagios, Zabbix)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Virtualización y Cloud -->
+    <h4 style="margin-top:16px">Virtualización y Cloud</h4>
+    <div class="comp-row"><span class="skill-name">VMware / VirtualBox / Proxmox</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Docker y contenedores</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Introducción a cloud (AWS / Azure / GCP)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Administración de Sistemas -->
+    <h4 style="margin-top:16px">Administración de Sistemas y Servicios</h4>
+    <div class="comp-row"><span class="skill-name">Active Directory y LDAP</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Servidores web (Apache / Nginx)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Bases de datos (MySQL / PostgreSQL)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Copias de seguridad y recuperación</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Seguridad -->
+    <h4 style="margin-top:16px">Seguridad Informática</h4>
+    <div class="comp-row"><span class="skill-name">Hardening de sistemas</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Firewalls y VPN</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Análisis de vulnerabilidades básico</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Scripting -->
+    <h4 style="margin-top:16px">Scripting y Automatización</h4>
+    <div class="comp-row"><span class="skill-name">Bash</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">PowerShell</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Python</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+
+    <!-- Herramientas -->
+    <h4 style="margin-top:16px">Herramientas de Desarrollo y Gestión</h4>
+    <div class="comp-row"><span class="skill-name">Git / GitHub</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    <div class="comp-row"><span class="skill-name">Documentación técnica (Markdown, Wikis)</span><select class="nivel"><option value="">-</option><option>Básico</option><option>Intermedio</option><option>Avanzado</option></select></div>
+  </section>
+
+  <!-- 6. Educación -->
+  <section>
+    <div class="sec-label"><span class="sec-num">7</span><h2>Educación y Formación</h2></div>
+
+    <h4>Estudios en curso</h4>
+    <div class="row2">
+      <div class="field">
+        <label for="estudiosEnCurso">Titulación</label>
+        <input type="text" id="estudiosEnCurso" value="Grado Superior en Administración de Sistemas Informáticos en Red (ASIR)">
+      </div>
+      <div class="field">
+        <label for="centroEducativo">Centro educativo</label>
+        <input type="text" id="centroEducativo" placeholder="Centro Público de FP en [Provincia]">
+      </div>
+    </div>
+
+    <h4 style="margin-top:20px">Otros estudios finalizados</h4>
+    <div id="estudiosContainer"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-add" id="addEstudio">+ Añadir estudio</button>
+    </div>
+  </section>
+
+  <!-- 7. Certificaciones -->
+  <section>
+    <div class="sec-label"><span class="sec-num">8</span><h2>Certificaciones y Formación Complementaria</h2></div>
+    <p class="section-note">Ejemplos: Cisco CCNA, AWS Cloud Practitioner, LPIC-1, CompTIA Network+, cursos de Docker/Kubernetes, ciberseguridad. Si no tienes, deja vacío.</p>
+    <div id="certsContainer"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-add" id="addCert">+ Añadir certificación</button>
+    </div>
+    <div class="field" id="noCertsField" style="display:none">
+      <div class="section-note">Sin certificaciones adicionales por el momento.</div>
+    </div>
+  </section>
+
+  <!-- 8. Idiomas -->
+  <section>
+    <div class="sec-label"><span class="sec-num">9</span><h2>Idiomas</h2></div>
+    <p class="section-note">Nivel según Marco Común Europeo de Referencia (MCER): A1–A2 Básico, B1–B2 Intermedio, C1–C2 Avanzado.</p>
+    <div id="idiomasContainer"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-add" id="addIdioma">+ Añadir idioma</button>
+    </div>
+  </section>
+
+  <!-- 9. Vehículo y Disponibilidad -->
+  <section>
+    <div class="sec-label"><span class="sec-num">10</span><h2>Vehículo y Disponibilidad Geográfica</h2></div>
+    <div class="row2">
+      <div class="field">
+        <label>Vehículo propio</label>
+        <div class="pill-group" style="margin-top:4px">
+          <label class="pill"><input type="radio" name="vehiculo" value="Sí"> Sí</label>
+          <label class="pill"><input type="radio" name="vehiculo" value="No"> No</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="tipoLicencia">Permiso de conducir</label>
+        <select id="tipoLicencia">
+          <option value="">Selecciona...</option>
+          <option>Sí – Tipo B</option>
+          <option>Sí – Otros</option>
+          <option>No</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Disponibilidad para viajar</label>
+      <div class="pill-group" style="margin-top:4px">
+        <label class="pill"><input type="radio" name="viajar" value="Sí"> Sí</label>
+        <label class="pill"><input type="radio" name="viajar" value="No"> No</label>
+      </div>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label for="obsDisponibilidad">Observaciones <span class="optional-tag">opcional</span></label>
+      <textarea id="obsDisponibilidad" rows="2" placeholder="Ej. Disponibilidad para viajar occasionally."></textarea>
+    </div>
+  </section>
+
+  <!-- 10. Competencias Blandas -->
+  <section>
+    <div class="sec-label"><span class="sec-num">11</span><h2>Competencias Blandas y Motivación</h2></div>
+    <div class="field">
+      <label for="habilidadesClave">Habilidades clave</label>
+      <input type="text" id="habilidadesClave" placeholder="Ej. Capacidad de aprendizaje rápido, trabajo en equipo, proactividad, resolución de problemas, adaptabilidad al cambio tecnológico.">
+    </div>
+    <div class="field">
+      <label for="ejemploTrabajoEquipo">Ejemplo de trabajo en equipo <span class="optional-tag">opcional</span></label>
+      <textarea id="ejemploTrabajoEquipo" rows="2" placeholder="Ej. Proyecto X realizado con N compañeros bajo metodología Scrum."></textarea>
+    </div>
+    <div class="field">
+      <label for="ejemploProactividad">Ejemplo de proactividad <span class="optional-tag">opcional</span></label>
+      <textarea id="ejemploProactividad" rows="2" placeholder="Ej. Propuse y documenté una mejora en el laboratorio de prácticas."></textarea>
+    </div>
+    <div class="field">
+      <label for="interesesTecnicos">Intereses técnicos</label>
+      <input type="text" id="interesesTecnicos" placeholder="Ej. Interés enfocado hacia la administración de sistemas Linux, la seguridad informática, la virtualización y el despliegue de infraestructuras en cloud.">
+    </div>
+    <div class="field">
+      <label for="motivacion">Motivación</label>
+      <textarea id="motivacion" rows="3" placeholder="Breve párrafo sobre qué esperas aprender en la empresa y cómo puedes aportar."></textarea>
+    </div>
+  </section>
+
+  <!-- 11. Referencias -->
+  <section>
+    <div class="sec-label"><span class="sec-num">12</span><h2>Referencias</h2></div>
+    <div class="field">
+      <div class="section-note">Referencias: Disponibles bajo petición al centro educativo.</div>
+    </div>
+  </section>
+
+  <!-- 12. Declaración de Veracidad -->
+  <section>
+    <div class="sec-label"><span class="sec-num">13</span><h2>Declaración de Veracidad</h2></div>
+    <div class="field">
+      <div class="pill-group">
+        <label class="pill"><input type="checkbox" id="declaracionVeracidad"> Declaro que los datos aquí reflejados son veraces y han sido revisados por mí.</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Generate -->
+  <div class="btn-row" style="margin-top:28px">
+    <button type="button" class="btn btn-primary" id="generarBtn">📄 Generar Markdown</button>
+    <button type="button" class="btn btn-secondary" id="resetBtn">🔄 Limpiar formulario</button>
+  </div>
+
+  <div class="output-wrap" id="outputWrap">
+    <div class="output-header">
+      <h3>Tu CV en Markdown</h3>
+      <button type="button" class="copy-btn" id="copyBtn">Copiar</button>
+      <a class="download-btn" id="downloadBtn" download="cv.md">Descargar .md</a>
+    </div>
+    <textarea class="output" id="outputMd" readonly></textarea>
+  </div>
+
+</form>
+
+<div class="foot">
+  <p>CV Alumno · Formulario FCT · Contenido generado por el alumno y revisado por el centro educativo.</p>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  var toastEl = document.getElementById("toast");
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    setTimeout(function() { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // Set default month to current
+  var now = new Date();
+
+  // ── Dynamic blocks ──
+
+  // Proyectos
+  var proyectoTpl = function(i) {
+    return '<div class="proyecto" id="proy-' + i + '">' +
+      '<h3>Proyecto ' + i + '</h3>' +
+      '<button type="button" class="del-btn" onclick="removeBlock(\'proy-' + i + '\')">Eliminar</button>' +
+      '<div class="field"><label>Título</label><input type="text" id="py-titulo-' + i + '" placeholder="Nombre del proyecto"></div>' +
+      '<div class="row2">' +
+        '<div class="field"><label>Rol</label><input type="text" id="py-rol-' + i + '" placeholder="Ej. Administrador de Sistemas"></div>' +
+        '<div class="field"><label>Tecnologías</label><input type="text" id="py-tec-' + i + '" placeholder="Ej. Linux, Docker, Ansible"></div>' +
+      '</div>' +
+      '<div class="field"><label>Descripción</label><textarea id="py-desc-' + i + '" rows="2" placeholder="Qué hacía el proyecto y qué retos técnicos se resolvieron"></textarea></div>' +
+      '<div class="row2">' +
+        '<div class="field"><label>Trabajo en equipo</label><input type="text" id="py-equipo-' + i + '" placeholder="Ej. En equipo de 3, metodología Scrum"></div>' +
+        '<div class="field"><label>Resultado / Entregables</label><input type="text" id="py-resultado-' + i + '" placeholder="Ej. Documentación técnica, repositorio Git"></div>' +
+      '</div>' +
+      '<div class="field"><label>Repositorio / Demo <span class="optional-tag">opcional</span></label><input type="text" id="py-repo-' + i + '" placeholder="URL o \'Disponible bajo petición\'"></div>' +
+    '</div>';
+  };
+
+  var expTpl = function(i) {
+    return '<div class="experiencia" id="exp-' + i + '">' +
+      '<h3>Experiencia ' + i + '</h3>' +
+      '<button type="button" class="del-btn" onclick="removeBlock(\'exp-' + i + '\')">Eliminar</button>' +
+      '<div class="row2">' +
+        '<div class="field"><label>Puesto</label><input type="text" id="ex-puesto-' + i + '" placeholder="Ej. Técnico de Soporte"></div>' +
+        '<div class="field"><label>Empresa</label><input type="text" id="ex-empresa-' + i + '" placeholder="Nombre o descripción genérica"></div>' +
+      '</div>' +
+      '<div class="field"><label>Periodo</label><input type="text" id="ex-periodo-' + i + '" placeholder="Ej. Mar 2023 – Dic 2023"></div>' +
+      '<div class="field"><label>Funciones principales (una por línea en el CV)</label><textarea id="ex-funciones-' + i + '" rows="2" placeholder="Lista las funciones, una por línea"></textarea></div>' +
+      '<div class="row2">' +
+        '<div class="field"><label>Tecnologías utilizadas</label><input type="text" id="ex-tec-' + i + '" placeholder="Ej. Windows Server, Active Directory, Linux"></div>' +
+        '<div class="field"><label>Logros o aprendizajes clave</label><input type="text" id="ex-logros-' + i + '" placeholder="Breve descripción de lo que aportaste"></div>' +
+      '</div>' +
+    '</div>';
+  };
+
+  var estudioTpl = function(i) {
+    return '<div id="estudio-' + i + '" style="margin-bottom:14px;padding:14px 16px;border:1px solid var(--line);border-radius:6px;background:var(--card-2)">' +
+      '<button type="button" class="del-btn" onclick="removeBlock(\'estudio-' + i + '\')" style="float:right">Eliminar</button>' +
+      '<div class="row2">' +
+        '<div class="field" style="margin-bottom:10px">' +
+          '<label>Titulación</label>' +
+          '<input type="text" id="est-titulo-' + i + '" placeholder="Ej. Bachillerato">' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px">' +
+          '<label>Centro</label>' +
+          '<input type="text" id="est-centro-' + i + '" placeholder="Nombre del centro">' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  };
+
+  var certTpl = function(i) {
+    return '<div class="field" id="cert-' + i + '" style="margin-bottom:12px">' +
+      '<div style="display:flex;gap:8px;align-items:end">' +
+        '<div style="flex:1">' +
+          '<label>Certificación / Curso</label>' +
+          '<input type="text" id="cert-nombre-' + i + '" placeholder="Nombre de la certificación">' +
+        '</div>' +
+        '<div style="flex:1">' +
+          '<label>Entidad</label>' +
+          '<input type="text" id="cert-entidad-' + i + '" placeholder="Organismo que la emite">' +
+        '</div>' +
+        '<div style="width:100px">' +
+          '<label>Año</label>' +
+          '<input type="text" id="cert-año-' + i + '" placeholder="Ej. 2025">' +
+        '</div>' +
+        '<div style="width:140px">' +
+          '<label>Estado</label>' +
+          '<select id="cert-estado-' + i + '"><option>En curso</option><option>Finalizado</option></select>' +
+        '</div>' +
+        '<button type="button" class="del-btn" onclick="removeBlock(\'cert-' + i + '\')" style="margin-bottom:2px">×</button>' +
+      '</div>' +
+    '</div>';
+  };
+
+  var idiomaTpl = function(i) {
+    return '<div id="idioma-' + i + '" style="margin-bottom:14px;padding:14px 16px;border:1px solid var(--line);border-radius:6px;background:var(--card-2)">' +
+      '<button type="button" class="del-btn" onclick="removeBlock(\'idioma-' + i + '\')" style="float:right">Eliminar</button>' +
+      '<div class="row3">' +
+        '<div class="field" style="margin-bottom:10px">' +
+          '<label>Idioma</label>' +
+          '<input type="text" id="idi-idioma-' + i + '" placeholder="Ej. Inglés">' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px">' +
+          '<label>Nivel MCER</label>' +
+          '<select id="idi-nivel-' + i + '">' +
+            '<option value="">Selecciona...</option>' +
+            '<option>A1</option><option>A2</option><option>B1</option><option>B2</option>' +
+            '<option>C1</option><option>C2</option><option>Nativo</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px">' +
+          '<label>Uso principal</label>' +
+          '<select id="idi-uso-' + i + '">' +
+            '<option value="">Selecciona...</option>' +
+            '<option>Lectura técnica</option><option>Conversación</option>' +
+            '<option>Escritura</option><option>Todos</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field" style="margin-bottom:0">' +
+        '<label>Observaciones <span class="optional-tag">opcional</span></label>' +
+        '<input type="text" id="idi-obs-' + i + '" placeholder="Ej. Equivalente B2 oficial">' +
+      '</div>' +
+    '</div>';
+  };
+
+  // Idioma español por defecto
+  document.getElementById("idiomasContainer").innerHTML = idiomaTpl(1) +
+    idiomaTpl(2);
+  document.getElementById("idi-idioma-1").value = "Español";
+  document.getElementById("idi-nivel-1").value = "Nativo";
+  document.getElementById("idi-uso-1").value = "Todos";
+
+  var counters = { proy: 0, exp: 0, cert: 0, idioma: 2, estudio: 0 };
+
+  document.getElementById("addProyecto").addEventListener("click", function() {
+    var n = ++counters.proy;
+    var c = document.getElementById("proyectosContainer");
+    c.insertAdjacentHTML("beforeend", proyectoTpl(n));
+  });
+
+  document.getElementById("addExperiencia").addEventListener("click", function() {
+    var n = ++counters.exp;
+    var c = document.getElementById("experienciasContainer");
+    c.insertAdjacentHTML("beforeend", expTpl(n));
+    document.getElementById("noExperienciaField").style.display = "none";
+  });
+
+  document.getElementById("addEstudio").addEventListener("click", function() {
+    var n = ++counters.estudio;
+    var c = document.getElementById("estudiosContainer");
+    c.insertAdjacentHTML("beforeend", estudioTpl(n));
+  });
+
+  document.getElementById("addCert").addEventListener("click", function() {
+    var n = ++counters.cert;
+    var c = document.getElementById("certsContainer");
+    c.insertAdjacentHTML("beforeend", certTpl(n));
+    document.getElementById("noCertsField").style.display = "none";
+  });
+
+  document.getElementById("addIdioma").addEventListener("click", function() {
+    var n = ++counters.idioma;
+    var c = document.getElementById("idiomasContainer");
+    c.insertAdjacentHTML("beforeend", idiomaTpl(n));
+  });
+
+  window.removeBlock = function(id) {
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  };
+
+  // ── Form reset ──
+  document.getElementById("resetBtn").addEventListener("click", function() {
+    if (!confirm("¿Segur@ que quieres borrar todo el formulario?")) return;
+    document.getElementById("outputWrap").classList.remove("show");
+    // Rebuild default idiomas
+    counters.idioma = 2;
+    counters.estudio = 0;
+    document.getElementById("estudiosContainer").innerHTML = "";
+    document.getElementById("idiomasContainer").innerHTML = idiomaTpl(1) + idiomaTpl(2);
+    document.getElementById("idi-idioma-1").value = "Español";
+    document.getElementById("idi-nivel-1").value = "Nativo";
+    document.getElementById("idi-uso-1").value = "Todos";
+    document.getElementById("perfilAcademico").value = "Estudiante de Grado Superior en Administración de Sistemas Informáticos en Red (ASIR)";
+    document.getElementById("estudiosEnCurso").value = "Grado Superior en Administración de Sistemas Informáticos en Red (ASIR)";
+    document.getElementById("cvForm").reset();
+  });
+
+  // ── Helpers ──
+  function v(id) { return (document.getElementById(id) || {}).value || ""; }
+  function rv(name) {
+    var el = document.querySelector("[name=" + name + "]:checked");
+    return el ? el.value : "";
+  }
+  function nivelBadge(val) {
+    if (!val) return "";
+    var map = {
+      "Básico": "Básico",
+      "Intermedio": "Intermedio",
+      "Avanzado": "Avanzado"
+    };
+    return map[val] || val;
+  }
+
+  // ── Generate ──
+  document.getElementById("generarBtn").addEventListener("click", function() {
+    // Validar
+    if (!v("perfil")) { toast("Completa el perfil profesional."); document.getElementById("perfil").focus(); return; }
+    if (!v("declaracionVeracidad")) { toast("Acepta la declaración de veracidad."); return; }
+
+
+    function mesTexto(s) {
+      if (!s || s.length !== 7) return s;
+      var meses = ["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      return meses[parseInt(s.slice(5,7), 10)] + " " + s.slice(0,4);
+    }
+
+    function secciones(lista) {
+      return Array.prototype.slice.call(lista).filter(function(s) {
+        var fields = s.querySelectorAll("input:not([type=radio]), textarea, select");
+        for (var i = 0; i < fields.length; i++) {
+          if (fields[i].value.trim()) return true;
+        }
+        return false;
+      });
+    }
+
+    // Proyectos
+    var proyBlocks = secciones(document.querySelectorAll(".proyecto"));
+    var proyectosMd = "";
+    proyBlocks.forEach(function(b, idx) {
+      var i = b.id.split("-")[1];
+      proyectosMd += "\n### Proyecto " + (idx + 1) + ": " + v("py-titulo-" + i) + "\n\n" +
+        "- **Rol:** " + v("py-rol-" + i) + "\n" +
+        "- **Tecnologías:** " + v("py-tec-" + i) + "\n" +
+        "- **Descripción:** " + v("py-desc-" + i) + "\n" +
+        "- **Trabajo en equipo:** " + v("py-equipo-" + i) + "\n" +
+        "- **Resultado / Entregables:** " + v("py-resultado-" + i) + "\n" +
+        (v("py-repo-" + i) ? "- **Repositorio / Demo:** " + v("py-repo-" + i) + "\n" : "");
+    });
+
+    // Experiencias
+    var expBlocks = secciones(document.querySelectorAll(".experiencia"));
+    var expMd = "";
+    if (expBlocks.length > 0) {
+      expBlocks.forEach(function(b) {
+        var i = b.id.split("-")[1];
+        expMd += "\n### " + v("ex-puesto-" + i) + "\n\n" +
+          "- **Empresa:** " + v("ex-empresa-" + i) + "\n" +
+          "- **Periodo:** " + v("ex-periodo-" + i) + "\n" +
+          "- **Funciones principales:**\n" +
+          (v("ex-funciones-" + i) || "").split("\n").map(function(f) { return "  - " + f.trim(); }).join("\n") + "\n" +
+          "- **Tecnologías utilizadas:** " + v("ex-tec-" + i) + "\n" +
+          "- **Logros o aprendizajes clave:** " + v("ex-logros-" + i) + "\n";
+      });
+    } else {
+      expMd = "\n*Si el alumno no tiene experiencia previa en el sector, indicar: \"Sin experiencia laboral previa en el sector. Los proyectos académicos reflejados en el apartado 3 constituyen su principal carta de presentación.\"*\n";
+    }
+
+    // Certificaciones
+    var certBlocks = Array.prototype.slice.call(document.querySelectorAll("#certsContainer .field")).filter(function(f) {
+      return f.querySelector("input").value.trim();
+    });
+    var certsMd = "";
+    if (certBlocks.length > 0) {
+      certBlocks.forEach(function(b) {
+        var i = b.id.split("-")[1];
+        if (v("cert-nombre-" + i)) {
+          certsMd += "- **" + v("cert-nombre-" + i) + ":** " + v("cert-entidad-" + i) + " – " + v("cert-año-" + i) + " – " + v("cert-estado-" + i) + "\n";
+        }
+      });
+    } else {
+      certsMd = "*Si no procede, indicar: \"Sin certificaciones adicionales por el momento.\"*\n";
+    }
+
+    // Idiomas
+    var idiBlocks = Array.prototype.slice.call(document.querySelectorAll("[id^=idioma-]")).filter(function(el) {
+      return el.id.match(/^idioma-\d+$/) && el.querySelector("input").value.trim();
+    });
+    var idiomasMd = "";
+    idiBlocks.forEach(function(b) {
+      var i = b.id.split("-")[1];
+      if (v("idi-idioma-" + i)) {
+        var obs = v("idi-obs-" + i) ? " – " + v("idi-obs-" + i) : "";
+        idiomasMd += "- **" + v("idi-idioma-" + i) + ":** " + v("idi-nivel-" + i) + " – Uso principal: " + v("idi-uso-" + i) + obs + "\n";
+      }
+    });
+
+    // Competencias
+    var skills = [];
+    document.querySelectorAll(".comp-row").forEach(function(row) {
+      var name = row.querySelector(".skill-name").textContent.trim();
+      var nivel = row.querySelector("select").value;
+      if (nivel) {
+        skills.push({ name: name, nivel: nivelBadge(nivel) });
+      }
+    });
+
+    // Agrupar competencias por sección (iterando el DOM real)
+    var compMd = "- **Área de mayor fortaleza:** " + v("areaFortaleza") + "\n- **Área en desarrollo:** " + v("areaDesarrollo") + "\n\n";
+    var h4s = document.querySelectorAll("#compSection h4");
+    h4s.forEach(function(h4) {
+      var grupoTitulo = h4.textContent.trim();
+      var rows = [];
+      var next = h4.nextElementSibling;
+      while (next && next.tagName !== "H4") {
+        if (next.classList.contains("comp-row")) rows.push(next);
+        next = next.nextElementSibling;
+      }
+      if (rows.length === 0) return;
+      compMd += "### " + grupoTitulo + "\n";
+      rows.forEach(function(row) {
+        var name = row.querySelector(".skill-name").textContent.trim();
+        var nivel = row.querySelector("select").value;
+        if (nivel) compMd += "- **" + name + ":** " + nivelBadge(nivel) + "\n";
+      });
+      compMd += "\n";
+    });
+    var generacionFecha = new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
+
+    // Assemble
+    var md = "# Perfil Profesional – Alumno/a en Prácticas (2º ASIR)\n\n" +
+      "---\n\n" +
+      "## 1. Perfil Profesional\n\n" +
+      v("perfil") + "\n\n" +
+      "---\n\n" +
+      "## 2. Cabecera e Identificación\n\n" +
+      "- **Perfil Académico:** " + v("perfilAcademico") + "\n" +
+      (v("puestoAula") ? "- **Puesto en el aula:** " + v("puestoAula") + "\n" : "") + "\n" +
+      "---\n\n" +
+      "## 3. Contacto\n\n" +
+      "- **Email del tutor/a:** " + v("emailTutor") + "\n\n" +
+      "---\n\n" +
+      "## 4. Proyectos Destacados\n\n" +
+      (proyectosMd.trim() ? proyectosMd + "\n" : "*Ningún proyecto añadido.*\n") +
+      "---\n\n" +
+      "## 5. Experiencia Laboral en el Sector\n\n" +
+      (expMd.trim() ? expMd + "\n" : "") +
+      "---\n\n" +
+      "## 6. Competencias Técnicas (Hard Skills)\n\n" +
+      "*Niveles:*\n" +
+      "_Básico_ → visto en clase.\n" +
+      "_Intermedio_ → usado en prácticas o proyectos.\n" +
+      "_Avanzado_ → podría usarlo en entorno real con supervisión mínima.*\n\n" +
+      compMd +
+      "---\n\n" +
+      "## 7. Educación y Formación Actual\n\n" +
+      "### Estudios en curso\n" +
+      "- **Titulación:** " + v("estudiosEnCurso") + "\n" +
+      "- **Centro:** " + v("centroEducativo") + "\n\n" +
+      (function() {
+        var estudioBlocks = Array.prototype.slice.call(document.querySelectorAll("[id^=estudio-]")).filter(function(el) {
+          return el.id.match(/^estudio-\d+$/) && el.querySelector("input").value.trim();
+        });
+        if (estudioBlocks.length === 0) return "";
+        var md = "### Otros estudios finalizados\n";
+        estudioBlocks.forEach(function(b) {
+          var i = b.id.split("-")[1];
+          md += "- **" + v("est-titulo-" + i) + ":** " + v("est-centro-" + i) + "\n";
+        });
+        return md + "\n";
+      })() +
+      "---\n\n" +
+      "## 8. Certificaciones y Formación Complementaria\n\n" +
+      certsMd + "\n" +
+      "---\n\n" +
+      "## 9. Idiomas\n\n" +
+      "*Nivel según Marco Común Europeo de Referencia (MCER): A1–A2 Básico, B1–B2 Intermedio, C1–C2 Avanzado.*\n\n" +
+      (idiomasMd || "- *(ninguno)*\n") + "\n" +
+      "---\n\n" +
+      "## 10. Vehículo y Disponibilidad Geográfica\n\n" +
+      "- **Vehículo propio:** " + rv("vehiculo") + "\n" +
+      "- **Permiso de conducir:** " + v("tipoLicencia") + "\n" +
+      "- **Disponibilidad para viajar:** " + rv("viajar") + "\n" +
+      (v("obsDisponibilidad") ? "- **Observaciones:** " + v("obsDisponibilidad") + "\n" : "") + "\n" +
+      "---\n\n" +
+      "## 11. Competencias Blandas (Soft Skills) y Motivación\n\n" +
+      "- **Habilidades clave:** " + v("habilidadesClave") + "\n" +
+      (v("ejemploTrabajoEquipo") ? "- **Ejemplo de trabajo en equipo:** " + v("ejemploTrabajoEquipo") + "\n" : "") +
+      (v("ejemploProactividad") ? "- **Ejemplo de proactividad:** " + v("ejemploProactividad") + "\n" : "") +
+      "- **Intereses técnicos:** " + v("interesesTecnicos") + "\n" +
+      "- **Motivación:** " + v("motivacion") + "\n\n" +
+      "---\n\n" +
+      "## 12. Referencias\n\n" +
+      "- **Referencias:** Disponibles bajo petición al centro educativo.\n\n" +
+      "---\n\n" +
+      "## 13. Declaración de Veracidad\n\n" +
+      "*Declaro que los datos aquí reflejados son veraces a fecha de su generación.*\n\n" +
+      "_Firmado:_ " + generacionFecha + "\n";
+
+    // Mostrar
+    document.getElementById("outputWrap").classList.add("show");
+    document.getElementById("outputMd").value = md;
+    document.getElementById("downloadBtn").href = "data:text/markdown;charset=utf-8," + encodeURIComponent(md);
+    document.getElementById("outputMd").scrollIntoView({ behavior: "smooth", block: "start" });
+    toast("CV generado.");
+  });
+
+  // Copy
+  document.getElementById("copyBtn").addEventListener("click", function() {
+    var ta = document.getElementById("outputMd");
+    ta.select();
+    try { document.execCommand("copy"); } catch(e) {}
+    var btn = document.getElementById("copyBtn");
+    btn.textContent = "Copiado";
+    btn.classList.add("copied");
+    setTimeout(function() { btn.textContent = "Copiar"; btn.classList.remove("copied"); }, 1500);
+    toast("Copiado al portapapeles.");
+  });
+
+})();
+</script>
+</body>
+</html>
