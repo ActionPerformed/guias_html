@@ -81,6 +81,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [PMDM - ACT 1.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%201.1.html) | Actividad 1.1 — Introducción a Android Studio y Kotlin |
 | [PMDM - ACT 2.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.1.html) | Actividad 2.1 — Pantalla de Login con Jetpack Compose — simulación interactiva en el navegador |
 | [PMDM - ACT 2.2.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.2.html) | Actividad 2.2 — NavHost, Registro, Scaffold y Dialogos — amplía la actividad 2.1 de login |
+| [PMDM - ACT 3.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%203.1.html) | Actividad 3.1 — CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue |
 
 ---
 
