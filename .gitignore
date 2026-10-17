@@ -8,6 +8,9 @@ Claude.md
 # Logs
 *.log
 
+# Python bytecode
+__pycache__/
+
 # Archivos auxiliares temporales
 temp/
 
