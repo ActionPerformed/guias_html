@@ -520,7 +520,7 @@ textarea.output {
     <div class="output-header">
       <h3>Tu CV en Markdown</h3>
       <button type="button" class="copy-btn" id="copyBtn">Copiar</button>
-      <a class="download-btn" id="downloadBtn" download="cv.md">Descargar .md</a>
+      <a class="download-btn" id="downloadBtn" href="#">Descargar .md</a>
     </div>
     <textarea class="output" id="outputMd" readonly></textarea>
   </div>
@@ -927,7 +927,13 @@ textarea.output {
     // Mostrar
     document.getElementById("outputWrap").classList.add("show");
     document.getElementById("outputMd").value = md;
-    document.getElementById("downloadBtn").href = "data:text/markdown;charset=utf-8," + encodeURIComponent(md);
+    var d = new Date();
+    var fechaStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+    var puestoAulaStr = (v("puestoAula") || "sin_puesto").replace(/\s+/g, "_");
+    var filename = fechaStr + "_" + puestoAulaStr + ".md";
+    var dlBtn = document.getElementById("downloadBtn");
+    dlBtn.download = filename;
+    dlBtn.href = "data:text/markdown;charset=utf-8," + encodeURIComponent(md);
     document.getElementById("outputMd").scrollIntoView({ behavior: "smooth", block: "start" });
     toast("CV generado.");
   });
