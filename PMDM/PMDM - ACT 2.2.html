@@ -220,33 +220,38 @@
         }
 
         /* NAV */
+        .shell {
+            position: relative;
+            display: grid;
+            grid-template-columns: 200px minmax(0, 1fr);
+            align-items: start;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
         .navbar {
             position: sticky;
             top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, .92);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            height: 100vh;
+            overflow-y: auto;
+            background: #fff;
+            border-right: 1px solid var(--border);
         }
 
         .navbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
             display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            overflow-x: auto;
+            flex-direction: column;
+            padding: 16px 12px;
+            gap: 2px;
         }
 
         .navbar-inner::-webkit-scrollbar {
-            height: 5px;
+            width: 4px;
         }
 
         .navbar-inner::-webkit-scrollbar-thumb {
             background: var(--border);
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
         .nav-brand {
@@ -254,15 +259,17 @@
             font-weight: 700;
             color: var(--primary);
             white-space: nowrap;
-            margin-right: 10px;
-            font-size: .95rem;
+            padding: 6px 12px 14px;
+            font-size: .9rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
         }
 
         .nav-link {
-            white-space: nowrap;
+            display: block;
             padding: 7px 12px;
             border-radius: 8px;
-            font-size: .82rem;
+            font-size: .8rem;
             font-weight: 600;
             color: var(--muted);
             text-decoration: none;
@@ -1286,6 +1293,42 @@
         }
 
         @media(max-width:640px) {
+            .shell {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                position: sticky;
+                top: 0;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .navbar-inner {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 8px 12px;
+                gap: 4px;
+            }
+
+            .nav-brand {
+                width: 100%;
+                padding: 4px 12px 10px;
+                border-bottom: 1px solid var(--border);
+                margin-bottom: 6px;
+            }
+
+            .nav-link {
+                font-size: .75rem;
+                padding: 5px 10px;
+            }
+
+            main {
+                padding: 24px 16px 60px;
+            }
+
             .hero h1 {
                 font-size: 1.6rem;
             }
@@ -2136,6 +2179,7 @@
             </div>
         </div>
     </header>
+    <div class="shell">
     <nav class="navbar">
         <div class="navbar-inner" id="navInner"><span class="nav-brand">🧭 NavHost PMDM</span><a class="nav-link"
                 href="#s1">1·Intro</a><a class="nav-link" href="#s2">2·Glosario</a><a class="nav-link"
@@ -4670,6 +4714,7 @@ class MainActivity : ComponentActivity() {
             </div>
         </div>
     </main>
+    </div><!-- /shell -->
     <footer>Actividad 2.2 · PMDM · 2º DAM — Guía interactiva autocontenida (HTML/CSS/JS; solo las tipografías vienen de
         Google Fonts).</footer>
     <script>/* ---------- ACCORDION SECTIONS ---------- */
