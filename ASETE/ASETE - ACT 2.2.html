@@ -2822,23 +2822,47 @@ function db(): PDO
             PHP buscara <span class="inline">App\Config\PDO</span>, que no existe.</p>
         </div>
         <h3>📄 Paso 3: puntos de entrada</h3>
-        <p>Cada archivo de <span class="inline">public/</span> solo necesita <b>una línea</b>:</p>
-        <pre class="code-src" data-lang="php" data-title="PHP" hidden>&lt;?php
+<p>Los <strong>puntos de entrada</strong> son los archivos de <span class="inline">public/</span> que el navegador puede pedir directamente. Son seis:</p>
+<div class="tw"><table><thead><tr><th>Archivo</th><th>Qué hace</th></tr></thead><tbody><tr><td><span class="inline">public/login.php</span></td><td>Formulario de login</td></tr><tr><td><span class="inline">public/logout.php</span></td><td>Cierra sesión</td></tr><tr><td><span class="inline">public/index.php</span></td><td>Catálogo</td></tr><tr><td><span class="inline">public/material.php</span></td><td>Ficha individual</td></tr><tr><td><span class="inline">public/prestar.php</span></td><td>Acción de préstamo</td></tr><tr><td><span class="inline">public/admin.php</span></td><td>Panel de administración</td></tr></tbody></table></div>
+<p><strong>La línea imprescindible</strong> en todos ellos es esta:</p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>require_once __DIR__ . '/../vendor/autoload.php';
+</pre>
+<p>Es la que registra el cargador de Composer. Sin ella, <span class="inline">new MaterialRepo()</span> o <span class="inline">new Libro()</span> darán <span class="inline">Class not found</span>. <strong>Va siempre la primera</strong>, antes de cualquier <span class="inline">use</span>.</p>
+<p><strong>Además</strong>, cada archivo necesita:</p>
+<ol><li><span class="inline">declare(strict_types=1);</span> justo después de <span class="inline"><?php</span>.</li>
+<li>Los <span class="inline">use</span> de las <strong>clases</strong> que vaya a usar.</li>
+<li>El <span class="inline">require_once</span> de <span class="inline">auth.php</span> (porque <span class="inline">auth.php</span> <strong>no es una clase</strong>, es un archivo con funciones; Composer no lo carga automáticamente).</li>
+<li><strong>Eliminar los <span class="inline">require_once</span> de clases</strong> que tuviera antes (los de <span class="inline">MaterialRepo.php</span>, <span class="inline">Libro.php</span>, etc.). Composer ya se encarga.</li></ol>
+<div class="banner"><p>️ <strong>Regla clave:</strong> <span class="inline">use</span> <strong>solo para clases</strong> (interfaces y traits incluidos). Para funciones como <span class="inline">requireLogin()</span> o <span class="inline">currentUser()</span>, <strong>no hay <span class="inline">use</span></strong>: se llaman directamente una vez incluido <span class="inline">auth.php</span> con <span class="inline">require_once</span>.</p></div>
+<p><strong><span class="inline">public/login.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
 
-use App\Includes\auth;
-use App\Repos\MaterialRepo;
-
-// ... resto igual ...</pre>
-        <p><b><span class="inline">public/index.php</span></b> (catálogo):</p>
-        <pre class="code-src" data-lang="php" data-title="public/index.php" hidden>&lt;?php
+// ... resto igual ...
+</pre>
+<div class="note"><p><strong>Fíjate:</strong> <span class="inline">vendor/autoload.php</span> para las clases, y <span class="inline">auth.php</span> sigue con <span class="inline">require_once</span> porque tiene funciones, no clases. <strong>Los dos <span class="inline">require</span> son necesarios.</strong> No hay ningún <span class="inline">use</span> porque <span class="inline">login.php</span> no instancia ninguna clase.</p></div>
+<p><strong><span class="inline">public/logout.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
 
-use App\Includes\auth;
+logout();
+header('Location: login.php');
+exit;
+</pre>
+<div class="note"><p>Tampoco necesita <span class="inline">use</span>: solo llama a <span class="inline">logout()</span>.</p></div>
+<p><strong><span class="inline">public/index.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
 use App\Repos\MaterialRepo;
 
 requireLogin();
@@ -2850,30 +2874,139 @@ require __DIR__ . '/../app/Includes/header.php';
 ?&gt;
 &lt;h1&gt;Catálogo de la biblioteca&lt;/h1&gt;
 &lt;!-- ... resto igual ... --&gt;
-&lt;?php require __DIR__ . '/../app/Includes/footer.php'; ?&gt;</pre>
-        <div class="note">
-          <p>📌 <b>Fíjate:</b> ya no hay <span class="inline">require_once</span> de <span
-              class="inline">MaterialRepo</span> ni de <span class="inline">Libro</span>. Solo <span
-              class="inline">vendor/autoload.php</span>. <b>Eso es el autoloading.</b></p>
-        </div>
-        <div class="note"><b>📎 Nota de la guía · dos matices técnicos</b>
-          <p><b>1. Las funciones no se autocargan.</b> PSR-4 solo localiza <i>clases</i>. Si <span
-              class="inline">db()</span>, <span class="inline">requireLogin()</span> o <span
-              class="inline">currentUser()</span> siguen siendo funciones sueltas en <span
-              class="inline">app/Config/db.php</span> o <span class="inline">app/Includes/auth.php</span>, esos ficheros
-            se siguen incluyendo con <span class="inline">require_once</span> (la regla «sin require_once» se refiere a
-            las <b>clases</b>) o se registran en <span class="inline">composer.json</span> con <span
-              class="inline">autoload.files</span> (ampliación A4). Y si la función vive en un namespace, se importa con
-            <span class="inline">use function App\Config\db;</span>: un <span class="inline">use App\Config\db;</span>
-            importaría una <i>clase</i> llamada <span class="inline">db</span>.</p>
-          <p style="margin-bottom:0"><b>2. ¿Cuándo hace falta <span class="inline">composer dump-autoload</span>?</b>
-            Con PSR-4 en su modo normal, Composer también localiza por ruta una clase recién creada. Regenerar es
-            imprescindible si usas <span class="inline">classmap-authoritative</span> o cambias el mapeo de <span
-              class="inline">composer.json</span>, y es un buen hábito aquí porque <span
-              class="inline">optimize-autoloader</span> genera un mapa de clases. Compruébalo en el laboratorio de
-            abajo.</p>
-        </div>
-        <div class="wdg" id="w-autoload" data-w></div>
+&lt;?php require __DIR__ . '/../app/Includes/footer.php'; ?&gt;
+</pre>
+<div class="note"><p><strong>Fíjate:</strong> ya <strong>no</strong> hay <span class="inline">require_once</span> de <span class="inline">MaterialRepo</span>. Solo <span class="inline">vendor/autoload.php</span>. <strong>Eso es el autoloading.</strong> <span class="inline">auth.php</span>, <span class="inline">header.php</span> y <span class="inline">footer.php</span> siguen con <span class="inline">require</span> porque no son clases.</p></div>
+<p><strong><span class="inline">public/material.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+use App\Exceptions\MaterialNoEncontradoException;
+use App\Repos\MaterialRepo;
+
+requireLogin();
+
+$id = (int)($_GET['id'] ?? 0);
+
+try {
+    $repo = new MaterialRepo();
+    $material = $repo-&gt;findById($id);
+} catch (MaterialNoEncontradoException $e) {
+    // ... igual que antes ...
+}
+
+// ... resto igual ...
+</pre>
+<div class="note"><p><strong>Fíjate:</strong> dos <span class="inline">use</span> de <strong>clases</strong> (<span class="inline">MaterialNoEncontradoException</span> y <span class="inline">MaterialRepo</span>). <strong>Ninguno de <span class="inline">auth</span>.</strong></p></div>
+<p><strong><span class="inline">public/prestar.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+use App\Exceptions\MaterialNoDisponibleException;
+use App\Exceptions\MaterialNoEncontradoException;
+use App\Repos\MaterialRepo;
+use App\Services\PrestamoService;
+
+requireLogin();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: /index.php');
+    exit;
+}
+
+$id = (int)($_POST['material_id'] ?? 0);
+
+try {
+    $service = new PrestamoService(new MaterialRepo());
+    $service-&gt;prestar($id, currentUser()['id']);
+
+    header('Location: /material.php?id=' . $id);
+    exit;
+
+} catch (MaterialNoEncontradoException $e) {
+    http_response_code(404);
+    $error = $e-&gt;getMessage();
+} catch (MaterialNoDisponibleException $e) {
+    http_response_code(400);
+    $error = $e-&gt;getMessage();
+}
+
+require __DIR__ . '/../app/Includes/header.php';
+echo '&lt;h1&gt;No se pudo completar el préstamo&lt;/h1&gt;';
+echo '&lt;p&gt;' . htmlspecialchars($error) . '&lt;/p&gt;';
+echo '&lt;a href="/index.php"&gt;Volver al catálogo&lt;/a&gt;';
+require __DIR__ . '/../app/Includes/footer.php';
+</pre>
+<div class="note"><p><strong>Cuatro <span class="inline">use</span> de clases</strong> (<span class="inline">MaterialNoDisponibleException</span>, <span class="inline">MaterialNoEncontradoException</span>, <span class="inline">MaterialRepo</span>, <span class="inline">PrestamoService</span>). <strong>Ninguno de <span class="inline">auth</span>.</strong> <span class="inline">currentUser()</span> y <span class="inline">requireLogin()</span> se llaman directamente porque ya están en el espacio global tras el <span class="inline">require_once</span> de <span class="inline">auth.php</span>.</p></div>
+<p><strong><span class="inline">public/admin.php</span>:</strong></p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+requireAdmin();
+
+// ... resto igual (consultas con db() o MaterialRepo, según tengas) ...
+</pre>
+<div class="note"><p><strong>Fíjate:</strong> <span class="inline">requireAdmin()</span> se llama directamente. Si <span class="inline">admin.php</span> usa <span class="inline">MaterialRepo</span> o excepciones, añade sus <span class="inline">use</span> correspondientes. Si usa <span class="inline">db()</span> directamente, añade <span class="inline">use function App\Config\db;</span>.</p></div>
+<h3>🧪 Comprobación</h3>
+<p>Después de tocar los seis archivos, abre cada uno en el navegador:</p>
+<ul><li>http://localhost:8080/login.php → formulario.</li>
+<li>http://localhost:8080/index.php → catálogo (tras login).</li>
+<li>http://localhost:8080/material.php?id=1 → ficha.</li>
+<li>http://localhost:8080/admin.php → panel (como admin).</li>
+<li>http://localhost:8080/logout.php → vuelve a login.</li></ul>
+<p>Si alguno da <span class="inline">Class not found</span>, revisa que tiene el <span class="inline">require_once __DIR__ . '/../vendor/autoload.php';</span>. Si da <span class="inline">Failed to open stream</span>, revisa que la ruta de <span class="inline">auth.php</span> es <span class="inline">__DIR__ . '/../app/Includes/auth.php'</span>.</p>
+<h3>🧪 Retos</h3>
+<p><strong>Reto 1.1</strong> — Abre <span class="inline">public/index.php</span> y elimina la línea <span class="inline">use App\Repos\MaterialRepo;</span>. ¿Qué error da? ¿Por qué?</p>
+<details><summary>Ver solución</summary>```
+Fatal error: Uncaught Error: Class "MaterialRepo" not found
+```
+
+Sin `use`, PHP busca `MaterialRepo` en el <strong>namespace actual</strong> de `index.php`, que es el global. Como no existe `\MaterialRepo` (ahora es `App\Repos\MaterialRepo`), falla.
+
+<strong>Dos formas de arreglarlo:</strong> volver a poner `use App\Repos\MaterialRepo;` (recomendado), o escribir `new \App\Repos\MaterialRepo()` (FQN, más feo).
+</details>
+<p><strong>Reto 1.2</strong> — ¿Por qué <span class="inline">public/index.php</span> necesita <strong>dos</strong> <span class="inline">require_once</span> (uno de <span class="inline">vendor/autoload.php</span> y otro de <span class="inline">auth.php</span>) pero <strong>ningún</strong> <span class="inline">use</span> de <span class="inline">auth</span>?</p>
+<details><summary>Ver solución</summary>Porque `vendor/autoload.php` <strong>solo carga clases</strong>. `auth.php` tiene <strong>funciones</strong> (`login()`, `currentUser()`, `requireLogin()`...), y Composer no las carga automáticamente por defecto.
+
+`index.php` necesita:
+1. `vendor/autoload.php` → para `MaterialRepo` (clase).
+2. `auth.php` → para `requireLogin()` (función).
+
+<strong>No necesita <span class="inline">use</span> de <span class="inline">auth</span></strong> porque `auth.php` <strong>no tiene namespace</strong> y sus funciones viven en el espacio global. Un `use` ahí no tendría sentido: `use` es para importar nombres de clases, no de archivos.
+</details>
+<p><strong>Reto 1.3 — Encuentra el error.</strong> Este <span class="inline">public/prestar.php</span> da <span class="inline">Class "App\Includes\auth" not found</span>:</p>
+<pre class="code-src" data-lang="php" data-title="php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+use App\Includes\auth;
+
+requireLogin();
+</pre>
+<details><summary>Ver solución</summary>El `use App\Includes\auth;` es <strong>incorrecto</strong>: `auth` no es una clase ni un namespace declarado, es un archivo con funciones. `use` busca una clase llamada `App\Includes\auth`, que no existe, y falla al intentar resolverla.
+
+<strong>Solución:</strong> eliminar el `use App\Includes\auth;`. El `require_once` ya incluye el archivo, y las funciones quedan disponibles directamente.
+
+```php
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+requireLogin();  // funciona sin use
+```
+
+<strong>Regla:</strong> `use` solo para clases, interfaces y traits. Las funciones se incluyen con `require_once` y se llaman directamente.
+</details><div class="wdg" id="w-autoload" data-w></div>
         <h3>🧪 Retos</h3>
         <div class="reto" data-reto id="reto-1-1">
           <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
@@ -3092,7 +3225,7 @@ class MaterialNoDisponibleException extends RuntimeException
             código llamador podría querer capturar. No extiendas <span class="inline">Exception</span> directamente si
             puedes ser más específico.</p>
         </div>
-        <h3>📄 Paso 2: lanzar excepciones desde el repositorio</h3>
+        <h3>📄 Paso 2: lanzar excepciones desde el repositorio (MaterialRepo.php)</h3>
         <p><b>Antes</b> (<span class="inline">findById</span> devolvía <span class="inline">null</span>):</p>
         <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function findById(int $id): ?MaterialBiblioteca
 {
@@ -3102,7 +3235,9 @@ class MaterialNoDisponibleException extends RuntimeException
     return $fila ? $this-&gt;hidratar($fila) : null;
 }</pre>
         <p><b>Después</b> (lanza excepción):</p>
-        <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function findById(int $id): MaterialBiblioteca
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>use App\Exceptions\MaterialNoEncontradoException;
+          
+public function findById(int $id): MaterialBiblioteca // Ya no necesitamos la ?
 {
     $stmt = db()-&gt;prepare('SELECT * FROM materiales WHERE id = ?');
     $stmt-&gt;execute([$id]);
