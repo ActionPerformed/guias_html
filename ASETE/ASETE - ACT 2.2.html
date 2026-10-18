@@ -1,0 +1,4556 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MiniApp de Biblioteca · Actividad 2.2 · Autoloading, namespaces y excepciones</title>
+  <meta name="description"
+    content="Guía interactiva: Composer y autoloading PSR-4, namespaces, excepciones propias, try/catch/finally, manejador global, strict_types y PSR-12. Base para Laravel.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --paper: #E7E4D9;
+      --card: #FBF9F3;
+      --card-2: #F2EFE5;
+      --ink: #22201B;
+      --muted: #6B6659;
+      --line: #CBC5B4;
+      --line-soft: #DED9CA;
+      --olive: #3E5233;
+      --olive-2: #2C3B24;
+      --burgundy: #7C2C3E;
+      --burgundy-soft: #F3E2E5;
+      --ochre: #A86F0E;
+      --ochre-soft: #F6EBD2;
+      --olive-soft: #E4EBDB;
+      --blue: #2E5C86;
+      --blue-soft: #E2EAF1;
+      --code-bg: #23261F;
+      --code-ink: #E7E6DA;
+      --k: #E8B96A;
+      --s: #B7CE92;
+      --v: #93C8D6;
+      --c: #8A8D7C;
+      --n: #E5A3B0;
+      --f: #EFE7BE;
+      --t: #9FD9C4;
+      --sidebar: 262px;
+      --shadow: 0 12px 30px -22px rgba(34, 32, 27, .7);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 76px
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      html {
+        scroll-behavior: auto
+      }
+
+      * {
+        transition-duration: .001ms !important;
+        animation-duration: .001ms !important
+      }
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Work Sans', system-ui, sans-serif;
+      font-size: 16.5px;
+      line-height: 1.62;
+      background-image: repeating-linear-gradient(to bottom, transparent 0 33px, rgba(62, 82, 51, .06) 33px 34px);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      line-height: 1.16
+    }
+
+    h1,
+    h2,
+    .serif {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-weight: 400;
+      letter-spacing: -.005em
+    }
+
+    h3,
+    h4 {
+      font-family: 'Work Sans';
+      font-weight: 700;
+      letter-spacing: -.01em
+    }
+
+    p {
+      margin: 0 0 1em
+    }
+
+    a {
+      color: var(--burgundy);
+      text-underline-offset: 3px
+    }
+
+    a:hover {
+      color: var(--olive-2)
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--ochre);
+      outline-offset: 2px;
+      border-radius: 2px
+    }
+
+    code,
+    pre,
+    kbd {
+      font-family: 'JetBrains Mono', ui-monospace, monospace
+    }
+
+    .inline {
+      background: var(--card-2);
+      border: 1px solid var(--line-soft);
+      padding: 1px 5px;
+      font-family: 'JetBrains Mono';
+      font-size: .87em
+    }
+
+    /* ---------- barra superior ---------- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      background: rgba(251, 249, 243, .95);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line)
+    }
+
+    .topbar-in {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .menu-toggle {
+      display: none
+    }
+
+    .sig {
+      font-family: 'Instrument Serif';
+      font-size: 19px;
+      white-space: nowrap
+    }
+
+    .sig b {
+      font-family: 'Work Sans';
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .04em;
+      background: var(--olive);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-right: 8px;
+      vertical-align: 2px
+    }
+
+    .topbar .spacer {
+      flex: 1
+    }
+
+    .score {
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    .bar {
+      height: 8px;
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      overflow: hidden;
+      width: 150px
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--olive);
+      transition: width .25s
+    }
+
+    /* ---------- estructura shell ---------- */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      align-items: start;
+      max-width: 1280px;
+      margin: 0 auto
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 57px;
+      height: calc(100vh - 57px);
+      overflow-y: auto;
+      padding: 22px 16px 100px;
+      border-right: 1px solid var(--line)
+    }
+
+    .sidebar h4 {
+      font-size: 11.5px;
+      letter-spacing: .06em;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 20px 0 7px;
+      text-transform: uppercase
+    }
+
+    .sidebar h4:first-child {
+      margin-top: 0
+    }
+
+    .nav-link {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      padding: 6px 9px;
+      border-radius: 2px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.35;
+      border-left: 2px solid transparent
+    }
+
+    .nav-link .tag {
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      color: var(--muted);
+      flex: none
+    }
+
+    .nav-link:hover {
+      background: var(--card-2)
+    }
+
+    .nav-link.active {
+      background: var(--card);
+      border-left-color: var(--olive);
+      font-weight: 700;
+      color: var(--olive-2)
+    }
+
+    main {
+      padding: 0 clamp(16px, 3.5vw, 48px) 130px;
+      max-width: 900px
+    }
+
+    section {
+      padding: 42px 0 6px;
+      border-top: 1px dashed var(--line)
+    }
+
+    section:first-of-type {
+      border-top: 0
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      margin-bottom: 8px
+    }
+
+    .sec-num {
+      font-family: 'JetBrains Mono';
+      font-size: 11.5px;
+      color: var(--olive);
+      border: 1px solid var(--olive);
+      padding: 2px 8px;
+      border-radius: 2px;
+      flex: none;
+      margin-top: 6px;
+      background: var(--card)
+    }
+
+    h2 {
+      font-size: clamp(25px, 3.2vw, 33px)
+    }
+
+    h3 {
+      font-size: 19px;
+      margin: 26px 0 9px
+    }
+
+    h4 {
+      font-size: 15.5px;
+      margin: 18px 0 6px
+    }
+
+    .time-badge {
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 2px 9px;
+      border-radius: 99px;
+      white-space: nowrap
+    }
+
+    p,
+    li {
+      max-width: 74ch
+    }
+
+    /* ---------- avisos / callouts ---------- */
+    .banner {
+      display: block;
+      background: var(--ochre-soft);
+      border: 1px solid #DEC48A;
+      border-left: 5px solid var(--ochre);
+      padding: 14px 16px;
+      margin: 20px 0
+    }
+
+    .banner>*+* {
+      margin-top: 10px;
+    }
+
+    .banner .ico {
+      font-size: 20px;
+      line-height: 1
+    }
+
+    .banner h4 {
+      margin: 0 0 4px;
+      font-size: 15px
+    }
+
+    .banner p:last-child {
+      margin-bottom: 0
+    }
+
+    .note {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--burgundy);
+      background: var(--card);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .note h4 {
+      margin-bottom: 4px;
+      font-size: 15px
+    }
+
+    .note p:last-child {
+      margin-bottom: 0
+    }
+
+    .tip {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--blue);
+      background: var(--blue-soft);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .tip h4 {
+      margin-bottom: 4px;
+      font-size: 15px;
+      color: #1E3E5C
+    }
+
+    .tip p:last-child {
+      margin-bottom: 0
+    }
+
+    /* ---------- tablas ---------- */
+    .tw {
+      overflow-x: auto;
+      margin: 18px 0
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: var(--card);
+      font-size: 14.5px
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 11px;
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      background: var(--card-2);
+      font-weight: 700;
+      font-size: 13.5px
+    }
+
+    td.mono,
+    th.mono {
+      font-family: 'JetBrains Mono';
+      font-size: 13px
+    }
+
+    /* ---------- código ---------- */
+    .code {
+      margin: 16px 0
+    }
+
+    .code-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: #1A1D17;
+      border: 1px solid #11130E;
+      border-bottom: 0;
+      padding: 7px 12px;
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      color: #B9BCAC
+    }
+
+    .code-head .spacer {
+      flex: 1
+    }
+
+    .cbtn {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #D8DACB;
+      padding: 4px 11px;
+      border-radius: 2px
+    }
+
+    .cbtn:hover {
+      background: rgba(255, 255, 255, .1)
+    }
+
+    .cbtn.copied {
+      color: #B7CE92;
+      border-color: #B7CE92
+    }
+
+    pre.src {
+      margin: 0;
+      padding: 14px 16px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border: 1px solid #11130E;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6
+    }
+
+    .tok-k {
+      color: var(--k)
+    }
+
+    .tok-s {
+      color: var(--s)
+    }
+
+    .tok-v {
+      color: var(--v)
+    }
+
+    .tok-c {
+      color: var(--c);
+      font-style: italic
+    }
+
+    .tok-n {
+      color: var(--n)
+    }
+
+    .tok-f {
+      color: var(--f)
+    }
+
+    .tok-t {
+      color: var(--t);
+      font-weight: 500
+    }
+
+    pre.map {
+      margin: 16px 0;
+      padding: 16px 18px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border: 1px solid #11130E;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5
+    }
+
+    /* ---------- reveal genérico (retos, piensa un momento) ---------- */
+    .reveal {
+      margin-top: 10px
+    }
+
+    .reveal-btn {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 7px 14px;
+      border-radius: 2px;
+      color: var(--olive-2)
+    }
+
+    .reveal-btn:hover {
+      background: var(--card-2);
+      border-color: var(--olive)
+    }
+
+    .reveal-box {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--olive);
+      background: var(--olive-soft);
+      padding: 12px 15px;
+      margin-top: 9px;
+      font-size: 15px
+    }
+
+    .reveal-box[hidden] {
+      display: none
+    }
+
+    .reveal-box p:last-child,
+    .reveal-box pre:last-child {
+      margin-bottom: 0
+    }
+
+    .reveal-box pre.mini-sql {
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 10px 12px;
+      border-radius: 3px;
+      font-size: 13px;
+      overflow-x: auto;
+      margin: 8px 0
+    }
+
+    /* ---------- piensa un momento ---------- */
+    .piensa {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .piensa>.ptitle {
+      font-weight: 700;
+      font-size: 14.5px;
+      margin-bottom: 8px;
+      color: var(--burgundy);
+      font-family: 'JetBrains Mono';
+      letter-spacing: .02em
+    }
+
+    .piensa ul {
+      margin: 0 0 0;
+      padding-left: 20px
+    }
+
+    .piensa li {
+      margin-bottom: 4px
+    }
+
+    /* ---------- retos ---------- */
+    .reto {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 14px 16px;
+      margin: 14px 0;
+      box-shadow: var(--shadow)
+    }
+
+    .reto.done {
+      border-color: var(--olive)
+    }
+
+    .reto-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px
+    }
+
+    .reto-check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      padding: 0;
+      font-family: 'Work Sans';
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink)
+    }
+
+    .reto-check .box {
+      width: 19px;
+      height: 19px;
+      flex: none;
+      border: 2px solid var(--olive);
+      background: var(--card);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 2px
+    }
+
+    .reto.done .box {
+      background: var(--olive)
+    }
+
+    .reto.done .box::after {
+      content: "✓"
+    }
+
+    .reto p {
+      margin: 0 0 4px
+    }
+
+    /* ---------- checklist final ---------- */
+    .check {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0
+    }
+
+    .check li {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 2px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      font-size: 15px
+    }
+
+    .check li:hover {
+      border-color: var(--olive)
+    }
+
+    .check li.done {
+      background: var(--olive-soft);
+      border-color: #BDCDAE
+    }
+
+    .check .box {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--olive);
+      border-radius: 3px;
+      flex: none;
+      margin-top: 2px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--card)
+    }
+
+    .check li.done .box {
+      background: var(--olive)
+    }
+
+    .check li.done .box::after {
+      content: "✓"
+    }
+
+    /* ---------- inspector devtools (demo estrella) ---------- */
+    .devtools {
+      border: 1px solid #11130E;
+      background: #1A1D17;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 20px 0;
+      box-shadow: 0 18px 40px -26px rgba(6, 20, 18, .8)
+    }
+
+    .dt-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      background: #111310;
+      color: #9FA89C;
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .dt-bar .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #3A4038
+    }
+
+    .dt-tabs {
+      display: flex;
+      gap: 2px;
+      background: #1A1D17;
+      padding: 0 8px;
+      border-bottom: 1px solid #11130E
+    }
+
+    .dt-tab {
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      color: #8B9188;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      padding: 9px 14px
+    }
+
+    .dt-tab[aria-selected="true"] {
+      color: #F4D67A;
+      border-bottom: 2px solid var(--ochre)
+    }
+
+    .dt-body {
+      padding: 14px 16px;
+      color: var(--code-ink);
+      font-size: 13px;
+      min-height: 150px
+    }
+
+    .dt-body[hidden] {
+      display: none
+    }
+
+    .dt-empty {
+      color: #6E756B;
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px
+    }
+
+    .dt-req {
+      border: 1px solid #333A2F;
+      background: #20241C;
+      border-radius: 3px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .3s, transform .3s
+    }
+
+    .dt-req.show {
+      opacity: 1;
+      transform: none
+    }
+
+    .dt-req .line1 {
+      color: #F4D67A;
+      margin-bottom: 6px
+    }
+
+    .dt-req .hdr {
+      color: #B9BCAC
+    }
+
+    .dt-req .hdr b {
+      color: #9FD9C4
+    }
+
+    .dt-req .hdr .setcookie {
+      color: #E5A3B0
+    }
+
+    .dt-cookies {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .dt-cookies th,
+    .dt-cookies td {
+      border: 1px solid #333A2F;
+      padding: 6px 9px;
+      text-align: left
+    }
+
+    .dt-cookies th {
+      background: #20241C;
+      color: #B9BCAC
+    }
+
+    .dt-cookies td {
+      color: var(--code-ink)
+    }
+
+    .dt-flag-on {
+      color: #9FD9C4
+    }
+
+    .dt-flag-off {
+      color: #6E756B
+    }
+
+    .dt-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px
+    }
+
+    .dt-btn {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid #3A4038;
+      color: #D8DACB;
+      padding: 6px 12px;
+      border-radius: 2px
+    }
+
+    .dt-btn:hover {
+      background: #2A2E23
+    }
+
+    .dt-btn.primary {
+      background: var(--ochre);
+      border-color: var(--ochre);
+      color: #2A1C00;
+      font-weight: 700
+    }
+
+    .dt-btn.primary:hover {
+      background: #C08016
+    }
+
+    .dt-note {
+      margin-top: 10px;
+      padding: 9px 11px;
+      background: #20241C;
+      border-left: 3px solid var(--ochre);
+      font-size: 12.5px;
+      color: #E9E6D8
+    }
+
+    .dt-jsline {
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      background: #111310;
+      padding: 8px 10px;
+      border-radius: 3px;
+      margin-top: 8px
+    }
+
+    /* ---------- generador de reflexion.md ---------- */
+    .mem-q {
+      margin: 16px 0
+    }
+
+    .mem-q label {
+      display: block;
+      font-weight: 700;
+      font-size: 14.5px;
+      margin-bottom: 6px
+    }
+
+    .mem-q textarea {
+      width: 100%;
+      min-height: 74px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font-family: 'Work Sans';
+      font-size: 14.5px;
+      border-radius: 2px;
+      resize: vertical
+    }
+
+    .mem-q textarea:focus {
+      border-color: var(--olive)
+    }
+
+    .mem-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0
+    }
+
+    .mem-preview {
+      display: none;
+      margin-top: 14px
+    }
+
+    .mem-preview.show {
+      display: block
+    }
+
+    .mem-preview pre {
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 14px 16px;
+      border-radius: 3px;
+      font-size: 12.5px;
+      overflow-x: auto;
+      white-space: pre-wrap
+    }
+
+    /* ---------- botones generales ---------- */
+    .btn {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      background: var(--olive);
+      border: 1px solid var(--olive-2);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 2px
+    }
+
+    .btn:hover {
+      background: var(--olive-2)
+    }
+
+    .btn.sec {
+      background: var(--card);
+      color: var(--olive-2);
+      border-color: var(--line)
+    }
+
+    .btn.sec:hover {
+      background: var(--card-2);
+      border-color: var(--olive)
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(18px);
+      z-index: 90;
+      background: var(--ink);
+      color: #F3F1E8;
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%)
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin: 18px 0
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 13px 15px
+    }
+
+    .mini h4 {
+      margin: 0 0 5px;
+      font-size: 14.5px
+    }
+
+    .mini p {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--muted)
+    }
+
+    .foot {
+      border-top: 2px solid var(--ink);
+      margin-top: 50px;
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    @media (max-width:960px) {
+      .shell {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 53px;
+        bottom: 0;
+        width: 280px;
+        z-index: 55;
+        background: var(--card);
+        transform: translateX(-101%);
+        transition: transform .25s;
+        height: auto;
+        box-shadow: 0 0 40px rgba(34, 32, 27, .25)
+      }
+
+      .sidebar.open {
+        transform: none
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 2px;
+        padding: 6px 11px;
+        font-family: 'Work Sans';
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--ink)
+      }
+
+      .bar {
+        display: none
+      }
+
+      main {
+        padding-left: 16px;
+        padding-right: 16px
+      }
+    }
+
+    @media print {
+
+      .topbar,
+      .sidebar,
+      .cbtn,
+      .btn,
+      .toast,
+      .dt-actions {
+        display: none
+      }
+
+      body {
+        background: #fff
+      }
+
+      main {
+        max-width: none
+      }
+    }
+
+    /* ================= GUÍA POO · extensiones ================= */
+    :root {
+      --ty: #C7A6EE;
+      --teal: #1F6F6B;
+      --teal-soft: #E0EEEC;
+      --plum: #5B3F7A;
+      --b0: #6B7A5E;
+      --b1: #3E5233;
+      --b2: #7C2C3E;
+      --b3: #A86F0E;
+      --b4: #2E5C86;
+      --b5: #5B3F7A;
+    }
+
+    .tok-ty {
+      color: var(--ty)
+    }
+
+    section[data-b] {
+      --bc: var(--olive)
+    }
+
+    section[data-b="0"] {
+      --bc: var(--b0)
+    }
+
+    section[data-b="1"] {
+      --bc: var(--b1)
+    }
+
+    section[data-b="2"] {
+      --bc: var(--b2)
+    }
+
+    section[data-b="3"] {
+      --bc: var(--b3)
+    }
+
+    section[data-b="4"] {
+      --bc: var(--b4)
+    }
+
+    section[data-b="5"] {
+      --bc: var(--b5)
+    }
+
+    section[data-b] .sec-num {
+      color: #fff;
+      background: var(--bc);
+      border-color: var(--bc);
+      font-weight: 700
+    }
+
+    section[data-b] h2 {
+      border-bottom: 3px solid var(--bc);
+      padding-bottom: 4px
+    }
+
+    section[data-b] h3.estado {
+      background: var(--olive-soft);
+      border: 1px solid #BDCDAE;
+      border-left: 5px solid var(--bc);
+      padding: 8px 12px;
+      font-size: 16px
+    }
+
+    /* ---- callouts nuevos ---- */
+    .key {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--olive);
+      background: var(--olive-soft);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .bridge {
+      border: 1px solid #B5D3D0;
+      border-left: 5px solid var(--teal);
+      background: var(--teal-soft);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .think {
+      border: 1px dashed var(--olive);
+      background: var(--card);
+      padding: 13px 16px;
+      margin: 18px 0
+    }
+
+    .goal {
+      display: inline-block;
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 5px 13px;
+      margin: 2px 0 14px;
+      border-radius: 99px;
+      font-size: 14px;
+      color: var(--muted)
+    }
+
+    .goal p {
+      margin: 0
+    }
+
+    .tip p:last-child,
+    .banner p:last-child,
+    .note p:last-child,
+    .key p:last-child,
+    .bridge p:last-child,
+    .think p:last-child {
+      margin-bottom: 0
+    }
+
+    .banner>div {
+      flex: 1
+    }
+
+    .note p,
+    .tip p,
+    .key p,
+    .bridge p,
+    .think p,
+    .banner p {
+      margin-bottom: .5em
+    }
+
+    /* ---- hero ---- */
+    .hero-kicker {
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      color: var(--burgundy);
+      margin-bottom: 14px
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6.4vw, 64px);
+      margin-bottom: 14px;
+      line-height: 1
+    }
+
+    .hero h1 i {
+      color: var(--olive)
+    }
+
+    .hero .lede {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 62ch
+    }
+
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+      border: 1px solid var(--line);
+      background: var(--card);
+      margin: 22px 0 6px
+    }
+
+    .fact {
+      padding: 11px 16px;
+      border-right: 1px solid var(--line);
+      flex: 1 1 130px
+    }
+
+    .fact:last-child {
+      border-right: 0
+    }
+
+    .fact dt {
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px
+    }
+
+    .fact dd {
+      margin: 0;
+      font-weight: 700;
+      font-size: 16px
+    }
+
+    .java-php {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 18px 0 6px;
+      font-family: 'JetBrains Mono';
+      font-size: 13px
+    }
+
+    .java-php span {
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 7px 11px;
+      border-radius: 3px
+    }
+
+    .java-php .arr {
+      background: none;
+      color: var(--burgundy);
+      font-weight: 700;
+      padding: 0
+    }
+
+    .timebar {
+      display: flex;
+      height: 46px;
+      border: 1px solid #11130E;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      margin: 34px 0 28px
+    }
+
+    .timebar a {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      font-family: 'JetBrains Mono';
+      font-size: 11.5px;
+      line-height: 1.2;
+      border-right: 1px solid rgba(255, 255, 255, .35);
+      transition: filter .15s;
+      min-width: 0;
+      overflow: hidden
+    }
+
+    .timebar a:hover {
+      filter: brightness(1.18)
+    }
+
+    .timebar a b {
+      font-size: 12.5px
+    }
+
+    .tmark {
+      position: absolute;
+      top: -17px;
+      bottom: -3px;
+      width: 0;
+      border-left: 2px dashed var(--ink);
+      pointer-events: none
+    }
+
+    .tmark span {
+      position: absolute;
+      top: -1px;
+      left: 5px;
+      font-family: 'JetBrains Mono';
+      font-size: 10.5px;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    /* ---- #construir / #aprender como tarjetas ---- */
+    #construir ul {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin: 16px 0
+    }
+
+    #construir li {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 12px 14px;
+      max-width: none;
+      box-shadow: var(--shadow)
+    }
+
+    #aprender ol {
+      list-style: none;
+      counter-reset: ap;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px
+    }
+
+    #aprender li {
+      counter-increment: ap;
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 10px 13px;
+      max-width: none
+    }
+
+    #aprender li::before {
+      content: counter(ap);
+      font-family: 'Instrument Serif';
+      font-size: 26px;
+      color: var(--burgundy);
+      line-height: 1;
+      flex: none;
+      width: 22px;
+      text-align: center
+    }
+
+    table.eval tbody tr:nth-child(1) {
+      border-left: 5px solid var(--b0)
+    }
+
+    table.eval tbody tr:nth-child(2) {
+      border-left: 5px solid var(--b3)
+    }
+
+    table.eval tbody tr:nth-child(3) {
+      border-left: 5px solid var(--b2)
+    }
+
+    /* ---- retos extra ---- */
+    .reto-sub {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--burgundy);
+      margin-left: 4px
+    }
+
+    .reto-body .code {
+      margin: 10px 0
+    }
+
+    .reto-body p {
+      margin: 0 0 8px
+    }
+
+    .reveal-box .code {
+      margin: 12px 0
+    }
+
+    .reveal-box p {
+      margin: 0 0 .7em
+    }
+
+    /* ---- tablas ---- */
+    .tbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 14px 0 -6px
+    }
+
+    .tbar input {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      font-family: 'Work Sans';
+      font-size: 14px;
+      border-radius: 2px;
+      min-width: 220px
+    }
+
+    .tbar button {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 2px;
+      color: var(--olive-2)
+    }
+
+    .tbar button[aria-pressed="true"] {
+      background: var(--olive);
+      color: #fff;
+      border-color: var(--olive-2)
+    }
+
+    table.quiz-on td.qcol:not(.shown) {
+      color: transparent;
+      text-shadow: 0 0 9px rgba(34, 32, 27, .65);
+      cursor: pointer;
+      user-select: none
+    }
+
+    table.quiz-on td.qcol:not(.shown) .inline {
+      background: transparent;
+      border-color: transparent
+    }
+
+    tr.hide {
+      display: none
+    }
+
+    /* ---- ampliaciones ---- */
+    .amps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 13px;
+      margin: 18px 0
+    }
+
+    .amp {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column
+    }
+
+    .amp.done {
+      border-color: var(--olive);
+      background: var(--olive-soft)
+    }
+
+    .amp-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px
+    }
+
+    .amp-n {
+      font-family: 'JetBrains Mono';
+      font-weight: 700;
+      font-size: 12px;
+      background: var(--plum);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 2px
+    }
+
+    .amp p {
+      font-size: 14.5px;
+      margin: 0 0 10px;
+      flex: 1
+    }
+
+    .amp-done {
+      align-self: flex-start;
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 5px 11px;
+      border-radius: 2px;
+      color: var(--olive-2)
+    }
+
+    .amp.done .amp-done {
+      background: var(--olive);
+      color: #fff;
+      border-color: var(--olive-2)
+    }
+
+    .amp-count {
+      font-family: 'JetBrains Mono';
+      font-size: 13px;
+      margin: 8px 0 0;
+      color: var(--muted)
+    }
+
+    .amp-count b {
+      color: var(--olive-2)
+    }
+
+    /* ================= WIDGETS ================= */
+    .wdg {
+      border: 1px solid #11130E;
+      background: #1A1D17;
+      border-radius: 5px;
+      margin: 26px 0;
+      color: var(--code-ink);
+      box-shadow: 0 18px 40px -28px rgba(6, 20, 18, .85);
+      overflow: hidden
+    }
+
+    .wdg-bar {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 13px;
+      background: #111310;
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      color: #9FA89C;
+      flex-wrap: wrap
+    }
+
+    .wdg-bar .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #3A4038
+    }
+
+    .wdg-bar b {
+      color: #F4D67A;
+      font-weight: 600
+    }
+
+    .wdg-bar .sp {
+      flex: 1
+    }
+
+    .wdg-in {
+      padding: 14px 16px 16px
+    }
+
+    .wdg p {
+      color: #C9CDBF;
+      font-size: 14px;
+      max-width: none
+    }
+
+    .wdg .btn2 {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid #3A4038;
+      color: #D8DACB;
+      padding: 6px 12px;
+      border-radius: 2px
+    }
+
+    .wdg .btn2:hover {
+      background: #2A2E23
+    }
+
+    .wdg .btn2.pri {
+      background: var(--ochre);
+      border-color: var(--ochre);
+      color: #2A1C00;
+      font-weight: 700
+    }
+
+    .wdg .btn2.pri:hover {
+      background: #C08016
+    }
+
+    .wdg .btn2[aria-pressed="true"],
+    .wdg .btn2.on {
+      background: #F4D67A;
+      color: #2A1C00;
+      border-color: #F4D67A
+    }
+
+    .wdg .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 8px 0
+    }
+
+    .wdg label.chk {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      font-size: 13.5px;
+      color: #D8DACB;
+      cursor: pointer;
+      font-family: 'Work Sans'
+    }
+
+    .wdg-out {
+      background: #111310;
+      border: 1px solid #2C3128;
+      border-radius: 3px;
+      padding: 11px 13px;
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      line-height: 1.55;
+      min-height: 60px;
+      overflow-x: auto
+    }
+
+    .wdg-out .err {
+      color: #FFB3C6
+    }
+
+    .wdg-out .ok {
+      color: #B7CE92
+    }
+
+    .wdg-out .dim {
+      color: #7C8576
+    }
+
+    .wdg-out .hl {
+      background: rgba(244, 214, 122, .16);
+      color: #FFE9A8
+    }
+
+    .cb {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono';
+      margin-right: 5px;
+      color: #1A1D17
+    }
+
+    .cb-Mat {
+      background: #E8B96A
+    }
+
+    .cb-Libro {
+      background: #B7CE92
+    }
+
+    .cb-Revista {
+      background: #93C8D6
+    }
+
+    .cb-DVD {
+      background: #E5A3B0
+    }
+
+    .cb-Aud {
+      background: #C7A6EE
+    }
+
+    .cb-trait {
+      background: #7FD3C6
+    }
+
+    .cb-if {
+      background: #F4D67A
+    }
+
+    .cb-own {
+      background: #D8DACB
+    }
+
+    .cb-over {
+      background: #FFB36B
+    }
+
+    .cb-inh {
+      background: #8B9188;
+      color: #fff
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    @media (max-width:860px) {
+      .two {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* UML */
+    .uml {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin: 6px 0 12px
+    }
+
+    .uml-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .uml-node {
+      background: #20241C;
+      border: 2px solid #3A4038;
+      color: var(--code-ink);
+      border-radius: 4px;
+      padding: 8px 14px;
+      min-width: 132px;
+      text-align: left;
+      cursor: pointer;
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      transition: border-color .15s, transform .1s
+    }
+
+    .uml-node:hover {
+      transform: translateY(-1px);
+      border-color: #8B9188
+    }
+
+    .uml-node b {
+      display: block;
+      font-size: 13.5px;
+      margin-bottom: 3px
+    }
+
+    .uml-node small {
+      color: #8B9188;
+      display: block
+    }
+
+    .uml-node[aria-pressed="true"] {
+      border-color: #F4D67A;
+      box-shadow: 0 0 0 2px rgba(244, 214, 122, .25)
+    }
+
+    .uml-node.n-Mat b {
+      color: #E8B96A
+    }
+
+    .uml-node.n-Libro b {
+      color: #B7CE92
+    }
+
+    .uml-node.n-Revista b {
+      color: #93C8D6
+    }
+
+    .uml-node.n-DVD b {
+      color: #E5A3B0
+    }
+
+    .uml-node.n-Aud b {
+      color: #C7A6EE;
+    }
+
+    .uml-node.opt {
+      border-style: dashed
+    }
+
+    .uml-edge {
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      color: #8B9188
+    }
+
+    .uml-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 5px
+    }
+
+    .mem {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .mem th,
+    .mem td {
+      border: 1px solid #2C3128;
+      padding: 5px 8px;
+      text-align: left;
+      background: transparent;
+      color: var(--code-ink)
+    }
+
+    .mem th {
+      background: #20241C;
+      color: #B9BCAC;
+      font-size: 11.5px
+    }
+
+    .mem tr.lock td:first-child {
+      color: #8B9188
+    }
+
+    .callchips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 6px 0 10px
+    }
+
+    .callchips button {
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      cursor: pointer;
+      background: #20241C;
+      border: 1px solid #3A4038;
+      color: #D8DACB;
+      padding: 4px 9px;
+      border-radius: 3px
+    }
+
+    .callchips button:hover {
+      border-color: #F4D67A
+    }
+
+    .callchips button.sp {
+      border-color: #FFB3C6;
+      color: #FFB3C6
+    }
+
+    .tr-line {
+      display: block;
+      white-space: pre-wrap
+    }
+
+    .fe-row {
+      display: grid;
+      grid-template-columns: 22px 108px 1fr;
+      gap: 8px;
+      padding: 5px 7px;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      align-items: start
+    }
+
+    .fe-row.act {
+      border-color: #F4D67A;
+      background: rgba(244, 214, 122, .08)
+    }
+
+    .fe-row.pend {
+      opacity: .35
+    }
+
+    /* capas */
+    .capas {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      margin: 6px 0
+    }
+
+    .capa {
+      border: 1px solid #3A4038;
+      background: #20241C;
+      border-radius: 4px;
+      padding: 10px 13px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--code-ink);
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .capa b {
+      color: #F4D67A;
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px
+    }
+
+    .capa:hover,
+    .capa[aria-pressed="true"] {
+      border-color: #F4D67A
+    }
+
+    .capa .m {
+      color: #8B9188
+    }
+
+    .capa .priv {
+      color: #FFB3C6
+    }
+
+    .capa-arrow {
+      text-align: center;
+      font-family: 'JetBrains Mono';
+      font-size: 11.5px;
+      color: #8B9188
+    }
+
+    .capas-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px
+    }
+
+    .capas-row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    @media (max-width:700px) {
+
+      .capas-row,
+      .capas-row2 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* tablas de BBDD simuladas */
+    .dbt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      margin-bottom: 10px
+    }
+
+    .dbt caption {
+      caption-side: top;
+      text-align: left;
+      color: #F4D67A;
+      font-size: 11.5px;
+      padding: 2px 0 5px
+    }
+
+    .dbt th,
+    .dbt td {
+      border: 1px solid #2C3128;
+      padding: 4px 7px;
+      text-align: left
+    }
+
+    .dbt th {
+      background: #20241C;
+      color: #B9BCAC
+    }
+
+    .dbt tr.sel td {
+      background: rgba(244, 214, 122, .14)
+    }
+
+    .dbt tr.flash td {
+      animation: fl 1.1s
+    }
+
+    @keyframes fl {
+      0% {
+        background: rgba(183, 206, 146, .5)
+      }
+
+      100% {
+        background: transparent
+      }
+    }
+
+    .cat-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 9px;
+      border: 1px solid #2C3128;
+      border-radius: 3px;
+      margin-bottom: 6px;
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .cat-item.off {
+      opacity: .6
+    }
+
+    .stp {
+      display: flex;
+      gap: 8px;
+      margin: 3px 0
+    }
+
+    .stp i {
+      font-style: normal;
+      flex: none;
+      width: 16px
+    }
+
+    select.sel2 {
+      background: #20241C;
+      color: #E7E6DA;
+      border: 1px solid #3A4038;
+      border-radius: 2px;
+      padding: 5px 8px;
+      font-family: 'JetBrains Mono';
+      font-size: 12px
+    }
+
+    .wdg pre.code-live {
+      margin: 0;
+      background: #111310;
+      border: 1px solid #2C3128;
+      border-radius: 3px;
+      padding: 11px 13px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      overflow-x: auto;
+      color: var(--code-ink)
+    }
+
+    /* ---- correcciones de maquetación ---- */
+    .mem,
+    .dbt {
+      background: transparent
+    }
+
+    .mem td,
+    .dbt td {
+      background: transparent
+    }
+
+    main {
+      min-width: 0
+    }
+
+    @media (max-width:960px) {
+      .shell {
+        grid-template-columns: minmax(0, 1fr)
+      }
+    }
+
+    .sec-head {
+      flex-wrap: wrap
+    }
+
+    .banner>div {
+      min-width: 0
+    }
+
+    .code,
+    .reveal-box,
+    .reto-body,
+    .note,
+    .tip,
+    .key,
+    .bridge,
+    .think {
+      min-width: 0;
+      max-width: 100%
+    }
+
+    pre.src {
+      max-width: 100%
+    }
+
+    .sig {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .topbar-in>* {
+      min-width: 0
+    }
+
+    .score {
+      flex: none
+    }
+
+    @media (max-width:520px) {
+      .sig {
+        font-size: 16px
+      }
+
+      .sig b {
+        display: none
+      }
+    }
+
+
+    /* ===== Actividad 2.2: extensiones ===== */
+    #aprender li {
+      display: block;
+      position: relative;
+      padding-left: 46px;
+      min-width: 0
+    }
+
+    #aprender li::before {
+      position: absolute;
+      left: 14px;
+      top: 8px
+    }
+
+    .amp.rec {
+      border-color: var(--ochre)
+    }
+
+    .amp.rec .amp-n {
+      background: var(--ochre)
+    }
+
+    .amp .recbadge {
+      font-family: 'JetBrains Mono';
+      font-size: 10.5px;
+      background: var(--ochre-soft);
+      color: #7A5300;
+      border: 1px solid #DEC48A;
+      padding: 1px 7px;
+      border-radius: 99px;
+      margin-left: auto
+    }
+
+    .ftree {
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      line-height: 1.75;
+      background: #111310;
+      border: 1px solid #2C3128;
+      border-radius: 3px;
+      padding: 10px 12px;
+      overflow-x: auto;
+      min-height: 60px
+    }
+
+    .ftree .dir {
+      color: #8B9188;
+      display: block;
+      margin-top: 5px
+    }
+
+    .ftree .f {
+      display: block;
+      padding: 0 6px 0 18px;
+      border-radius: 2px;
+      cursor: pointer;
+      color: var(--code-ink);
+      white-space: nowrap
+    }
+
+    .ftree .f:hover,
+    .ftree .f.sel {
+      background: rgba(244, 214, 122, .18)
+    }
+
+    .ftree .f.nw {
+      color: #7FD3C6
+    }
+
+    .ftree .f.gone {
+      opacity: .35;
+      cursor: default
+    }
+
+    .wtabs {
+      display: flex;
+      gap: 4px;
+      margin: 0 0 10px;
+      flex-wrap: wrap
+    }
+
+    .wtabs button {
+      font-family: 'Work Sans';
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid #3A4038;
+      color: #B9BCAC;
+      padding: 6px 12px;
+      border-radius: 2px
+    }
+
+    .wtabs button[aria-selected="true"] {
+      background: #F4D67A;
+      color: #2A1C00;
+      border-color: #F4D67A
+    }
+
+    .lint-ta {
+      width: 100%;
+      min-height: 230px;
+      background: #111310;
+      color: #E7E6DA;
+      border: 1px solid #2C3128;
+      border-radius: 3px;
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      line-height: 1.55;
+      white-space: pre;
+      tab-size: 4;
+      resize: vertical;
+      overflow: auto
+    }
+
+    .hier {
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      line-height: 1.8
+    }
+
+    .hier div {
+      padding: 0 6px;
+      border-radius: 2px
+    }
+
+    .hier .thrown {
+      background: rgba(255, 179, 198, .18);
+      color: #FFB3C6;
+      font-weight: 700
+    }
+
+    .hier .catchm {
+      background: rgba(183, 206, 146, .18)
+    }
+
+    .lbl {
+      font-size: 12px;
+      color: #8B9188;
+      font-family: 'JetBrains Mono';
+      margin: 8px 0 3px
+    }
+
+    .wdg .row select.sel2 {
+      max-width: 100%
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-in">
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir el índice">☰ Índice</button>
+      <div class="sig"><b>DAM</b> MiniApp de Biblioteca · Actividad 2.2</div>
+      <div class="spacer"></div>
+      <div class="score" id="score">0 / 0</div>
+      <div class="bar" title="Progreso: retos + checklist final"><span id="barFill"></span></div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="Índice de la guía">
+      <h4>Introducción</h4>
+      <a class="nav-link" href="#inicio">Portada y tiempos</a>
+      <a class="nav-link" href="#construir">Qué vas a construir</a>
+      <a class="nav-link" href="#aprender">Qué vas a aprender</a>
+      <a class="nav-link" href="#evaluacion">Cómo se evalúa</a>
+      <h4>Bloques</h4>
+      <a class="nav-link" href="#bloque-0"><span class="tag" style="color:var(--b0)">●</span> 0 · Repaso y Composer</a>
+      <a class="nav-link" href="#bloque-1"><span class="tag" style="color:var(--b1)">●</span> 1 · Namespaces y PSR-4</a>
+      <a class="nav-link" href="#bloque-2"><span class="tag" style="color:var(--b2)">●</span> 2 · Excepciones</a>
+      <a class="nav-link" href="#bloque-3"><span class="tag" style="color:var(--b3)">●</span> 3 · Buenas prácticas</a>
+      <a class="nav-link" href="#bloque-4"><span class="tag" style="color:var(--b4)">●</span> 4 · Integración y
+        cierre</a>
+      <h4>Para terminar</h4>
+      <a class="nav-link" href="#reflexion">Reflexión</a>
+      <a class="nav-link" href="#checklist">Checklist final</a>
+      <a class="nav-link" href="#ampliaciones">Ampliaciones</a>
+      <a class="nav-link" href="#glosario">Glosario</a>
+    </nav>
+
+    <main>
+
+      <section id="inicio" class="hero">
+        <div class="hero-kicker">Guía interactiva del alumnado · 2º DAM · Última actividad antes de Laravel</div>
+        <h1>🧩 MiniApp <i>de Biblioteca</i> · 2.2</h1>
+        <p class="lede">Tu biblioteca ya funciona con POO. Ahora la <b>profesionalizas</b>: namespaces y autoloading con
+          Composer (PSR-4), excepciones propias con <span class="inline">try/catch/finally</span> y un manejador global,
+          y buenas prácticas (<span class="inline">strict_types</span>, PSR-12). Así se organiza un proyecto PHP de
+          verdad.</p>
+        <div class="java-php"><span>package com.app.classes;</span><span class="arr">⟶</span><span>namespace
+            App\Classes;</span><span style="background:none;color:var(--muted);padding:0">mismo concepto, otra
+            sintaxis</span></div>
+        <dl class="facts">
+          <div class="fact">
+            <dt>Duración</dt>
+            <dd>4 h · 2 sesiones</dd>
+          </div>
+          <div class="fact">
+            <dt>Bloques</dt>
+            <dd>5 (0 a 4)</dd>
+          </div>
+          <div class="fact">
+            <dt>Retos con solución</dt>
+            <dd>19</dd>
+          </div>
+          <div class="fact">
+            <dt>Ampliaciones</dt>
+            <dd>10 (sin solución)</dd>
+          </div>
+          <div class="fact">
+            <dt>Laboratorios</dt>
+            <dd>4 interactivos</dd>
+          </div>
+        </dl>
+        <div class="timebar" id="timebar" aria-label="Reparto de tiempos por bloque"></div>
+        <p style="font-size:14.5px;color:var(--muted);margin-top:-12px">Reparto orientativo de los 240 minutos. Pulsa un
+          tramo para saltar a su bloque. El marcador discontinuo señala las 2 h (fin de la primera sesión).</p>
+      </section>
+
+      <section id="construir">
+        <div class="sec-head">
+          <h2>🎯 ¿Qué vas a construir?</h2>
+        </div>
+        <p>Sobre la MiniApp de Biblioteca que ya funciona, vas a aplicar tres capas de "profesionalización":</p>
+        <ul>
+          <li><b>Namespaces y autoloading</b>: las clases dejan de estar sueltas en el espacio global y pasan a vivir
+            bajo <span class="inline">App\</span>. Composer las carga automáticamente. <b>Desaparecen los <span
+                class="inline">require_once</span> manuales.</b></li>
+          <li><b>Gestión de excepciones</b>: donde antes había <span class="inline">exit()</span> o <span
+              class="inline">return false</span>, ahora hay <span class="inline">throw new ExcepcionPropia(...)</span>.
+            Los errores se capturan en un punto central y se muestran con un mensaje amigable.</li>
+          <li><b>Buenas prácticas</b>: <span class="inline">declare(strict_types=1)</span>, tipos en todo, PSR-12,
+            nombres coherentes.</li>
+        </ul>
+        <p><b>Escenario:</b> el equipo de desarrollo de la biblioteca ha crecido. Ya no eres tú solo con tres archivos:
+          hay más gente tocando el código y hay que poner orden. El primer paso antes de migrar a un framework es que el
+          proyecto <b>parezca</b> un proyecto de verdad.</p>
+        <p><b>Duración total:</b> 4 horas (2 sesiones de 2 h).</p>
+      </section>
+
+      <section id="aprender">
+        <div class="sec-head">
+          <h2>📚 Qué vas a aprender</h2>
+        </div>
+        <p>Al terminar serás capaz de:</p>
+        <ol>
+          <li>Explicar qué es un <b>namespace</b> y por qué evita colisiones.</li>
+          <li>Declarar una clase bajo un namespace y usarla con <span class="inline">use</span>.</li>
+          <li>Configurar <b>Composer</b> con autoloading <b>PSR-4</b>.</li>
+          <li>Eliminar <span class="inline">require_once</span> manuales de clases.</li>
+          <li>Distinguir <b>errores</b>, <b>excepciones</b> y <b><span class="inline">Throwable</span></b>.</li>
+          <li>Crear <b>excepciones propias</b> que extiendan <span class="inline">Exception</span>/<span
+              class="inline">RuntimeException</span>.</li>
+          <li>Usar <span class="inline">try</span>/<span class="inline">catch</span>/<span
+              class="inline">finally</span>.</li>
+          <li>Configurar un <b>manejador global de excepciones</b>.</li>
+          <li>Aplicar <b><span class="inline">declare(strict_types=1)</span></b> y <b>PSR-12</b>.</li>
+          <li>Reconocer la estructura de un proyecto PHP moderno como <b>base para Laravel</b>.</li>
+        </ol>
+      </section>
+
+      <section id="evaluacion">
+        <div class="sec-head">
+          <h2>⚖️ Cómo se te va a evaluar</h2>
+        </div>
+        <p><b>Entregables:</b></p>
+        <ol>
+          <li>Carpeta <span class="inline">src/</span> comprimida (con <span class="inline">composer.json</span>, sin
+            <span class="inline">vendor/</span>, con <span class="inline">.gitignore</span>).</li>
+          <li><span class="inline">reflexion.md</span> con respuestas a la ampliación A1 y a las 9 preguntas del Bloque 4.</li>
+          <li>Capturas de pantalla:
+            <ul>
+              <li><span class="inline">composer.json</span> con <span class="inline">autoload.psr-4</span>.</li>
+              <li>App funcionando <b>sin</b> <span class="inline">require_once</span> de clases.</li>
+              <li><span class="inline">try</span>/<span class="inline">catch</span> funcionando (intentar prestar un
+                material ya prestado).</li>
+              <li>Salida de <span class="inline">composer dump-autoload</span>.</li>
+              <li>Manejador global (provocar una excepción no capturada).</li>
+            </ul>
+          </li>
+        </ol>
+        <div class="tip">
+          <p>💡 <b>Regla de oro:</b> cuando algo deje de funcionar tras meter namespaces, el error casi siempre es
+            <b><span class="inline">Class "X" not found</span></b>. Significa que PHP busca <span
+              class="inline">X</span> en el espacio global, pero ahora vive en <span class="inline">App\...</span>.
+            Revisa el <span class="inline">use</span> o el <span class="inline">namespace</span>.</p>
+        </div>
+      </section>
+
+      <section id="bloque-0" data-b="0">
+        <div class="sec-head"><span class="sec-num">B0</span>
+          <h2>🚀 Bloque 0 — Repaso, Composer y preparación</h2><span class="time-badge">⏱ 25 min</span>
+        </div>
+        <h3>✅ Antes de tocar nada: comprueba que la app funciona</h3>
+        <p><b>No empieces a meter namespaces sin saber si el punto de partida está sano.</b> Abre http://localhost:8080
+          y verifica:</p>
+        <ol>
+          <li>Login como <span class="inline">user@demo.com</span> / <span class="inline">user123</span> → entra al
+            catálogo.</li>
+          <li>El catálogo muestra los 6 materiales.</li>
+          <li>Ficha de un material (<span class="inline">material.php?id=1</span>) → se ve correctamente.</li>
+          <li>Préstamo de un material disponible → se marca como prestado.</li>
+          <li>Login como <span class="inline">admin@demo.com</span> / <span class="inline">admin123</span> → ve el panel
+            admin.</li>
+        </ol>
+        <p>Si algo de esto falla, <b>arréglalo antes de seguir</b>. Esta actividad asume que la anterior está terminada
+          y funcionando.</p>
+        <h3>¿Qué vamos a cambiar?</h3>
+        <div class="wdg" id="w-migracion" data-w></div>
+        <div class="key">
+          <p>🔑 <b>Dos cambios estructurales clave:</b></p>
+          <ol>
+            <li>Todo el código de aplicación vive en <span class="inline">app/</span> bajo <span
+                class="inline">App\</span>.</li>
+            <li><b>Solo</b> lo que está en <span class="inline">public/</span> es accesible desde el navegador. <b>Eso
+                es seguridad:</b> nadie puede pedir <span class="inline">http://localhost:8080/app/Config/db.php</span>
+              porque está fuera del document root.</li>
+          </ol>
+        </div>
+        <h3>🧠 Por qué <span class="inline">public/</span> como document root</h3>
+        <p>Antes, cualquier archivo en <span class="inline">src/</span> era accesible desde el navegador. Si alguien
+          ponía <span class="inline">http://localhost:8080/config/db.php</span>, Apache ejecutaba el PHP y <b>podía ver
+            credenciales</b> si había un <span class="inline">var_dump</span>. Con <span class="inline">public/</span>
+          como document root:</p>
+        <ul>
+          <li>Solo se sirven los archivos de <span class="inline">public/</span>.</li>
+          <li><span class="inline">app/</span>, <span class="inline">vendor/</span>, <span
+              class="inline">composer.json</span> quedan <b>fuera del alcance</b> del navegador.</li>
+          <li>Es la estructura de <b>todos</b> los frameworks modernos (Laravel, Symfony).</li>
+        </ul>
+        <div class="bridge">
+          <p>🔁 En Java con Spring, es como tener <span class="inline">src/main/webapp/</span> para lo público y el
+            resto fuera.</p>
+        </div>
+        <h3>📄 Instalar Composer en <span class="inline">php-fpm</span></h3>
+        <p>Composer no viene con la imagen oficial de PHP. Lo incluiremos en <span class="inline">php/Dockerfile</span>:</p>
+        <pre class="code-src" data-lang="dockerfile" data-title="Dockerfile"
+            hidden>COPY --from=composer:latest /usr/bin/composer /usr/bin/composer</pre>
+        <p>Reconstruye el contenedor:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose build --no-cache php-fpm &amp;&amp; docker compose up -d</pre>
+          <p>Y comprueba que se ha instalado correctamente:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose exec php-fpm composer --version</pre>
+        <p>Deberías ver <span class="inline">Composer version 2.x.x</span>.</p>        
+        <h3>🧪 Retos de arranque</h3>
+        <div class="reto" data-reto id="reto-0-1">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 0.1</button></div>
+          <div class="reto-body">
+            <p>Ejecuta <span class="inline">composer --version</span> dentro del contenedor. ¿Qué versión tienes? Si ves
+              1.x, ¿qué ha pasado?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Composer 2.x es la actual. Si ves 1.x, has instalado una versión antigua (el instalador de
+                getcomposer.org ya da la 2.x, así que probablemente hayas usado otro método). La 2.x es la que soporta
+                PSR-4 de forma nativa y la que usa todo el ecosistema moderno.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-0-2">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 0.2</button></div>
+          <div class="reto-body">
+            <p>Abre <span class="inline">src/repos/MaterialRepo.php</span> y cuenta los <span
+                class="inline">require_once</span> al principio. ¿Qué pasaría si mañana añades una clase <span
+                class="inline">Mapa</span> y quieres usarla en el repo?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><span class="inline">MaterialRepo.php</span> tiene cuatro <span class="inline">require_once</span>:
+                <span class="inline">db.php</span>, <span class="inline">Libro.php</span>, <span
+                  class="inline">Revista.php</span>, <span class="inline">DVD.php</span>. Si añades <span
+                  class="inline">Mapa</span>, tienes que <b>acordarte</b> de añadirlo <b>en todos los archivos que lo
+                  usen</b>. Si te olvidas en uno, error fatal en runtime.</p>
+              <p><b>Con autoloading, ese problema desaparece:</b> escribes <span class="inline">use
+                  App\Classes\Mapa;</span> y Composer lo encuentra. Ese es el objetivo del Bloque 1.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-0-3">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 0.3</button></div>
+          <div class="reto-body">
+            <p>Intenta abrir <span class="inline">http://localhost:8080/config/db.php</span> en el navegador. ¿Qué ves?
+              ¿Es un problema de seguridad?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Ves una pantalla en blanco (o el código si Apache sirve el PHP sin ejecutarlo, según configuración). En
+                cualquier caso, <b>el archivo es accesible</b> desde el navegador. Si tuviera un <span
+                  class="inline">var_dump</span> de las credenciales, las verías.</p>
+              <p><b>Sí es un problema de seguridad.</b> Cualquier archivo de <span class="inline">src/</span> es
+                alcanzable. Por eso vamos a mover el document root a <span class="inline">public/</span>: solo los
+                archivos de ahí serán servidos.</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout">
+          <p>📋 <strong>Orden de los movimientos (no lo improvises)</strong></p>
+          <p>La reorganización tiene cinco fases. Después de cada una, comprueba que la app sigue funcionando. Si algo falla, para y arréglalo antes de seguir.</p>
+        </div>
+
+        <h4>📁 Fase 1 — Crear la estructura vacía</h4>
+        <p>Crea las carpetas <span class="inline">app/Classes/Traits/</span>, <span class="inline">app/Repos/</span>, <span class="inline">app/Config/</span>, <span class="inline">app/Includes/</span>, <span class="inline">app/Exceptions/</span>, <span class="inline">app/Services/</span> y <span class="inline">public/</span>. <strong>No muevas nada todavía.</strong></p>
+
+        <h4>📦 Fase 2 — Mover los archivos</h4>
+        <p>Mueve cada archivo a su sitio:</p>
+        <ul>
+          <li><span class="inline">classes/*</span> → <span class="inline">app/Classes/</span> (renombra <span class="inline">traits/</span> → <span class="inline">Traits/</span>)</li>
+          <li><span class="inline">repos/*</span> → <span class="inline">app/Repos/</span></li>
+          <li><span class="inline">config/*</span> → <span class="inline">app/Config/</span></li>
+          <li><span class="inline">includes/*</span> → <span class="inline">app/Includes/</span></li>
+          <li><span class="inline">index.php</span>, <span class="inline">material.php</span>, <span class="inline">prestar.php</span>, <span class="inline">login.php</span>, <span class="inline">logout.php</span>, <span class="inline">admin.php</span> → <span class="inline">public/</span></li>
+        </ul>
+
+        <h4>🔧 Fase 3 — Ajustar rutas de require_once</h4>
+        <p>Los archivos movidos ahora tienen rutas relativas distintas. Todavía no hay namespaces ni Composer. Arregla las rutas para que la app siga funcionando igual que antes:</p>
+        <ul>
+          <li>En <span class="inline">public/index.php</span>: <span class="inline">require_once __DIR__ . '/../includes/auth.php'</span> → <span class="inline">require_once __DIR__ . '/../app/Includes/auth.php'</span>.</li>
+          <li>En <span class="inline">app/Repos/MaterialRepo.php</span>: <span class="inline">require_once __DIR__ . '/../config/db.php'</span> → <span class="inline">require_once __DIR__ . '/../app/Config/db.php'</span>.</li>
+          <li>Etc.</li>
+        </ul>
+
+        <h4>🌐 Fase 4 — Cambiar DocumentRoot de Apache</h4>
+        <p>Edita <span class="inline">apache/vhost.conf</span>:</p>
+        <pre class="code-src" data-lang="apache" data-title="apache/vhost.conf" hidden>DocumentRoot /var/www/html/public
+
+&lt;Directory /var/www/html/public&gt;
+    AllowOverride All
+    Require all granted
+&lt;/Directory&gt;</pre>
+        <p>Reinicia Apache y verifica que <span class="inline">http://localhost:8080</span> sigue funcionando. Si da 404, el DocumentRoot no está bien.</p>
+
+        <h4>✅ Fase 5 — Comprobar que la app funciona</h4>
+        <p>Login, catálogo, ficha, préstamo. Todo debe funcionar como antes de tocar Composer. Si algo falla, vuelve a la Fase 3.</p>
+        <p><strong>Solo entonces</strong> pasas al Bloque 1 (crear <span class="inline">composer.json</span>, añadir namespaces, eliminar require_once).</p>
+
+        <div class="banner">
+          <p>⚠️ <em>Error típico:</em> mover <span class="inline">index.php</span> a <span class="inline">public/</span> antes de cambiar el DocumentRoot. Resultado: 404 en todo. El orden importa.</p>
+        </div>
+        <div class="tip">
+          <p>💡 <em>Truco:</em> haz la Fase 2 con <span class="inline">git mv</span> (si usas Git) para que el historial no se rompa. Y haz un commit por fase para poder volver atrás si algo falla.</p>
+        </div>
+
+        <h3 class="estado">📌 Estado al terminar el Bloque 0</h3>
+        <p>App verificada funcionando. Composer instalado. Entiendes por qué movemos el código a <span
+            class="inline">app/</span> y el document root a <span class="inline">public/</span>.</p>
+      </section>
+
+      <section id="bloque-1" data-b="1">
+        <div class="sec-head"><span class="sec-num">B1</span>
+          <h2>📦 Bloque 1 — Namespaces, PSR-4 y autoloading</h2><span class="time-badge">⏱ 75 min</span>
+        </div>
+        <div class="goal">
+          <p>🎯 <b>Criterio trabajado:</b> CE d) — carga automática mediante espacios de nombres y gestores de
+            dependencias.</p>
+        </div>
+        <h3>🧠 ¿Qué es un namespace?</h3>
+        <p>Imagina que tú y otro compañero creáis cada uno una clase <span class="inline">Libro</span>. Si juntáis el
+          código, PHP no sabe cuál es cuál: <b>colisión de nombres</b>. Los <b>namespaces</b> lo resuelven: cada clase
+          vive en una "carpeta lógica" con nombre.</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>namespace App\Classes;
+
+class Libro { ... }</pre>
+        <p>La clase ahora se llama <b><span class="inline">App\Classes\Libro</span></b> (nombre completamente
+          cualificado, <b>FQN</b>). Desde otro archivo:</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>use App\Classes\Libro;
+
+$l = new Libro(...);  // PHP sabe que es App\Classes\Libro</pre>
+        <div class="bridge">
+          <p>🔁 <b>Comparación Java:</b> <span class="inline">package com.app.classes;</span> + <span
+              class="inline">import com.app.classes.Libro;</span>. Idéntico concepto, sintaxis distinta.</p>
+          <p>🔑 <b>Regla:</b> un archivo = un namespace = una clase (convención PSR-4).</p>
+        </div>
+        <h3>🧠 ¿Qué es PSR-4?</h3>
+        <p>PSR-4 es un <b>estándar</b> que dice: "si tu clase se llama <span class="inline">App\Classes\Libro</span>, su
+          archivo debe estar en <span class="inline">app/Classes/Libro.php</span>". Es decir, <b>el namespace se mapea a
+            carpetas</b>.</p>
+        <p>Composer lee ese mapeo de <span class="inline">composer.json</span>:</p>
+        <pre class="code-src" data-lang="json" data-title="composer.json" hidden>{
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}</pre>
+        <p>Esto significa: "todo lo que empiece por <span class="inline">App\</span> está en <span
+            class="inline">app/</span>". Así, <span class="inline">App\Classes\Libro</span> → <span
+            class="inline">app/Classes/Libro.php</span>. Composer genera <span class="inline">vendor/autoload.php</span>
+          que, al incluirlo, <b>registra un cargador automático</b>: cuando PHP encuentra <span class="inline">new
+            Libro()</span>, busca el archivo y lo incluye sin que tú hagas nada.</p>
+        <div class="note">
+          <p>📌 PSR-4 es la evolución de PSR-0 (obsoleto). Usa siempre PSR-4.</p>
+        </div>
+        <h3>🧠 Los tres comandos de Composer que vas a usar</h3>
+        <div class="tw">
+          <table class="" data-quiz="1">
+            <thead>
+              <tr>
+                <th>Comando</th>
+                <th>Qué hace</th>
+                <th>Cuándo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="inline">composer install</span></td>
+                <td>Lee <span class="inline">composer.lock</span> e instala <b>las versiones exactas</b> que fija el
+                  lock</td>
+                <td>Primera vez, o tras clonar un repo</td>
+              </tr>
+              <tr>
+                <td><span class="inline">composer update</span></td>
+                <td>Actualiza dependencias a sus últimas versiones compatibles <b>y actualiza <span
+                      class="inline">composer.lock</span></b></td>
+                <td>Solo cuando quieres actualizar</td>
+              </tr>
+              <tr>
+                <td><span class="inline">composer dump-autoload</span></td>
+                <td>Regenera <b>solo</b> el cargador automático (no toca dependencias)</td>
+                <td><b>Cada vez que añades una clase nueva</b> o cambias el mapeo PSR-4</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="key">
+          <p>🔑 <b>Regla mnemotécnica:</b> <span class="inline">install</span> = "pon lo que dice el lock". <span
+              class="inline">update</span> = "busca versiones nuevas y actualiza el lock". <span
+              class="inline">dump-autoload</span> = "recalcula dónde están mis clases".</p>
+        </div>
+        <h3>📄 Paso 1: <span class="inline">composer.json</span></h3>
+        <p>Crea <span class="inline">src/composer.json</span>:</p>
+        <pre class="code-src" data-lang="json" data-title="src/composer.json" hidden>{
+    "name": "dam/biblioteca",
+    "description": "MiniApp de Biblioteca con POO, namespaces y Composer",
+    "type": "project",
+    "require": {
+        "php": "&gt;=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}</pre>
+        <p>Ejecuta:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose exec php-fpm sh -c "cd /var/www/html &amp;&amp; composer dump-autoload"</pre>
+        <p>Deberías ver:</p>
+        <pre class="code-src" data-lang="text" data-title="salida esperada" hidden>Generating optimized autoload files
+Generated autoload files</pre>
+        <p>Y aparecerá <span class="inline">src/vendor/</span> con <span class="inline">autoload.php</span>.</p>
+        <div class="note">
+          <p>📌 <b><span class="inline">composer.lock</span></b> se genera automáticamente la primera vez que ejecutas
+            <span class="inline">composer install</span> o <span class="inline">composer update</span>. <b>Se sube al
+              repositorio</b> (junto a <span class="inline">composer.json</span>), porque fija las versiones exactas.
+            <b><span class="inline">vendor/</span> no se sube</b> (se regenera con <span class="inline">install</span>).
+          </p>
+        </div>
+        <h3>📄 Paso 2: añadir namespaces a las clases</h3>
+        <p><b>Todas</b> las clases de <span class="inline">app/</span> necesitan <span class="inline">namespace</span> +
+          <span class="inline">declare(strict_types=1)</span> (lo veremos a fondo en el Bloque 3, pero lo ponemos ya).
+        </p>
+        <p><span class="inline">app/Classes/MaterialBiblioteca.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Classes/MaterialBiblioteca.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Classes;
+
+use App\Classes\Traits\TieneFechas;
+use App\Classes\Traits\Loggable;
+
+class MaterialBiblioteca implements Prestable
+{
+    use TieneFechas, Loggable;
+
+    // ... resto igual ...
+}</pre>
+        <div class="note">
+          <p>📌 <b>Fíjate:</b></p>
+          <ul>
+            <li><span class="inline">declare(strict_types=1);</span> <b>primera línea ejecutable</b>, antes de <span
+                class="inline">namespace</span>.</li>
+            <li><span class="inline">namespace</span> <b>antes</b> de cualquier <span class="inline">use</span>.</li>
+            <li><span class="inline">Prestable</span> está en el mismo namespace → <b>no necesita <span
+                  class="inline">use</span></b>.</li>
+            <li>Los traits están en <span class="inline">App\Classes\Traits</span> → <b>sí necesitan <span
+                  class="inline">use</span></b>.</li>
+          </ul>
+        </div>
+        <p><span class="inline">app/Classes/Libro.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Classes/Libro.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Classes;
+
+class Libro extends MaterialBiblioteca
+{
+    // ... resto igual, SIN require_once ...
+}</pre>
+        <div class="note">
+          <p>📌 <b>Elimina los <span class="inline">require_once</span></b>. Composer carga <span
+              class="inline">MaterialBiblioteca</span> automáticamente.</p>
+        </div>
+        <p>Haz lo mismo con <span class="inline">Revista</span>, <span class="inline">DVD</span>, <span
+            class="inline">Prestable</span> y los traits. En <span class="inline">MaterialRepo</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Repos;
+
+use App\Classes\DVD;
+use App\Classes\Libro;
+use App\Classes\MaterialBiblioteca;
+use App\Classes\Revista;
+use App\Config\db;
+
+class MaterialRepo
+{
+    // ... resto igual, SIN require_once ...
+}</pre>
+        <div class="banner">
+          <p>⚠️ <b>Ojo con <span class="inline">db()</span>.</b> Es una <b>función</b>, no una clase. Los namespaces
+            también afectan a las funciones:</p>
+          <ul>
+            <li><span class="inline">use App\Config\db;</span> → importa la <b>función</b> (correcto).</li>
+            <li>O llamar <span class="inline">\App\Config\db()</span> (FQN, más feo).</li>
+          </ul>
+          <p><b>Recomendación:</b> <span class="inline">use function App\Config\db;</span> explícito. Es más legible y
+            evita ambigüedades con clases que se llamen igual.</p>
+        </div>
+        <p><span class="inline">app/Config/db.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Config/db.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Config;
+
+use PDO;
+
+function db(): PDO
+{
+    static $pdo = null;
+    if ($pdo === null) {
+        // ... igual que antes ...
+    }
+    return $pdo;
+}</pre>
+        <div class="note">
+          <p>📌 <b><span class="inline">use PDO;</span></b> es necesario porque <span class="inline">PDO</span> vive en
+            el namespace global (<span class="inline">\PDO</span>). Dentro de <span class="inline">namespace
+              App\Config;</span>, escribir <span class="inline">PDO</span> sin <span class="inline">use</span> haría que
+            PHP buscara <span class="inline">App\Config\PDO</span>, que no existe.</p>
+        </div>
+        <h3>📄 Paso 3: puntos de entrada</h3>
+        <p>Cada archivo de <span class="inline">public/</span> solo necesita <b>una línea</b>:</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Includes\auth;
+use App\Repos\MaterialRepo;
+
+// ... resto igual ...</pre>
+        <p><b><span class="inline">public/index.php</span></b> (catálogo):</p>
+        <pre class="code-src" data-lang="php" data-title="public/index.php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Includes\auth;
+use App\Repos\MaterialRepo;
+
+requireLogin();
+
+$repo = new MaterialRepo();
+$materiales = $repo-&gt;findAll();
+
+require __DIR__ . '/../app/Includes/header.php';
+?&gt;
+&lt;h1&gt;Catálogo de la biblioteca&lt;/h1&gt;
+&lt;!-- ... resto igual ... --&gt;
+&lt;?php require __DIR__ . '/../app/Includes/footer.php'; ?&gt;</pre>
+        <div class="note">
+          <p>📌 <b>Fíjate:</b> ya no hay <span class="inline">require_once</span> de <span
+              class="inline">MaterialRepo</span> ni de <span class="inline">Libro</span>. Solo <span
+              class="inline">vendor/autoload.php</span>. <b>Eso es el autoloading.</b></p>
+        </div>
+        <div class="note"><b>📎 Nota de la guía · dos matices técnicos</b>
+          <p><b>1. Las funciones no se autocargan.</b> PSR-4 solo localiza <i>clases</i>. Si <span
+              class="inline">db()</span>, <span class="inline">requireLogin()</span> o <span
+              class="inline">currentUser()</span> siguen siendo funciones sueltas en <span
+              class="inline">app/Config/db.php</span> o <span class="inline">app/Includes/auth.php</span>, esos ficheros
+            se siguen incluyendo con <span class="inline">require_once</span> (la regla «sin require_once» se refiere a
+            las <b>clases</b>) o se registran en <span class="inline">composer.json</span> con <span
+              class="inline">autoload.files</span> (ampliación A4). Y si la función vive en un namespace, se importa con
+            <span class="inline">use function App\Config\db;</span>: un <span class="inline">use App\Config\db;</span>
+            importaría una <i>clase</i> llamada <span class="inline">db</span>.</p>
+          <p style="margin-bottom:0"><b>2. ¿Cuándo hace falta <span class="inline">composer dump-autoload</span>?</b>
+            Con PSR-4 en su modo normal, Composer también localiza por ruta una clase recién creada. Regenerar es
+            imprescindible si usas <span class="inline">classmap-authoritative</span> o cambias el mapeo de <span
+              class="inline">composer.json</span>, y es un buen hábito aquí porque <span
+              class="inline">optimize-autoloader</span> genera un mapa de clases. Compruébalo en el laboratorio de
+            abajo.</p>
+        </div>
+        <div class="wdg" id="w-autoload" data-w></div>
+        <h3>🧪 Retos</h3>
+        <div class="reto" data-reto id="reto-1-1">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.1</button></div>
+          <div class="reto-body">
+            <p>Abre <span class="inline">public/index.php</span> y elimina la línea <span class="inline">use
+                App\Repos\MaterialRepo;</span>. ¿Qué error da? ¿Por qué?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <pre class="code-src" data-lang="text" data-title="public/index.php"
+                hidden>Fatal error: Uncaught Error: Class "MaterialRepo" not found</pre>
+              <p>Sin <span class="inline">use</span>, PHP busca <span class="inline">MaterialRepo</span> en el
+                <b>namespace actual</b> de <span class="inline">index.php</span>, que es el global. Como no existe <span
+                  class="inline">\MaterialRepo</span> (ahora es <span class="inline">App\Repos\MaterialRepo</span>),
+                falla.</p>
+              <p><b>Dos formas de arreglarlo:</b> volver a poner <span class="inline">use App\Repos\MaterialRepo;</span>
+                (recomendado), o escribir <span class="inline">new \App\Repos\MaterialRepo()</span> (FQN, más feo).</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-1-2">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.2</button></div>
+          <div class="reto-body">
+            <p>¿Por qué <span class="inline">Libro.php</span> <b>no</b> necesita <span class="inline">use
+                App\Classes\MaterialBiblioteca;</span> pero <span class="inline">MaterialBiblioteca.php</span> <b>sí</b>
+              necesita <span class="inline">use App\Classes\Traits\TieneFechas;</span>?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><span class="inline">Libro</span> y <span class="inline">MaterialBiblioteca</span> están en <span
+                  class="inline">App\Classes</span>. <b>Mismo namespace = no hace falta <span
+                    class="inline">use</span>.</b></p>
+              <p><span class="inline">TieneFechas</span> está en <span class="inline">App\Classes\Traits</span>, que es
+                <b>otro namespace</b> (aunque sea "hijo"). PHP no lo busca automáticamente. Hay que importarlo.</p>
+              <p><b>Regla:</b> <span class="inline">use</span> solo es necesario cuando el FQN <b>no coincide</b> con el
+                namespace actual + el nombre corto.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-1-3">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.3</button></div>
+          <div class="reto-body">
+            <p>Añade una clase nueva <span class="inline">App\Classes\Mapa</span> (un material tipo mapa). Crea <span
+                class="inline">app/Classes/Mapa.php</span> con su <span class="inline">namespace</span> y <span
+                class="inline">class Mapa extends MaterialBiblioteca</span>. Luego úsala en <span
+                class="inline">MaterialRepo::hidratar()</span> añadiendo un caso <span class="inline">'mapa'</span>.
+              ¿Qué pasos has tenido que dar?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><b>Pasos:</b></p>
+              <ol>
+                <li>Crear <span class="inline">app/Classes/Mapa.php</span> con <span class="inline">namespace
+                    App\Classes;</span>.</li>
+                <li>En <span class="inline">MaterialRepo.php</span>, añadir <span class="inline">use
+                    App\Classes\Mapa;</span>.</li>
+                <li>En <span class="inline">hidratar()</span>, añadir el caso <span class="inline">'mapa' =&gt; new
+                    Mapa(...)</span>.</li>
+                <li><b>Ejecutar <span class="inline">composer dump-autoload</span></b> para que Composer registre la
+                  clase.</li>
+              </ol>
+              <p><b>El paso 4 es el que se olvida.</b> Sin él, <span class="inline">Class not found</span>. <b>Siempre
+                  <span class="inline">dump-autoload</span> después de añadir una clase.</b></p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-1-4">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.4</button><span class="reto-sub">Encuentra el error.</span></div>
+          <div class="reto-body">
+            <p>Este código no funciona. ¿Por qué?</p>
+            <pre class="code-src" data-lang="php" data-title="PHP" hidden>&lt;?php
+namespace App\Repos;
+
+class MaterialRepo
+{
+    public function findById(int $id): MaterialBiblioteca
+    {
+        // ...
+    }
+}</pre>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Falta <span class="inline">use App\Classes\MaterialBiblioteca;</span> (o usar el FQN <span
+                  class="inline">\App\Classes\MaterialBiblioteca</span>). Como <span class="inline">MaterialRepo</span>
+                está en <span class="inline">App\Repos</span>, PHP busca <span class="inline">MaterialBiblioteca</span>
+                en <span class="inline">App\Repos\MaterialBiblioteca</span>, que no existe.</p>
+              <p><b>Error:</b> <span class="inline">Class "App\Repos\MaterialBiblioteca" not found</span>.</p>
+              <p><b>Regla:</b> cada vez que uses una clase de <b>otro</b> namespace, añade el <span
+                  class="inline">use</span>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-1-5">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.5</button></div>
+          <div class="reto-body">
+            <p>¿Qué diferencia hay entre <span class="inline">require_once __DIR__ . '/../vendor/autoload.php'</span> y
+              los <span class="inline">require_once</span> que tenías antes de las clases?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><b>Antes:</b> cada archivo incluía <b>manualmente</b> cada clase que usaba. Cascada de <span
+                  class="inline">require_once</span> que había que mantener a mano.</p>
+              <p><b>Ahora:</b> <b>una sola línea</b> (<span class="inline">vendor/autoload.php</span>) registra un
+                <b>cargador automático</b>. Cuando PHP encuentra <span class="inline">new Libro()</span>, el cargador
+                calcula la ruta (<span class="inline">app/Classes/Libro.php</span>), la incluye y sigue. <b>No hay
+                  cascada: hay carga bajo demanda.</b></p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-1-6">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 1.6</button></div>
+          <div class="reto-body">
+            <p>Ejecuta <span class="inline">composer dump-autoload</span> y luego mira <span
+                class="inline">src/vendor/composer/autoload_psr4.php</span>. ¿Qué contiene?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Un array que mapea prefijos de namespace a directorios:</p>
+              <pre class="code-src" data-lang="php" data-title="PHP" hidden>return array(
+    'App\\' =&gt; array($baseDir . '/app'),
+);</pre>
+              <p>Eso es lo que leíste de <span class="inline">composer.json</span>. Composer lo genera para que el
+                cargador sepa dónde buscar. <b>No se toca a mano</b>: se regenera con <span
+                  class="inline">dump-autoload</span>.</p>
+            </div>
+          </div>
+        </div>
+        <h3 class="estado">📌 Estado al terminar el Bloque 1</h3>
+        <pre class="code-src" data-lang="text" data-title="estructura" hidden>src/
+├── app/
+│   ├── Classes/       ← namespace App\Classes
+│   ├── Repos/         ← namespace App\Repos
+│   ├── Config/        ← namespace App\Config
+│   └── Includes/
+├── public/            ← puntos de entrada, solo require de vendor/autoload.php
+├── vendor/            ← generado por Composer
+├── composer.json
+└── composer.lock</pre>
+        <p>La app funciona igual, pero <b>sin <span class="inline">require_once</span> de clases</b>. Composer se
+          encarga. Tienes namespaces en todo el código de aplicación.</p>
+      </section>
+
+      <section id="bloque-2" data-b="2">
+        <div class="sec-head"><span class="sec-num">B2</span>
+          <h2>⚠️ Bloque 2 — Gestión de excepciones</h2><span class="time-badge">⏱ 70 min</span>
+        </div>
+        <div class="goal">
+          <p>🎯 <b>Criterio trabajado:</b> CE e) — gestión de excepciones y errores en aplicaciones de servidor.</p>
+        </div>
+        <h3>🧠 Errores, excepciones y <span class="inline">Throwable</span></h3>
+        <p>En PHP moderno (7+) hay una jerarquía clara:</p>
+        <pre class="code-src" data-lang="text" data-title="estructura" hidden>Throwable (interfaz)
+├── Error
+│   ├── TypeError
+│   ├── ValueError
+│   └── ...
+└── Exception
+    ├── RuntimeException
+    ├── InvalidArgumentException
+    ├── PDOException
+    └── ... (y las tuyas)</pre>
+        <ul>
+          <li><b><span class="inline">Exception</span></b>: errores "esperables" del dominio (material no encontrado,
+            límite de préstamos). <b>Las tuyas extienden <span class="inline">Exception</span> o <span
+                class="inline">RuntimeException</span></b>.</li>
+          <li><b><span class="inline">Error</span></b>: errores del motor de PHP (método inexistente, tipo incorrecto).
+            <b>No las lanzas tú</b>.</li>
+          <li><b><span class="inline">Throwable</span></b>: lo que captura <b>ambas</b>. Si quieres un <span
+              class="inline">catch</span> que atrape todo, usa <span class="inline">Throwable</span>.</li>
+        </ul>
+        <div class="bridge">
+          <p>🔁 <b>Comparación Java:</b> <span class="inline">Exception</span> y <span class="inline">Error</span> son
+            hermanos bajo <span class="inline">Throwable</span>. En PHP, desde 7, es igual.</p>
+        </div>
+        <h3>📄 Paso 1: excepciones propias</h3>
+        <p>Crea <span class="inline">app/Exceptions/MaterialNoEncontradoException.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Exceptions/MaterialNoEncontradoException.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Exceptions;
+
+use RuntimeException;
+
+class MaterialNoEncontradoException extends RuntimeException
+{
+    public function __construct(int $id)
+    {
+        parent::__construct("No existe un material con id {$id}");
+    }
+}</pre>
+        <p>Crea <span class="inline">app/Exceptions/MaterialNoDisponibleException.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Exceptions/MaterialNoDisponibleException.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Exceptions;
+
+use RuntimeException;
+
+class MaterialNoDisponibleException extends RuntimeException
+{
+    public function __construct(string $titulo)
+    {
+        parent::__construct("El material '{$titulo}' no está disponible para préstamo");
+    }
+}</pre>
+        <div class="note">
+          <p>📌 <b>Fíjate:</b> extienden <span class="inline">RuntimeException</span>. Es una buena práctica: <span
+              class="inline">RuntimeException</span> es para errores que ocurren <b>durante la ejecución</b> y que el
+            código llamador podría querer capturar. No extiendas <span class="inline">Exception</span> directamente si
+            puedes ser más específico.</p>
+        </div>
+        <h3>📄 Paso 2: lanzar excepciones desde el repositorio</h3>
+        <p><b>Antes</b> (<span class="inline">findById</span> devolvía <span class="inline">null</span>):</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function findById(int $id): ?MaterialBiblioteca
+{
+    $stmt = db()-&gt;prepare('SELECT * FROM materiales WHERE id = ?');
+    $stmt-&gt;execute([$id]);
+    $fila = $stmt-&gt;fetch();
+    return $fila ? $this-&gt;hidratar($fila) : null;
+}</pre>
+        <p><b>Después</b> (lanza excepción):</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function findById(int $id): MaterialBiblioteca
+{
+    $stmt = db()-&gt;prepare('SELECT * FROM materiales WHERE id = ?');
+    $stmt-&gt;execute([$id]);
+    $fila = $stmt-&gt;fetch();
+
+    if ($fila === false) {
+        throw new MaterialNoEncontradoException($id);
+    }
+
+    return $this-&gt;hidratar($fila);
+}</pre>
+        <div class="banner">
+          <p>⚠️ <b>Cambio de contrato:</b> el método ya no devuelve <span class="inline">?MaterialBiblioteca</span>.
+            <b>Siempre devuelve objeto o lanza excepción.</b> El <span class="inline">?</span> desaparece. <b>Todos los
+              sitios que llamaban a <span class="inline">findById</span></b> deben actualizarse. En tu código son <span
+              class="inline">material.php</span> y <span class="inline">prestar.php</span>. Si tienes otros, revísalos.
+          </p>
+        </div>
+        <h3>📄 Paso 3: <span class="inline">PrestamoService</span> (lógica de negocio)</h3>
+        <div class="tip">
+          <p>💡 <b>¿Por qué una clase nueva?</b> Porque <span class="inline">prestar.php</span> es un
+            <b>controlador</b>: recibe la petición y devuelve respuesta. La <b>lógica de negocio</b> (comprobar
+            disponibilidad, registrar préstamo, validar límites) no debería estar ahí. Cuando llegues a Laravel, esto se
+            llama <b>Servicio</b> y es el sitio natural para esa lógica.</p>
+        </div>
+        <p>Crea <span class="inline">app/Services/PrestamoService.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Services/PrestamoService.php" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Exceptions\MaterialNoDisponibleException;
+use App\Repos\MaterialRepo;
+
+class PrestamoService
+{
+    public function __construct(private MaterialRepo $repo) {}
+
+    /**
+     * Intenta prestar un material a un usuario.
+     *
+     * @throws MaterialNoDisponibleException si el material ya está prestado
+     * @throws \App\Exceptions\MaterialNoEncontradoException si el id no existe
+     */
+    public function prestar(int $materialId, int $usuarioId): void
+    {
+        $material = $this-&gt;repo-&gt;findById($materialId);
+
+        if (!$material-&gt;prestar()) {
+            throw new MaterialNoDisponibleException($material-&gt;getTitulo());
+        }
+
+        $this-&gt;repo-&gt;setDisponible($materialId, false);
+        $this-&gt;repo-&gt;registrarPrestamo($materialId, $usuarioId);
+
+        $material-&gt;log(
+            "Préstamo de '{$material-&gt;getTitulo()}' al usuario {$usuarioId}"
+        );
+    }
+}</pre>
+        <div class="note">
+          <p>📌 <b>Fíjate en:</b></p>
+          <ul>
+            <li><b>Inyección de dependencias</b> en el constructor: <span class="inline">private MaterialRepo
+                $repo</span> (constructor property promotion, PHP 8+).</li>
+            <li>El método <span class="inline">prestar()</span> <b>lanza</b> excepciones, no las captura. <b>La captura
+                es responsabilidad del controlador.</b></li>
+            <li>Es <b>una</b> operación de negocio. El controlador solo llama y traduce excepciones a respuestas HTTP.
+            </li>
+          </ul>
+        </div>
+        <h3>📄 Paso 4: <span class="inline">finally</span> — un caso real</h3>
+        <p><span class="inline">finally</span> se ejecuta <b>siempre</b>, haya o no excepción. Útil para limpiar
+          recursos. En nuestro caso, un buen sitio es registrar <b>siempre</b> el intento de préstamo (éxito o fracaso):
+        </p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function prestar(int $materialId, int $usuarioId): void
+{
+    $material = $this-&gt;repo-&gt;findById($materialId);
+
+    try {
+        if (!$material-&gt;prestar()) {
+            throw new MaterialNoDisponibleException($material-&gt;getTitulo());
+        }
+
+        $this-&gt;repo-&gt;setDisponible($materialId, false);
+        $this-&gt;repo-&gt;registrarPrestamo($materialId, $usuarioId);
+    } finally {
+        // Se ejecuta SIEMPRE, haya excepción o no
+        $material-&gt;log(
+            "Intento de préstamo de '{$material-&gt;getTitulo()}' al usuario {$usuarioId}"
+        );
+    }
+}</pre>
+        <div class="note">
+          <p>📌 <b><span class="inline">finally</span> no captura: solo limpia.</b> Si hay excepción, se propaga
+            <b>después</b> del <span class="inline">finally</span>. Eso permite "hacer algo siempre" sin tragarte el
+            error.</p>
+        </div>
+        <h3>📄 Paso 5: capturar en los puntos de entrada</h3>
+        <p><span class="inline">public/material.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="public/material.php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Exceptions\MaterialNoEncontradoException;
+use App\Includes\auth;
+use App\Repos\MaterialRepo;
+
+requireLogin();
+
+$id = (int)($_GET['id'] ?? 0);
+
+try {
+    $repo = new MaterialRepo();
+    $material = $repo-&gt;findById($id);
+} catch (MaterialNoEncontradoException $e) {
+    http_response_code(404);
+    require __DIR__ . '/../app/Includes/header.php';
+    echo '&lt;h1&gt;Material no encontrado&lt;/h1&gt;';
+    echo '&lt;p&gt;' . htmlspecialchars($e-&gt;getMessage()) . '&lt;/p&gt;';
+    echo '&lt;a href="/index.php"&gt;Volver al catálogo&lt;/a&gt;';
+    require __DIR__ . '/../app/Includes/footer.php';
+    exit;
+}
+
+require __DIR__ . '/../app/Includes/header.php';
+// ... resto igual ...</pre>
+        <div class="note">
+          <p>📌 <b><span class="inline">htmlspecialchars($e-&gt;getMessage())</span></b>: el mensaje puede contener
+            datos del usuario (por ejemplo, un título). <b>Escápalo siempre</b> antes de mostrarlo.</p>
+        </div>
+        <p><span class="inline">public/prestar.php</span> (ahora usa <span class="inline">PrestamoService</span>):</p>
+        <pre class="code-src" data-lang="php" data-title="public/prestar.php" hidden>&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Exceptions\MaterialNoDisponibleException;
+use App\Exceptions\MaterialNoEncontradoException;
+use App\Includes\auth;
+use App\Repos\MaterialRepo;
+use App\Services\PrestamoService;
+
+requireLogin();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: /index.php');
+    exit;
+}
+
+$id = (int)($_POST['material_id'] ?? 0);
+
+try {
+    $service = new PrestamoService(new MaterialRepo());
+    $service-&gt;prestar($id, currentUser()['id']);
+
+    header('Location: /material.php?id=' . $id);
+    exit;
+
+} catch (MaterialNoEncontradoException $e) {
+    http_response_code(404);
+    $error = $e-&gt;getMessage();
+} catch (MaterialNoDisponibleException $e) {
+    http_response_code(400);
+    $error = $e-&gt;getMessage();
+}
+
+require __DIR__ . '/../app/Includes/header.php';
+echo '&lt;h1&gt;No se pudo completar el préstamo&lt;/h1&gt;';
+echo '&lt;p&gt;' . htmlspecialchars($error) . '&lt;/p&gt;';
+echo '&lt;a href="/index.php"&gt;Volver al catálogo&lt;/a&gt;';
+require __DIR__ . '/../app/Includes/footer.php';</pre>
+        <div class="note">
+          <p>📌 <b><span class="inline">catch (A | B $e)</span></b>: PHP 7.1+ permite capturar varias excepciones a la
+            vez si las tratas igual. Aquí las tratamos distinto (404 vs 400), así que van en <span
+              class="inline">catch</span> separados.</p>
+        </div>
+        <h3>📄 Paso 6: manejador global de excepciones</h3>
+        <p>Si una excepción <b>no se captura</b> en ningún sitio, PHP muestra un error fatal feo. Puedes interceptarla
+          con <span class="inline">set_exception_handler()</span>. <b>Esta es la red de seguridad de tu app.</b></p>
+        <p>Crea <span class="inline">app/Includes/exceptions.php</span>:</p>
+        <pre class="code-src" data-lang="php" data-title="app/Includes/exceptions.php" hidden>&lt;?php
+declare(strict_types=1);
+
+use App\Exceptions\MaterialNoEncontradoException;
+
+set_exception_handler(function (Throwable $e): void {
+    // Loguea el detalle (para el desarrollador)
+    error_log('Excepción no capturada: ' . $e-&gt;getMessage());
+    error_log($e-&gt;getTraceAsString());
+
+    // Decide el código HTTP
+    http_response_code(
+        $e instanceof MaterialNoEncontradoException ? 404 : 500
+    );
+
+    // Muestra un mensaje genérico al usuario
+    require __DIR__ . '/header.php';
+    echo '&lt;h1&gt;Algo ha ido mal&lt;/h1&gt;';
+    echo '&lt;p&gt;Inténtalo de nuevo más tarde.&lt;/p&gt;';
+    require __DIR__ . '/footer.php';
+    exit;
+});</pre>
+        <p>E inclúyelo en <b>todos</b> los puntos de entrada:</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/exceptions.php';</pre>
+        <div class="banner">
+          <p>⚠️ <b>No muestres <span class="inline">$e-&gt;getMessage()</span> al usuario en el manejador global.</b>
+            Puede contener rutas, SQL o datos internos. <b>Loguea el detalle, muestra un mensaje genérico.</b> Eso es
+            una regla de seguridad básica.</p>
+          <p>💡 <b>Mejor aún:</b> si vas a tener un bootstrap común, crea <span class="inline">app/bootstrap.php</span>
+            y carga <span class="inline">vendor/autoload.php</span> + <span class="inline">exceptions.php</span> desde
+            ahí. Un solo punto de arranque para toda la app.</p>
+        </div>
+        <div class="wdg" id="w-excepciones" data-w></div>
+        <h3>🧪 Retos</h3>
+        <div class="reto" data-reto id="reto-2-1">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.1</button></div>
+          <div class="reto-body">
+            <p>Intenta acceder a <span class="inline">material.php?id=9999</span>. ¿Qué pasa ahora? ¿Y antes de las
+              excepciones?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><b>Ahora:</b> <span class="inline">findById(9999)</span> lanza <span
+                  class="inline">MaterialNoEncontradoException</span>. <span class="inline">material.php</span> la
+                captura, devuelve 404 y muestra un mensaje amigable.</p>
+              <p><b>Antes:</b> <span class="inline">findById</span> devolvía <span class="inline">null</span>, y <span
+                  class="inline">material.php</span> hacía <span class="inline">if (!$material) {
+                  http_response_code(404); exit('Material no encontrado'); }</span>. Funcionaba, pero <b>la lógica de
+                  "no encontrado" estaba repartida</b>: el repositorio devolvía <span class="inline">null</span>, el
+                controlador comprobaba <span class="inline">null</span>. Con excepciones, <b>el repositorio decide</b>
+                que no encontrarlo es un error, y el controlador solo lo presenta.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-2-2">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.2</button></div>
+          <div class="reto-body">
+            <p>¿Por qué <span class="inline">MaterialNoDisponibleException</span> extiende <span
+                class="inline">RuntimeException</span> y no <span class="inline">Exception</span> directamente?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Porque <span class="inline">RuntimeException</span> es una <b>categoría semántica</b>: errores que
+                ocurren durante la ejecución y que el código llamador <b>podría</b> querer capturar.</p>
+              <p><b>Ventaja práctica:</b> si mañana quieres capturar <b>todas</b> las excepciones de runtime de tu app,
+                puedes hacer <span class="inline">catch (RuntimeException $e)</span> y atrapar también las tuyas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-2-3">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.3</button><span class="reto-sub">Encuentra el error.</span></div>
+          <div class="reto-body">
+            <p>Este código pretende capturar cualquier excepción, pero no captura los <span
+                class="inline">TypeError</span>:</p>
+            <pre class="code-src" data-lang="php" data-title="PHP" hidden>try {
+    $material = $repo-&gt;findById('abc'); // string donde se espera int
+} catch (Exception $e) {
+    echo 'Error: ' . $e-&gt;getMessage();
+}</pre>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><span class="inline">TypeError</span> extiende <span class="inline">Error</span>, <b>no</b> <span
+                  class="inline">Exception</span>. Por eso <span class="inline">catch (Exception $e)</span> no lo
+                captura. Solución:</p>
+              <pre class="code-src" data-lang="php" data-title="PHP" hidden>try {
+    $material = $repo-&gt;findById('abc');
+} catch (Throwable $e) {  // captura Exception Y Error
+    echo 'Error: ' . $e-&gt;getMessage();
+}</pre>
+              <p><b>Regla:</b> si quieres capturar <b>todo</b> (incluidos errores del motor), usa <span
+                  class="inline">Throwable</span>. Si solo quieres tus excepciones de dominio, usa <span
+                  class="inline">Exception</span> o una excepción propia específica.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-2-4">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.4</button></div>
+          <div class="reto-body">
+            <p>Provoca una excepción no capturada (por ejemplo, llama a un método inexistente en <span
+                class="inline">index.php</span>). ¿Qué muestra el manejador global? ¿Y qué aparece en los logs de <span
+                class="inline">php-fpm</span>?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><b>En el navegador:</b> "Algo ha ido mal. Inténtalo de nuevo más tarde." (mensaje genérico). Código
+                HTTP 500.</p>
+              <p><b>En los logs de <span class="inline">php-fpm</span></b> (<span class="inline">docker compose logs
+                  php-fpm</span>): el mensaje detallado y el stack trace. Eso es lo que te sirve para depurar.</p>
+              <p><b>La separación es intencionada:</b> el usuario no ve detalles técnicos (seguridad), tú sí
+                (depuración).</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-2-5">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.5</button></div>
+          <div class="reto-body">
+            <p>¿Qué diferencia hay entre <span class="inline">catch (MaterialNoEncontradoException $e)</span> y <span
+                class="inline">catch (RuntimeException $e)</span>?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><span class="inline">MaterialNoEncontradoException extends RuntimeException</span>. Por tanto:</p>
+              <ul>
+                <li><span class="inline">catch (MaterialNoEncontradoException $e)</span> captura <b>solo</b> las
+                  excepciones de ese tipo exacto (o subclases suyas).</li>
+                <li><span class="inline">catch (RuntimeException $e)</span> captura <b>también</b> las <span
+                    class="inline">MaterialNoEncontradoException</span>, y <b>cualquier otra</b> <span
+                    class="inline">RuntimeException</span> (por ejemplo, <span
+                    class="inline">MaterialNoDisponibleException</span>).</li>
+              </ul>
+              <p><b>Cuanto más específico el <span class="inline">catch</span>, mejor:</b> capturas lo que sabes manejar
+                y dejas que lo demás suba.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-2-6">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 2.6</button></div>
+          <div class="reto-body">
+            <p>¿Qué hace <span class="inline">finally</span>? ¿Se ejecuta si hay <span class="inline">return</span>
+              dentro del <span class="inline">try</span>?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><span class="inline">finally</span> se ejecuta <b>siempre</b>: haya excepción, no la haya, o incluso si
+                hay un <span class="inline">return</span> dentro del <span class="inline">try</span> o del <span
+                  class="inline">catch</span>. Es el sitio para <b>limpiar recursos</b> (cerrar ficheros, cerrar
+                conexiones, registrar logs).</p>
+              <pre class="code-src" data-lang="php" data-title="PHP" hidden>function ejemplo(): string {
+    try {
+        return 'desde try';
+    } finally {
+        echo 'esto se ejecuta siempre';
+    }
+}
+// Imprime "esto se ejecuta siempre" y devuelve "desde try".</pre>
+              <p><b>Cuidado:</b> si dentro del <span class="inline">finally</span> hay un <span
+                  class="inline">return</span>, <b>sobrescribe</b> el del <span class="inline">try</span>. Mala práctica
+                salvo casos muy concretos.</p>
+            </div>
+          </div>
+        </div>
+        <h3 class="estado">📌 Estado al terminar el Bloque 2</h3>
+        <pre class="code-src" data-lang="text" data-title="estructura" hidden>src/app/
+├── Exceptions/
+│   ├── MaterialNoEncontradoException.php
+│   └── MaterialNoDisponibleException.php
+├── Services/
+│   └── PrestamoService.php
+├── Includes/
+│   └── exceptions.php         ← manejador global
+└── Repos/
+    └── MaterialRepo.php       ← findById lanza excepción
+src/public/
+├── material.php               ← try/catch
+└── prestar.php                ← try/catch + PrestamoService</pre>
+        <p>La app maneja errores de forma controlada. El repositorio decide qué es un error, el servicio aplica la
+          lógica de negocio, los controladores deciden cómo presentarlo.</p>
+      </section>
+
+      <section id="bloque-3" data-b="3">
+        <div class="sec-head"><span class="sec-num">B3</span>
+          <h2>✨ Bloque 3 — Buenas prácticas y PSR-12</h2><span class="time-badge">⏱ 40 min</span>
+        </div>
+        <div class="goal">
+          <p>🎯 <b>Criterio trabajado:</b> CE f) — buenas prácticas de codificación y estilos recomendados.</p>
+        </div>
+        <h3>🧠 ¿Qué es PSR-12?</h3>
+        <p>PSR-12 es el <b>estándar de estilo</b> de PHP FIG para código moderno. No es obligatorio, pero es lo que usan
+          Laravel, Symfony y la mayoría de proyectos profesionales. Reglas clave:</p>
+        <ul>
+          <li>Indentación con <b>4 espacios</b> (no tabs).</li>
+          <li>Llaves de apertura de clase y método en <b>línea nueva</b>.</li>
+          <li><b>Una clase por archivo</b>.</li>
+          <li><span class="inline">declare(strict_types=1)</span> al principio.</li>
+          <li>Nombres: <span class="inline">PascalCase</span> para clases, <span class="inline">camelCase</span> para
+            métodos, <span class="inline">snake_case</span> para variables.</li>
+          <li>Línea en blanco después de <span class="inline">namespace</span> y de cada <span
+              class="inline">use</span>.</li>
+          <li>Visibilidad <b>explícita</b> en todos los métodos.</li>
+        </ul>
+        <div class="bridge">
+          <p>🔁 <b>Comparación Java:</b> equivalente a las convenciones de Oracle/Sun. Nadie te obliga, pero si no las
+            sigues, tu código "canta".</p>
+        </div>
+        <h3>📄 Paso 1: <span class="inline">declare(strict_types=1)</span></h3>
+        <p>PHP por defecto es <b>débilmente tipado</b>: <span class="inline">function sumar(int $a, int $b)</span>
+          acepta <span class="inline">"3"</span> como <span class="inline">3</span>. Con <span
+            class="inline">strict_types=1</span>, <b>no</b>: lanza <span class="inline">TypeError</span>.</p>
+        <p>Añade <span class="inline">declare(strict_types=1);</span> a <b>todos</b> los archivos de <span
+            class="inline">app/</span> y <span class="inline">public/</span>, justo después de <span
+            class="inline">&lt;?php</span>. Primera línea ejecutable.</p>
+        <div class="note">
+          <p>📌 <b>Importa:</b> sin strict types, un <span class="inline">findById("1abc")</span> se convierte
+            silenciosamente en <span class="inline">1</span>. Con strict, falla ruidosamente. <b>Mejor fallar pronto que
+              depurar después.</b></p>
+        </div>
+        <h3>📄 Paso 2: tipos en todo</h3>
+        <p>Revisa que <b>todos</b> los parámetros, retornos y propiedades tengan tipo:</p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>// ❌ Mal
+public function setTitulo($t) { $this-&gt;titulo = $t; }
+
+// ✅ Bien
+public function setTitulo(string $t): void { $this-&gt;titulo = $t; }</pre>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>// ❌ Mal
+public function findById(int $id) { ... }
+
+// ✅ Bien
+public function findById(int $id): MaterialBiblioteca { ... }</pre>
+        <div class="note">
+          <p>📌 <b>Si un método puede devolver <span class="inline">null</span>, usa <span
+                class="inline">?Tipo</span>.</b> Obliga a quien llama a comprobar el <span class="inline">null</span>.
+          </p>
+        </div>
+        <h3>📄 Paso 3: PSR-12 en la práctica</h3>
+        <p><b>Llaves en línea nueva (clases y métodos):</b></p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>// ✅ PSR-12
+class Libro extends MaterialBiblioteca
+{
+    public function mostrarFicha(): string
+    {
+        // ...
+    }
+}
+
+// ❌ No PSR-12
+class Libro extends MaterialBiblioteca {
+    public function mostrarFicha(): string {
+        // ...
+    }
+}</pre>
+        <p><b>Visibilidad explícita:</b></p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>// ✅
+public function getTitulo(): string { ... }
+private function hidratar(array $fila): MaterialBiblioteca { ... }
+
+// ❌
+function getTitulo(): string { ... }  // falta public</pre>
+        <p><b>Línea en blanco entre <span class="inline">namespace</span> y <span class="inline">use</span>:</b></p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>&lt;?php
+declare(strict_types=1);
+
+namespace App\Classes;
+
+use App\Classes\Traits\TieneFechas;
+
+class Libro { ... }</pre>
+        <h3>📄 Paso 4 (opcional, para nota): <span class="inline">phpcs</span></h3>
+        <p><span class="inline">phpcs</span> (PHP_CodeSniffer) <b>comprueba</b> PSR-12 automáticamente:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose exec php-fpm sh -c "cd /var/www/html &amp;&amp; composer require --dev squizlabs/php_codesniffer"</pre>
+        <p>Ejecutar:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose exec php-fpm sh -c "cd /var/www/html &amp;&amp; vendor/bin/phpcs --standard=PSR12 app/ public/"</pre>
+        <p>Si hay errores, te dice <b>línea y regla</b>. Muchos son corregibles automáticamente:</p>
+        <pre class="code-src" data-lang="bash" data-title="terminal"
+          hidden>docker compose exec php-fpm sh -c "cd /var/www/html &amp;&amp; vendor/bin/phpcbf --standard=PSR12 app/ public/"</pre>
+        <div class="note">
+          <p>📌 <b><span class="inline">phpcs</span> comprueba. <span class="inline">phpcbf</span> corrige.</b> Ejecuta
+            <span class="inline">phpcbf</span> primero, luego <span class="inline">phpcs</span> para ver qué queda.</p>
+        </div>
+        <div class="wdg" id="w-estricto" data-w></div>
+        <h3>🧪 Retos</h3>
+        <div class="reto" data-reto id="reto-3-1">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 3.1</button></div>
+          <div class="reto-body">
+            <p>Añade <span class="inline">declare(strict_types=1)</span> a <span class="inline">Libro.php</span>. Luego
+              llama desde cualquier sitio a <span class="inline">new Libro('Título', 'Autor', 2020, 12345)</span>
+              (pasando <span class="inline">int</span> donde se espera <span class="inline">string</span> en <span
+                class="inline">isbn</span>). ¿Qué error da? ¿Y sin <span class="inline">strict_types</span>?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p><b>Con <span class="inline">strict_types=1</span>:</b> <span class="inline">TypeError:
+                  Libro::__construct(): Argument #4 ($isbn) must be of type string, int given</span>.</p>
+              <p><b>Sin <span class="inline">strict_types</span>:</b> PHP convierte silenciosamente <span
+                  class="inline">12345</span> a <span class="inline">"12345"</span> y el objeto se crea. <b>El error se
+                  esconde</b> y aparece más tarde cuando menos lo esperas.</p>
+              <p><b>Por eso <span class="inline">strict_types</span> es una buena práctica:</b> falla pronto, en el
+                sitio donde está el bug.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-3-2">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 3.2</button></div>
+          <div class="reto-body">
+            <p>Ejecuta <span class="inline">phpcs --standard=PSR12 app/</span>. ¿Cuántos errores salen? Elige tres y
+              corrígelos a mano. Luego pasa <span class="inline">phpcbf</span> y compara.</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Los errores típicos de un código que no ha seguido PSR-12:</p>
+              <ul>
+                <li>Llaves de clase/método en la misma línea.</li>
+                <li>Falta de línea en blanco tras <span class="inline">namespace</span> o <span
+                    class="inline">use</span>.</li>
+                <li>Indentación con tabs.</li>
+                <li>Falta de visibilidad en métodos.</li>
+              </ul>
+              <p><b>Corregir a mano</b> te enseña la regla. <b>Pasar <span class="inline">phpcbf</span></b> te la aplica
+                automáticamente. <b>Haz las dos cosas:</b> primero a mano (para aprender), luego <span
+                  class="inline">phpcbf</span> (para el resto).</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-3-3">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 3.3</button></div>
+          <div class="reto-body">
+            <p>¿Por qué <span class="inline">declare(strict_types=1)</span> es <b>por archivo</b> y no global del
+              proyecto?</p>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <p>Porque PHP aplica <span class="inline">strict_types</span> <b>al archivo donde se declara</b>, no a
+                todo el proyecto. Un archivo sin <span class="inline">declare</span> sigue siendo débilmente tipado
+                <b>aunque llame a funciones de un archivo que sí lo tiene</b>.</p>
+              <p><b>Consecuencia práctica:</b> hay que ponerlo <b>en todos los archivos</b>. En Laravel viene por
+                defecto en todos los archivos generados.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reto" data-reto id="reto-3-4">
+          <div class="reto-head"><button class="reto-check" type="button" aria-pressed="false"><span class="box"></span>
+              Reto 3.4</button></div>
+          <div class="reto-body">
+            <p>Mira este método y reescríbelo siguiendo PSR-12 (llaves, visibilidad, tipos):</p>
+            <pre class="code-src" data-lang="php" data-title="PHP" hidden>function calcularDias($material) {
+    if ($material-&gt;diasPrestamo() &gt; 7) return $material-&gt;diasPrestamo();
+    else return 7;
+}</pre>
+          </div>
+          <div class="reveal"><button class="reveal-btn" type="button">Ver solución</button>
+            <div class="reveal-box" hidden>
+              <pre class="code-src" data-lang="php" data-title="PHP" hidden>public function calcularDias(MaterialBiblioteca $material): int
+{
+    $dias = $material-&gt;diasPrestamo();
+
+    if ($dias &gt; 7) {
+        return $dias;
+    }
+
+    return 7;
+}</pre>
+              <p><b>Cambios:</b> <span class="inline">public</span> explícito, tipo en parámetro y retorno, llave en
+                línea nueva, <span class="inline">else</span> eliminado (early return), <b>una sola llamada</b> a <span
+                  class="inline">diasPrestamo()</span>. PSR-12 no exige lo último, pero es buena práctica.</p>
+            </div>
+          </div>
+        </div>
+        <h3 class="estado">📌 Estado al terminar el Bloque 3</h3>
+        <ul>
+          <li><span class="inline">declare(strict_types=1)</span> en todos los archivos.</li>
+          <li>Tipos en todos los parámetros, retornos y propiedades.</li>
+          <li>Código formateado según PSR-12 (o casi).</li>
+          <li>Opcional: <span class="inline">phpcs</span> instalado y sin errores.</li>
+        </ul>
+      </section>
+
+      <section id="bloque-4" data-b="4">
+        <div class="sec-head"><span class="sec-num">B4</span>
+          <h2>🏁 Bloque 4 — Integración y cierre</h2><span class="time-badge">⏱ 30 min</span>
+        </div>
+        <div class="goal">
+          <p>🎯 <b>Criterio trabajado:</b> CE g) — pequeños proyectos que aplican POO como base para frameworks.</p>
+        </div>
+        <h3>🔍 Prueba funcional completa</h3>
+        <p>Recorre esta secuencia y verifica que <b>todo sigue funcionando</b> después de los tres bloques:</p>
+        <ol>
+          <li>Login como <span class="inline">user@demo.com</span> / <span class="inline">user123</span>.</li>
+          <li>Catálogo visible con los 6 materiales.</li>
+          <li>Ficha de un material (<span class="inline">material.php?id=1</span>). Se ve fecha formateada, antigüedad,
+            días de préstamo.</li>
+          <li>Préstamo de un material disponible → redirige a la ficha, ahora "Prestado".</li>
+          <li>Intento de préstamo de un material ya prestado → <b>mensaje amigable</b> (excepción capturada), no error
+            fatal.</li>
+          <li>Acceso a <span class="inline">material.php?id=9999</span> → <b>404 amigable</b> (excepción capturada).
+          </li>
+          <li><b>Sin <span class="inline">require_once</span> de clases</b> en ningún archivo de <span
+              class="inline">public/</span>.</li>
+          <li><span class="inline">composer dump-autoload</span> se ejecuta sin errores.</li>
+          <li><b>Manejador global</b> funcionando (provoca una excepción no capturada y comprueba que muestra mensaje
+            genérico + loguea detalle).</li>
+        </ol>
+        <div class="tip">
+          <p>💡 <b>Si algo falla:</b> revisa el orden. Casi siempre es (1) falta un <span class="inline">use</span>, (2)
+            falta <span class="inline">dump-autoload</span>, (3) el <span class="inline">DocumentRoot</span> de Apache
+            no apunta a <span class="inline">public/</span>.</p>
+        </div>
+        <h3>🧠 Por qué esto es "base para frameworks"</h3>
+        <p>Laravel, Symfony y cualquier framework moderno funcionan <b>exactamente así</b>:</p>
+        <div class="tw">
+          <table class="" data-quiz="1">
+            <thead>
+              <tr>
+                <th>Lo que has hecho</th>
+                <th>Dónde lo verás en Laravel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="inline">namespace App\...</span></td>
+                <td><span class="inline">app/</span> es el namespace raíz</td>
+              </tr>
+              <tr>
+                <td><span class="inline">composer.json</span> con PSR-4</td>
+                <td>Laravel lo trae configurado</td>
+              </tr>
+              <tr>
+                <td><span class="inline">require vendor/autoload.php</span></td>
+                <td><span class="inline">public/index.php</span> lo hace por ti</td>
+              </tr>
+              <tr>
+                <td><span class="inline">public/</span> como document root</td>
+                <td>Exactamente igual</td>
+              </tr>
+              <tr>
+                <td>Excepciones propias</td>
+                <td><span class="inline">app/Exceptions/</span></td>
+              </tr>
+              <tr>
+                <td><span class="inline">try</span>/<span class="inline">catch</span> en controladores</td>
+                <td>Los controladores capturan y devuelven vistas</td>
+              </tr>
+              <tr>
+                <td><span class="inline">declare(strict_types=1)</span></td>
+                <td>En todos los archivos generados</td>
+              </tr>
+              <tr>
+                <td><span class="inline">PrestamoService</span></td>
+                <td><span class="inline">app/Services/</span></td>
+              </tr>
+              <tr>
+                <td>Manejador global</td>
+                <td><span class="inline">app/Exceptions/Handler.php</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><b>Código actual vs código Laravel equivalente:</b></p>
+        <pre class="code-src" data-lang="php" data-title="PHP" hidden>// AHORA (a mano)
+$service = new PrestamoService(new MaterialRepo());
+$service-&gt;prestar($id, currentUser()['id']);
+
+// LARAVEL (en un controlador, con inyección automática)
+public function prestar(int $id, PrestamoService $service)
+{
+    $service-&gt;prestar($id, auth()-&gt;id());
+    return redirect()-&gt;route('material.show', $id);
+}</pre>
+        <p><b>Cuando abras Laravel, reconocerás la estructura.</b> No empezarás de cero.</p>
+        <h3 id="reflexion">✍️ Preguntas de reflexión</h3>
+        <p>Responde en tu <span class="inline">reflexion.md</span> (mínimo 3 líneas por pregunta). <b>Cada pregunta está
+            asociada a un criterio de evaluación:</b></p>
+        <div id="reflexionHost"></div>
+        <div class="note">
+          <p>📝 <b>Cómo se evalúa la reflexión:</b> claridad, terminología correcta, referencia a <b>tu propio
+              código</b>. No se trata de escribir mucho, sino de demostrar que entiendes <b>por qué</b>.</p>
+        </div>
+      </section>
+
+      <section id="checklist">
+        <div class="sec-head">
+          <h2>✅ Checklist final de "terminado"</h2>
+        </div>
+        <ul class="check" id="checklistHost">
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">composer.json</span> existe en <span class="inline">src/</span> con <span
+                class="inline">autoload.psr-4</span> mapeando <span class="inline">App\</span> a <span
+                class="inline">app/</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">composer dump-autoload</span> se ejecuta sin errores.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">vendor/autoload.php</span> está incluido en <b>todos</b> los archivos de <span
+                class="inline">public/</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><b>Ningún</b>
+              archivo de <span class="inline">public/</span> tiene <span class="inline">require_once</span> de clases de
+              <span class="inline">app/</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>Todas las
+              clases de <span class="inline">app/</span> tienen <span class="inline">namespace</span> y <span
+                class="inline">declare(strict_types=1)</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>Los traits
+              están en <span class="inline">app/Classes/Traits/</span> con <span class="inline">namespace
+                App\Classes\Traits</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">MaterialRepo::findById()</span> lanza <span
+                class="inline">MaterialNoEncontradoException</span> si no existe.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">PrestamoService</span> existe y se usa desde <span
+                class="inline">prestar.php</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">prestar.php</span> captura <span class="inline">MaterialNoDisponibleException</span> y
+              muestra mensaje amigable.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">material.php</span> captura <span class="inline">MaterialNoEncontradoException</span> y
+              devuelve 404 amigable.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span><span
+                class="inline">app/Includes/exceptions.php</span> existe y está cargado en todos los puntos de
+              entrada.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>Se usa <span
+                class="inline">finally</span> en <span class="inline">PrestamoService::prestar()</span>.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>Todos los
+              métodos tienen visibilidad explícita y tipos en parámetros/retorno.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>La app
+              funciona igual que antes: catálogo, ficha, préstamo, login, admin.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>He respondido
+              los retos de cada bloque (1.x, 2.x, 3.x).</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>He escrito
+              <span class="inline">reflexion.md</span> con las 10 preguntas.</span></li>
+          <li data-check role="checkbox" aria-checked="false" tabindex="0"><span class="box"></span><span>He hecho
+              capturas de pantalla (composer.json, app funcionando, try/catch, dump-autoload, manejador global).</span>
+          </li>
+      </section>
+
+      <section id="ampliaciones">
+        <div class="sec-head">
+          <h2>🚀 Retos de ampliación (sin solución)</h2>
+        </div>
+        <div class="note">
+          <p>Sin solución. Para quien termine antes y quiera profundizar.</p>
+        </div>
+        <div class="amp" data-amp="A1">
+          <div class="amp-head"><span class="amp-n">A1</span><b><span class="inline">PrestamoService</span> con límite
+              de préstamos</b></div>
+          <p>Añade al servicio la comprobación de que un usuario no tiene más de 3 préstamos activos. Necesitarás un
+            método <span class="inline">contarPrestamosActivos(int $usuarioId): int</span> en el repo. ¿Dónde lanzas la
+            excepción <span class="inline">LimitePrestamosException</span>?</p><button class="amp-done"
+            type="button">Marcar como resuelta</button>
+        </div>
+        <div class="amp" data-amp="A2">
+          <div class="amp-head"><span class="amp-n">A2</span><b>Manejador global con logging a archivo</b></div>
+          <p>Configura <span class="inline">set_exception_handler</span> para que escriba <span
+              class="inline">storage/logs/error.log</span> con fecha, mensaje y stack trace. Al usuario le muestras un
+            mensaje genérico. ¿Qué información pones en el log y qué <b>no</b> pones?</p><button class="amp-done"
+            type="button">Marcar como resuelta</button>
+        </div>
+        <div class="amp" data-amp="A3">
+          <div class="amp-head"><span class="amp-n">A3</span><b><span
+                class="inline">MaterialNoEncontradoException</span> con código HTTP</b></div>
+          <p>Añade a la excepción un método <span class="inline">getHttpStatus(): int</span> que devuelva 404. En el
+            manejador global, usa ese código para <span class="inline">http_response_code()</span>. ¿Qué ventaja tiene
+            que la excepción "sepa" su código HTTP?</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+        <div class="amp" data-amp="A4">
+          <div class="amp-head"><span class="amp-n">A4</span><b>Autoload de funciones</b></div>
+          <p>Composer también puede autoloadear funciones (<span class="inline">autoload.files</span>). Mueve <span
+              class="inline">db()</span> a <span class="inline">app/Config/db.php</span> y añade <span
+              class="inline">"files": ["app/Config/db.php"]</span> en <span class="inline">composer.json</span>. ¿Qué
+            diferencia hay entre <span class="inline">autoload.psr-4</span> (clases) y <span
+              class="inline">autoload.files</span> (funciones)?</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+        <div class="amp" data-amp="A5">
+          <div class="amp-head"><span class="amp-n">A5</span><b><span class="inline">composer validate</span></b></div>
+          <p>Ejecuta <span class="inline">composer validate</span> sobre tu <span class="inline">composer.json</span>.
+            ¿Qué comprueba? Corrige los warnings.</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+        <div class="amp" data-amp="A6">
+          <div class="amp-head"><span class="amp-n">A6</span><b>Git y <span class="inline">vendor/</span></b></div>
+          <p>Si usas Git, añade <span class="inline">.gitignore</span> con <span class="inline">/vendor/</span>. ¿Por
+            qué <b>no</b> se sube <span class="inline">vendor/</span>? ¿Qué se sube en su lugar (<span
+              class="inline">composer.lock</span>)?</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+        <div class="amp" data-amp="A7">
+          <div class="amp-head"><span class="amp-n">A7</span><b>Logging estructurado</b></div>
+          <p>En lugar de <span class="inline">error_log</span> con strings, crea <span
+              class="inline">App\Log\Logger</span> que escriba JSON lines (<span class="inline">{"fecha": "...",
+              "nivel": "info", "mensaje": "..."}</span>). Úsala en el trait <span class="inline">Loggable</span>. ¿Qué
+            ventaja tiene el log estructurado?</p><button class="amp-done" type="button">Marcar como resuelta</button>
+        </div>
+        <div class="amp" data-amp="A8">
+          <div class="amp-head"><span class="amp-n">A8</span><b>PHPStan</b></div>
+          <p>Instala <span class="inline">phpstan/phpstan</span> con Composer y ejecútalo sobre <span
+              class="inline">app/</span> con nivel 5. ¿Cuántos errores da? Corrige los que puedas. ¿Qué tipo de errores
+            detecta que <span class="inline">phpcs</span> no ve?</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+        <div class="amp" data-amp="A9">
+          <div class="amp-head"><span class="amp-n">A9</span><b><span class="inline">composer.json</span> con <span
+                class="inline">require-dev</span></b></div>
+          <p>Mueve <span class="inline">phpcs</span> y <span class="inline">phpstan</span> a <span
+              class="inline">require-dev</span>. ¿Qué diferencia hay entre <span class="inline">composer install</span>
+            y <span class="inline">composer install --no-dev</span>? ¿Por qué importa en producción?</p><button
+            class="amp-done" type="button">Marcar como resuelta</button>
+        </div>
+        <div class="amp" data-amp="A10">
+          <div class="amp-head"><span class="amp-n">A10</span><b>Bootstrap centralizado</b></div>
+          <p>Crea <span class="inline">app/bootstrap.php</span> que haga <span class="inline">require
+              vendor/autoload.php</span>, configure <span class="inline">set_exception_handler</span> y cargue
+            configuración. Inclúyelo desde todos los <span class="inline">public/*.php</span> con una sola línea. ¿Qué
+            ventaja tiene tener <b>un solo</b> punto de arranque?</p><button class="amp-done" type="button">Marcar como
+            resuelta</button>
+        </div>
+      </section>
+
+      <section id="glosario">
+        <div class="sec-head">
+          <h2>📖 Glosario rápido</h2>
+        </div>
+        <div class="tw">
+          <table class="" data-quiz="1" data-filter>
+            <thead>
+              <tr>
+                <th>Término</th>
+                <th>Qué es</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Namespace</b></td>
+                <td>"Carpeta lógica" para clases, evita colisiones. <span class="inline">namespace App\Classes;</span>
+                </td>
+              </tr>
+              <tr>
+                <td><b>FQN</b></td>
+                <td>Fully Qualified Name: <span class="inline">App\Classes\Libro</span> (sin <span
+                    class="inline">use</span>)</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">use</span></b></td>
+                <td>Importa un nombre al archivo actual</td>
+              </tr>
+              <tr>
+                <td><b>PSR-4</b></td>
+                <td>Estándar que mapea namespace a carpeta. <span class="inline">App\</span> → <span
+                    class="inline">app/</span></td>
+              </tr>
+              <tr>
+                <td><b>Composer</b></td>
+                <td>Gestor de dependencias y autoloading de PHP</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">vendor/autoload.php</span></b></td>
+                <td>Archivo generado por Composer que registra el cargador</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">composer dump-autoload</span></b></td>
+                <td>Regenera el cargador (necesario tras añadir clases)</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">composer install</span></b></td>
+                <td>Instala versiones exactas del <span class="inline">composer.lock</span></td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">composer update</span></b></td>
+                <td>Actualiza dependencias y actualiza el lock</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">composer.lock</span></b></td>
+                <td>Fija las versiones exactas instaladas (se sube al repo)</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">Exception</span></b></td>
+                <td>Errores esperables del dominio</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">Error</span></b></td>
+                <td>Errores del motor de PHP</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">Throwable</span></b></td>
+                <td>Interfaz que engloba <span class="inline">Exception</span> y <span class="inline">Error</span></td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">try</span>/<span class="inline">catch</span>/<span
+                      class="inline">finally</span></b></td>
+                <td>Capturar excepciones / limpiar siempre</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">set_exception_handler</span></b></td>
+                <td>Manejador global para excepciones no capturadas</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">declare(strict_types=1)</span></b></td>
+                <td>Fuerza tipos estrictos <b>en ese archivo</b></td>
+              </tr>
+              <tr>
+                <td><b>PSR-12</b></td>
+                <td>Estándar de estilo de código PHP</td>
+              </tr>
+              <tr>
+                <td><b><span class="inline">phpcs</span> / <span class="inline">phpcbf</span></b></td>
+                <td>Comprobador / corrector automático de estilo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="foot">
+        <p><b>MiniApp de Biblioteca · Actividad 2.2.</b> Archivo único: CSS y JavaScript incrustados; funciona sin
+          conexión salvo por las tipografías. Los laboratorios simulan el comportamiento de PHP y Composer en el
+          navegador: sirven para entender, no sustituyen a ejecutar tu código en el contenedor.</p>
+        <p>El progreso de la barra superior cuenta los retos marcados como «probados» y los puntos del checklist final.
+          No se guarda al cerrar la página y no sustituye a la revisión del profesorado.</p>
+      </div>
+
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    var REFLEXION = ["Namespaces: ¿qué problema resuelven? Pon un ejemplo de colisión.", "PSR-4: explica cómo Composer sabe que `App\\Classes\\Libro` está en `app/Classes/Libro.php`.", "Autoloading: ¿qué diferencia hay entre `require_once` manual y el cargador de Composer?", "Excepciones: ¿qué ventaja tiene lanzar `MaterialNoEncontradoException` en lugar de devolver `null`?", "Try/catch: ¿dónde capturas las excepciones y por qué ahí? ¿Qué pasa si no las capturas?", "`Throwable` vs `Exception`: ¿cuándo usarías cada uno?", "`finally`: pon un ejemplo de tu código donde se ejecute `finally`. ¿Por qué es útil?", "PSR-12: cita tres reglas que hayas aplicado y explica por qué mejoran la legibilidad.", "`strict_types`: ¿qué cambia respecto al comportamiento por defecto? ¿Por qué es una buena práctica?"];
+    (function () {
+      "use strict";
+      var $ = function (s, c) { return (c || document).querySelector(s); };
+      var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+      function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+      /* ================= RESALTADO ================= */
+      var PHP_KW = ["abstract", "and", "array", "as", "bool", "break", "callable", "case", "catch", "class", "const", "continue", "declare", "default", "do", "echo", "else", "elseif", "empty", "exit", "extends", "final", "finally", "float", "fn", "for", "foreach", "function", "global", "if", "implements", "insteadof", "instanceof", "int", "interface", "isset", "list", "match", "mixed", "new", "null", "or", "parent", "print", "private", "protected", "public", "readonly", "require", "require_once", "return", "self", "static", "string", "switch", "this", "throw", "trait", "true", "false", "try", "unset", "use", "var", "void", "while"];
+      var PHP_RE = new RegExp([
+        "(<\\?php|<\\?=|\\?>)",
+        "(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*|#[^\\n]*)",
+        "('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\")",
+        "(\\$[A-Za-z_][A-Za-z0-9_]*)",
+        "(\\b\\d+\\.?\\d*\\b)",
+        "([A-Za-z_][A-Za-z0-9_]*)"
+      ].join("|"), "g");
+
+      function classify(txt, code, idx) {
+        if (PHP_KW.indexOf(txt.toLowerCase()) >= 0) return "tok-k";
+        var after = code.slice(idx + txt.length);
+        if (/^\s*\(/.test(after)) return /new\s+$/.test(code.slice(Math.max(0, idx - 8), idx)) ? "tok-ty" : "tok-f";
+        if (/^[A-Z][A-Z0-9]*$/.test(txt)) return "tok-ty";
+        if (/^[A-Z][A-Z0-9_]*$/.test(txt)) return "tok-n";
+        if (/^[A-Z][A-Za-z0-9]*$/.test(txt)) return "tok-ty";
+        return null;
+      }
+      function hlPHP(code) {
+        var out = "", last = 0, m; PHP_RE.lastIndex = 0;
+        while ((m = PHP_RE.exec(code)) !== null) {
+          out += esc(code.slice(last, m.index));
+          var txt = m[0], cls = null;
+          if (m[1]) cls = "tok-t"; else if (m[2]) cls = "tok-c"; else if (m[3]) cls = "tok-s";
+          else if (m[4]) cls = "tok-v"; else if (m[5]) cls = "tok-n"; else if (m[6]) cls = classify(txt, code, m.index);
+          out += cls ? '<span class="' + cls + '">' + esc(txt) + "</span>" : esc(txt);
+          last = m.index + txt.length;
+        }
+        return out + esc(code.slice(last));
+      }
+      var SQL_KW = ["CREATE", "TABLE", "INT", "AUTO_INCREMENT", "PRIMARY", "KEY", "VARCHAR", "UNIQUE", "NOT", "NULL", "DEFAULT", "ENUM", "TIMESTAMP", "CURRENT_TIMESTAMP", "FOREIGN", "REFERENCES", "ON", "DELETE", "CASCADE", "INSERT", "INTO", "VALUES", "SELECT", "FROM", "WHERE", "UPDATE", "SET", "GROUP", "BY", "LEFT", "JOIN", "AS", "COUNT", "TINYINT", "ORDER", "DESC", "AND", "OR", "SHOW", "TABLES"];
+      function hlGeneric(code, cfg) {
+        var out = "", i = 0, n = code.length;
+        while (i < n) {
+          var c = code[i];
+          if (cfg.lineComment && code.startsWith(cfg.lineComment, i)) {
+            var j = code.indexOf("\n", i); if (j < 0) j = n;
+            out += '<span class="tok-c">' + esc(code.slice(i, j)) + "</span>"; i = j; continue;
+          }
+          if (c === "'" || c === '"') {
+            var q = c, j2 = i + 1;
+            while (j2 < n && code[j2] !== q) { if (code[j2] === "\\") j2++; j2++; }
+            j2 = Math.min(j2 + 1, n);
+            out += '<span class="tok-s">' + esc(code.slice(i, j2)) + "</span>"; i = j2; continue;
+          }
+          if (/[A-Za-z_]/.test(c)) {
+            var j3 = i; while (j3 < n && /[A-Za-z0-9_]/.test(code[j3])) j3++;
+            var w = code.slice(i, j3);
+            out += (cfg.keywords && cfg.keywords.indexOf(w.toUpperCase()) >= 0) ? '<span class="tok-k">' + esc(w) + "</span>" : esc(w);
+            i = j3; continue;
+          }
+          if (/[0-9]/.test(c)) {
+            var j4 = i; while (j4 < n && /[0-9.]/.test(code[j4])) j4++;
+            out += '<span class="tok-n">' + esc(code.slice(i, j4)) + "</span>"; i = j4; continue;
+          }
+          out += esc(c); i++;
+        }
+        return out;
+      }
+      function hlText(code) {
+        return code.split("\n").map(function (line) {
+          var idx = line.indexOf("←");
+          return idx >= 0 ? esc(line.slice(0, idx)) + '<span class="tok-c">' + esc(line.slice(idx)) + "</span>" : esc(line);
+        }).join("\n");
+      }
+      function hl(code, lang) {
+        switch (lang) {
+          case "sql": return hlGeneric(code, { keywords: SQL_KW, lineComment: "--" });
+          case "bash": return hlGeneric(code, { lineComment: "#" });
+          case "text": return hlText(code);
+          case "json": return hlJson(code);
+          case "apache": return hlApache(code);
+          case "dockerfile": return hlDocker(code);
+          default: return hlPHP(code);
+        }
+      }
+
+      /* ================= UTILIDADES ================= */
+      var toastEl = $("#toast"), tt = null;
+      function toast(msg) {
+        toastEl.textContent = msg; toastEl.classList.add("show");
+        clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+      }
+      function copyText(text, btn) {
+        function done() {
+          var p = btn.textContent; btn.textContent = "Copiado"; btn.classList.add("copied");
+          setTimeout(function () { btn.textContent = p; btn.classList.remove("copied"); }, 1400);
+        }
+        function fb(t) {
+          var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); } catch (e) { }
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); });
+        else { fb(text); done(); }
+      }
+      function download(name, text) {
+        var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 300);
+      }
+
+      /* ================= BLOQUES DE CÓDIGO ================= */
+      var LANGNAME = { json: "JSON", apache: "Apache", dockerfile: "Dockerfile", php: "PHP", sql: "SQL", bash: "bash", text: "texto", java: "Java" };
+      $$("pre.code-src").forEach(function (p) {
+        var lang = p.getAttribute("data-lang"), title = p.getAttribute("data-title"), code = p.textContent;
+        var box = document.createElement("div"); box.className = "code";
+        var head = document.createElement("div"); head.className = "code-head";
+        head.innerHTML = "<span>" + esc(title) + "</span><span style='opacity:.55'>· " + (LANGNAME[lang] || lang) + "</span><span class='spacer'></span>";
+        var copy = document.createElement("button"); copy.className = "cbtn"; copy.type = "button"; copy.textContent = "Copiar";
+        copy.addEventListener("click", function () { copyText(code, copy); });
+        head.appendChild(copy);
+        var pre = document.createElement("pre"); pre.className = "src"; pre.innerHTML = hl(code, lang);
+        box.appendChild(head); box.appendChild(pre);
+        p.parentNode.replaceChild(box, p);
+      });
+
+      /* ================= REVEAL, RETOS, CHECKLIST ================= */
+      $$(".reveal-btn").forEach(function (btn) {
+        var box = btn.nextElementSibling;
+        btn.addEventListener("click", function () {
+          box.hidden = !box.hidden;
+          btn.textContent = box.hidden ? "Ver solución" : "Ocultar solución";
+        });
+      });
+      var totalRetos = $$("[data-reto]").length, totalCheck = $$("li[data-check]").length, hechos = 0;
+      function updateScore() {
+        var total = totalRetos + totalCheck;
+        $("#score").textContent = hechos + " / " + total;
+        $("#barFill").style.width = (total ? hechos / total * 100 : 0) + "%";
+      }
+      $$(".reto-check").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var r = btn.closest(".reto"), d = r.classList.toggle("done");
+          btn.setAttribute("aria-pressed", d ? "true" : "false");
+          hechos += d ? 1 : -1; updateScore();
+        });
+      });
+      $$("li[data-check]").forEach(function (li) {
+        function toggle() {
+          var ok = li.classList.toggle("done");
+          li.setAttribute("aria-checked", ok ? "true" : "false");
+          hechos += ok ? 1 : -1; updateScore();
+        }
+        li.addEventListener("click", toggle);
+        li.addEventListener("keydown", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+      });
+      updateScore();
+
+      /* ================= TABLAS: filtro y modo autoevaluación ================= */
+      function tbar(t) {
+        var w = t.closest(".tw"), b = w.previousElementSibling;
+        if (!b || !b.classList.contains("tbar")) { b = document.createElement("div"); b.className = "tbar"; w.parentNode.insertBefore(b, w); }
+        return b;
+      }
+      $$("table[data-filter]").forEach(function (t) {
+        var inp = document.createElement("input"); inp.type = "search"; inp.placeholder = "Filtrar la tabla…";
+        inp.setAttribute("aria-label", "Filtrar la tabla");
+        inp.addEventListener("input", function () {
+          var q = inp.value.toLowerCase();
+          $$("tbody tr", t).forEach(function (tr) { tr.classList.toggle("hide", !!q && tr.textContent.toLowerCase().indexOf(q) < 0); });
+        });
+        tbar(t).appendChild(inp);
+      });
+      $$("table[data-quiz]").forEach(function (t) {
+        var col = +t.getAttribute("data-quiz"), name = t.rows[0].cells[col].textContent;
+        $$("tbody tr", t).forEach(function (tr) {
+          var td = tr.cells[col]; if (!td) return;
+          td.classList.add("qcol");
+          td.addEventListener("click", function () { if (t.classList.contains("quiz-on")) td.classList.toggle("shown"); });
+        });
+        var btn = document.createElement("button"); btn.type = "button"; btn.setAttribute("aria-pressed", "false");
+        btn.textContent = "🙈 Modo autoevaluación: tapar «" + name + "»";
+        btn.addEventListener("click", function () {
+          var on = t.classList.toggle("quiz-on");
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+          $$("td.qcol", t).forEach(function (td) { td.classList.remove("shown"); });
+          if (on) toast("Pulsa una celda tapada para ver la respuesta.");
+        });
+        tbar(t).appendChild(btn);
+      });
+
+      /* ================= AMPLIACIONES ================= */
+      var amps = $$(".amp");
+      if (amps.length) {
+        var grid = document.createElement("div"); grid.className = "amps";
+        amps[0].parentNode.insertBefore(grid, amps[0]);
+        amps.forEach(function (a) { grid.appendChild(a); });
+        var cnt = document.createElement("p"); cnt.className = "amp-count";
+        cnt.innerHTML = "Ampliaciones resueltas: <b id='ampN'>0</b>";
+        grid.parentNode.insertBefore(cnt, grid.nextSibling);
+        amps.forEach(function (a) {
+          var b = $(".amp-done", a);
+          b.addEventListener("click", function () {
+            var d = a.classList.toggle("done");
+            b.textContent = d ? "✓ Resuelta" : "Marcar como resuelta";
+            $("#ampN").textContent = $$(".amp.done").length;
+          });
+        });
+      }
+
+      /* ================= GENERADOR DE reflexion.md ================= */
+      var host = $("#reflexionHost");
+      if (host) {
+        var q8 = REFLEXION;
+        var h = '<div class="mem-q"><label for="rfNombre">Tu nombre</label><input type="text" id="rfNombre" placeholder="Nombre y apellidos" style="width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--card);font-family:\'Work Sans\';font-size:14.5px;border-radius:2px"></div>';
+        q8.forEach(function (q, i) {
+          h += '<div class="mem-q"><label>' + (i + 1) + ". " + esc(q.replace(/`/g, "")) + "</label><textarea data-rf='" + i + "' placeholder='Mínimo 3 líneas: terminología correcta, referencia a tu código, honestidad…'></textarea></div>";
+        });
+        h += '<div class="mem-q"><label>Ampliaciones resueltas · documenta qué hiciste y por qué (marca las tuyas en la sección de ampliaciones)</label><textarea data-rf="amp" placeholder="A1: …"></textarea></div>';
+        h += '<div class="mem-actions"><button class="btn" id="rfPrev" type="button">Vista previa</button><button class="btn sec" id="rfDown" type="button">Descargar reflexion.md</button></div><div class="mem-preview" id="rfBox"><pre id="rfText"></pre></div>';
+        host.innerHTML = h;
+        var build = function () {
+          var nombre = $("#rfNombre").value.trim() || "______________________";
+          var L = ["# Reflexión — Actividad 2.2 (autoloading, namespaces y excepciones)", "", "**Nombre:** " + nombre, ""];
+          q8.forEach(function (q, i) {
+            L.push("## " + (i + 1) + ". " + q.replace(/\s+/g, " "), "", ($("[data-rf='" + i + "']").value.trim() || "_(sin responder)_"), "");
+          });
+          var ids = $$(".amp.done").map(function (a) { return a.getAttribute("data-amp"); });
+          L.push("## Ampliaciones resueltas", "", "Marcadas: " + (ids.length ? ids.join(", ") : "ninguna"), "",
+            ($("[data-rf='amp']").value.trim() || "_(sin documentar)_"), "",
+            "## Autoevaluación", "", ($("[data-rf='auto']").value.trim() || "_(sin rellenar)_"), "");
+          return L.join("\n");
+        };
+        $("#rfPrev").addEventListener("click", function () { $("#rfText").textContent = build(); $("#rfBox").classList.add("show"); });
+        $("#rfDown").addEventListener("click", function () { download("reflexion.md", build()); toast("reflexion.md descargado."); });
+      }
+
+      /* ================= BARRA DE TIEMPOS ================= */
+      var BL = [[0, 25, "Repaso y Composer"], [1, 75, "Namespaces y PSR-4"], [2, 70, "Excepciones"], [3, 40, "Buenas prácticas"], [4, 30, "Integración y cierre"]];
+      var tb = $("#timebar");
+      BL.forEach(function (b) {
+        var a = document.createElement("a"); a.href = "#bloque-" + b[0]; a.style.flex = b[1] + " 0 0"; a.style.background = "var(--b" + b[0] + ")";
+        a.title = "Bloque " + b[0] + " · " + b[2] + " · " + b[1] + " min";
+        a.innerHTML = "<b>B" + b[0] + "</b><span>" + b[1] + "′</span>"; tb.appendChild(a);
+      });
+      [[120, "2 h"]].forEach(function (m) {
+        var d = document.createElement("div"); d.className = "tmark"; d.style.left = (m[0] / 240 * 100) + "%";
+        d.innerHTML = "<span>" + m[1] + "</span>"; tb.appendChild(d);
+      });
+
+      /* ================= NAVEGACIÓN ================= */
+      var sidebar = $("#sidebar");
+      $("#menuToggle").addEventListener("click", function () { sidebar.classList.toggle("open"); });
+      var links = $$(".nav-link");
+      links.forEach(function (a) { a.addEventListener("click", function () { sidebar.classList.remove("open"); }); });
+      var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            links.forEach(function (l) { l.classList.toggle("active", l.getAttribute("href") === "#" + e.target.id); });
+          });
+        }, { rootMargin: "-80px 0px -70% 0px", threshold: 0 });
+        secs.forEach(function (s) { io.observe(s); });
+      }
+
+
+
+      /* ================= RESALTADORES EXTRA ================= */
+      function hlJson(code) {
+        return esc(code).replace(/"((?:[^"\\]|\\.)*)"(\s*:)?/g, function (m, s, c) { return c ? '<span class="tok-f">"' + s + '"</span>' + c : '<span class="tok-s">"' + s + '"</span>'; })
+          .replace(/\b(true|false|null)\b/g, '<span class="tok-k">$1</span>');
+      }
+      function hlApache(code) {
+        return code.split("\n").map(function (l) {
+          var m = /^(\s*)(<\/?\w+)(.*?)(>)\s*$/.exec(l);
+          if (m) return esc(m[1]) + '<span class="tok-t">' + esc(m[2]) + "</span>" + esc(m[3]) + '<span class="tok-t">&gt;</span>';
+          m = /^(\s*)([A-Za-z]+)(.*)$/.exec(l);
+          return m ? esc(m[1]) + '<span class="tok-k">' + esc(m[2]) + "</span>" + esc(m[3]) : esc(l);
+        }).join("\n");
+      }
+      function hlDocker(code) {
+        return code.split("\n").map(function (l) {
+          if (/^\s*#/.test(l)) return '<span class="tok-c">' + esc(l) + "</span>";
+          var m = /^(\s*)([A-Z]+)(\s.*)?$/.exec(l);
+          return m ? esc(m[1]) + '<span class="tok-k">' + esc(m[2]) + "</span>" + esc(m[3] || "") : esc(l);
+        }).join("\n");
+      }
+      function wbar(n, title) {
+        return '<div class="wdg-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><b>LABORATORIO ' + n + "</b> " + title + '<span class="sp"></span></div>';
+      }
+      var ST = ' style="background:#20241C;color:#F4D67A;border-color:#3A4038"';
+
+      /* ================= LAB 1 · Migración de carpetas y document root ================= */
+      (function () {
+        var host = $("#w-migracion"); if (!host) return;
+        var F = [
+          { b: "classes/MaterialBiblioteca.php", a: "app/Classes/MaterialBiblioteca.php", ns: "App\\Classes", c: "MaterialBiblioteca" },
+          { b: "classes/Libro.php", a: "app/Classes/Libro.php", ns: "App\\Classes", c: "Libro" },
+          { b: "classes/Revista.php", a: "app/Classes/Revista.php", ns: "App\\Classes", c: "Revista" },
+          { b: "classes/DVD.php", a: "app/Classes/DVD.php", ns: "App\\Classes", c: "DVD" },
+          { b: "classes/Prestable.php", a: "app/Classes/Prestable.php", ns: "App\\Classes", c: "Prestable" },
+          { b: "classes/traits/TieneFechas.php", a: "app/Classes/Traits/TieneFechas.php", ns: "App\\Classes\\Traits", c: "TieneFechas", ren: true },
+          { b: "classes/traits/Loggable.php", a: "app/Classes/Traits/Loggable.php", ns: "App\\Classes\\Traits", c: "Loggable", ren: true },
+          { b: "repos/MaterialRepo.php", a: "app/Repos/MaterialRepo.php", ns: "App\\Repos", c: "MaterialRepo" },
+          { b: "config/db.php", a: "app/Config/db.php", ns: "App\\Config", fn: true },
+          { b: "includes/auth.php", a: "app/Includes/auth.php", ns: "App\\Includes", fn: true },
+          { b: "includes/header.php", a: "app/Includes/header.php", ns: "App\\Includes", inc: true },
+          { b: "includes/footer.php", a: "app/Includes/footer.php", ns: "App\\Includes", inc: true },
+          { a: "app/Services/PrestamoService.php", ns: "App\\Services", c: "PrestamoService", nw: "Bloque 2" },
+          { a: "app/Exceptions/MaterialNoEncontradoException.php", ns: "App\\Exceptions", c: "MaterialNoEncontradoException", nw: "Bloque 2" },
+          { a: "app/Exceptions/MaterialNoDisponibleException.php", ns: "App\\Exceptions", c: "MaterialNoDisponibleException", nw: "Bloque 2" },
+          { a: "app/Includes/exceptions.php", ns: "App\\Includes", inc: true, nw: "Bloque 2" },
+          { b: "index.php", a: "public/index.php", pub: true }, { b: "material.php", a: "public/material.php", pub: true },
+          { b: "prestar.php", a: "public/prestar.php", pub: true }, { b: "login.php", a: "public/login.php", pub: true },
+          { b: "logout.php", a: "public/logout.php", pub: true }, { b: "admin.php", a: "public/admin.php", pub: true },
+          { a: "composer.json", nw: "Bloque 1", cfg: true }, { a: "vendor/autoload.php", nw: "Bloque 1 · generado por Composer", cfg: true }
+        ];
+        var sel = 1;
+        host.innerHTML = wbar(1, "De «src/ suelto» a «app/ + public/»") + '<div class="wdg-in"><p>Pulsa un fichero para ver <b>de dónde viene, a dónde va y qué namespace le toca</b>. Debajo, comprueba qué puede pedir el navegador antes y después de mover el document root.</p>' +
+          '<div class="two"><div><div class="lbl">ANTES · document root = src/</div><div class="ftree" id="w1a"></div></div><div><div class="lbl">DESPUÉS · app/ (App\\) + public/ (document root)</div><div class="ftree" id="w1d"></div></div></div>' +
+          '<div class="wdg-out" id="w1info" style="margin-top:10px"></div>' +
+          '<div style="margin-top:14px;border-top:1px dashed #3A4038;padding-top:12px"><div class="lbl">¿QUIÉN PUEDE PEDIR ESTO DESDE EL NAVEGADOR? (Reto 0.3)</div><div class="row"><select class="sel2" id="w1url"></select><button class="btn2 pri" id="w1go" type="button">GET</button></div><div class="wdg-out" id="w1res"><span class="dim">Elige una URL y pulsa GET…</span></div></div></div>';
+        function tree(key) {
+          var dirs = {}, order = [];
+          F.forEach(function (it, i) {
+            var p = it[key]; if (!p) return;
+            var k = p.lastIndexOf("/"), d = "src/" + (k < 0 ? "" : p.slice(0, k + 1));
+            if (!dirs[d]) { dirs[d] = []; order.push(d); } dirs[d].push([i, p.slice(k + 1), it]);
+          });
+          return order.map(function (d) {
+            return '<span class="dir">📁 ' + d + "</span>" + dirs[d].map(function (x) {
+              return '<span class="f' + (x[2].nw && key === "a" ? " nw" : "") + (sel === x[0] ? " sel" : "") + '" data-i="' + x[0] + '">📄 ' + x[1] + (x[2].nw && key === "a" ? " <b>NUEVO</b>" : "") + "</span>";
+            }).join("");
+          }).join("");
+        }
+        function info() {
+          var it = F[sel], h = '<span class="hl">' + esc(it.a) + "</span>\n";
+          h += "Antes   : " + (it.b ? "src/" + it.b : '<span class="dim">— (no existía)</span>') + "\nDespués : src/" + it.a + "\n";
+          if (it.ren) h += '<span class="err">⚠ traits/ → Traits/ : Linux distingue mayúsculas y PSR-4 también</span>\n';
+          if (it.c) h += "namespace " + it.ns + ";   →   FQN <span class=\"ok\">" + it.ns + "\\" + it.c + "</span>\nPSR-4: App\\ → app/  ⇒  " + it.a + "\n";
+          else if (it.fn) h += "Contiene <b>funciones</b>, no clases: <span class=\"dim\">PSR-4 no las autocarga (ver nota de la guía; ampliación A4).</span>\n";
+          else if (it.inc) h += "Plantilla/include: se incluye con require, no se autocarga.\n";
+          else if (it.pub) h += "Punto de entrada: namespace global, solo necesita require_once '../vendor/autoload.php'.\n";
+          else if (it.cfg) h += "Configuración / generado por Composer.\n";
+          if (it.nw) h += '<span class="ok">NUEVO · ' + it.nw + "</span>\n";
+          $("#w1info").innerHTML = h;
+        }
+        function draw() { $("#w1a").innerHTML = tree("b"); $("#w1d").innerHTML = tree("a"); info(); }
+        host.addEventListener("click", function (e) { var f = e.target.closest(".f"); if (!f) return; sel = +f.getAttribute("data-i"); draw(); });
+        var URLS = ["/index.php", "/config/db.php", "/classes/Libro.php", "/app/Config/db.php", "/app/Classes/Libro.php", "/vendor/autoload.php", "/composer.json"];
+        $("#w1url").innerHTML = URLS.map(function (u) { return "<option>" + u + "</option>"; }).join("");
+        $("#w1go").addEventListener("click", function () {
+          var u = $("#w1url").value;
+          var before = F.some(function (it) { return it.b && "/" + it.b === u; });
+          var after = F.some(function (it) { return it.pub && "/" + it.a.replace("public/", "") === u; });
+          var line = function (lbl, ok, okTxt, koTxt) { return '<span class="' + (ok ? "ok" : "err") + '">' + lbl + " → " + (ok ? "200 OK " : "404 Not Found ") + "</span> " + (ok ? okTxt : koTxt); };
+          $("#w1res").innerHTML = "GET " + esc(u) + "\n" +
+            line("Antes   (root = src/)       ", before, "Apache lo sirve y ejecuta. Un var_dump olvidado enseñaría credenciales.", /^\/(vendor|composer)/.test(u) ? "todavía no existe." : "no existe en esa ruta.") + "\n" +
+            line("Después (root = src/public/)", after, "es un punto de entrada público.", /^\/(app|vendor|composer)/.test(u) || /^\/(config|classes)/.test(u) ? "queda <b>fuera del document root</b>: el navegador no puede alcanzarlo." : "no existe en public/.");
+        });
+        draw();
+      })();
+
+      /* ================= LAB 2 · Resolución de nombres + autoloader PSR-4 ================= */
+      (function () {
+        var host = $("#w-autoload"); if (!host) return;
+        var FILES = [["public/index.php", ""], ["app/Repos/MaterialRepo.php", "App\\Repos"], ["app/Classes/Libro.php", "App\\Classes"], ["app/Config/db.php", "App\\Config"], ["app/Services/PrestamoService.php", "App\\Services"]];
+        var IMPS = ["App\\Repos\\MaterialRepo", "App\\Classes\\MaterialBiblioteca", "App\\Classes\\Traits\\TieneFechas", "App\\Classes\\Mapa", "PDO"];
+        var CODES = ["MaterialRepo", "MaterialBiblioteca", "TieneFechas", "Libro", "PDO", "\\App\\Classes\\Libro", "Mapa", "RuntimeException"];
+        var BUILTIN = ["PDO", "RuntimeException", "Exception", "Throwable", "TypeError", "Error"];
+        var chk = function (id, lbl, on) { return '<label class="chk"><input type="checkbox" id="' + id + '"' + (on ? " checked" : "") + "> " + lbl + "</label>"; };
+        host.innerHTML = wbar(2, "¿Dónde busca PHP esta clase? Namespaces + autoloader PSR-4") + '<div class="wdg-in"><p>Elige <b>en qué archivo estás</b>, qué <span class="inline"' + ST + '>use</span> tienes y qué clase instancias. Verás cómo PHP <b>resuelve el nombre</b> y cómo el autoloader lo convierte en una ruta (Retos 1.1, 1.2, 1.3 y 1.4).</p><div class="two"><div>' +
+          '<div class="lbl">Archivo (su namespace)</div><select class="sel2" id="w2f">' + FILES.map(function (f, i) { return '<option value="' + i + '">' + f[0] + (f[1] ? "  ·  namespace " + f[1] : "  ·  namespace global") + "</option>"; }).join("") + "</select>" +
+          '<div class="lbl">use … (imports de ese archivo)</div>' + IMPS.map(function (u, i) { return chk("w2i" + i, "use " + u + ";", false); }).join("") +
+          '<div class="lbl">Código</div><select class="sel2" id="w2c">' + CODES.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div><div>" +
+          '<div class="lbl">Entorno</div>' + chk("w2v", "require_once '../vendor/autoload.php' incluido", true) + chk("w2t", "carpeta Traits/ con mayúscula", true) + chk("w2m", "app/Classes/Mapa.php creado (Reto 1.3)", false) + chk("w2d", "composer dump-autoload ejecutado tras crear Mapa", false) + chk("w2a", "composer.json con classmap-authoritative", false) +
+          '<div class="lbl">Mapeo en composer.json</div><select class="sel2" id="w2p"><option value="ok">"App\\\\": "app/"</option><option value="bad">"App\\\\": "src/"  (error de ruta)</option></select></div></div>' +
+          '<div class="wdg-out" id="w2o" style="margin-top:10px"></div></div>';
+        function run() {
+          var f = FILES[+$("#w2f").value], ns = f[1];
+          var imps = IMPS.filter(function (u, i) { return $("#w2i" + i).checked; });
+          var n = $("#w2c").value, why, fqn, first = n.split("\\")[0], hit = null;
+          if (n[0] === "\\") { fqn = n.slice(1); why = "nombre totalmente cualificado (empieza por \\): se usa tal cual"; }
+          else {
+            imps.forEach(function (u) { if (!hit && u.split("\\").pop() === first) hit = u; });
+            if (hit) { fqn = hit + n.slice(first.length); why = "coincide con un use → " + hit; }
+            else if (ns) { fqn = ns + "\\" + n; why = "sin use: PHP antepone el namespace del archivo (" + ns + ")"; }
+            else { fqn = n; why = "archivo en el namespace global: el nombre se usa tal cual"; }
+          }
+          var h = '<span class="dim">// ' + f[0] + "\n" + (ns ? "namespace " + ns + ";\n" : "") + imps.map(function (u) { return "use " + u + ";"; }).join("\n") + (imps.length ? "\n" : "") + '</span><span class="hl">new ' + esc(n) + "();</span>\n";
+          h += "1) Resolución del nombre → <b>" + esc(fqn) + "</b>\n   <span class=\"dim\">" + esc(why) + "</span>\n";
+          var ok = false, msg = "";
+          if (fqn.indexOf("\\") < 0 && BUILTIN.indexOf(fqn) >= 0) { ok = true; h += '2) Clase interna de PHP (namespace global): <span class="ok">no necesita autoloader ✓</span>\n'; }
+          else if (!$("#w2v").checked) { h += '2) <span class="err">vendor/autoload.php no está incluido: nadie ha registrado el cargador.</span>\n'; }
+          else if (fqn.indexOf("App\\") !== 0) { h += '2) Autoloader: el prefijo de «' + esc(fqn) + '» no coincide con ningún mapeo PSR-4 (solo conoce App\\).\n'; }
+          else {
+            var dir = $("#w2p").value === "ok" ? "app/" : "src/", path = dir + fqn.slice(4).split("\\").join("/") + ".php";
+            h += "2) Autoloader PSR-4: prefijo <b>App\\</b> → <b>" + dir + "</b>   ⇒   <b>" + path + "</b>\n";
+            var fs = {};
+            ["Classes/MaterialBiblioteca", "Classes/Libro", "Classes/Revista", "Classes/DVD", "Classes/Prestable", "Repos/MaterialRepo", "Services/PrestamoService", "Exceptions/MaterialNoEncontradoException", "Exceptions/MaterialNoDisponibleException"].forEach(function (x) { fs["app/" + x + ".php"] = 1; });
+            var td = $("#w2t").checked ? "Traits" : "traits";
+            ["TieneFechas", "Loggable"].forEach(function (x) { fs["app/Classes/" + td + "/" + x + ".php"] = 1; });
+            var mapa = $("#w2m").checked; if (mapa) fs["app/Classes/Mapa.php"] = 1;
+            var isMapa = fqn === "App\\Classes\\Mapa", dumped = $("#w2d").checked, auth = $("#w2a").checked;
+            if (!fs[path]) h += '3) ¿Existe ' + path + " en disco? <span class=\"err\">no (Linux distingue mayúsculas: Traits ≠ traits)</span>\n";
+            else if (isMapa && auth && !dumped) h += '3) El archivo existe, pero con <b>classmap-authoritative</b> Composer solo conoce el mapa generado: <span class="err">hay que regenerarlo</span>\n';
+            else {
+              ok = true; h += "3) ¿Existe " + path + "? <span class=\"ok\">sí → se incluye y la clase queda definida ✓</span>\n";
+              if (isMapa && !dumped) h += '<span class="dim">   Ojo: no ejecutaste dump-autoload y aun así funciona. En modo PSR-4 normal Composer busca por ruta. Con classmap-authoritative no ocurriría.</span>\n';
+            }
+          }
+          h += ok ? '<span class="ok">⇒ la instancia se crea correctamente</span>' : '<span class="err">⇒ PHP Fatal error:  Uncaught Error: Class "' + esc(fqn) + '" not found</span>';
+          $("#w2o").innerHTML = h;
+        }
+        host.addEventListener("change", run); run();
+      })();
+
+      /* ================= LAB 3 · Excepciones: try / catch / finally ================= */
+      (function () {
+        var host = $("#w-excepciones"); if (!host) return;
+        var HIER = { Throwable: null, Error: "Throwable", TypeError: "Error", Exception: "Throwable", RuntimeException: "Exception", PDOException: "RuntimeException", MaterialNoEncontradoException: "RuntimeException", MaterialNoDisponibleException: "RuntimeException" };
+        var DEPTH = { Throwable: 0, Error: 1, TypeError: 2, Exception: 1, RuntimeException: 2, PDOException: 3, MaterialNoEncontradoException: 3, MaterialNoDisponibleException: 3 };
+        function isa(c, t) { while (c) { if (c === t) return true; c = HIER[c]; } return false; }
+        var SC = [
+          { t: "Material disponible: préstamo correcto", ex: null },
+          { t: "Material ya prestado (Reto 2.1 / prueba funcional)", ex: "MaterialNoDisponibleException", msg: "El material 'Dune' no está disponible para préstamo", after: true },
+          { t: "material_id = 9999 (no existe)", ex: "MaterialNoEncontradoException", msg: "No existe un material con id 9999" },
+          { t: "Llamada con tipo incorrecto: findById('abc') (Reto 2.3)", ex: "TypeError", msg: "App\\Repos\\MaterialRepo::findById(): Argument #1 ($id) must be of type int, string given" },
+          { t: "La base de datos está caída", ex: "PDOException", msg: "SQLSTATE[HY000] [2002] Connection refused" }
+        ];
+        var CF = [
+          { t: "Como en la guía: catch NoEncontrada (404) + catch NoDisponible (400)", c: [["MaterialNoEncontradoException", 404], ["MaterialNoDisponibleException", 400]] },
+          { t: "catch (RuntimeException $e) → 400", c: [["RuntimeException", 400]] },
+          { t: "catch (Exception $e) → 400  (Reto 2.3)", c: [["Exception", 400]] },
+          { t: "catch (Throwable $e) → 500", c: [["Throwable", 500]] },
+          { t: "Sin try/catch en el controlador", c: [] }
+        ];
+        host.innerHTML = wbar(3, "¿Quién captura qué? prestar.php bajo la lupa") + '<div class="wdg-in"><p>Combina <b>qué falla</b>, <b>qué captura el controlador</b> y si hay <span class="inline"' + ST + '>finally</span> y manejador global. Verás el recorrido, la respuesta que recibe el usuario y lo que queda en el log de php-fpm.</p><div class="two"><div>' +
+          '<div class="lbl">¿Qué pasa?</div><select class="sel2" id="w3s">' + SC.map(function (s, i) { return '<option value="' + i + '"' + (i === 1 ? " selected" : "") + ">" + esc(s.t) + "</option>"; }).join("") + "</select>" +
+          '<div class="lbl">Catch en prestar.php</div><select class="sel2" id="w3c">' + CF.map(function (s, i) { return '<option value="' + i + '">' + esc(s.t) + "</option>"; }).join("") + "</select>" +
+          '<div class="row"><label class="chk"><input type="checkbox" id="w3f"> finally en PrestamoService::prestar() (Paso 4)</label></div><div class="row"><label class="chk"><input type="checkbox" id="w3g" checked> manejador global (exceptions.php)</label></div></div>' +
+          '<div><div class="lbl">Jerarquía (rojo = lanzada · verde = tipo del catch que la atrapa)</div><div class="hier" id="w3h"></div></div></div><div class="wdg-out" id="w3o" style="margin-top:10px"></div></div>';
+        function run() {
+          var s = SC[+$("#w3s").value], cf = CF[+$("#w3c").value], fin = $("#w3f").checked, glob = $("#w3g").checked, ex = s.ex;
+          var clause = null; if (ex) cf.c.forEach(function (c) { if (!clause && isa(ex, c[0])) clause = c; });
+          var L = ["POST /prestar.php   material_id=" + (ex === "MaterialNoEncontradoException" ? 9999 : 2), "requireLogin() ✓", "$service->prestar($id, 2)", "   $repo->findById($id)  " + (ex && !s.after ? "↯ lanza " + ex : "✓ devuelve el objeto")];
+          if (!ex || s.after) { L.push("   try {"); L.push("      $material->prestar()  → " + (ex ? "false  → throw new " + ex + "  ↯" : "true  → UPDATE + INSERT ✓")); L.push("   }" + (fin ? " finally { log('Intento de préstamo…') }" : "")); }
+          var st, page, logs = [], warn = "";
+          if (!ex) { st = "302 → /material.php?id=2"; page = "El usuario ve la ficha: «Prestado»."; if (!fin) logs.push("Préstamo de 'Dune' al usuario 2"); }
+          else if (clause) { st = clause[1]; page = "«No se pudo completar el préstamo»  +  " + s.msg; if (ex === "TypeError" || ex === "PDOException") warn = "\n<span class=\"err\">⚠ El mensaje técnico llega al usuario: fuga de información (rutas, SQL…). Un catch demasiado amplio no debería mostrar getMessage().</span>"; }
+          else if (glob) { st = ex === "MaterialNoEncontradoException" ? 404 : 500; page = "«Algo ha ido mal. Inténtalo de nuevo más tarde.» (mensaje genérico)"; logs.push("Excepción no capturada: " + s.msg, "#0 {stack trace…}"); }
+          else { st = 500; page = "PHP Fatal error:  Uncaught " + ex + ": " + s.msg + " …(con display_errors=On, detalle visible al usuario)"; }
+          if (fin && ex && !s.after) L.push("   (finally NO se ejecuta: la excepción saltó antes de entrar en el try)");
+          if (fin && (!ex || s.after)) logs.unshift("Intento de préstamo de 'Dune' al usuario 2");
+          $("#w3o").innerHTML = '<span class="dim">Recorrido</span>\n' + esc(L.join("\n")) + '\n\n<span class="dim">Respuesta HTTP</span>\n<span class="' + (st >= 400 ? "err" : "ok") + '">' + st + "</span>  " + esc(page) + warn + '\n\n<span class="dim">docker compose logs php-fpm</span>\n' + (logs.length ? logs.map(function (x) { return "NOTICE: PHP message: " + esc(x); }).join("\n") : '<span class="dim">(sin entradas)</span>');
+          $("#w3h").innerHTML = Object.keys(HIER).map(function (c) {
+            var cls = c === ex ? "thrown" : (clause && clause[0] === c ? "catchm" : "");
+            return '<div class="' + cls + '" style="padding-left:' + (DEPTH[c] * 16 + 6) + 'px">' + c + (c === ex ? "  ← lanzada" : "") + (clause && clause[0] === c ? "  ← catch" : "") + "</div>";
+          }).join("");
+        }
+        host.addEventListener("change", run); run();
+      })();
+
+      /* ================= LAB 4 · strict_types + mini phpcs/phpcbf ================= */
+      (function () {
+        var host = $("#w-estricto"); if (!host) return;
+        var CALLS = [
+          { t: "new Libro('Título', 'Autor', 2020, 12345)", weak: 'se crea el libro; $isbn llega como string(5) "12345" (conversión silenciosa)', err: "App\\Classes\\Libro::__construct(): Argument #4 ($isbn) must be of type string, int given" },
+          { t: '$repo->findById("3")', weak: "findById recibe int(3)", err: "App\\Repos\\MaterialRepo::findById(): Argument #1 ($id) must be of type int, string given" },
+          { t: "$repo->findById(3.0)", weak: "findById recibe int(3)  (3.0 no tiene decimales)", err: "App\\Repos\\MaterialRepo::findById(): Argument #1 ($id) must be of type int, float given" },
+          { t: "$repo->findById(true)", weak: "findById recibe int(1)", err: "App\\Repos\\MaterialRepo::findById(): Argument #1 ($id) must be of type int, bool given" },
+          { t: "$repo->findById('abc')", always: true, err: "App\\Repos\\MaterialRepo::findById(): Argument #1 ($id) must be of type int, string given" }
+        ];
+        var BAD = "<?php\nnamespace App\\Classes;\nuse App\\Classes\\Traits\\TieneFechas;\nclass Libro extends MaterialBiblioteca {\n\tuse TieneFechas;\n\n    function getTitulo(): string {\n        return $this->titulo;\n    }\n\n    private function hidratar(array $fila): MaterialBiblioteca {\n        return $this;\n    }\n}\n";
+        var CLASSRE = /^\s*(abstract\s+|final\s+)?(class|interface|trait)\s+[^{]*\{\s*$/, FNRE = /^\s*((public|private|protected)\s+)?(static\s+)?function\s+\w+\s*\(.*\)\s*(:\s*\??[\w\\]+)?\s*\{\s*$/;
+        host.innerHTML = wbar(4, "strict_types y PSR-12") + '<div class="wdg-in"><div class="wtabs"><button type="button" aria-selected="true" data-t="a">① strict_types (Retos 3.1 y 3.3)</button><button type="button" aria-selected="false" data-t="b">② phpcs / phpcbf (Retos 3.2 y 3.4)</button></div>' +
+          '<div id="w4a"><p>Elige una llamada y si el archivo <b>que llama</b> declara <span class="inline"' + ST + '>declare(strict_types=1)</span>. (El modo se decide en el archivo desde el que se llama, no donde se define la función.)</p><div class="row"><select class="sel2" id="w4c">' + CALLS.map(function (c, i) { return '<option value="' + i + '">' + esc(c.t) + "</option>"; }).join("") + '</select><label class="chk"><input type="checkbox" id="w4s"> el archivo que llama tiene strict_types=1</label></div><div class="wdg-out" id="w4o"></div></div>' +
+          '<div id="w4b" hidden><p>Esta clase incumple varias reglas de PSR-12. Pulsa <b>phpcs</b> para listar los fallos y <b>phpcbf</b> para corregirlos. Puedes editar el código. <span class="dim">(Simulación con las reglas más típicas; el phpcs real revisa muchas más.)</span></p><textarea class="lint-ta" id="w4t" spellcheck="false"></textarea><div class="row"><button class="btn2 pri" id="w4l" type="button">▶ phpcs --standard=PSR12</button><button class="btn2" id="w4f" type="button">🛠 phpcbf</button><button class="btn2" id="w4r" type="button">↺ ejemplo</button></div><div class="wdg-out" id="w4lo"></div></div></div>';
+        $$(".wtabs button", host).forEach(function (b) { b.addEventListener("click", function () { $$(".wtabs button", host).forEach(function (x) { x.setAttribute("aria-selected", x === b ? "true" : "false"); }); $("#w4a").hidden = b.getAttribute("data-t") !== "a"; $("#w4b").hidden = b.getAttribute("data-t") !== "b"; }); });
+        function strict() {
+          var c = CALLS[+$("#w4c").value], s = $("#w4s").checked, bad = c.always || s;
+          $("#w4o").innerHTML = '<span class="dim">// archivo llamador ' + (s ? "CON" : "SIN") + " declare(strict_types=1)</span>\n" + esc(c.t) + ";\n" + (bad ? '<span class="err">TypeError: ' + esc(c.err) + "</span>" + (c.always ? '\n<span class="dim">Un string no numérico falla en ambos modos.</span>' : '\n<span class="dim">Falla pronto, en el sitio donde está el bug.</span>') : '<span class="ok">✓ ' + esc(c.weak) + '</span>\n<span class="dim">El error se esconde y aparecerá más tarde, lejos de su origen.</span>');
+        }
+        function lint(src) {
+          var L = src.split("\n"), er = [], lastUse = -1;
+          L.forEach(function (l, i) { if (/^use\s/.test(l)) lastUse = i; });
+          L.forEach(function (l, i) {
+            var n = i + 1, m;
+            if (/^\t/.test(l)) er.push([n, "Spaces must be used to indent lines; tabs are not allowed"]);
+            if (CLASSRE.test(l)) er.push([n, "Opening brace of a class must be on the line after the declaration"]);
+            else if (FNRE.test(l)) er.push([n, "Opening brace should be on a new line"]);
+            if ((m = /^\s+function\s+(\w+)\s*\(/.exec(l))) er.push([n, 'Visibility must be declared on method "' + m[1] + '"']);
+            if (/^namespace\s/.test(l) && L[i + 1] !== "" && L[i + 1] !== undefined) er.push([n, "Expected 1 blank line after namespace declaration"]);
+            if (i === lastUse && L[i + 1] !== "" && L[i + 1] !== undefined) er.push([n, "Expected 1 blank line after the last use statement"]);
+          });
+          return er;
+        }
+        function fix(src) {
+          var L = src.split("\n"), out = [], lastUse = -1;
+          L.forEach(function (l, i) { if (/^use\s/.test(l)) lastUse = i; });
+          L.forEach(function (l, i) {
+            l = l.replace(/^\t+/, function (t) { return new Array(t.length * 4 + 1).join(" "); });
+            if (/^\s+function\s+\w+\s*\(/.test(l)) l = l.replace(/^(\s+)function/, "$1public function");
+            var o = /^(\s*)(.*\S)\s*\{\s*$/.exec(l);
+            if (o && (CLASSRE.test(l) || FNRE.test(l))) { out.push(o[1] + o[2]); out.push(o[1] + "{"); } else out.push(l);
+            if ((/^namespace\s/.test(l) || i === lastUse) && L[i + 1] !== "" && L[i + 1] !== undefined) out.push("");
+          });
+          return out.join("\n");
+        }
+        function showLint(pre) {
+          var er = lint($("#w4t").value);
+          $("#w4lo").innerHTML = (pre ? '<span class="ok">' + pre + "</span>\n" : "") + (er.length ? '<span class="err">FOUND ' + er.length + " ERRORS</span>\n" + er.map(function (e) { return "Línea " + e[0] + " | ERROR | " + esc(e[1]); }).join("\n") : '<span class="ok">✓ 0 errores: el fichero cumple las reglas comprobadas.</span>');
+        }
+        $("#w4t").value = BAD;
+        $("#w4l").addEventListener("click", function () { showLint(""); });
+        $("#w4f").addEventListener("click", function () { var n = lint($("#w4t").value).length; $("#w4t").value = fix($("#w4t").value); showLint("phpcbf: " + n + " fallos corregidos automáticamente. Re-ejecutando phpcs…"); });
+        $("#w4r").addEventListener("click", function () { $("#w4t").value = BAD; $("#w4lo").innerHTML = ""; });
+        host.addEventListener("change", strict); strict();
+      })();
+
+      /* ================= Ampliaciones recomendadas ================= */
+      ["A1", "A2", "A3"].forEach(function (id) {
+        var a = $('.amp[data-amp="' + id + '"]'); if (!a) return;
+        a.classList.add("rec"); var s = document.createElement("span"); s.className = "recbadge"; s.textContent = "recomendada"; $(".amp-head", a).appendChild(s);
+      });
+
+    })();
+
+  </script>
+</body>
+
+</html>
