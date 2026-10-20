@@ -389,10 +389,16 @@ textarea.output {
 ══════════════════════════════════════ */
 @media print {
   @page { margin: 12mm; size: A4; @top-left { content: none; } @top-right { content: none; } @bottom-left { content: none; } @bottom-center { content: counter(page) " de " counter(pages); font-family: 'Work Sans', system-ui, sans-serif; font-size: 9.5px; color: #6B8CAE; } }
-  html, body { background: white; display: block; }
-  body > * { display: none !important; }
-  #cvPreview { display: block !important; width: 100%; }
-  .cv { box-shadow: none; border-radius: 0; width: 100%; }
+  html, body { background: white; width: 100%; margin: 0; padding: 0; }
+  .wrap, .topbar, .foot, .btn-row, #outputMd { display: none !important; }
+  #cvPreview {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    display: block !important;
+    background: white;
+    overflow: visible;
+  }
+  .cv { box-shadow: none; border-radius: 0; width: 100%; max-width: 100%; margin: 0; }
   .cv-header, .cv-section-title, .skill-bar-fill, .cv-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
