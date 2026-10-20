@@ -742,6 +742,9 @@ textarea.output {
   document.getElementById("generarBtn").addEventListener("click", function() {
     // Validar
     if (!v("perfil")) { toast("Completa el perfil profesional."); document.getElementById("perfil").focus(); return; }
+    if (!v("vehiculo")) { toast("Indica si tienes vehículo propio."); return; }
+    if (!v("tipoLicencia")) { toast("Indica tu permiso de conducir."); return; }
+    if (!v("viajar")) { toast("Indica tu disponibilidad para viajar."); return; }
     if (!v("declaracionVeracidad")) { toast("Acepta la declaración de veracidad."); return; }
 
 
@@ -790,7 +793,7 @@ textarea.output {
           "- **Logros o aprendizajes clave:** " + v("ex-logros-" + i) + "\n";
       });
     } else {
-      expMd = "\n*Si el alumno no tiene experiencia previa en el sector, indicar: \"Sin experiencia laboral previa en el sector. Los proyectos académicos reflejados en el apartado 3 constituyen su principal carta de presentación.\"*\n";
+      expMd = "\n*Sin experiencia laboral previa en el sector. Los proyectos académicos reflejados en el apartado 3 constituyen su principal carta de presentación.*\n";
     }
 
     // Certificaciones
@@ -843,7 +846,8 @@ textarea.output {
         if (next.classList.contains("comp-row")) rows.push(next);
         next = next.nextElementSibling;
       }
-      if (rows.length === 0) return;
+      var hasSkills = rows.some(function(row) { return row.querySelector("select").value; });
+      if (!hasSkills) return;
       compMd += "### " + grupoTitulo + "\n";
       rows.forEach(function(row) {
         var name = row.querySelector(".skill-name").textContent.trim();
@@ -897,11 +901,8 @@ textarea.output {
         return md + "\n";
       })() +
       "---\n\n" +
-      "## 8. Certificaciones y Formación Complementaria\n\n" +
-      certsMd + "\n" +
-      "---\n\n" +
+      (certsMd.trim() ? "## 8. Certificaciones y Formación Complementaria\n\n" + certsMd + "\n---\n\n" : "") +
       "## 9. Idiomas\n\n" +
-      "*Nivel según Marco Común Europeo de Referencia (MCER): A1–A2 Básico, B1–B2 Intermedio, C1–C2 Avanzado.*\n\n" +
       (idiomasMd || "- *(ninguno)*\n") + "\n" +
       "---\n\n" +
       "## 10. Vehículo y Disponibilidad Geográfica\n\n" +
@@ -917,10 +918,7 @@ textarea.output {
       "- **Intereses técnicos:** " + v("interesesTecnicos") + "\n" +
       "- **Motivación:** " + v("motivacion") + "\n\n" +
       "---\n\n" +
-      "## 12. Referencias\n\n" +
-      "- **Referencias:** Disponibles bajo petición al centro educativo.\n\n" +
-      "---\n\n" +
-      "## 13. Declaración de Veracidad\n\n" +
+      "## 12. Declaración de Veracidad\n\n" +
       "*Declaro que los datos aquí reflejados son veraces a fecha de su generación.*\n\n" +
       "_Firmado:_ " + generacionFecha + "\n";
 
