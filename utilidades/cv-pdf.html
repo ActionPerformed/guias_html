@@ -429,6 +429,8 @@ function parseCV(md) {
     if (/^##\s+/.test(line)) {
       closeList(); closeTable();
       var t = line.replace(/^##\s+/, '');
+      // Skip "## 1. Perfil Profesional" (already shown in header)
+      if (/^##\s+1\.\s*Perfil Profesional/i.test(line)) { i++; continue; }
       if (sectionCount > 0) html += '</div>';
       html += '<div class="cv-section"><div class="cv-section-title">' + t + '</div>';
       sectionCount++;
@@ -532,7 +534,7 @@ function renderCV(md) {
       '<h1>' + (header.puesto || 'CV Profesional') + '</h1>' +
       (header.perfilA ? '<div class="cv-subtitle">' + header.perfilA + '</div>' : '') +
       '<div class="cv-header-meta">' +
-        (header.email ? '<span>' + header.email + '</span>' : '') +
+        (header.email ? '<span>Contacto del tutor: ' + header.email + '</span>' : '') +
       '</div>' +
     '</div>' +
     '<div class="cv-body">' + body + '</div>' +
