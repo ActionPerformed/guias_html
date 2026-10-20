@@ -742,9 +742,9 @@ textarea.output {
   document.getElementById("generarBtn").addEventListener("click", function() {
     // Validar
     if (!v("perfil")) { toast("Completa el perfil profesional."); document.getElementById("perfil").focus(); return; }
-    if (!v("vehiculo")) { toast("Indica si tienes vehículo propio."); return; }
+    if (!rv("vehiculo")) { toast("Indica si tienes vehículo propio."); return; }
     if (!v("tipoLicencia")) { toast("Indica tu permiso de conducir."); return; }
-    if (!v("viajar")) { toast("Indica tu disponibilidad para viajar."); return; }
+    if (!rv("viajar")) { toast("Indica tu disponibilidad para viajar."); return; }
     if (!v("declaracionVeracidad")) { toast("Acepta la declaración de veracidad."); return; }
 
 
