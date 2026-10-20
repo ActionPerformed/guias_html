@@ -411,9 +411,9 @@ function parseCV(md) {
   while (i < lines.length) {
     var line = lines[i];
 
-    // Headings
-    // Skip H1 (first line title, already shown in header)
+    // Skip: H1 title, MCER reference note in Idiomas
     if (/^#\s+[^#]/.test(line)) { i++; continue; }
+    if (/Nivel según Marco Común Europeo/i.test(line)) { i++; continue; }
     if (/^#{3}\s+/.test(line)) {
       closeList(); closeTable();
       var t = line.replace(/^#{3}\s+/, '');
