@@ -503,6 +503,8 @@ function parseInline(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/_(.+?)_/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code style="background:#f0f4f8;padding:1px5px;border-radius:3px;font-size:.9em;">$1</code>');
 }
 
