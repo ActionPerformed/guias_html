@@ -304,7 +304,7 @@ textarea#mdInput:focus { outline: 2px solid var(--cyan); outline-offset: -1px; }
    PRINT STYLES
 ══════════════════════════════════════ */
 @media print {
-  @page { margin: 12mm; size: A4; @top-left { content: none; } @top-right { content: none; } @bottom-left { content: none; } @bottom-center { content: counter(page) " de " counter(pages); font-family: 'Work Sans', system-ui, sans-serif; font-size: 9.5px; color: #6B8CAE; } }
+  @page { margin: 12mm; size: A4; }
   html, body { background: white; }
   .topbar, .input-panel, .layout > .input-panel, .wrap > .output-panel > .render-btn,
   .cv-placeholder { display: none !important; }
