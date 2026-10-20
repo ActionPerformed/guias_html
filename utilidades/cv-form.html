@@ -390,7 +390,7 @@ textarea.output {
 @media print {
   @page { margin: 12mm; size: A4; @top-left { content: none; } @top-right { content: none; } @bottom-left { content: none; } @bottom-center { content: counter(page) " de " counter(pages); font-family: 'Work Sans', system-ui, sans-serif; font-size: 9.5px; color: #6B8CAE; } }
   html, body { background: white; }
-  .topbar, .foot, .btn-row, .output-wrap,
+  .topbar, .foot, .btn-row, #outputMd, .output-wrap,
   .cv-placeholder { display: none !important; }
   #cvPreview { display: block !important; }
   .cv { box-shadow: none; border-radius: 0; width: 100%; }
@@ -660,8 +660,8 @@ textarea.output {
       <button type="button" class="btn btn-secondary" id="printBtn" style="font-size:13px;padding:6px 14px">🖨️ Imprimir PDF</button>
     </div>
     <textarea class="output" id="outputMd" readonly></textarea>
-    <div id="cvPreview" style="display:none"></div>
   </div>
+  <div id="cvPreview" style="display:none"></div>
 
 </form>
 
