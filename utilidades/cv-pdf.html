@@ -176,6 +176,19 @@ textarea#mdInput:focus { outline: 2px solid var(--cyan); outline-offset: -1px; }
 }
 .cv-section p:last-child { margin-bottom: 0; }
 
+.cv-info-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-left: 3px solid #0EA5E9;
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #0c4a6e;
+  margin-bottom: 10px;
+}
+.cv-info-box strong { color: #0369a1; }
+.cv-info-box em { font-style: normal; color: #0284c7; }
+
 .cv-section hr {
   border: none; border-top: 1px solid #e2e8f0; margin: 14px 0;
 }
@@ -405,6 +418,22 @@ function parseCV(md) {
       sectionCount++;
       i++; continue;
     }
+    // Info box: *Niveles:* followed by italic lines
+    if (/\*Niveles:\*/.test(line)) {
+      closeList(); closeTable();
+      var boxLines = [];
+      i++;
+      while (i < lines.length && (/_(Básico|Intermedio|Avanzado)_/.test(lines[i]) || lines[i].trim() === '')) {
+        if (lines[i].trim()) boxLines.push(lines[i].trim());
+        i++;
+      }
+      var boxHtml = boxLines.map(function(l) {
+        return '<div>' + l.replace(/_(Básico|Intermedio|Avanzado)_/g, '<em>$1</em>').replace(/→/g, '→') + '</div>';
+      }).join('');
+      html += '<div class="cv-info-box"><strong>Niveles:</strong><br>' + boxHtml + '</div>';
+      continue;
+    }
+
     // HR
     if (/^---+$/.test(line)) {
       i++; continue;
