@@ -801,16 +801,12 @@ textarea.output {
       return f.querySelector("input").value.trim();
     });
     var certsMd = "";
-    if (certBlocks.length > 0) {
-      certBlocks.forEach(function(b) {
-        var i = b.id.split("-")[1];
-        if (v("cert-nombre-" + i)) {
-          certsMd += "- **" + v("cert-nombre-" + i) + ":** " + v("cert-entidad-" + i) + " – " + v("cert-año-" + i) + " – " + v("cert-estado-" + i) + "\n";
-        }
-      });
-    } else {
-      certsMd = "*Si no procede, indicar: \"Sin certificaciones adicionales por el momento.\"*\n";
-    }
+    certBlocks.forEach(function(b) {
+      var i = b.id.split("-")[1];
+      if (v("cert-nombre-" + i)) {
+        certsMd += "- **" + v("cert-nombre-" + i) + ":** " + v("cert-entidad-" + i) + " – " + v("cert-año-" + i) + " – " + v("cert-estado-" + i) + "\n";
+      }
+    });
 
     // Idiomas
     var idiBlocks = Array.prototype.slice.call(document.querySelectorAll("[id^=idioma-]")).filter(function(el) {
