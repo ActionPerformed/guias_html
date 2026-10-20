@@ -871,8 +871,7 @@ textarea.output {
       "## 3. Contacto\n\n" +
       "- **Email del tutor/a:** " + v("emailTutor") + "\n\n" +
       "---\n\n" +
-      "## 4. Proyectos Destacados\n\n" +
-      (proyectosMd.trim() ? proyectosMd + "\n" : "*Ningún proyecto añadido.*\n") +
+      (proyectosMd.trim() ? "## 4. Proyectos Destacados\n\n" + proyectosMd + "\n---\n\n" : "") +
       "---\n\n" +
       "## 5. Experiencia Laboral en el Sector\n\n" +
       (expMd.trim() ? expMd + "\n" : "") +
