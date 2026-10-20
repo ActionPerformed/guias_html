@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV → PDF · Generador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #0A1826;
+  --card: #112233;
+  --ink: #E0E8F0;
+  --muted: #6B8CAE;
+  --line: #1E3A5F;
+  --cyan: #4FD1C5;
+  --amber: #E8A33D;
+  --green: #68D391;
+  --red: #FC8181;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Work Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.62;
+  min-height: 100vh;
+}
+
+/* ── Topbar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(10,24,38,.95); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 14px;
+  flex-wrap: wrap;
+}
+.topbar .sig {
+  font-family: 'Instrument Serif'; font-size: 18px; color: var(--ink);
+}
+.topbar .sig b {
+  font-family: 'Work Sans'; font-weight: 700; font-size: 11px;
+  background: var(--cyan); color: #061018; padding: 2px 8px;
+  border-radius: 2px; margin-right: 8px; vertical-align: 2px;
+}
+.topbar .spacer { flex: 1; }
+.topbar .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.btn {
+  font-family: 'Work Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.btn:active { transform: scale(.97); }
+.btn-print {
+  background: var(--cyan); color: #061018;
+}
+.btn-print:hover { background: #38B2AC; }
+.btn-clear {
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn-clear:hover { background: var(--line); }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+/* ── Layout 2 columnas ── */
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Panel izquierdo ── */
+.input-panel {
+  position: sticky;
+  top: 60px;
+}
+.input-panel h2 {
+  font-family: 'Work Sans', sans-serif; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+  margin-bottom: 12px;
+}
+.input-panel .hint {
+  font-size: 12.5px; color: var(--muted); margin-bottom: 10px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 6px; padding: 8px 12px;
+}
+.input-panel .hint code {
+  font-size: 11.5px; color: var(--cyan);
+}
+textarea#mdInput {
+  width: 100%; min-height: 480px;
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 16px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.55; resize: vertical;
+}
+textarea#mdInput:focus { outline: 2px solid var(--cyan); outline-offset: -1px; }
+
+/* ── Panel derecho: render del CV ── */
+.output-panel { min-width: 0; }
+
+/* ══════════════════════════════════════
+   CV RENDERED — PRINT-FRIENDLY
+══════════════════════════════════════ */
+.cv {
+  background: #ffffff;
+  color: #1a202c;
+  font-family: 'Work Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+}
+
+/* Cabecera */
+.cv-header {
+  background: #0A1826;
+  color: #E0E8F0;
+  padding: 28px 36px 22px;
+  border-bottom: 3px solid #4FD1C5;
+}
+.cv-header .cv-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 500;
+  background: #4FD1C5; color: #061018;
+  padding: 2px 10px; border-radius: 3px;
+  letter-spacing: .06em; text-transform: uppercase;
+  display: inline-block; margin-bottom: 10px;
+}
+.cv-header h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 30px; font-weight: 400;
+  color: #ffffff; margin-bottom: 4px; line-height: 1.1;
+}
+.cv-header .cv-subtitle {
+  font-size: 13px; color: #6B8CAE; margin-bottom: 14px;
+}
+.cv-header-meta {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.cv-header-meta span {
+  font-size: 12px; color: #6B8CAE;
+  display: flex; align-items: center; gap: 5px;
+}
+.cv-header-meta span::before {
+  content: ''; display: inline-block;
+  width: 6px; height: 6px; background: #4FD1C5;
+  border-radius: 50%;
+}
+
+/* Cuerpo */
+.cv-body { padding: 28px 36px; }
+
+.cv-section { margin-bottom: 24px; }
+.cv-section:last-child { margin-bottom: 0; }
+
+.cv-section-title {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: #4FD1C5; background: #0A1826;
+  padding: 4px 10px; border-radius: 3px;
+  display: inline-block; margin-bottom: 10px;
+  border-left: 3px solid #4FD1C5;
+}
+
+.cv-section p {
+  font-size: 13px; color: #2d3748; margin-bottom: 6px;
+}
+.cv-section p:last-child { margin-bottom: 0; }
+
+.cv-section hr {
+  border: none; border-top: 1px solid #e2e8f0; margin: 14px 0;
+}
+
+.cv-section ul {
+  list-style: none; padding: 0; margin: 6px 0;
+}
+.cv-section ul li {
+  font-size: 13px; color: #2d3748;
+  padding: 3px 0 3px 16px; position: relative;
+  border-bottom: 1px solid #f0f4f8;
+}
+.cv-section ul li:last-child { border-bottom: none; }
+.cv-section ul li::before {
+  content: '▸'; position: absolute; left: 0;
+  color: #4FD1C5; font-size: 10px; top: 4px;
+}
+
+.cv-section strong { color: #0A1826; font-weight: 600; }
+
+/* Tabla proyectos / competencias */
+.cv-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12.5px; margin: 6px 0;
+}
+.cv-table th {
+  background: #0A1826; color: #4FD1C5;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; padding: 6px 10px; text-align: left;
+}
+.cv-table td {
+  padding: 7px 10px; color: #2d3748;
+  border-bottom: 1px solid #e2e8f0; vertical-align: top;
+}
+.cv-table tr:last-child td { border-bottom: none; }
+.cv-table tr:nth-child(even) td { background: #f8fafc; }
+
+/* Niveles de skill */
+.skill-bar-wrap {
+  display: flex; align-items: center; gap: 8px; margin: 3px 0;
+}
+.skill-name { font-size: 12.5px; color: #2d3748; flex: 0 0 130px; }
+.skill-bar {
+  flex: 1; height: 6px; background: #e2e8f0;
+  border-radius: 3px; overflow: hidden;
+}
+.skill-bar-fill {
+  height: 100%; border-radius: 3px;
+}
+.skill-bar-fill.n1 { width: 33%; background: #FC8181; }
+.skill-bar-fill.n2 { width: 66%; background: #E8A33D; }
+.skill-bar-fill.n3 { width: 100%; background: #68D391; }
+.skill-level {
+  font-size: 9.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  flex: 0 0 26px; text-align: right;
+}
+.skill-level.n1 { color: #FC8181; }
+.skill-level.n2 { color: #E8A33D; }
+.skill-level.n3 { color: #68D391; }
+
+/* Idiomas */
+.cv-idioma {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid #f0f4f8;
+  font-size: 12.5px;
+}
+.cv-idioma:last-child { border-bottom: none; }
+.cv-idioma-nombre { color: #2d3748; font-weight: 500; }
+.cv-idioma-nivel {
+  font-size: 10.5px; font-family: 'JetBrains Mono', monospace;
+  background: #0A1826; color: #4FD1C5; padding: 1px 7px;
+  border-radius: 3px;
+}
+
+/* Declaration */
+.cv-declaration {
+  background: #f0f4f8; border-left: 3px solid #4FD1C5;
+  padding: 10px 14px; font-size: 12px; color: #4a5568;
+  border-radius: 0 4px 4px 0; margin-top: 12px;
+}
+
+/* Botón generar */
+.render-btn {
+  width: 100%; margin-top: 10px;
+  background: var(--cyan); color: #061018;
+  font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 10px; border-radius: 7px; border: none; cursor: pointer;
+}
+.render-btn:hover { background: #38B2AC; }
+
+/* Placeholder cuando no hay CV */
+.cv-placeholder {
+  background: var(--card); border: 2px dashed var(--line);
+  border-radius: 10px; padding: 48px 36px; text-align: center;
+  color: var(--muted);
+}
+.cv-placeholder h3 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px; color: var(--ink); margin-bottom: 8px;
+}
+.cv-placeholder p { font-size: 13.5px; }
+
+/* ══════════════════════════════════════
+   PRINT STYLES
+══════════════════════════════════════ */
+@media print {
+  @page { margin: 0; size: A4; }
+  html, body { background: white; }
+  .topbar, .input-panel, .layout > .input-panel, .wrap > .output-panel > .render-btn,
+  .cv-placeholder { display: none !important; }
+  .wrap { max-width: 100%; padding: 0; }
+  .layout { display: block; }
+  .output-panel { width: 100%; }
+  .cv {
+    box-shadow: none; border-radius: 0;
+    width: 100%;
+  }
+  .cv-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cv-section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .skill-bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cv-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .input-panel { position: static; }
+  .topbar .spacer { display: none; }
+}
+
+/* ══════════════════════════════════════
+   MARKDOWN RENDERER
+══════════════════════════════════════ */
+.md-proy-title { font-size: 13.5px; font-weight: 600; color: #0A1826; margin-bottom: 2px; }
+.md-proy-desc { font-size: 12px; color: #4a5568; margin-bottom: 4px; }
+.md-proy-tech { font-size: 10.5px; color: #4FD1C5; font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="sig"><b>utilidades</b> CV → PDF</span>
+  <span class="spacer"></span>
+  <div class="actions">
+    <button class="btn btn-clear" id="clearBtn">Limpiar</button>
+    <button class="btn btn-print" id="printBtn">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="layout">
+
+    <!-- Panel izquierdo -->
+    <div class="input-panel">
+      <h2>Markdown del CV</h2>
+      <div class="hint">
+        Pega aquí el contenido del archivo <code>.md</code> generado por
+        <a href="cv-form.html" style="color:var(--cyan)">cv-form.html</a>.
+      </div>
+      <textarea id="mdInput" placeholder="Pega aquí el markdown..."></textarea>
+      <button class="render-btn" id="renderBtn">Generar vista previa</button>
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="output-panel">
+      <div id="cvOutput">
+        <div class="cv-placeholder">
+          <h3>Vista previa del CV</h3>
+          <p>Pega el markdown a la izquierda y pulsa "Generar vista previa".</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Markdown parser (standalone, no deps) ──────────────────────────────────────
+function parseCV(md) {
+  // Limpia líneas
+  var lines = md.split('\n');
+  var html = '';
+  var i = 0;
+  var inList = false;
+  var inTable = false;
+  var tableRows = [];
+  var sectionCount = 0;
+
+  function closeList() {
+    if (inList) { html += '</ul>'; inList = false; }
+  }
+  function closeTable() {
+    if (inTable) {
+      var thead = '';
+      var tbody = '';
+      tableRows.forEach(function(row, idx) {
+        var cells = row.filter(function(c) { return c.trim(); });
+        if (cells.length === 0) return;
+        var tag = idx === 0 ? 'th' : 'td';
+        var rowHtml = cells.map(function(c) {
+          return '<' + tag + '>' + c.trim() + '</' + tag + '>';
+        }).join('');
+        if (idx === 0) thead += '<tr>' + rowHtml + '</tr>';
+        else tbody += '<tr>' + rowHtml + '</tr>';
+      });
+      html += '<table class="cv-table"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
+      tableRows = []; inTable = false;
+    }
+  }
+
+  while (i < lines.length) {
+    var line = lines[i];
+
+    // Headings
+    if (/^#{3}\s+/.test(line)) {
+      closeList(); closeTable();
+      var t = line.replace(/^#{3}\s+/, '');
+      html += '<div class="cv-section"><div class="cv-section-title">' + t + '</div>';
+      sectionCount++;
+      i++; continue;
+    }
+    if (/^##\s+/.test(line)) {
+      closeList(); closeTable();
+      var t = line.replace(/^##\s+/, '');
+      if (sectionCount > 0) html += '</div>';
+      html += '<div class="cv-section"><div class="cv-section-title">' + t + '</div>';
+      sectionCount++;
+      i++; continue;
+    }
+    // HR
+    if (/^---+$/.test(line)) {
+      i++; continue;
+    }
+    // Tabla (líneas con |)
+    if (/^\|/.test(line)) {
+      closeList();
+      var cells = line.split('|').filter(function(c) { return c !== undefined; });
+      tableRows.push(cells);
+      inTable = true;
+      i++; continue;
+    } else {
+      closeTable();
+    }
+    // Lista
+    if (/^[-*]\s/.test(line) || /^\d+\.\s/.test(line)) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      var item = line.replace(/^[-*]\s/, '').replace(/^\d+\.\s/, '');
+      // skill bar
+      var barMatch = item.match(/^(.+?)\s*\[(Básico|Intermedio|Avanzado)\]/);
+      if (barMatch) {
+        var name = barMatch[1].replace(/\*\*/g, '').trim();
+        var lvl = barMatch[2];
+        var lvlIdx = lvl === 'Básico' ? 1 : lvl === 'Intermedio' ? 2 : 3;
+        html += '<li><div class="skill-bar-wrap">';
+        html += '<span class="skill-name">' + name + '</span>';
+        html += '<div class="skill-bar"><div class="skill-bar-fill n' + lvlIdx + '"></div></div>';
+        html += '<span class="skill-level n' + lvlIdx + '">' + (lvlIdx === 1 ? 'B' : lvlIdx === 2 ? 'I' : 'A') + '</span>';
+        html += '</div></li>';
+      } else {
+        // Parse inline: **bold**, `code`, etc.
+        html += '<li>' + parseInline(item) + '</li>';
+      }
+      i++; continue;
+    }
+    // Párrafo normal
+    if (line.trim()) {
+      closeList();
+      html += '<p>' + parseInline(line) + '</p>';
+    }
+    i++;
+  }
+  closeList(); closeTable();
+  if (sectionCount > 0) html += '</div>';
+  return html;
+}
+
+function parseInline(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code style="background:#f0f4f8;padding:1px5px;border-radius:3px;font-size:.9em;">$1</code>');
+}
+
+// ── CV header extractor ────────────────────────────────────────────────────────
+function extractCVHeader(md) {
+  var perfil = '', perfilA = '', puesto = '', email = '';
+  var m;
+  m = md.match(/\*\*Perfil Académico:\*\*\s*(.+)/);
+  if (m) perfilA = m[1].trim();
+  m = md.match(/\*\*Puesto en el aula:\*\*\s*(.+)/);
+  if (m) puesto = m[1].trim();
+  m = md.match(/\*\*Email del tutor\/a:\*\*\s*(.+)/);
+  if (m) email = m[1].trim();
+  m = md.match(/\*\*Perfil Profesional:\*\*\s*\n(.+)/);
+  if (m) perfil = m[1].trim();
+  return { perfil: perfil, perfilA: perfilA, puesto: puesto, email: email };
+}
+
+function renderCV(md) {
+  var header = extractCVHeader(md);
+  var body = parseCV(md);
+  return '<div class="cv">' +
+    '<div class="cv-header">' +
+      '<div class="cv-tag">Currículum Vitae</div>' +
+      '<h1>' + (header.puesto || 'CV Profesional') + '</h1>' +
+      (header.perfilA ? '<div class="cv-subtitle">' + header.perfilA + '</div>' : '') +
+      '<div class="cv-header-meta">' +
+        (header.email ? '<span>' + header.email + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="cv-body">' + body + '</div>' +
+  '</div>';
+}
+
+// ── UI ───────────────────────────────────────────────────────────────────────
+document.getElementById('renderBtn').addEventListener('click', function() {
+  var md = document.getElementById('mdInput').value;
+  if (!md.trim()) { alert('Pega primero el markdown.'); return; }
+  var out = document.getElementById('cvOutput');
+  out.innerHTML = renderCV(md);
+  out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('printBtn').addEventListener('click', function() {
+  window.print();
+});
+
+document.getElementById('clearBtn').addEventListener('click', function() {
+  document.getElementById('mdInput').value = '';
+  document.getElementById('cvOutput').innerHTML =
+    '<div class="cv-placeholder"><h3>Vista previa del CV</h3><p>Pega el markdown a la izquierda y pulsa "Generar vista previa".</p></div>';
+});
+
+// Auto-render on paste
+document.getElementById('mdInput').addEventListener('paste', function() {
+  setTimeout(function() {
+    var md = document.getElementById('mdInput').value;
+    if (md.trim()) {
+      document.getElementById('cvOutput').innerHTML = renderCV(md);
+    }
+  }, 100);
+});
+</script>
+</body>
+</html>
