@@ -61,6 +61,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP con Docker |
 | [ASETE - ACT 1.3.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3.html) | Actividad 1.3 — Login con PHP (sesiones y roles) |
 | [ASETE - ACT 2.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%202.1.html) | Actividad 2.1 — MiniApp de Biblioteca (POO en PHP) |
+| [ASETE - ACT 2.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%202.2.html) | Actividad 2.2 — Composer y autoloading |
 
 ### IAW (Implantación de Aplicaciones Web)
 
