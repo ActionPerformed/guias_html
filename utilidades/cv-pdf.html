@@ -170,6 +170,15 @@ textarea#mdInput:focus { outline: 2px solid var(--cyan); outline-offset: -1px; }
   display: inline-block; margin-bottom: 10px;
   border-left: 3px solid #4FD1C5;
 }
+.cv-section-title h3 {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: #0A1826; background: #E0F7FA;
+  padding: 5px 12px; border-radius: 4px;
+  display: block; margin-bottom: 8px;
+  border-bottom: 2px solid #4FD1C5;
+}
 
 .cv-section p {
   font-size: 13px; color: #2d3748; margin-bottom: 6px;
@@ -406,7 +415,7 @@ function parseCV(md) {
     if (/^#{3}\s+/.test(line)) {
       closeList(); closeTable();
       var t = line.replace(/^#{3}\s+/, '');
-      html += '<div class="cv-section"><div class="cv-section-title">' + t + '</div>';
+      html += '<div class="cv-section"><h3>' + t + '</h3>';
       sectionCount++;
       i++; continue;
     }
