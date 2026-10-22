@@ -860,7 +860,7 @@ docker compose up -d</pre>
     }
     $('#vgo').onclick = chk; $('#vin').onkeydown = e => { if (e.key === 'Enter') chk() }; $$('#vchips .chip').forEach(c => c.onclick = () => { $('#vin').value = 'PHP ' + c.textContent; chk() }); chk();
     /* tabs genéricos */
-    function tabs(sel, fn) { const bs = $$(sel + ' button'); bs.forEach(b => b.onclick = () => { bs.forEach(x => x.classList.remove('on')); b.classList.add('on'); fn(b) }) }
+    function tabs(sel, fn) { const bs = $$(sel); bs.forEach(b => b.onclick = () => { bs.forEach(x => x.classList.remove('on')); b.classList.add('on'); fn(b) }) }
     /* Dockerfile antes/después */
     const D = ['<span class="c"># Dockerfile</span>\nFROM php:8.2-fpm-alpine', '<span class="c"># Dockerfile</span>\nFROM php:8.2.35-fpm-alpine', '<span class="rm">- FROM php:8.2-fpm-alpine</span><span class="ad">+ FROM php:8.2.35-fpm-alpine</span>'];
     $('#dpre').innerHTML = D[0]; tabs('[data-d]', b => $('#dpre').innerHTML = D[b.dataset.d]);
