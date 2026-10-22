@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parche urgente: PHP-FPM y WordPress en Docker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=Red+Hat+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #dde4e8;
+      --paper: #f3f6f7;
+      --ink: #0e2a3a;
+      --mut: #4d6573;
+      --hz: #ffc933;
+      --red: #d7263d;
+      --ok: #16906b;
+      --line: #b7c4cc;
+      --term: #0b1a24;
+      --fh: 'Barlow Condensed', Impact, sans-serif;
+      --fb: 'Barlow', system-ui, sans-serif;
+      --fm: 'Red Hat Mono', Consolas, monospace
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font: 17px/1.6 var(--fb)
+    }
+
+    a {
+      color: inherit
+    }
+
+    .tape {
+      height: 14px;
+      background: repeating-linear-gradient(135deg, var(--hz) 0 14px, #14202a 14px 28px)
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--ink);
+      color: #fff;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 0 16px;
+      overflow-x: auto;
+      white-space: nowrap
+    }
+
+    nav b {
+      font: 800 22px var(--fh);
+      color: var(--hz);
+      margin-right: 14px;
+      padding: 10px 0
+    }
+
+    nav a {
+      text-decoration: none;
+      font: 600 16px var(--fh);
+      padding: 14px 10px;
+      color: #cfe0ea;
+      letter-spacing: .3px
+    }
+
+    nav a:hover,
+    nav a.on {
+      color: var(--hz)
+    }
+
+    #bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0;
+      background: var(--red);
+      z-index: 30
+    }
+
+    main {
+      max-width: 1060px;
+      margin: auto;
+      padding: 0 18px 60px
+    }
+
+    section {
+      padding: 56px 0 8px
+    }
+
+    h1 {
+      font: 800 clamp(44px, 8vw, 88px)/.92 var(--fh);
+      letter-spacing: -1px
+    }
+
+    h2 {
+      font: 800 clamp(32px, 5vw, 48px)/1 var(--fh);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    h2 i {
+      font-style: normal;
+      background: var(--hz);
+      padding: 2px 10px;
+      border: 2px solid var(--ink);
+      font-size: .6em;
+      transform: rotate(-2deg)
+    }
+
+    h3 {
+      font: 700 24px var(--fh);
+      margin: 22px 0 6px
+    }
+
+    p {
+      margin: 8px 0;
+      max-width: 72ch
+    }
+
+    .lead {
+      font-size: 20px;
+      color: var(--mut)
+    }
+
+    code {
+      font-family: var(--fm);
+      font-size: .86em;
+      background: #cbd7de;
+      padding: 1px 6px;
+      border-radius: 3px
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 28px;
+      padding: 46px 0 10px;
+      align-items: start
+    }
+
+    @media(max-width:820px) {
+
+      .hero,
+      .two {
+        grid-template-columns: 1fr !important
+      }
+    }
+
+    .radar {
+      background: var(--ink);
+      color: #fff;
+      border: 3px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--hz);
+      padding: 18px
+    }
+
+    .radar h4 {
+      font: 700 20px var(--fh);
+      color: var(--hz);
+      margin-bottom: 8px
+    }
+
+    .cve {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px dashed #36566a;
+      font: 500 14px var(--fm)
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--red);
+      flex: none;
+      animation: p 1.4s infinite
+    }
+
+    @keyframes p {
+      0% {
+        box-shadow: 0 0 0 0 #d7263dcc
+      }
+
+      100% {
+        box-shadow: 0 0 0 12px #d7263d00
+      }
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .chip {
+      font: 500 14px var(--fm);
+      background: #fff;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      padding: 3px 10px;
+      border-radius: 99px;
+      cursor: pointer
+    }
+
+    .chip:hover,
+    .chip.on {
+      background: var(--hz)
+    }
+
+    .radar .chip {
+      border-color: var(--hz);
+      background: transparent;
+      color: #fff;
+      cursor: default
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      padding: 18px;
+      margin: 16px 0
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px
+    }
+
+    .card {
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-top: 10px solid var(--hz);
+      padding: 16px 18px
+    }
+
+    .card.b {
+      border-top-color: #2a6fb0
+    }
+
+    .card.r {
+      border-top-color: var(--red)
+    }
+
+    .card.g {
+      border-top-color: var(--ok)
+    }
+
+    .card h3 {
+      margin-top: 0
+    }
+
+    input[type=text],
+    select {
+      font: 500 16px var(--fm);
+      padding: 8px 10px;
+      border: 2px solid var(--ink);
+      background: #fff;
+      color: var(--ink);
+      max-width: 100%
+    }
+
+    button,
+    .btn {
+      font: 700 17px var(--fh);
+      background: var(--hz);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      padding: 7px 16px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--ink)
+    }
+
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink)
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 2px
+    }
+
+    .verdict {
+      margin-top: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      border-left: 8px solid var(--mut);
+      background: #e4ebef
+    }
+
+    .verdict.ok {
+      border-color: var(--ok);
+      background: #d6efe6
+    }
+
+    .verdict.bad {
+      border-color: var(--red);
+      background: #f8dde1
+    }
+
+    pre {
+      position: relative;
+      background: var(--term);
+      color: #d9ecf6;
+      font: 400 14px/1.55 var(--fm);
+      padding: 14px 16px;
+      overflow-x: auto;
+      border-radius: 4px;
+      margin: 10px 0
+    }
+
+    pre .c {
+      color: #7fa2b6
+    }
+
+    .k {
+      color: var(--hz)
+    }
+
+    .rm {
+      background: #d7263d44;
+      display: block
+    }
+
+    .ad {
+      background: #16906b44;
+      display: block
+    }
+
+    .cp {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font: 600 13px var(--fh);
+      padding: 2px 8px;
+      box-shadow: none;
+      background: #fff
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .tabs button {
+      box-shadow: none;
+      background: #fff
+    }
+
+    .tabs button.on {
+      background: var(--ink);
+      color: #fff
+    }
+
+    .note {
+      border-left: 8px solid var(--hz);
+      background: #fff7d6;
+      padding: 10px 14px;
+      margin: 12px 0
+    }
+
+    .note.red {
+      border-color: var(--red);
+      background: #fbe4e7
+    }
+
+    details {
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      margin: 8px 0
+    }
+
+    summary {
+      cursor: pointer;
+      font: 700 20px var(--fh);
+      padding: 10px 14px;
+      list-style: none;
+      display: flex;
+      justify-content: space-between
+    }
+
+    summary::after {
+      content: '+';
+      font-size: 26px;
+      line-height: 1
+    }
+
+    details[open] summary::after {
+      content: '–'
+    }
+
+    details[open] summary {
+      background: var(--hz)
+    }
+
+    details>div {
+      padding: 4px 16px 14px
+    }
+
+    .term {
+      background: var(--term);
+      color: #d9ecf6;
+      font: 400 14px/1.6 var(--fm);
+      padding: 14px;
+      min-height: 190px;
+      border-radius: 4px;
+      white-space: pre-wrap
+    }
+
+    .term .ok {
+      color: #4fe0b0
+    }
+
+    .term .no {
+      color: #ff7b8c
+    }
+
+    .term .pr {
+      color: var(--hz)
+    }
+
+    .ctl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px
+    }
+
+    .ctl label {
+      font: 700 17px var(--fh);
+      display: block
+    }
+
+    .ctl select {
+      width: 100%
+    }
+
+    .flow {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 14px 0
+    }
+
+    .step {
+      flex: 1;
+      min-width: 170px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      padding: 10px 12px;
+      position: relative;
+      margin: 0 -2px -2px 0
+    }
+
+    .step b {
+      font: 700 19px var(--fh);
+      display: block
+    }
+
+    .step.stop {
+      background: #f8dde1
+    }
+
+    .step.go {
+      background: #d6efe6
+    }
+
+    .chk {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      margin: 6px 0;
+      cursor: pointer
+    }
+
+    .chk input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--ok);
+      flex: none;
+      margin-top: 3px
+    }
+
+    .chk:has(input:checked) {
+      background: #d6efe6;
+      text-decoration: line-through;
+      text-decoration-color: #16906b88
+    }
+
+    .prog {
+      height: 16px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      margin: 8px 0
+    }
+
+    .prog div {
+      height: 100%;
+      width: 0;
+      background: var(--ok);
+      transition: width .3s
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--paper);
+      font-size: 15px
+    }
+
+    th {
+      background: var(--ink);
+      color: #fff;
+      font: 700 18px var(--fh);
+      text-align: left;
+      padding: 8px 10px
+    }
+
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top
+    }
+
+    td code {
+      white-space: nowrap
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--red)
+    }
+
+    .gauge {
+      display: flex;
+      height: 18px;
+      border: 2px solid var(--ink);
+      margin: 6px 0
+    }
+
+    .gauge i {
+      flex: 1
+    }
+
+    .who {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .who span {
+      border: 2px solid var(--ink);
+      padding: 4px 12px;
+      background: #fff;
+      font-weight: 600
+    }
+
+    footer {
+      text-align: center;
+      color: var(--mut);
+      padding: 30px 18px;
+      font-size: 15px
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .dot {
+        animation: none
+      }
+
+      html {
+        scroll-behavior: auto
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bar"></div>
+  <div class="tape"></div>
+  <nav id="nav"><b>PARCHE URGENTE</b>
+    <a href="#porque">Alerta</a><a href="#caso-a">PHP-FPM</a><a href="#sim">Simulador</a><a
+      href="#caso-b">WordPress</a><a href="#tags">Docker Hub</a><a href="#compat">Compatibilidad</a><a
+      href="#check">Checklist</a><a href="#cmds">Comandos</a><a href="#test">Autotest</a>
+  </nav>
+
+  <main>
+    <header class="hero" id="porque">
+      <div>
+        <h1>Hay un agujero en tu PHP. Tu Docker no se parchea solo.</h1>
+        <p class="lead">Dos vulnerabilidades críticas permiten ejecutar código en tu servidor sin que el atacante inicie
+          sesión. Esta guía te enseña a actualizar un stack con <b>PHP-FPM</b> y <b>WordPress</b> en Docker, y por qué
+          un <code>pull</code> a veces no sirve de nada.</p>
+        <div class="who"><span>ASIR</span><span>DAM</span><span>DAW</span></div>
+      </div>
+      <aside class="radar">
+        <h4>Radar de la semana</h4>
+        <div class="cve"><span class="dot"></span>CVE-2026-109618 · RCE sin autenticación</div>
+        <div class="cve"><span class="dot"></span>CVE-2026-109619 · RCE sin autenticación</div>
+        <p style="font-size:15px;color:#cfe0ea">Afectan a todas las versiones de PHP desde la 5.4. Versiones parcheadas
+          del 21 de octubre de 2026:</p>
+        <div class="chips"><span class="chip">8.5.12</span><span class="chip">8.4.27</span><span
+            class="chip">8.3.36</span><span class="chip">8.2.35</span></div>
+      </aside>
+    </header>
+
+    <div class="panel">
+      <h3 style="margin-top:0">¿Está parcheada tu versión?</h3>
+      <p>Pega la salida de <code>php -v</code> o solo el número de versión.</p>
+      <input type="text" id="vin" value="PHP 8.3.31 (fpm-fcgi)" size="32" aria-label="Versión de PHP"> <button
+        id="vgo">Comprobar</button>
+      <div class="chips" id="vchips"></div>
+      <div id="vout" class="verdict">Escribe una versión y pulsa Comprobar.</div>
+    </div>
+
+    <h3>Dos piezas, dos mecanismos</h3>
+    <p>En un stack típico hay que revisar <b>por separado</b> cada contenedor, porque se construyen de forma distinta.
+    </p>
+    <div class="two">
+      <div class="card">
+        <h3>Si usamos build</h3>
+        <p>Se construye en local con un <code>Dockerfile</code> y la clave está en <code>build:</code>. La versión la
+          decides tú en la línea <code>FROM</code>.</p><a href="#caso-a"><b>Ir al caso A</b></a>
+      </div>
+      <div class="card b">
+        <h3>Si usamos image</h3>
+        <p>Usa una imagen prefabricada con <code>image:</code>. No compilas nada: dependes de que el mantenedor
+          republique la etiqueta.</p><a href="#caso-b"><b>Ir al caso B</b></a>
+      </div>
+    </div>
+
+    <section id="caso-a">
+      <h2><i>A</i>PHP-FPM con Dockerfile</h2>
+      <h3>1. Fija la versión con el número de parche</h3>
+      <p>La etiqueta <code>8.2-fpm</code> es flotante y, cuando salió la vulnerabilidad, seguía apuntando a 8.2.34.
+        Pulsa para ver el antes y el después.</p>
+      <div class="tabs" role="tablist"><button class="on" data-d="0">Antes</button><button
+          data-d="1">Después</button><button data-d="2">Ver diff</button></div>
+      <pre id="dpre"></pre>
+      <h3>2. Fuerza la reconstrucción</h3>
+      <p>Cambiar el <code>Dockerfile</code> no basta: Docker puede reutilizar capas en caché y un contenedor en marcha
+        sigue usando la imagen con la que nació.</p>
+      <pre class="code">docker compose build --pull --no-cache
+docker compose up -d --force-recreate</pre>
+      <p>Pulsa cada opción para ver qué hace:</p>
+      <div class="chips" id="flags"></div>
+      <div id="fx" class="verdict">Elige una opción.</div>
+      <h3>3. Verifica</h3>
+      <pre>docker compose exec &lt;servicio_php&gt; php -v</pre>
+      <p>Debe mostrar la versión parcheada, por ejemplo <code>PHP 8.2.35</code>.</p>
+      <details>
+        <summary>¿Se está cargando mi <code>custom.ini</code>?</summary>
+        <div>
+          <p>En <code>phpinfo()</code> no aparece en <code>Loaded Configuration File</code> (ese apunta a
+            <code>php.ini</code>). Búscalo en:</p>
+          <p><code>Scan this dir for additional .ini files</code> →
+            <code>/usr/local/etc/php/conf.d</code><br><code>Additional .ini files parsed</code> → debe listar
+            <code>/usr/local/etc/php/conf.d/custom.ini</code></p>
+          <p>Alternativa más fiable desde la terminal:</p>
+          <pre>docker compose exec php php --ini</pre>
+        </div>
+      </details>
+    </section>
+
+    <section id="sim">
+      <h2>Simulador de parcheo</h2>
+      <p>Elige qué servicio tienes, qué etiqueta usa y qué comando lanzas. El terminal te dirá si acabas parcheado o no,
+        y por qué. Prueba todas las combinaciones.</p>
+      <div class="panel">
+        <div class="ctl">
+          <div><label>Servicio</label><select id="s_svc">
+              <option value="php">PHP-FPM (build: + Dockerfile)</option>
+              <option value="wp">WordPress (image:)</option>
+            </select></div>
+          <div><label>Etiqueta en tu fichero</label><select id="s_tag"></select></div>
+          <div><label>Comando</label><select id="s_cmd">
+              <option value="up">docker compose up -d</option>
+              <option value="build">build --pull --no-cache + up --force-recreate</option>
+              <option value="pull">pull + up --force-recreate</option>
+            </select></div>
+        </div>
+        <button id="s_go">Ejecutar</button>
+        <div class="term" id="term" aria-live="polite">$ _</div>
+        <div id="s_v" class="verdict">Sin ejecutar todavía.</div>
+      </div>
+    </section>
+
+    <section id="caso-b">
+      <h2><i>B</i>WordPress con image:</h2>
+      <h3>El problema: etiqueta oficial pero congelada</h3>
+      <pre>services:
+  wordpress:
+    image: wordpress:6-php8.3-fpm   <span class="c"># ¡publicada hace ~5 meses, PHP 8.3.31!</span></pre>
+      <p>La etiqueta pertenece a la imagen oficial (<code>library/wordpress</code>), pero Docker ya no la reconstruye
+        con los nuevos parches de PHP porque la rama activa es otra.</p>
+      <h3>Por qué <code>build</code> no sirve aquí</h3>
+      <pre>docker compose build --pull --no-cache
+<span class="c">WARN[0000] No services to build</span></pre>
+      <div class="note">El servicio solo tiene <code>image:</code>, no <code>build:</code>. La advertencia es
+        inofensiva, pero te avisa de que necesitas otro mecanismo: descargar, no compilar.</div>
+      <h3>Cómo actualizar una imagen prefabricada</h3>
+      <pre>docker compose pull
+docker compose up -d --force-recreate</pre>
+      <p>Si sospechas de caché local:</p>
+      <pre>docker compose down
+docker rmi wordpress:6-php8.3-fpm
+docker compose pull wordpress
+docker compose up -d</pre>
+      <h3>La solución real: una etiqueta oficial mantenida</h3>
+      <p>Las etiquetas activas ya son de la <b>rama 7</b>. Cambia a una etiqueta mantenida:</p>
+      <pre>image: wordpress:7-php8.3-fpm   <span class="c"># o fija: wordpress:7.1-php8.3-fpm</span></pre>
+      <div class="note">El volumen <code>wordpress_data</code> y la base de datos se mantienen intactos: no pierdes
+        contenido. Verifica con <code>docker compose exec wordpress php -v</code>; debe salir PHP 8.3.36 o superior.
+      </div>
+    </section>
+
+    <section id="tags">
+      <h2>Docker Hub y etiquetas</h2>
+      <div class="two">
+        <div class="card g">
+          <h3>Imagen oficial</h3>
+          <p>Sin prefijo de usuario: <code>wordpress</code>, <code>php</code>, <code>mariadb</code>. URL:
+            <code>hub.docker.com/_/wordpress</code> (internamente <code>library/</code>).</p>
+        </div>
+        <div class="card r">
+          <h3>Imagen de la comunidad</h3>
+          <p>Con prefijo de usuario: <code>festum/wordpress</code>. URL: <code>hub.docker.com/r/festum/wordpress</code>.
+          </p>
+        </div>
+      </div>
+      <p>Una etiqueta es un alias de una imagen concreta (un <i>digest</i>). Haz clic para ver cada tipo:</p>
+      <div class="tabs"><button class="on" data-t="f">Flotante</button><button data-t="x">Fija</button></div>
+      <div class="panel" id="tagbox"></div>
+
+      <h3>La trampa de las etiquetas flotantes</h3>
+      <p>No son magia. Activa o desactiva el paso 2 y mira qué le llega a tu servidor:</p>
+      <div class="flow" id="flow"></div>
+      <label class="chk" style="max-width:440px"><input type="checkbox" id="rebuilt" checked> <span>El mantenedor
+          reconstruyó la imagen (paso 2)</span></label>
+
+      <h3>¿Está mantenida esta etiqueta?</h3>
+      <p>Ser oficial no garantiza estar mantenida. Mira el campo <b>Last pushed</b> en Docker Hub. Desliza para simular
+        su antigüedad:</p>
+      <input type="range" min="0" max="12" value="5" id="age" aria-label="Meses desde el último push">
+      <div class="gauge"><i style="background:#16906b"></i><i style="background:#8ab84a"></i><i
+          style="background:var(--hz)"></i><i style="background:#e8742c"></i><i style="background:var(--red)"></i></div>
+      <div id="ageout" class="verdict"></div>
+      <details>
+        <summary>Los tres sitios donde mirar en Docker Hub</summary>
+        <div>
+          <p><b>Nombre:</b> sin prefijo de usuario significa oficial.<br><b>Last pushed:</b> si tiene meses o años, esa
+            etiqueta ya no recibe parches.<br><b>Pestaña Tags:</b> muestra las etiquetas activas. Si la tuya no aparece,
+            probablemente esté obsoleta.</p>
+          <p>Listar etiquetas desde PowerShell:</p>
+          <pre>Invoke-RestMethod -Uri "https://hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100"</pre>
+        </div>
+      </details>
+    </section>
+
+    <section id="compat">
+      <h2>Qué puede romperse al subir de versión</h2>
+      <div class="tabs"><button class="on" data-c="0">PHP-FPM</button><button data-c="1">WordPress</button></div>
+      <div id="compbox"></div>
+    </section>
+
+    <section id="check">
+      <h2>Antes de migrar</h2>
+      <p>Marca cada paso. Una migración sin copia de seguridad es una apuesta.</p>
+      <div class="prog">
+        <div id="pb"></div>
+      </div>
+      <p id="pt" style="font:700 18px var(--fh)">0 de 5</p>
+      <div id="chk"></div>
+    </section>
+
+    <section id="cmds">
+      <h2>Chuleta de comandos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Comando</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </section>
+
+    <section id="test">
+      <h2>Autotest</h2>
+      <p>Intenta responder antes de abrir la solución.</p>
+      <div id="qz"></div>
+    </section>
+
+    <section>
+      <h2>Lo que te llevas</h2>
+      <div class="two">
+        <div class="card">
+          <h3>Etiquetas</h3>
+          <p>Las flotantes solo reciben parches si el mantenedor reconstruye. Comprueba <b>Last pushed</b>. Ser oficial
+            no basta.</p>
+        </div>
+        <div class="card b">
+          <h3>Cada servicio, su receta</h3>
+          <p>PHP-FPM: fija versión y <code>--pull --no-cache</code>. WordPress: etiqueta mantenida, <code>pull</code> y
+            <code>--force-recreate</code>.</p>
+        </div>
+      </div>
+      <div class="note red"><b>Siempre:</b> entorno de pruebas, copia del volumen y de la base de datos, y revisión de
+        plugins y temas antes de dar el salto.</div>
+    </section>
+  </main>
+  <div class="tape"></div>
+  <footer>Guía didáctica · Actualización segura de PHP-FPM y WordPress en Docker</footer>
+
+  <script>
+    const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    /* copiar */
+    function addCopy(root = document) { $$('pre', root).forEach(p => { if (p.querySelector('.cp') || p.id === 'dpre') return; const b = document.createElement('button'); b.className = 'cp'; b.textContent = 'Copiar'; b.onclick = () => { navigator.clipboard.writeText(p.innerText.replace(/^Copiar\n?/, '')).then(() => { b.textContent = 'Copiado'; setTimeout(() => b.textContent = 'Copiar', 1400) }).catch(() => { b.textContent = 'Selecciona y Ctrl+C' }) }; p.appendChild(b) }) }
+    addCopy();
+    /* progreso + nav */
+    const secs = $$('section[id]'), links = $$('#nav a');
+    addEventListener('scroll', () => { const h = document.documentElement; $('#bar').style.width = (scrollY / (h.scrollHeight - innerHeight) * 100) + '%'; let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < 120) cur = s.id }); links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur)) });
+    /* comprobador */
+    const MIN = { '8.5': 12, '8.4': 27, '8.3': 36, '8.2': 35 };
+    $('#vchips').innerHTML = ['8.2.34', '8.3.31', '8.3.36', '8.4.27', '8.1.30'].map(v => `<span class="chip">${v}</span>`).join('');
+    function chk() {
+      const m = $('#vin').value.match(/(\d+)\.(\d+)\.(\d+)/), o = $('#vout'); if (!m) { o.className = 'verdict'; o.textContent = 'No encuentro un número de versión con formato X.Y.Z.'; return }
+      const br = m[1] + '.' + m[2], p = +m[3];
+      if (!(br in MIN)) { o.className = 'verdict bad'; o.innerHTML = `<b>PHP ${m[0]}: vulnerable.</b> Esta guía solo lista parches para las ramas 8.2 a 8.5. Tendrás que migrar de rama.`; return }
+      if (p >= MIN[br]) { o.className = 'verdict ok'; o.innerHTML = `<b>PHP ${m[0]}: parcheada.</b> Mínimo seguro en la rama ${br}: ${br}.${MIN[br]}.` }
+      else { o.className = 'verdict bad'; o.innerHTML = `<b>PHP ${m[0]}: vulnerable.</b> Necesitas ${br}.${MIN[br]} o superior (te faltan ${MIN[br] - p} parche${MIN[br] - p > 1 ? 's' : ''}).` }
+    }
+    $('#vgo').onclick = chk; $('#vin').onkeydown = e => { if (e.key === 'Enter') chk() }; $$('#vchips .chip').forEach(c => c.onclick = () => { $('#vin').value = 'PHP ' + c.textContent; chk() }); chk();
+    /* tabs genéricos */
+    function tabs(sel, fn) { const bs = $$(sel + ' button'); bs.forEach(b => b.onclick = () => { bs.forEach(x => x.classList.remove('on')); b.classList.add('on'); fn(b) }) }
+    /* Dockerfile antes/después */
+    const D = ['<span class="c"># Dockerfile</span>\nFROM php:8.2-fpm-alpine', '<span class="c"># Dockerfile</span>\nFROM php:8.2.35-fpm-alpine', '<span class="rm">- FROM php:8.2-fpm-alpine</span><span class="ad">+ FROM php:8.2.35-fpm-alpine</span>'];
+    $('#dpre').innerHTML = D[0]; tabs('[data-d]', b => $('#dpre').innerHTML = D[b.dataset.d]);
+    /* flags */
+    const FL = { '--pull': 'Obliga a buscar la versión más reciente de la imagen base en el registro.', '--no-cache': 'Ignora todas las capas intermedias y reconstruye desde cero.', '--force-recreate': 'Elimina el contenedor actual y crea uno nuevo con la imagen recién construida. Sin esto, el contenedor en marcha sigue usando la imagen con la que se creó.' };
+    $('#flags').innerHTML = Object.keys(FL).map(k => `<button class="chip">${k}</button>`).join('');
+    $$('#flags .chip').forEach(c => c.onclick = () => { $$('#flags .chip').forEach(x => x.classList.remove('on')); c.classList.add('on'); $('#fx').innerHTML = `<code>${c.textContent}</code>: ${FL[c.textContent]}` });
+    /* simulador */
+    const T = { php: [{ l: 'FROM php:8.2-fpm-alpine', v: '8.2.34', fl: 1 }, { l: 'FROM php:8.2.35-fpm-alpine', v: '8.2.35' }], wp: [{ l: 'image: wordpress:6-php8.3-fpm', v: '8.3.31', fl: 1 }, { l: 'image: wordpress:7-php8.3-fpm', v: '8.3.36' }] };
+    const OLD = { php: '8.2.34', wp: '8.3.31' }, MINV = { php: '8.2.35', wp: '8.3.36' };
+    function fillTags() { $('#s_tag').innerHTML = T[$('#s_svc').value].map((t, i) => `<option value="${i}">${t.l}</option>`).join('') }
+    fillTags(); $('#s_svc').onchange = fillTags;
+    let timers = [];
+    $('#s_go').onclick = () => {
+      timers.forEach(clearTimeout); timers = []; const s = $('#s_svc').value, t = T[s][+$('#s_tag').value], c = $('#s_cmd').value, svc = s === 'php' ? 'php' : 'wordpress';
+      let L = [], v = OLD[s], why = '';
+      L.push(['pr', '$ ' + ({ up: 'docker compose up -d', build: 'docker compose build --pull --no-cache\n$ docker compose up -d --force-recreate', pull: 'docker compose pull\n$ docker compose up -d --force-recreate' }[c])]);
+      if (s === 'php') {
+        if (c === 'up') { L.push(['', '[+] Running 1/1\n ✔ Container ' + svc + '  Running']); why = 'Compose no reconstruye nada: la imagen ya existe y el contenedor sigue en marcha. Tu cambio en el Dockerfile ni se mira.' }
+        if (c === 'build') { L.push(['', '[+] Building… pulling base image, no cache\n ✔ Image ' + svc + '  Built\n ✔ Container ' + svc + '  Recreated']); v = t.v; why = t.fl ? 'Reconstruiste bien, pero la etiqueta flotante 8.2-fpm-alpine aún apunta a 8.2.34. Hay que fijar el número de parche.' : 'Base fijada a 8.2.35, reconstruida sin caché y contenedor recreado. Es la receta completa.' }
+        if (c === 'pull') { L.push(['', '[+] Pulling 1/1\n ! ' + svc + ' Skipped - No image to be pulled\n ✔ Container ' + svc + '  Recreated']); why = 'El servicio solo tiene build:, no hay nada que descargar. Recreaste el contenedor con la misma imagen vieja.' }
+      } else {
+        const nuevo = !t.fl;
+        if (c === 'build') { L.push(['no', 'WARN[0000] No services to build']) }
+        if (nuevo) { L.push(['', '[+] Pulling 1/1\n ✔ ' + svc + ' Pulled  (etiqueta nueva: no estaba en local)\n ✔ Container ' + svc + '  Recreated']); v = t.v; why = c === 'build' ? 'Build no hizo nada, pero up descargó la imagen porque la etiqueta nueva no existía en local.' : 'La etiqueta de la rama 7 está mantenida y la descargaste de cero. Estás parcheado.' }
+        else if (c === 'up') { L.push(['', '✔ Container ' + svc + '  Running']); why = 'Sin pull ni recreate no cambia nada, y además esta etiqueta está congelada.' }
+        else if (c === 'build') { L.push(['', '✔ Container ' + svc + '  Recreated']); why = 'No hay build: y la etiqueta 6-php8.3-fpm sigue congelada en PHP 8.3.31.' }
+        else { L.push(['', '[+] Pulling 1/1\n ✔ ' + svc + ' Pulled  (Image is up to date)\n ✔ Container ' + svc + '  Recreated']); why = 'El pull funcionó, pero no hay nada nuevo que bajar: el mantenedor no republica esta etiqueta. Por mucho que hagas pull, sigues en 8.3.31. Cambia a una etiqueta de la rama 7.' }
+      }
+      L.push(['pr', '$ docker compose exec ' + (s === 'php' ? 'php' : 'wordpress') + ' php -v']);
+      const ok = v >= MINV[s] && v.length >= MINV[s].length || v.split('.')[2] >= MINV[s].split('.')[2];
+      L.push([ok ? 'ok' : 'no', 'PHP ' + v + ' (fpm-fcgi)  ' + (ok ? '✔ parcheada' : '✘ VULNERABLE')]);
+      const tm = $('#term'); tm.innerHTML = ''; $('#s_v').className = 'verdict'; $('#s_v').textContent = 'Ejecutando…';
+      L.forEach((x, i) => timers.push(setTimeout(() => { tm.innerHTML += `<div class="${x[0]}">${esc(x[1])}</div>`; if (i === L.length - 1) { const e = $('#s_v'); e.className = 'verdict ' + (ok ? 'ok' : 'bad'); e.innerHTML = `<b>${ok ? 'Parcheado' : 'Sigues vulnerable'}.</b> ${why}` } }, i * 550)))
+    };
+    /* flujo etiquetas */
+    const FS = [['1. El upstream publica', 'PHP 8.2.35 sale el 21 de octubre.'], ['2. El mantenedor reconstruye', 'La imagen oficial se rehace con la nueva base.'], ['3. Tú haces pull', 'Solo recibes lo que ya está en Docker Hub.']];
+    function flow() { const r = $('#rebuilt').checked; $('#flow').innerHTML = FS.map((s, i) => `<div class="step ${i === 1 ? (r ? 'go' : 'stop') : ''}"><b>${s[0]}</b>${i === 2 ? (r ? 'Recibes 8.2.35. Parcheado.' : 'Recibes 8.2.34. Sigues vulnerable aunque hagas pull.') : i === 1 && !r ? 'No ocurre. La etiqueta queda congelada.' : s[1]}</div>`).join('') }
+    $('#rebuilt').onchange = flow; flow();
+    const TG = { f: '<b>Flotante</b>: <code>wordpress:6-php8.3-fpm</code>, <code>php:8.2-fpm</code>. Apunta a «la última publicada» bajo ese nombre. Recibe parches <b>solo si el mantenedor reconstruye y republica</b>.', x: '<b>Fija</b>: <code>wordpress:6.9.4-php8.3-fpm</code>, <code>php:8.2.35-fpm</code>. Apunta a una versión exacta y no cambia nunca. Tienes que actualizarla a mano.' };
+    $('#tagbox').innerHTML = TG.f; tabs('[data-t]', b => $('#tagbox').innerHTML = TG[b.dataset.t]);
+    const AG = [[1, 'Activa. Se publicó hace poco, es buena señal.'], [3, 'Reciente. Comprueba si hay una versión nueva en la pestaña Tags.'], [5, 'Dudosa. Sospecha y compara con la rama activa.'], [8, 'Probablemente congelada. Busca una etiqueta mantenida.'], [99, 'Abandonada. No recibe parches: migra.']];
+    function age() { const m = +$('#age').value, a = AG.find(x => m <= x[0] || x[0] === 99); const cls = m <= 3 ? 'ok' : m >= 6 ? 'bad' : ''; $('#ageout').className = 'verdict ' + cls; $('#ageout').innerHTML = `<b>Hace ${m} ${m === 1 ? 'mes' : 'meses'}.</b> ${a[1]}${m === 5 ? ' (El caso de wordpress:6-php8.3-fpm en esta guía.)' : ''}` }
+    $('#age').oninput = age; age();
+    /* compatibilidad */
+    const CP = [[['Extensiones', 'Si instalas con <code>docker-php-ext-install</code> o <code>pecl</code>, revisa que sigan compilando: algunas cambian de API entre versiones menores.'], ['Código de la aplicación', 'Sintaxis obsoleta o funciones deprecadas pueden dar errores fatales o pantallas en blanco. Prueba antes en un entorno de pruebas.'], ['php.ini y conf.d', 'Las rutas (<code>/usr/local/etc/php/conf.d</code>) se mantienen, pero comprueba que tus <code>custom.ini</code> siguen cargándose tras reconstruir.'], ['Imágenes Alpine', 'Si fijas <code>-alpine3.20</code>, asegúrate de que la nueva etiqueta incluye esa variante para no romper dependencias del sistema.']],
+    [['Plugins del panel de administración', 'WordPress 7 renueva la interfaz (listas con DataViews). Los plugins que modifican columnas, menús o edición rápida pueden fallar.'], ['Plugins del editor clásico', 'Los que dependen del bloque clásico o del HTML antiguo necesitan actualizarse.'], ['Temas clásicos y page builders', 'Temas no-bloque con Elementor u otros pueden mostrar problemas de diseño o CSS.'], ['Plugins abandonados', 'Con 2 años sin mantenimiento pueden dar errores fatales en WP 7 + PHP 8.3.'], ['Editor en iframe', 'En WP 7 el editor siempre carga en un iframe: los bloques que dependen del <code>document</code> o <code>window</code> global pueden necesitar ajustes.'], ['El código de WordPress no se actualiza solo', 'Al migrar de imagen el volumen no se sobrescribe. Actualiza WordPress desde <code>/wp-admin</code> para tener también el código parcheado, no solo PHP.']]];
+    function comp(i) { $('#compbox').innerHTML = CP[i].map(x => `<details><summary>${x[0]}</summary><div><p>${x[1]}</p></div></details>`).join('') }
+    comp(0); tabs('[data-c]', b => comp(+b.dataset.c));
+    /* checklist */
+    const CK = ['Copia de seguridad del volumen <code>wordpress_data</code> y de la base de datos MariaDB.', 'Probar primero en un entorno de pruebas (copia del volumen + base de datos, nuevo <code>docker-compose.yml</code>).', 'Revisar la compatibilidad declarada de plugins y temas críticos con la nueva versión.', 'Tras actualizar: login en admin, publicar un artículo de prueba, subir una imagen y verificar el front-end.', 'Tener a mano el rollback (volumen y base de datos anteriores).'];
+    $('#chk').innerHTML = CK.map(t => `<label class="chk"><input type="checkbox"><span>${t}</span></label>`).join('');
+    $$('#chk input').forEach(i => i.onchange = () => { const n = $$('#chk input:checked').length; $('#pb').style.width = n / CK.length * 100 + '%'; $('#pt').textContent = n === CK.length ? 'Listo para migrar.' : n + ' de ' + CK.length })
+    /* comandos */
+    const CM = [['PHP-FPM (con <code>build:</code>)', 'docker compose build --pull --no-cache\ndocker compose up -d --force-recreate'], ['WordPress (con <code>image:</code>)', 'docker compose pull\ndocker compose up -d --force-recreate'], ['Limpiar caché de imagen', 'docker compose down\ndocker rmi &lt;imagen&gt;\ndocker compose pull'], ['Verificar PHP', 'docker compose exec &lt;servicio&gt; php -v'], ['Ver php.ini cargados', 'docker compose exec &lt;servicio&gt; php --ini'], ['Listar tags oficiales (API)', 'Invoke-RestMethod -Uri "https://hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100"']];
+    $('#tb').innerHTML = CM.map(r => `<tr><td>${r[0]}</td><td><pre style="margin:0">${r[1]}</pre></td></tr>`).join(''); addCopy($('#tb'));
+    /* autotest */
+    const Q = [['Cambias <code>FROM php:8.2-fpm-alpine</code> por <code>FROM php:8.2.35-fpm-alpine</code> y lanzas solo <code>docker compose up -d</code>. ¿Estás parcheado?', 'No. Compose reutiliza la imagen y el contenedor existentes. Hace falta <code>build --pull --no-cache</code> y <code>up -d --force-recreate</code>.'], ['Al lanzar <code>docker compose build</code> en el servicio WordPress aparece <code>No services to build</code>. ¿Qué significa?', 'Que el servicio solo define <code>image:</code> y no <code>build:</code>. Para estos servicios se descarga con <code>pull</code>, no se compila.'], ['Haces <code>pull</code> en <code>wordpress:6-php8.3-fpm</code> y sigues en PHP 8.3.31. ¿Por qué?', 'La etiqueta está congelada: el mantenedor no la ha vuelto a publicar. Hay que migrar a una etiqueta mantenida como <code>wordpress:7-php8.3-fpm</code>.'], ['Migras la imagen de WordPress. ¿Se actualiza también el código de WordPress que está en tu volumen?', 'No: el volumen no se sobrescribe. Actualiza WordPress desde <code>/wp-admin</code> para que el código también quede parcheado.']];
+    $('#qz').innerHTML = Q.map((q, i) => `<details><summary>Pregunta ${i + 1}</summary><div><p>${q[0]}</p><details><summary>Ver solución</summary><div><p>${q[1]}</p></div></details></div></details>`).join('');
+  </script>
+</body>
+
+</html>
