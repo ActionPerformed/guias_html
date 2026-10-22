@@ -2695,7 +2695,7 @@
 <body>
     <div id="progressBar"></div>
     <header class="hero"><span class="eyebrow">PMDM · 2º DAM · Jetpack Compose</span>
-        <h1>Actividad 2.3 · CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue</h1>
+        <h1>Actividad 3.1 · CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue</h1>
         <p class="lead">Da persistencia real a la app: sesión con DataStore, colección de videojuegos con Room, UI
             reactiva con <code>Flow</code>, notificaciones con permiso en tiempo de ejecución y APK firmado en un
             dispositivo real.</p>
@@ -5285,12 +5285,12 @@ LaunchedEffect(Unit) {
                     <pre>app/release/app-release.apk</pre>
                 </div>
                 <h3>11.3. Verificar el APK</h3>
-                <p><strong>Con <code>apksigner</code>:</strong></p>
+                <p><strong>Con <code>apksigner</code></strong>, sustituyendo <code>[ANDROID_HOME]</code> por <code>C:\Users\.....\AppData\Local\Android\Sdk\</code></p>
                 <div class="code-wrap">
                     <div class="code-label"><span>bash</span><span><button class="copy-btn"
                                 onclick="copyCode(this)">Copiar</button></span></div>
                     <pre
-                        data-lang="sh">$ANDROID_HOME/build-tools/36.0.0/apksigner verify --verbose app/release/app-release.apk</pre>
+                        data-lang="sh">& "[ANDROID_HOME]\build-tools\36.0.0\apksigner.bat" verify --verbose app\build\outputs\apk\release\app-release.apk</pre>
                 </div>
                 <p>Debe mostrar:</p>
                 <div class="code-wrap">
@@ -5314,11 +5314,36 @@ Verified using v2 scheme (APK Signature Scheme v2): true</pre>
                             <li><strong>Cable USB</strong> conectado.</li>
                             <li><strong>Aceptar el diálogo</strong> «¿Permitir depuración USB?».</li>
                         </ol>
-                        <p><strong>Comando:</strong></p>
+                        <p><strong>Comandos:</strong></p>
                         <div class="code-wrap">
                             <div class="code-label"><span>bash</span><span><button class="copy-btn"
                                         onclick="copyCode(this)">Copiar</button></span></div>
-                            <pre data-lang="sh">adb install -r app/release/app-release.apk</pre>
+                            <pre data-lang="sh">& "[ANDROID_HOME]\platform-tools\adb.exe" uninstall com.ejemplo.login
+& "[ANDROID_HOME]\platform-tools\adb.exe" install -r app\build\outputs\apk\release\app-release.apk
+                            </pre>
+                        </div>
+                        <div class="callout warn">
+                            <strong>⚠️ Aviso — si ya tenías la app en el móvil, desinstálala
+                                antes:</strong> si ejecutaste la aplicación en este dispositivo
+                                anteriormente (por ejemplo desde el panel <em>Running devices</em>
+                                de Android Studio, desde el emulador o instalando un APK a mano),
+                                <strong>Android rechazará la actualización</strong> cuando la
+                                firma del APK nuevo no coincida con la de la app que ya está
+                                instalada. Y la firma puede haber cambiado sin que tú lo notes:
+                                se regenera la clave de depuración, cambia el
+                                <code>signingConfig</code> o el APK de <em>release</em> está
+                                firmado con una clave distinta de la de <em>debug</em>.
+                            <p>El síntoma típico es el error
+                                <code>INSTALL_FAILED_UPDATE_INCOMPATIBLE</code> («el paquete
+                                ya existe con una firma distinta») o un simple
+                                <em>«App not installed»</em> tras la instalación. Por eso el
+                                primer comando es el <code>adb uninstall</code>: borra la
+                                versión anterior (y sus datos) y deja el hueco limpio para el
+                                APK firmado. Si instalas a mano (opción B), borra antes la
+                                aplicación desde <em>Ajustes → Aplicaciones</em>.</p>
+                            <p><strong>Ojo:</strong> al desinstalar se borran también los datos
+                                locales de la app anterior (preferencias, base de datos
+                                <em>Room</em>...), así que haz copia si te importa algo.</p>
                         </div>
                     </div>
                     <div class="tab-panel" id="inst_1">
@@ -6119,8 +6144,6 @@ fun getByGenero(filtro: String): Flow&lt;List&lt;Videojuego&gt;&gt;</pre>
                         qué.</li>
                     <li>Incluir una captura del resultado.</li>
                 </ol>
-                <div class="callout warn"><strong>No se aceptan retos copiados entre compañeros.</strong> Si dos
-                    entregas son idénticas, ambos retos se anulan.</div>
                 <div class="callout "><strong>Recomendación final:</strong> no intentes hacer todos los retos. Elige
                     <strong>uno o dos</strong> que te llamen la atención y hazlos <strong>bien</strong>. Es mejor
                     entender profundamente un reto que copiar cinco sin saber qué has hecho. Y recuerda: <strong>romper
@@ -6129,7 +6152,7 @@ fun getByGenero(filtro: String): Flow&lt;List&lt;Videojuego&gt;&gt;</pre>
         </div>
     </main>
     </div><!-- /shell -->
-    <footer>Actividad 2.3 · PMDM · 2º DAM — Guía interactiva autocontenida (HTML/CSS/JS; solo las tipografías vienen de
+    <footer>Actividad 3.1 · PMDM · 2º DAM — Guía interactiva autocontenida (HTML/CSS/JS; solo las tipografías vienen de
         Google Fonts).</footer>
     <script>/* ---------- ACCORDION SECTIONS ---------- */
         function toggleCard(head) {
@@ -6224,7 +6247,7 @@ fun getByGenero(filtro: String): Flow&lt;List&lt;Videojuego&gt;&gt;</pre>
         });
 
 
-        /* ===== Guía 2.3 · interacciones ===== */
+        /* ===== Guía 3.1 · interacciones ===== */
         HL.sh = { rx: /(#[^\n]*)|("[^"\n]*")|(\$\w+|\$\{[^}]+\})|\b(adb|apksigner|install|pair|connect|verify)\b/g, cls: ['tok-com', 'tok-str', 'tok-type', 'tok-kw'] };
         HL.pro = { rx: /(#[^\n]*)|(-\w+)|(@[\w.]+)/g, cls: ['tok-com', 'tok-kw', 'tok-attr'] };
 
