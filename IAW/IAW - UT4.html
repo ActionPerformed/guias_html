@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ofimática web · 2º ASIR</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --b: #0082c9;
+            --bd: #00577f;
+            --bl: #e6f4fb;
+            --bg: #f4f9fd;
+            --ink: #14293a;
+            --mu: #5b7083;
+            --ok: #1f9d63;
+            --wa: #e8890c;
+            --rd: #d64545;
+            --r: 14px
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px
+        }
+
+        body {
+            margin: 0;
+            font: 17px/1.6 'Source Sans 3', sans-serif;
+            color: var(--ink);
+            background: var(--bg)
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: Manrope, sans-serif;
+            line-height: 1.2
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 9;
+            background: #fffd;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #d5e6f1;
+            display: flex;
+            gap: 4px;
+            padding: 8px 16px;
+            overflow-x: auto;
+            align-items: center
+        }
+
+        nav b {
+            font-family: Manrope;
+            color: var(--b);
+            margin-right: 10px;
+            white-space: nowrap
+        }
+
+        nav a {
+            padding: 5px 12px;
+            border-radius: 99px;
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap
+        }
+
+        nav a:hover {
+            background: var(--bl)
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #00679e, #0082c9 55%, #4fb3e8);
+            color: #fff;
+            padding: 70px 20px 110px;
+            text-align: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero:before {
+            content: "";
+            position: absolute;
+            background: #fff3;
+            border-radius: 99px;
+            width: 340px;
+            height: 110px;
+            top: 40px;
+            left: -60px;
+            box-shadow: 120px 70px 0 30px #fff2, 820px 20px 0 10px #fff2
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 48px);
+            margin: 0 0 10px;
+            position: relative
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: auto;
+            position: relative
+        }
+
+        .ic {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 22px;
+            position: relative;
+            flex-wrap: wrap
+        }
+
+        .ic span {
+            background: #0005;
+            padding: 6px 14px;
+            border-radius: 99px;
+            font: 700 14px Manrope
+        }
+
+        main {
+            max-width: 1000px;
+            margin: -60px auto 60px;
+            padding: 0 16px;
+            position: relative
+        }
+
+        section {
+            background: #fff;
+            border-radius: var(--r);
+            padding: 28px;
+            margin: 22px 0;
+            box-shadow: 0 6px 24px #0a3a5a14
+        }
+
+        h2 {
+            margin: 0 0 6px;
+            font-size: 28px;
+            color: var(--bd)
+        }
+
+        h3 {
+            margin: 22px 0 8px
+        }
+
+        .nt,
+        .fix {
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin: 12px 0;
+            border-left: 5px solid
+        }
+
+        .nt {
+            background: var(--bl);
+            border-color: var(--b)
+        }
+
+        .fix {
+            background: #fff5e5;
+            border-color: var(--wa)
+        }
+
+        .fix:before {
+            content: "🔧 Ojo · ";
+            font-weight: 700;
+            color: var(--wa)
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 15px;
+            display: block;
+            overflow-x: auto
+        }
+
+        th {
+            background: var(--bd);
+            color: #fff;
+            text-align: left
+        }
+
+        th,
+        td {
+            padding: 8px 11px;
+            border-bottom: 1px solid #dbe8f0;
+            vertical-align: top
+        }
+
+        td.w {
+            background: #e3f6ec;
+            font-weight: 600
+        }
+
+        .g3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 14px
+        }
+
+        .card {
+            border: 2px solid var(--bl);
+            border-radius: var(--r);
+            padding: 14px;
+            background: #fff
+        }
+
+        .card h4 {
+            margin: 0 0 6px;
+            font: 800 17px Manrope;
+            color: var(--b)
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 2px 3px 2px 0;
+            background: var(--bl);
+            color: var(--bd)
+        }
+
+        .pill.s {
+            background: #e3f6ec;
+            color: #146c43
+        }
+
+        .pill.a {
+            background: #fff1c9;
+            color: #8a5a00
+        }
+
+        .pill.o {
+            background: #efe6fb;
+            color: #5b2a9e
+        }
+
+        .f {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 8px 0
+        }
+
+        .f button {
+            border: 2px solid var(--bl);
+            background: #fff;
+            border-radius: 99px;
+            padding: 5px 13px;
+            cursor: pointer;
+            font: 600 14px 'Source Sans 3'
+        }
+
+        .f button.on {
+            background: var(--b);
+            color: #fff;
+            border-color: var(--b)
+        }
+
+        .ok {
+            color: var(--ok)
+        }
+
+        .ko {
+            color: var(--rd)
+        }
+
+        .sm {
+            font-size: 14px;
+            margin: 4px 0
+        }
+
+        .bt {
+            background: var(--b);
+            color: #fff;
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 16px;
+            font: 700 15px Manrope;
+            cursor: pointer
+        }
+
+        .bt:hover {
+            background: var(--bd)
+        }
+
+        .sl {
+            display: grid;
+            grid-template-columns: 320px max-content;
+            gap: 18px;
+            align-items: center;
+            justify-content: center
+        }
+
+        .stars {
+            display: inline-flex;
+            gap: 2px
+        }
+
+        .st {
+            background: none;
+            border: 0;
+            padding: 0 2px;
+            font-size: 24px;
+            line-height: 1;
+            color: #cfdcea;
+            cursor: pointer;
+            transition: color .15s, transform .15s
+        }
+
+        .st.on {
+            color: var(--b)
+        }
+
+        .st:hover {
+            transform: scale(1.15)
+        }
+
+        .st:focus-visible {
+            outline: 2px solid var(--b);
+            outline-offset: 2px;
+            border-radius: 4px
+        }
+
+        .rk {
+            margin-top: 14px
+        }
+
+        .rk div {
+            margin: 7px 0
+        }
+
+        .rk i {
+            display: block;
+            height: 22px;
+            border-radius: 7px;
+            background: linear-gradient(90deg, var(--b), #4fb3e8);
+            transition: width .4s;
+            color: #fff;
+            font: 700 13px Manrope;
+            padding-left: 8px;
+            line-height: 22px;
+            white-space: nowrap
+        }
+
+        select,
+        input[type=text],
+        textarea {
+            border: 2px solid var(--bl);
+            border-radius: 8px;
+            padding: 6px;
+            font: inherit;
+            max-width: 100%
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px
+        }
+
+        .cl td {
+            padding: 6px 8px
+        }
+
+        .cl select {
+            width: 100%
+        }
+
+        details {
+            border: 1px solid #cfe2ef;
+            border-radius: 10px;
+            margin: 8px 0
+        }
+
+        summary {
+            cursor: pointer;
+            padding: 10px 15px;
+            font-weight: 600
+        }
+
+        details[open]>summary {
+            background: var(--bl)
+        }
+
+        details>div {
+            padding: 4px 16px 14px
+        }
+
+        pre {
+            background: #10283a;
+            color: #d6ecfa;
+            padding: 14px;
+            border-radius: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-size: 13px
+        }
+
+        .gl dt {
+            font-weight: 700;
+            color: var(--bd);
+            margin-top: 8px
+        }
+
+        .gl dd {
+            margin: 0
+        }
+
+        @media(max-width:700px) {
+            .sl {
+                grid-template-columns: 1fr;
+                justify-content: start
+            }
+
+            section {
+                padding: 18px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav><b>☁ Ofimática web</b><a href="#que">Qué es</a><a href="#ejes">Ejes</a><a href="#cat">Catálogo</a><a
+            href="#suites">Suites</a><a href="#elige">Elige</a><a href="#prac">Practica</a><a
+            href="#refl">Reflexión</a><a href="#glo">Glosario</a></nav>
+    <header class="hero">
+        <h1>Ofimática web: qué es, cómo se clasifica y cómo elegir</h1>
+        <p>2º ASIR · Implantación de aplicaciones web · 2 h · Teoría previa al despliegue de Nextcloud</p>
+        <div class="ic"><span>a) Reconocer su utilidad</span><span>b) Clasificar por funcionalidad y prestaciones</span>
+        </div>
+    </header>
+    <main>
+        <section id="que">
+            <h2>1 · ¿Qué es una aplicación de ofimática web?</h2>
+            <p>Un programa para <b>crear, editar, almacenar y compartir</b> documentos, hojas de cálculo,
+                presentaciones, calendarios y más <b>desde el navegador</b>, sin instalación local. Se ejecuta en un
+                servidor remoto o propio y se accede por URL. Sacrifica profundidad funcional a cambio de <b>ubicuidad y
+                    colaboración</b>. Las celdas verdes marcan dónde gana cada modelo.</p>
+            <table>
+                <tr>
+                    <th>Prestación</th>
+                    <th>🌐 Web</th>
+                    <th>🖥 Escritorio</th>
+                </tr>
+                <tr>
+                    <td>Instalación</td>
+                    <td class="w">Ninguna; solo navegador</td>
+                    <td>Instalación y actualizaciones</td>
+                </tr>
+                <tr>
+                    <td>Colaboración</td>
+                    <td class="w">Tiempo real, varios usuarios</td>
+                    <td>Limitada o con complementos</td>
+                </tr>
+                <tr>
+                    <td>Acceso</td>
+                    <td class="w">Cualquier dispositivo con navegador</td>
+                    <td>Solo el equipo instalado</td>
+                </tr>
+                <tr>
+                    <td>Almacenamiento</td>
+                    <td class="w">Servidor/nube, sincronizado</td>
+                    <td>Disco local</td>
+                </tr>
+                <tr>
+                    <td>Funciones avanzadas</td>
+                    <td>Limitadas</td>
+                    <td class="w">Completas</td>
+                </tr>
+                <tr>
+                    <td>Dependencia de red</td>
+                    <td>Total</td>
+                    <td class="w">Nula una vez instalada</td>
+                </tr>
+                <tr>
+                    <td>Sistema operativo</td>
+                    <td class="w">Independiente</td>
+                    <td>Depende del SO</td>
+                </tr>
+            </table>
+            <div class="nt">Para tareas administrativas basta la web; para macros complejas, modelos financieros pesados
+                o diseño editorial, gana el escritorio.</div>
+            <div class="fix">La distinción «colaboración: web sí, escritorio no» es una simplificación: las suites de
+                escritorio actuales también coeditan si el archivo está en su nube. La diferencia real es <b>dónde corre
+                    la aplicación y quién guarda el archivo</b>, no tanto qué puede hacer cada una. Piénsalo al
+                responder la pregunta 1.</div>
+        </section>
+
+        <section id="ejes">
+            <h2>2 · Tres ejes de clasificación (criterio b)</h2>
+            <div class="g3">
+                <div class="card">
+                    <h4>① Función principal</h4>
+                    <p class="sm">Texto · Hojas · Presentaciones · Archivos · Calendario · Tareas · Correo y contactos
+                    </p>
+                </div>
+                <div class="card">
+                    <h4>② Modelo de despliegue</h4>
+                    <p class="sm"><span class="pill s">SaaS</span> el proveedor aloja app y datos (Google Workspace,
+                        Microsoft 365, Zoho).</p>
+                    <p class="sm"><span class="pill a">Autoalojado</span> tú instalas y mantienes (Nextcloud Hub,
+                        Collabora, OnlyOffice).</p>
+                </div>
+                <div class="card">
+                    <h4>③ Licencia</h4>
+                    <p class="sm"><span class="pill">Propietaria</span> código cerrado, de pago o freemium.</p>
+                    <p class="sm"><span class="pill o">Abierta</span> código disponible (AGPL, MPL, GPL).</p>
+                </div>
+            </div>
+            <div class="fix">Los ejes son <b>independientes</b>: autoalojado no implica código abierto (hay software
+                propietario autoalojable) ni al revés (hay software abierto ofrecido como SaaS). Varias herramientas,
+                como OnlyOffice, existen en ambas versiones: <b>clasifica la edición concreta</b> que analizas.</div>
+        </section>
+
+        <section id="cat">
+            <h2>3 · Catálogo interactivo</h2>
+            <p>Filtra por los tres ejes y descubre puntos fuertes y débiles.</p>
+            <div class="f" id="f1"></div>
+            <div class="f" id="f2"></div>
+            <div class="f" id="f3"></div>
+            <div class="g3" id="cards"></div>
+            <p class="sm" id="cnt"></p>
+        </section>
+
+        <section id="suites">
+            <h2>4 · Suites integradas y el debate ODF vs OOXML</h2>
+            <p>Una suite no solo junta aplicaciones: <b>se comunican entre sí</b>. Un archivo creado en el procesador se
+                comparte desde el gestor de archivos y se adjunta a un evento sin salir de la plataforma, con inicio de
+                sesión único.</p>
+            <div class="g3">
+                <div class="card">
+                    <h4>📄 ODF · OpenDocument</h4>
+                    <p class="sm">ODT, ODS, ODP. Estándar ISO y abierto. Prioridad de <b>Collabora</b>.</p>
+                    <p class="sm ok">Encaja con administraciones públicas y soberanía del formato.</p>
+                </div>
+                <div class="card">
+                    <h4>📎 OOXML · Microsoft</h4>
+                    <p class="sm">DOCX, XLSX, PPTX. Muy extendido en empresas. Prioridad de <b>Euro-Office</b> según el
+                        material de la unidad.</p>
+                    <p class="sm ok">Reduce fricción con clientes y socios que usan Office.</p>
+                </div>
+            </div>
+            <div class="fix">La compatibilidad es un espectro: ninguna opción abre bien <i>todos</i> los documentos. Un
+                buen administrador <b>prueba con los documentos reales de la organización</b> antes de decidir. Y
+                recuerda que OnlyOffice también aparece en el catálogo con alta compatibilidad .docx.</div>
+            <div class="fix">Puente con la práctica: la imagen <code>nextcloud:apache</code> del siguiente despliegue
+                incluye archivos, calendario y contactos, pero la <b>edición de documentos</b> la aporta un servidor
+                externo (Collabora u OnlyOffice) conectado por <b>WOPI</b>. Fíjate en que esto explica por qué los
+                editores «requieren servidor con recursos».</div>
+        </section>
+
+        <section id="elige">
+            <h2>5 · ¿Qué suite elijo? Los 6 criterios en acción</h2>
+            <p>Valora cada criterio con <b>1 a 4 estrellas</b> (1 = poco importante, 4 = muy importante).
+                <b>Valoraciones orientativas</b>: ¿estás de acuerdo con ellas? Argumenta tu respuesta.</p>
+            <div id="sl"></div>
+            <div class="rk" id="rk"></div>
+            <div class="nt">Los 6 criterios de decisión: control de tus datos, coste, colaboración en tiempo real,
+                compatibilidad con DOCX/XLSX, poco mantenimiento e integración entre apps. Cada uno se valora de 1 a 4
+                estrellas; ese peso se combina con las valoraciones orientativas de la tabla para obtener la media
+                ponderada de cada suite.</div>
+        </section>
+
+        <section id="prac">
+            <h2>6 · Practica la clasificación</h2>
+            <p>Clasifica cada herramienta (no son las de la reflexión) y comprueba.</p>
+            <table class="cl" id="cl"></table>
+            <p><button class="bt" id="chk">Comprobar</button> <span id="res"></span></p>
+        </section>
+
+        <section id="refl">
+            <h2>7 · Actividad de reflexión (evidencia de a y b)</h2>
+            <p>Escribe tus respuestas con tus palabras y genera tu borrador en <code>.md</code>.</p>
+            <p>Nombre: <input type="text" id="nom" placeholder="Nombre y apellidos"></p>
+            <div id="qs"></div>
+            <p><button class="bt" id="pv">Vista previa</button> <button class="bt" id="dl">Descargar .md</button></p>
+            <pre id="out" hidden></pre>
+        </section>
+
+        <section id="glo">
+            <h2>8 · Glosario</h2>
+            <dl class="gl" id="gl"></dl>
+        </section>
+    </main>
+    <script>
+        const $ = s => document.querySelector(s), E = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h) e.innerHTML = h; return e };
+        const T = [['Google Docs', 'Texto', 'SaaS', 'Propietaria', 'Colaboración fluida e historial', 'Requiere conexión; depende de Google'],
+        ['Word Online', 'Texto', 'SaaS', 'Propietaria', 'Compatibilidad total con .docx', 'Lo avanzado solo en escritorio'],
+        ['Collabora Online', 'Texto', 'Autoalojado', 'Abierta', 'ODF nativo; integrable en Nextcloud', 'Pide CPU/RAM y configuración'],
+        ['OnlyOffice Docs', 'Texto', 'Autoalojado', 'Abierta', 'Alta compatibilidad .docx', 'Menos complementos'],
+        ['Google Sheets', 'Hojas', 'SaaS', 'Propietaria', 'Tiempo real y APIs', 'Límite de celdas'],
+        ['Excel Online', 'Hojas', 'SaaS', 'Propietaria', '.xlsx total, Power Query', 'Funciones avanzadas solo en escritorio'],
+        ['Collabora Spreadsheet', 'Hojas', 'Autoalojado', 'Abierta', 'ODS y código abierto', 'Interfaz menos pulida'],
+        ['OnlyOffice Spreadsheet', 'Hojas', 'Autoalojado', 'Abierta', 'Buen .xlsx', 'Menos funciones que Excel'],
+        ['Google Drive', 'Archivos', 'SaaS', 'Propietaria', 'Integra Docs/Sheets; 15 GB gratis', 'Dependencia de Google'],
+        ['OneDrive', 'Archivos', 'SaaS', 'Propietaria', 'Integración con Windows y Office', 'Gratis limitado'],
+        ['Nextcloud Files', 'Archivos', 'Autoalojado', 'Abierta', 'Control total; archivos legibles en disco', 'Requiere servidor y mantenimiento'],
+        ['Seafile', 'Archivos', 'Autoalojado', 'Abierta', 'Sincronización muy rápida', 'No es groupware; bloques ilegibles sin BD'],
+        ['Google Calendar', 'Calendario', 'SaaS', 'Propietaria', 'Integra Gmail y Meet', 'Dependencia de Google'],
+        ['Outlook Calendar', 'Calendario', 'SaaS', 'Propietaria', 'Salas, recursos y Teams', 'Suscripción'],
+        ['Nextcloud Calendar', 'Calendario', 'Autoalojado', 'Abierta', 'CalDAV y votación de horarios', 'Requiere Nextcloud'],
+        ['Doodle', 'Calendario', 'SaaS', 'Propietaria', 'Se vota sin cuenta', 'No es un calendario completo'],
+        ['Todoist', 'Tareas', 'SaaS', 'Propietaria', 'Lenguaje natural', 'Enfoque personal'],
+        ['Trello', 'Tareas', 'SaaS', 'Propietaria', 'Kanban sencillo y visual', 'Corto en proyectos complejos'],
+        ['Notion', 'Tareas', 'SaaS', 'Propietaria', 'Flexibilidad extrema', 'Curva de aprendizaje alta'],
+        ['Nextcloud Deck', 'Tareas', 'Autoalojado', 'Abierta', 'Integrado con archivos y calendario', 'Menos pulido que Trello'],
+        ['Gmail', 'Correo', 'SaaS', 'Propietaria', 'Filtros potentes', 'Almacenamiento compartido con Drive'],
+        ['Outlook Web', 'Correo', 'SaaS', 'Propietaria', 'Integra Teams y OneDrive', 'Interfaz densa'],
+        ['Nextcloud Mail', 'Correo', 'Autoalojado', 'Abierta', 'Delegación y CardDAV', 'Necesita IMAP/SMTP aparte'],
+        ['Google Workspace', 'Suite', 'SaaS', 'Propietaria', 'Integración total', 'Funciones avanzadas de pago'],
+        ['Microsoft 365', 'Suite', 'SaaS', 'Propietaria', 'Estándar empresarial', 'Suscripción'],
+        ['Nextcloud Hub', 'Suite', 'Autoalojado', 'Abierta', 'Control total; CalDAV/CardDAV', 'Requiere servidor y mantenimiento'],
+        ['Zoho Workplace', 'Suite', 'SaaS', 'Propietaria', 'Precio competitivo; autoalojable en algunos planes', 'Integraciones limitadas']];
+        const fl = { 0: 'Todas', 1: 'Todas', 2: 'Todas' }, ax = [['Función', 1, ['Texto', 'Hojas', 'Archivos', 'Calendario', 'Tareas', 'Correo', 'Suite']], ['Despliegue', 2, ['SaaS', 'Autoalojado']], ['Licencia', 3, ['Propietaria', 'Abierta']]];
+        function rc() { const l = T.filter(t => ax.every(([n, i], k) => fl[k] == 'Todas' || t[i] == fl[k])); $('#cards').innerHTML = ''; l.forEach(t => { const c = E('div', 'card', '<h4>' + t[0] + '</h4><span class="pill">' + t[1] + '</span><span class="pill ' + (t[2] == 'SaaS' ? 's' : 'a') + '">' + t[2] + '</span><span class="pill ' + (t[3] == 'Abierta' ? 'o' : '') + '">' + t[3] + '</span><p class="sm ok">✔ ' + t[4] + '</p><p class="sm ko">✖ ' + t[5] + '</p>'); $('#cards').appendChild(c) }); $('#cnt').textContent = l.length + ' de ' + T.length + ' herramientas' }
+        ax.forEach(([n, i, o], k) => { const f = $('#f' + (k + 1));['Todas', ...o].forEach(v => { const b = E('button', '', v); if (v == 'Todas') b.classList.add('on'); b.onclick = () => { fl[k] = v; f.querySelectorAll('button').forEach(x => x.classList.toggle('on', x == b)); rc() }; f.appendChild(b) }) }); rc();
+        const K = ['Control de tus datos', 'Coste bajo', 'Colaboración en tiempo real', 'Compatibilidad con DOCX/XLSX', 'Poco mantenimiento', 'Integración entre apps'],
+            S = { 'Google Workspace': [1, 4, 5, 3, 5, 5], 'Microsoft 365': [1, 2, 4, 5, 4, 5], 'Nextcloud Hub': [5, 4, 3, 3, 2, 4], 'Zoho Workplace': [2, 4, 3, 3, 3, 3] }, w = K.map(() => 1);
+        K.forEach((k, i) => {
+            const box = E('div', 'stars', [1, 2, 3, 4].map(v => '<button type="button" class="st" data-v="' + v + '" role="radio" aria-checked="false" tabindex="-1" aria-label="' + v + ' de 4 estrellas">★</button>').join(''));
+            box.setAttribute('role', 'radiogroup'); box.setAttribute('aria-label', k);
+            const r = E('div', 'sl', '<span>' + k + '</span>'); r.appendChild(box); $('#sl').appendChild(r);
+            const fill = v => box.querySelectorAll('.st').forEach((b, j) => b.classList.toggle('on', j < v));
+            const mark = v => { fill(v); box.querySelectorAll('.st').forEach((b, j) => { b.setAttribute('aria-checked', j === v - 1 ? 'true' : 'false'); b.tabIndex = j === v - 1 ? 0 : -1 }) };
+            const set = v => { w[i] = v; mark(v); rk() };
+            const focus = v => box.querySelectorAll('.st')[v - 1].focus();
+            box.querySelectorAll('.st').forEach(b => {
+                const v = +b.dataset.v;
+                b.onclick = () => set(v);
+                b.onmouseenter = () => fill(v);
+                b.onfocus = () => fill(v);
+            });
+            box.onmouseleave = () => mark(w[i]);
+            box.onblur = e => { if (!box.contains(e.relatedTarget)) mark(w[i]) };
+            box.onkeydown = e => {
+                const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+                if (d) { e.preventDefault(); set(Math.min(4, Math.max(1, w[i] + d))); focus(w[i]) }
+                else if (e.key === 'Home') { e.preventDefault(); set(1); focus(1) }
+                else if (e.key === 'End') { e.preventDefault(); set(4); focus(4) }
+            };
+            mark(w[i]);
+        });
+        function rk() { const tot = w.reduce((a, b) => a + b, 0) || 1; const l = Object.entries(S).map(([n, s]) => [n, s.reduce((a, v, i) => a + v * w[i], 0) / tot]).sort((a, b) => b[1] - a[1]); $('#rk').innerHTML = l.map(([n, v]) => '<div><i style="width:' + Math.max(v / 5 * 100, 12) + '%">★ ' + v.toFixed(1) + ' · ' + n + '</i></div>').join('') } rk();
+        const P = [['Google Sheets', 'Hojas', 'SaaS', 'Propietaria'], ['Seafile', 'Archivos', 'Autoalojado', 'Abierta'], ['Nextcloud Deck', 'Tareas', 'Autoalojado', 'Abierta'], ['Outlook Web', 'Correo', 'SaaS', 'Propietaria'], ['Todoist', 'Tareas', 'SaaS', 'Propietaria']];
+        const sel = (o) => '<select><option value="">—</option>' + o.map(x => '<option>' + x + '</option>').join('') + '</select>';
+        $('#cl').innerHTML = '<tr><th>Herramienta</th><th>Función</th><th>Despliegue</th><th>Licencia</th></tr>' + P.map(p => '<tr><td><b>' + p[0] + '</b></td><td>' + sel(ax[0][2].slice(0, 6)) + '</td><td>' + sel(['SaaS', 'Autoalojado']) + '</td><td>' + sel(['Propietaria', 'Abierta']) + '</td></tr>').join('');
+        $('#chk').onclick = () => { let n = 0; $('#cl').querySelectorAll('tr').forEach((r, i) => { if (!i) return; r.querySelectorAll('select').forEach((s, j) => { const ok = s.value == P[i - 1][j + 1]; s.style.borderColor = ok ? '#1f9d63' : '#d64545'; if (ok) n++ }) }); $('#res').textContent = n + ' de ' + P.length * 3 + ' aciertos' + (n == 15 ? ' 🎉' : ' · revisa las rojas') };
+        const Q = ['1. Tres tareas de tu rutina que habrías resuelto con ofimática web, y por qué te habría sido útil.', '2. Clasifica Google Docs, Nextcloud Calendar, Trello, Collabora Online y Doodle según función, despliegue y licencia, y justifica.', '3. Equipo de 5 personas que edita informes y no quiere depender de proveedores externos: ¿qué procesador de texto? Compara al menos dos.', '4. Empresa que intercambia DOCX/XLSX con clientes de Office y quiere autoalojar: ¿Collabora o Euro-Office? Considera ODF/OOXML.', '5. Tipo de aplicación adecuada para: (a) presupuesto anual, (b) reunión con 4 personas de distintas organizaciones, (c) contrato, (d) seguimiento de tareas de un proyecto, (e) carpeta compartida con un cliente.'];
+        Q.forEach((q, i) => { const d = E('div', '', '<p><b>' + q + '</b></p><textarea data-mem-q="' + q.replace(/"/g, '&quot;') + '" placeholder="Tu respuesta…"></textarea>'); $('#qs').appendChild(d) });
+        function md() { return '# Reflexión · Ofimática web\n\n**Alumno/a:** ' + ($('#nom').value || '(sin nombre)') + '\n\n' + [...document.querySelectorAll('[data-mem-q]')].map(t => '## ' + t.dataset.memQ + '\n\n' + (t.value.trim() || '_(sin responder)_')).join('\n\n') + '\n' }
+        $('#pv').onclick = () => { $('#out').hidden = false; $('#out').textContent = md() };
+        $('#dl').onclick = () => { const u = URL.createObjectURL(new Blob([md()], { type: 'text/markdown' })), a = E('a'); a.href = u; a.download = 'reflexion-ofimatica-web.md'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u) };
+        [['SaaS', 'Software consumido como servicio desde la nube del proveedor.'], ['Autoalojamiento', 'Instalar y ejecutar la aplicación en infraestructura propia.'], ['CalDAV / CardDAV', 'Protocolos abiertos para sincronizar calendarios y contactos.'], ['ODF', 'Formatos abiertos ODT, ODS, ODP; estándar ISO.'], ['OOXML', 'Formatos de Microsoft Office (DOCX, XLSX, PPTX).'], ['WOPI', 'Protocolo de integración entre suites ofimáticas web y plataformas de almacenamiento.'], ['Freemium', 'Versión básica gratuita con funciones avanzadas de pago.'], ['Groupware', 'Aplicaciones colaborativas integradas: correo, calendario, contactos, tareas.']].forEach(([a, b]) => { $('#gl').appendChild(E('dt', '', a)); $('#gl').appendChild(E('dd', '', b)) });
+    </script>
+</body>
+
+</html>

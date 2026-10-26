@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nextcloud sobre LEMP en Docker · 2º ASIR</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --b: #0082c9;
+      --bd: #00577f;
+      --bl: #e6f4fb;
+      --bg: #f4f9fd;
+      --ink: #14293a;
+      --mu: #5b7083;
+      --ok: #1f9d63;
+      --wa: #e8890c;
+      --rd: #d64545;
+      --r: 14px
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px
+    }
+
+    body {
+      margin: 0;
+      font: 17px/1.6 'Source Sans 3', sans-serif;
+      color: var(--ink);
+      background: var(--bg)
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: Manrope, sans-serif;
+      line-height: 1.2
+    }
+
+    code,
+    pre,
+    .m {
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 9;
+      background: #fffd;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #d5e6f1;
+      display: flex;
+      gap: 4px;
+      padding: 8px 16px;
+      overflow-x: auto;
+      align-items: center
+    }
+
+    nav b {
+      font-family: Manrope;
+      color: var(--b);
+      margin-right: 10px;
+      white-space: nowrap
+    }
+
+    nav a {
+      padding: 5px 12px;
+      border-radius: 99px;
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap
+    }
+
+    nav a:hover {
+      background: var(--bl)
+    }
+
+    #bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--wa);
+      width: 0;
+      z-index: 20;
+      transition: width .3s
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #00679e, #0082c9 55%, #4fb3e8);
+      color: #fff;
+      padding: 70px 20px 110px;
+      text-align: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero:before,
+    .hero:after {
+      content: "";
+      position: absolute;
+      background: #fff3;
+      border-radius: 99px;
+      width: 340px;
+      height: 110px;
+      top: 40px;
+      left: -60px;
+      box-shadow: 120px 70px 0 30px #fff2, 820px 20px 0 10px #fff2
+    }
+
+    .hero:after {
+      left: auto;
+      right: -80px;
+      top: 120px;
+      width: 300px
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      margin: 0 0 10px;
+      position: relative
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: auto;
+      opacity: .95;
+      position: relative
+    }
+
+    .q {
+      display: inline-block;
+      margin-top: 22px;
+      padding: 12px 22px;
+      background: #0006;
+      border-radius: var(--r);
+      font: italic 600 19px Manrope;
+      position: relative
+    }
+
+    main {
+      max-width: 1000px;
+      margin: -60px auto 60px;
+      padding: 0 16px;
+      position: relative
+    }
+
+    section {
+      background: #fff;
+      border-radius: var(--r);
+      padding: 28px;
+      margin: 22px 0;
+      box-shadow: 0 6px 24px #0a3a5a14
+    }
+
+    h2 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      color: var(--bd)
+    }
+
+    h2 .t {
+      display: inline-block;
+      background: var(--b);
+      color: #fff;
+      font-size: 14px;
+      padding: 3px 11px;
+      border-radius: 99px;
+      vertical-align: middle;
+      margin-right: 8px
+    }
+
+    h3 {
+      margin: 24px 0 8px
+    }
+
+    pre {
+      background: #10283a;
+      color: #d6ecfa;
+      padding: 16px;
+      border-radius: 10px;
+      overflow: auto;
+      position: relative;
+      font-size: 14px;
+      margin: 10px 0
+    }
+
+    pre button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #ffffff22;
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 3px 9px;
+      cursor: pointer;
+      font-size: 12px
+    }
+
+    pre button:hover {
+      background: var(--b)
+    }
+
+    :not(pre)>code {
+      background: var(--bl);
+      color: var(--bd);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: .88em
+    }
+
+    .cam,
+    .fix,
+    .nt,
+    .pb {
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 12px 0;
+      border-left: 5px solid
+    }
+
+    .cam {
+      background: #eef9f3;
+      border-color: var(--ok)
+    }
+
+    .cam:before {
+      content: "📸 Captura: "
+    }
+
+    .fix {
+      background: #fff5e5;
+      border-color: var(--wa)
+    }
+
+    .fix:before {
+      content: "🔧 Ojo · ";
+      font-weight: 700;
+      color: var(--wa)
+    }
+
+    .nt {
+      background: var(--bl);
+      border-color: var(--b)
+    }
+
+    .pb {
+      background: #fdecec;
+      border-color: var(--rd)
+    }
+
+    .pb:before {
+      content: "🆘 Plan B · ";
+      font-weight: 700;
+      color: var(--rd)
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 15px;
+      display: block;
+      overflow-x: auto
+    }
+
+    th {
+      background: var(--bd);
+      color: #fff;
+      text-align: left
+    }
+
+    th,
+    td {
+      padding: 8px 11px;
+      border-bottom: 1px solid #dbe8f0;
+      vertical-align: top
+    }
+
+    .min {
+      background: #fff1c9;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 0 6px
+    }
+
+    .chips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px
+    }
+
+    .chip {
+      border: 2px solid var(--bl);
+      border-radius: var(--r);
+      padding: 14px
+    }
+
+    .chip b {
+      font: 800 26px Manrope;
+      color: var(--b)
+    }
+
+    .ck {
+      list-style: none;
+      padding: 0
+    }
+
+    .ck li {
+      margin: 4px 0
+    }
+
+    .ck label {
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      cursor: pointer
+    }
+
+    .ck label:hover {
+      background: var(--bl)
+    }
+
+    .ck input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--ok);
+      flex: none;
+      margin-top: 3px
+    }
+
+    .ck input:checked+span {
+      text-decoration: line-through;
+      color: var(--mu)
+    }
+
+    details {
+      border: 1px solid #cfe2ef;
+      border-radius: 10px;
+      margin: 10px 0;
+      background: #fbfdff
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 11px 15px;
+      font-weight: 600
+    }
+
+    details[open]>summary {
+      background: var(--bl)
+    }
+
+    details>div {
+      padding: 4px 16px 14px
+    }
+
+    button.bt {
+      background: var(--b);
+      color: #fff;
+      border: 0;
+      border-radius: 9px;
+      padding: 9px 16px;
+      font: 700 15px Manrope;
+      cursor: pointer
+    }
+
+    button.bt:hover {
+      background: var(--bd)
+    }
+
+    .ex {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 16px;
+      margin-top: 14px
+    }
+
+    .ex .l button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 0 0 6px;
+      padding: 9px 12px;
+      border: 2px solid var(--bl);
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font: 600 15px 'Source Sans 3'
+    }
+
+    .ex .l button.on {
+      background: var(--b);
+      color: #fff;
+      border-color: var(--b)
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px
+    }
+
+    .two>div {
+      border-radius: 10px;
+      padding: 12px
+    }
+
+    .dk {
+      background: #e4f3fc;
+      border-top: 4px solid var(--b)
+    }
+
+    .mn {
+      background: #fff2e0;
+      border-top: 4px solid var(--wa)
+    }
+
+    .sim label {
+      display: block;
+      padding: 6px 0
+    }
+
+    .sim input {
+      accent-color: var(--b);
+      width: 18px;
+      height: 18px;
+      vertical-align: middle
+    }
+
+    #log {
+      background: #10283a;
+      color: #d6ecfa;
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 130px;
+      margin-top: 12px;
+      font-size: 14px
+    }
+
+    #log p {
+      margin: 3px 0
+    }
+
+    .rev {
+      display: none
+    }
+
+    .rev.show {
+      display: block
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 2px solid var(--bl);
+      border-radius: 9px;
+      padding: 9px;
+      font: inherit
+    }
+
+    @media(max-width:700px) {
+
+      .ex,
+      .two {
+        grid-template-columns: 1fr
+      }
+
+      section {
+        padding: 18px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bar"></div>
+  <nav><b>☁ Nextcloud · ASIR</b><a href="#obj">Objetivos</a><a href="#s1">S1</a><a href="#s2">S2</a><a
+      href="#s3">S3</a><a href="#s4">S4</a><a href="#ent">Entregable</a></nav>
+  <header class="hero">
+    <h1>Tu propia nube: Nextcloud sobre LEMP en Docker</h1>
+    <p>2º ASIR · Implantación de aplicaciones web · 8 h (4 sesiones) · Host Windows 11 + Docker Desktop (WSL 2)</p>
+    <div class="q">«¿Qué tendría que hacer si no tuviera Docker?»</div>
+  </header>
+  <main>
+    <section id="obj">
+      <h2>1 · Presentación</h2>
+      <p>Nextcloud integra archivos, calendario, contactos, tareas y edición colaborativa, pero <b>en tu
+          infraestructura</b>: control total sobre datos y seguridad. Vas a <b>desplegarlo</b>, <b>comprender qué
+          necesita por debajo</b>, <b>configurarlo para una intranet</b>, <b>gestionar usuarios</b> y <b>asegurarlo</b>.
+        Cada vez que Docker resuelva algo por ti, mirarás dentro y contrastarás <i>lo que Docker hace</i> con <i>lo que
+          harías a mano</i>.</p>
+      <div class="nt"><b>Windows 11 como host:</b> 1) comandos en <b>PowerShell</b>; 2) los volúmenes viven dentro de la
+        VM de WSL 2, <b>no en <code>C:\</code></b>; 3) para acceder desde otros equipos hay que abrir el puerto en el
+        <b>Firewall</b> y configurar <i>trusted domains</i>; 4) el <code>.env</code> se protege con <code>icacls</code>,
+        no con <code>chmod</code>.
+      </div>
+      <div class="cam">Debes entregar capturas de cada paso, mostrando el comando y el resultado.</div>
+      <h3>Criterios y evidencias</h3>
+      <table>
+        <tr>
+          <th>Criterio</th>
+          <th>Evidencia mínima</th>
+          <th>Excelencia</th>
+        </tr>
+        <tr>
+          <td><span class="min">c) Instalación</span></td>
+          <td>Nextcloud accesible, login admin, contenedores en marcha</td>
+          <td>Tabla «Docker vs manual» explicada (8 filas)</td>
+        </tr>
+        <tr>
+          <td><span class="min">d) Intranet</span></td>
+          <td>Trusted domain, puerto en firewall, acceso desde otro equipo</td>
+          <td>Propósito de <code>trusted_domains</code> y firewall</td>
+        </tr>
+        <tr>
+          <td><span class="min">e) Usuarios</span></td>
+          <td>Altas, grupos, cuotas, login verificado</td>
+          <td>Ciclo completo: alta, modificación, baja, pérdida de acceso</td>
+        </tr>
+        <tr>
+          <td><span class="min">f) Seguridad</span></td>
+          <td><code>.env</code> restringido, política de contraseñas, 2FA forzado, advertencias</td>
+          <td>Plan HTTPS en producción</td>
+        </tr>
+        <tr>
+          <td>g) Cooperativo</td>
+          <td>Carpeta compartida con permisos + calendario compartido</td>
+          <td>Cliente de escritorio o CalDAV</td>
+        </tr>
+        <tr>
+          <td>h) Documentación</td>
+          <td>Apartados de la sección 8 + capturas</td>
+          <td>Reproducible por terceros, reflexión crítica</td>
+        </tr>
+      </table>
+      <div class="pb" style="border-color:var(--wa);background:#fff5e5"><b>Condición de superación:</b> c), d), e) y f)
+        son <b>mínimos</b>. No superar uno = no superar la actividad.</div>
+      <h3>Planificación</h3>
+      <div class="chips">
+        <div class="chip"><b>S1</b><br>Preparar Docker, compose y <code>.env</code>. Desplegar.</div>
+        <div class="chip"><b>S2</b><br>Inspección Docker vs manual. Instalación web.</div>
+        <div class="chip"><b>S3</b><br>Trusted domains, firewall, usuarios, seguridad.</div>
+        <div class="chip"><b>S4</b><br>Uso cooperativo, integración, documentación.</div>
+      </div>
+    </section>
+
+    <section id="s1">
+      <h2><span class="t">S1</span>Preparar el entorno y desplegar</h2>
+      <h3>4.1 · Verificar WSL 2 y Docker Desktop</h3>
+      <pre>wsl --version
+docker --version
+docker compose version</pre>
+      <p>WSL debe ser <b>2.1.5 o superior</b>; si no, <code>wsl --update</code> (PowerShell como administrador). En
+        Docker Desktop → Settings → General, marca <i>Use WSL 2 based engine</i>.</p>
+      <div class="cam"><code>wsl --version</code> (≥ 2.1.5) y <code>docker --version</code> +
+        <code>docker compose version</code>.
+      </div>
+      <div class="pb">Docker no arranca: revisa la virtualización en BIOS/UEFI. Si <code>wsl --version</code> da error:
+        <code>wsl --install</code> y reinicia.
+      </div>
+      <h3>4.2 · Carpeta de trabajo y <code>.env</code></h3>
+      <pre>mkdir C:\ASIR\nextcloud-lab
+cd C:\ASIR\nextcloud-lab</pre>
+      <div class="nt">El Bloc de notas puede guardar <code>.env.txt</code>. Comprueba con <code>dir /a</code> que se
+        llama exactamente <code>.env</code>.</div>
+      <pre># .env — NO compartir, NO subir a git
+MYSQL_ROOT_PASSWORD=root_cambiame_por_una_segura
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_PASSWORD=nextcloud_cambiame_por_una_segura
+NEXTCLOUD_ADMIN_USER=admin
+NEXTCLOUD_ADMIN_PASSWORD=admin_cambiame_por_una_segura
+NEXTCLOUD_TRUSTED_DOMAINS=localhost 127.0.0.1</pre>
+      <p>Cambia los valores por frases largas y aleatorias. <code>NEXTCLOUD_TRUSTED_DOMAINS</code> lleva espacios porque
+        es una lista separada por espacios.</p>
+      <pre>icacls .env /inheritance:r
+icacls .env /grant:r "$($env:USERNAME):(R,W)"
+icacls .env</pre>
+      <p>Primero se elimina la herencia; luego solo tu usuario recibe lectura/escritura. <b>No debe aparecer
+          <code>Users</code> ni <code>Everyone</code>.</b></p>
+      <pre>".env" | Out-File -Encoding ascii -Append .gitignore</pre>
+      <div class="cam"><code>.env</code> censurado, <code>icacls .env</code> y <code>.gitignore</code> con la línea
+        <code>.env</code>.
+      </div>
+      <h3>4.3 · <code>compose.yaml</code></h3>
+      <p>Es un punto de partida: debes <b>justificar cada decisión</b> (¿por qué MariaDB 11? ¿volúmenes nombrados? ¿red
+        bridge explícita? ¿la BD sin puertos? ¿credenciales como <code>${VARIABLE}</code>?).</p>
+      <pre>services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - nextcloud-net
+
+  app:
+    image: nextcloud:apache
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_TRUSTED_DOMAINS}
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - nextcloud-net
+
+volumes:
+  db_data:
+  nextcloud_data:
+
+networks:
+  nextcloud-net:
+    driver: bridge</pre>
+      <div class="nt"><b>Debes poder justificar:</b> <code>db</code> no publica puertos (menos superficie de ataque) ·
+        los volúmenes persisten aunque se recreen los contenedores · <code>8080:80</code> publica el 80 del contenedor
+        en el 8080 del host (si está ocupado, cámbialo y documéntalo) · el compose no contiene contraseñas en claro.
+      </div>
+      <div class="fix"><code>depends_on</code> solo garantiza el <i>orden de arranque</i>, no que
+        MariaDB esté lista. ¿Qué crees que pasa si Nextcloud arranca antes que la BD?</div>
+      <div class="fix"><code>nextcloud:apache</code> y <code>mariadb:11</code> son etiquetas «móviles»: ¿qué
+        ventaja daría fijar una
+        versión concreta para reproducir la práctica?</div>
+      <div class="cam">Compose completo y salida de <code>docker compose config</code>.</div>
+      <h3>4.4 · Desplegar y verificar</h3>
+      <pre>docker compose up -d
+docker compose ps
+docker compose logs app
+docker compose logs db</pre>
+      <p>Abre <code>http://localhost:8080</code>.</p>
+      <div class="pb">
+        <ul>
+          <li>Puerto ocupado: <code>netstat -ano | findstr :8080</code> y cambia a <code>"8081:80"</code>.
+          </li>
+          <li>Docker colgado: reinícialo desde la bandeja. </li>
+          <li><code>.env</code> no se carga: debe estar junto al compose y sin
+            <code>.txt</code>.
+          </li>
+        </ul>
+      </div>
+      <h3>✅ Punto de control</h3>
+      <ul class="ck">
+        <li><label><input type="checkbox"><span>WSL 2 ≥ 2.1.5 y Docker con backend WSL 2 (capturas)</span></label></li>
+        <li><label><input type="checkbox"><span><code>.env</code> con permisos restringidos (<code>icacls</code>) y en
+              <code>.gitignore</code></span></label></li>
+        <li><label><input type="checkbox"><span>Compose revisado y justificado, sin contraseñas literales</span></label>
+        </li>
+        <li><label><input type="checkbox"><span>Ambos contenedores <code>running</code> y Nextcloud responde en
+              :8080</span></label></li>
+        <li><label><input type="checkbox"><span>Persistencia: <code>docker compose down; docker compose up -d</code> no
+              pierde datos (antes/después)</span></label></li>
+      </ul>
+    </section>
+
+    <section id="s2">
+      <h2><span class="t">S2</span>Inspección: Docker vs manual</h2>
+      <p>Completa la instalación web si aparece (o entra con las credenciales del <code>.env</code>). Después, <b>abre
+          la caja negra</b>: elige un componente, ejecuta el comando y compara.</p>
+      <div class="cam">Login admin correcto.</div>
+      <div class="ex" id="ex">
+        <div class="l"></div>
+        <div class="r"></div>
+      </div>
+      <div class="fix">La versión de PHP depende de la imagen que descargues (Nextcloud 31 usa PHP 8.3 por defecto):
+        <b>documenta la que veas tú</b> con <code>php -v</code>. En la fila de la BD, <code>-p</code> sin valor te
+        pedirá la contraseña: así no queda escrita en el historial.
+      </div>
+      <div class="cam">Las 5 inspecciones: versión PHP, extensiones, tablas BD, propietario de archivos, credenciales +
+        <code>icacls .env</code>.
+      </div>
+      <h3>Reflexión guiada</h3>
+      <p>Escribe <b>tu</b> respuesta antes de ver la propuesta. Después, entrégala con tus palabras.</p>
+      <div id="qs"></div>
+      <h3>✅ Punto de control</h3>
+      <ul class="ck">
+        <li><label><input type="checkbox"><span>Tabla «Docker vs manual» leída y comprendida</span></label></li>
+        <li><label><input type="checkbox"><span>Respuestas propias a las 5 preguntas</span></label></li>
+        <li><label><input type="checkbox"><span>Capturas de las 5 inspecciones</span></label></li>
+      </ul>
+      <div class="pb">Si falla la contraseña de BD, revisa las variables con <code>docker compose config</code>. Si
+        falla el login, busca la creación del admin en <code>docker compose logs app</code>.</div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="t">S3</span>Intranet, usuarios y seguridad</h2>
+      <h3>6.1 · Trusted domains y firewall (criterio d)</h3>
+      <p>En Windows son <b>dos barreras distintas</b>: el firewall decide si el paquete <i>llega</i>; Nextcloud decide
+        si <i>acepta</i> el nombre/IP usado. Averigua tu IPv4 con <code>ipconfig</code> y pruébalo en el simulador:</p>
+      <div class="sim"><label><input type="checkbox" id="c1" checked> Puerto publicado en el compose
+          (<code>8080:80</code>)</label>
+        <label><input type="checkbox" id="c2"> Regla de entrada en el Firewall de Windows</label>
+        <label><input type="checkbox" id="c3"> IP del servidor en <code>trusted_domains</code></label>
+        <button class="bt" id="go">📡 Acceder desde el PC del compañero</button>
+        <div id="log" class="m">
+          <p>Marca las barreras y lanza la petición…</p>
+        </div>
+      </div>
+      <pre>New-NetFirewallRule -DisplayName "Nextcloud 8080" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080</pre>
+      <p>(PowerShell <b>como administrador</b>). Verificación:
+        <code>Get-NetFirewallRule -DisplayName "Nextcloud 8080"</code>; el compañero abre
+        <code>http://TU_IP:8080</code>.
+      </p>
+      <div class="fix"><b>Importante:</b> <code>NEXTCLOUD_TRUSTED_DOMAINS</code> solo se aplica en la <b>primera
+          instalación</b>. Como el volumen ya contiene <code>config.php</code>, editar el <code>.env</code> y hacer
+        <code>down</code>/<code>up</code> normalmente <b>no añadirá tu IP</b> (aunque <code>restart</code> tampoco
+        recarga el <code>.env</code>). Comprueba el resultado real y, si falta, añádela con <code>occ</code>:
+        <pre>docker compose exec app php occ config:system:get trusted_domains
+docker compose exec -u www-data app php occ config:system:set trusted_domains 2 --value=192.168.1.50</pre>
+        Lección: tras instalar, la fuente de verdad es <code>config.php</code>, no el <code>.env</code>. Si el aula está
+        clasificada como red <i>Pública</i>, la regla también debe cubrir ese perfil.
+      </div>
+      <div class="cam"><code>trusted_domains</code> con tu IP, regla de firewall y acceso desde otro equipo.</div>
+      <div class="nt"><b>Documenta:</b> ¿qué ocurre sin trusted domains? ¿Y sin regla de firewall? ¿Por qué son pasos
+        separados?</div>
+      <h3>6.2 · Ciclo de vida de usuarios (criterio e)</h3>
+      <table>
+        <tr>
+          <th>Paso</th>
+          <th>Acción</th>
+        </tr>
+        <tr>
+          <td>Alta</td>
+          <td><code>ana.garcia</code> (profesores, 1 GB) · <code>luis.perez</code> (profesores, 500 MB) ·
+            <code>marta.ruiz</code> (alumnos, 200 MB)
+          </td>
+        </tr>
+        <tr>
+          <td>Modificación</td>
+          <td>Cuota de <code>marta.ruiz</code> a 300 MB; documenta cómo se refleja en su sesión</td>
+        </tr>
+        <tr>
+          <td>Baja</td>
+          <td>Entra como <code>luis.perez</code>, sube un archivo, elimínalo y verifica que no accede. <b>¿Qué pasó con
+              su archivo?</b></td>
+        </tr>
+        <tr>
+          <td>Verificación</td>
+          <td>Login de <code>ana.garcia</code> y <code>marta.ruiz</code>, cuotas y acceso</td>
+        </tr>
+      </table>
+      <div class="nt"><b>Documenta:</b> tabla con usuario, grupo, cuota, estado y destino de los datos.</div>
+      <h3>6.3 · Seguridad de acceso (criterio f)</h3>
+      <ol>
+        <li><b>Política de contraseñas</b> (Administración → Seguridad): mínimo 10, mayúsculas, minúsculas, números y
+          especiales; intenta crear un usuario con clave débil. <i>(Si no aparece, comprueba que la app Password policy
+            está habilitada.)</i></li>
+        <li><b>2FA forzado:</b> activa <i>Two-Factor TOTP Provider</i> y fuérzalo para el grupo <code>profesores</code>.
+        </li>
+        <li><b>Advertencias</b> (Administración → Información general): documenta al menos dos y cómo las resolverías.
+        </li>
+        <li><b>HTTPS en producción</b> (documentado, no ejecutado): certbot/Let's Encrypt, config Apache/Nginx,
+          redirección 301, HSTS.</li>
+        <li><b><code>.env</code> en Windows:</b> por qué <code>icacls</code> y no <code>chmod</code>, y qué riesgo
+          supone que alguien lo lea.</li>
+      </ol>
+      <div class="fix">El admin no está en <code>profesores</code>, así que no se queda fuera.
+        Aprende la regla: nunca fuerces 2FA a quien administra sin haber probado antes. Para <code>ana.garcia</code>
+        necesitarás una app TOTP y <b>guarda los códigos de respaldo</b>; en S4, los clientes externos (escritorio,
+        CalDAV) deberán usar una <b>contraseña de aplicación</b>.</div>
+      <h3>✅ Punto de control</h3>
+      <ul class="ck">
+        <li><label><input type="checkbox"><span>Acceso desde otro equipo y regla de firewall (capturas)</span></label>
+        </li>
+        <li><label><input type="checkbox"><span>Tabla de ciclo de vida de usuarios con capturas</span></label></li>
+        <li><label><input type="checkbox"><span>Política de contraseñas y 2FA forzado verificados</span></label></li>
+        <li><label><input type="checkbox"><span>Dos advertencias documentadas + plan HTTPS + justificación de
+              <code>icacls</code></span></label></li>
+      </ul>
+    </section>
+
+    <section id="s4">
+      <h2><span class="t">S4</span>Uso cooperativo e integración</h2>
+      <h3>7.1 · Criterio g</h3>
+      <ol>
+        <li>Como <code>ana.garcia</code>, crea <code>proyecto-comun</code> y compártela con <code>marta.ruiz</code> en
+          <b>solo lectura</b>; sube un archivo.
+        </li>
+        <li>Comparte un archivo con <b>enlace público con contraseña</b>.</li>
+        <li>Crea el calendario <code>reuniones-equipo</code>, compártelo con <code>profesores</code> y crea un evento
+          invitando a otro usuario. <i>(Si no ves Calendario, instálalo desde Aplicaciones.)</i></li>
+        <li>Verifica desde <code>marta.ruiz</code>: ve la carpeta pero no edita.</li>
+      </ol>
+      <h3>7.2 · Integración heterogénea (elige una)</h3>
+      <table>
+        <tr>
+          <th>Opción A · Cliente de escritorio</th>
+          <th>Opción B · CalDAV</th>
+        </tr>
+        <tr>
+          <td>Instala el cliente oficial para Windows, conéctalo a <code>http://TU_IP:8080</code>, sincroniza
+            <code>proyecto-comun</code> y verifica que un archivo creado en el cliente aparece en la web.
+          </td>
+          <td>Configura <code>reuniones-equipo</code> en Thunderbird (el calendario ya está integrado; Lightning ya no
+            es un complemento aparte) o en Android/iOS con la URL CalDAV, y verifica el evento en ambos lados.</td>
+        </tr>
+      </table>
+      <div class="cam">Cliente configurado y sincronización visible en ambos lados.</div>
+      <h3>✅ Punto de control</h3>
+      <ul class="ck">
+        <li><label><input type="checkbox"><span>Carpeta compartida con permisos diferenciados</span></label></li>
+        <li><label><input type="checkbox"><span>Calendario compartido con evento verificado</span></label></li>
+        <li><label><input type="checkbox"><span>Integración heterogénea verificada</span></label></li>
+      </ul>
+    </section>
+
+    <section id="ent">
+      <h2>8 · Entregable: documentación técnica (criterio h)</h2>
+      <p>Autocontenido, con capturas de <b>todos</b> los pasos y decisiones justificadas. <b>El <code>.env</code> no se
+          entrega</b>; las contraseñas, censuradas. Otra persona debe poder reproducir el despliegue sin ver
+        credenciales.</p>
+      <ol>
+        <li>Portada: nombre, fecha, título.</li>
+        <li>Entorno Windows 11: WSL 2, Docker Desktop, backend.</li>
+        <li>Arquitectura: servicios, volúmenes, red, compose final y <code>docker compose config</code> censurado.</li>
+        <li>Gestión de credenciales: <code>.env</code> censurado, <code>icacls</code>, <code>.gitignore</code>, por qué
+          no en el compose.</li>
+        <li>Decisiones de construcción: <b>MariaDB frente a SQLite</b>, volúmenes (y dónde viven en WSL 2) y puertos.
+        </li>
+        <li>Capturas de inspección.</li>
+        <li>Intranet: trusted domains, firewall, acceso externo y «qué pasaría si no».</li>
+        <li>Usuarios: tabla de ciclo de vida.</li>
+        <li>Seguridad: medidas + plan HTTPS + <code>icacls</code>.</li>
+        <li>Cooperativo e integración.</li>
+      </ol>
+      <div class="fix">SQLite sirve para pruebas, pero Nextcloud no lo recomienda con varios usuarios concurrentes.</div>
+    </section>
+  </main>
+  <script>
+    const $ = s => document.querySelector(s);
+    document.querySelectorAll('pre').forEach(p => { const b = document.createElement('button'); b.textContent = 'Copiar'; b.onclick = () => { navigator.clipboard.writeText(p.firstChild.textContent.trim()); b.textContent = '¡Copiado!'; setTimeout(() => b.textContent = 'Copiar', 1400) }; p.appendChild(b) });
+    const cks = [...document.querySelectorAll('.ck input')]; cks.forEach(c => c.onchange = () => $('#bar').style.width = 100 * cks.filter(x => x.checked).length / cks.length + '%');
+    const C = [
+      ['PHP', 'docker compose exec app php -v', 'La imagen nextcloud:apache ya trae PHP instalado y configurado.', 'Instalar PHP desde los repositorios, comprobar con php -v y asegurar compatibilidad con tu versión de Nextcloud.'],
+      ['Extensiones PHP', 'docker compose exec app php -m', 'Vienen compiladas y habilitadas: ctype, curl, dom, gd, mbstring, xml, zip, zlib, pdo_mysql…', 'Instalar cada extensión, verificar con php -m y reiniciar el servidor web.'],
+      ['Servidor web', 'docker compose exec app apache2 -v', 'Apache ya instalado y configurado para servir Nextcloud.', 'Instalar Apache, habilitar módulos (a2enmod rewrite headers env dir mime) y configurar un VirtualHost.'],
+      ['VirtualHost', 'docker compose exec app cat /etc/apache2/sites-enabled/000-default.conf', 'VirtualHost preconfigurado en el puerto 80 del contenedor.', 'Crear /etc/apache2/sites-available/nextcloud.conf con DocumentRoot, activarlo con a2ensite y recargar Apache.'],
+      ['Base de datos', 'docker compose exec db mariadb -u nextcloud -p nextcloud -e "SHOW TABLES;"', 'mariadb:11 arranca el servidor. Las tablas (prefijo oc_) las crea Nextcloud al completar la instalación.', 'Instalar MariaDB, ejecutar mysql_secure_installation y crear BD y usuario con CREATE DATABASE y GRANT ALL.'],
+      ['Propietario', 'docker compose exec app ls -la /var/www/html', 'El propietario es www-data (el usuario de Apache), fijado por la imagen.', 'sudo chown -R www-data:www-data /var/www/nextcloud; sin esto Apache no escribe en config/ ni data/.'],
+      ['Persistencia', 'docker volume ls  ·  docker volume inspect nextcloud-lab_nextcloud_data', 'Volúmenes nombrados que sobreviven a docker compose down. En Windows viven dentro de la VM de WSL 2, no en C:\\. (El prefijo del nombre depende de la carpeta del proyecto.)', 'Datos en /var/lib/mysql y /var/www/nextcloud/data; depende de no borrarlos y de tener copias de seguridad.'],
+      ['Credenciales', 'docker compose config  ·  icacls .env', 'Compose lee el .env e inyecta variables de entorno; el .env no se copia al contenedor.', 'Estarían en config/config.php o en variables del sistema, con permisos restringidos (640, www-data).']];
+    const L = $('#ex .l'), R = $('#ex .r');
+    C.forEach((c, i) => {
+      const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + c[0]; b.onclick = () => {
+        L.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+        R.innerHTML = '<b>Comando de inspección</b><pre></pre><div class="two"><div class="dk"><b>🐳 Qué hace Docker</b><p></p></div><div class="mn"><b>🔧 Qué harías a mano</b><p></p></div></div>';
+        R.querySelector('pre').textContent = c[1]; R.querySelectorAll('p')[0].textContent = c[2]; R.querySelectorAll('p')[1].textContent = c[3]
+      }; L.appendChild(b)
+    }); L.firstChild.click();
+    const Q = [['¿Qué extensión de PHP conecta con MariaDB? ¿Qué pasaría sin ella?', 'Es pdo_mysql. Sin ella la instalación falla en la conexión: Nextcloud no podría leer ni escribir usuarios, archivos ni calendarios, ni siquiera validar el login del admin.'],
+    ['¿Qué tablas contienen usuarios y archivos? ¿Qué relación tienen con data/?', 'oc_users, oc_accounts, oc_filecache y oc_storages. La BD guarda los metadatos (quién, dónde, cuándo); el contenido real está en data/. Sin BD pierdes la organización; sin data/ pierdes el contenido.'],
+    ['De los ocho componentes, ¿cuáles habrías configurado a mano y cuáles vienen de fábrica?', 'De fábrica: PHP, extensiones, Apache y VirtualHost. A mano: la BD, los permisos (chown), la persistencia y copias, y la gestión de credenciales. Aun con Docker debes definir variables, volúmenes y .env.'],
+    ['¿Por qué es peligroso poner contraseñas en el compose.yaml? ¿Alternativas?', 'Se comparte y se versiona, y las credenciales quedan expuestas. Alternativas: .env restringido y fuera de git; Docker secrets o gestores externos (Vault…); variables inyectadas por el orquestador.'],
+    ['¿Docker simplifica la formación o la empobrece? Al menos dos argumentos.', 'Respuesta orientativa: simplifica el despliegue (sin variabilidad entre equipos, rápido), pero puede empobrecer si no abres la caja negra. El enfoque híbrido de esta práctica (desplegar y luego inspeccionar) resuelve ambas cosas. Elabora la tuya con ejemplos.']];
+    Q.forEach((q, i) => {
+      const d = document.createElement('details'); d.innerHTML = '<summary>Pregunta ' + (i + 1) + '. ' + q[0] + '</summary><div><textarea placeholder="Tu respuesta (con tus palabras)…"></textarea><p><button class="bt">Ver respuesta propuesta</button></p><div class="rev nt"></div></div>';
+      const t = d.querySelector('textarea'), r = d.querySelector('.rev'), b = d.querySelector('button'); r.textContent = q[1]; let w = 0;
+      b.onclick = () => { if (!t.value.trim() && !w) { w = 1; b.textContent = 'Aún no has escrito nada. ¿Ver igualmente?'; return } r.classList.add('show'); b.style.display = 'none' }; $('#qs').appendChild(d)
+    });
+    const out = (s, c) => { const p = document.createElement('p'); p.style.color = c || ''; p.textContent = s; $('#log').appendChild(p) };
+    $('#go').onclick = () => {
+      $('#log').innerHTML = ''; const a = $('#c1').checked, f = $('#c2').checked, t = $('#c3').checked; out('→ GET http://192.168.1.50:8080 desde el PC del compañero');
+      setTimeout(() => {
+        if (!a) { out('✖ Ningún proceso publica el puerto: conexión rechazada.', '#ff8a8a'); return }
+        if (!f) { out('✖ El Firewall de Windows descarta el paquete: tiempo de espera agotado.', '#ff8a8a'); out('Solución: New-NetFirewallRule … -LocalPort 8080', '#ffd08a'); return }
+        out('✔ El firewall deja pasar el paquete; llega a Docker y a Apache.', '#8be0b0');
+        setTimeout(() => { if (!t) { out('✖ Nextcloud: «Acceso a través de un dominio no de confianza».', '#ff8a8a'); out('Solución: occ config:system:set trusted_domains 2 --value=IP', '#ffd08a') } else out('✔ La IP está en trusted_domains: aparece la pantalla de login. 🎉', '#8be0b0') }, 700)
+      }, 600)
+    };
+  </script>
+</body>
+
+</html>

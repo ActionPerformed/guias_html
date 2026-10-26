@@ -69,9 +69,11 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | Guía | Descripción |
 |------|-------------|
 | [IAW - UT1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT1.html) | UT1 — Implantación de aplicaciones web |
+| [IAW - UT4.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20UT4.html) | UT4 — Ofimática web: qué es, cómo se clasifica y cómo elegir suite |
 | [IAW - ACT 1.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
 | [IAW - ACT 2.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%202.1.html) | Actividad 2.1 — Instalación y securización de WordPress sobre LEMP |
 | [IAW - ACT 3.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%203.1.html) | Actividad 3.1 — Proyecto de personalización integral de WordPress |
+| [IAW - ACT 4.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%204.1.html) | Actividad 4.1 — Nextcloud sobre LEMP en Docker: intranet, usuarios y seguridad |
 
 
 ### PMDM (Programación Multimedia y Dispositivos Móviles)
