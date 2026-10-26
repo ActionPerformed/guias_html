@@ -4509,18 +4509,20 @@ exit;</pre>
           h += '<div class="mem-q"><label>' + (i + 1) + ". " + esc(q.replace(/`/g, "")) + "</label><textarea data-rf='" + i + "' placeholder='Mínimo 3 líneas: terminología correcta, referencia a tu código, honestidad…'></textarea></div>";
         });
         h += '<div class="mem-q"><label>Ampliaciones resueltas · documenta qué hiciste y por qué (marca las tuyas en la sección de ampliaciones)</label><textarea data-rf="amp" placeholder="A1: …"></textarea></div>';
+        h += '<div class="mem-q"><label>Autoevaluación · ¿qué has aprendido? ¿qué te costó más? ¿qué repetirías?</label><textarea data-rf="auto" placeholder="Lo que dominas, lo que te sigue fallando, tu nota estimada…"></textarea></div>';
         h += '<div class="mem-actions"><button class="btn" id="rfPrev" type="button">Vista previa</button><button class="btn sec" id="rfDown" type="button">Descargar reflexion.md</button></div><div class="mem-preview" id="rfBox"><pre id="rfText"></pre></div>';
         host.innerHTML = h;
+        var rfval = function (sel) { var el = $(sel); return el && el.value ? el.value.trim() : ""; };
         var build = function () {
-          var nombre = $("#rfNombre").value.trim() || "______________________";
+          var nombre = rfval("#rfNombre") || "______________________";
           var L = ["# Reflexión — MiniApp de Biblioteca (POO en PHP)", "", "**Nombre:** " + nombre, ""];
           q8.forEach(function (q, i) {
-            L.push("## " + (i + 1) + ". " + q.replace(/\s+/g, " "), "", ($("[data-rf='" + i + "']").value.trim() || "_(sin responder)_"), "");
+            L.push("## " + (i + 1) + ". " + q.replace(/\s+/g, " "), "", (rfval("[data-rf='" + i + "']") || "_(sin responder)_"), "");
           });
           var ids = $$(".amp.done").map(function (a) { return a.getAttribute("data-amp"); });
           L.push("## Ampliaciones resueltas", "", "Marcadas: " + (ids.length ? ids.join(", ") : "ninguna"), "",
-            ($("[data-rf='amp']").value.trim() || "_(sin documentar)_"), "",
-            "## Autoevaluación", "", ($("[data-rf='auto']").value.trim() || "_(sin rellenar)_"), "");
+            (rfval("[data-rf='amp']") || "_(sin documentar)_"), "",
+            "## Autoevaluación", "", (rfval("[data-rf='auto']") || "_(sin rellenar)_"), "");
           return L.join("\n");
         };
         $("#rfPrev").addEventListener("click", function () { $("#rfText").textContent = build(); $("#rfBox").classList.add("show"); });
