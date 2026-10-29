@@ -759,8 +759,17 @@ docker compose logs db</pre>
     <section id="s3">
       <h2><span class="t">S3</span>Intranet, usuarios y seguridad</h2>
       <h3>6.1 · Trusted domains y firewall (criterio d)</h3>
-      <p>En Windows son <b>dos barreras distintas</b>: el firewall decide si el paquete <i>llega</i>; Nextcloud decide
-        si <i>acepta</i> el nombre/IP usado. Averigua tu IPv4 con <code>ipconfig</code> y pruébalo en el simulador:</p>
+      <p>En Windows hay que atravesar <b>dos barreras distintas</b>, y cada una puede cortar la conexión por su
+        lado:
+        <br>· <b>El Firewall de Windows</b>: decide si el paquete <i>llega</i> al puerto publicado. Si falta la
+        regla de entrada, la petición ni siquiera aparece en los logs de Nextcloud: el paquete se queda en el
+        camino.
+        <br>· <b>Nextcloud</b> (<code>trusted_domains</code>): decide si <i>acepta</i> el nombre o la IP con el que
+        te llamas. Si tu IP no está en la lista, la página carga pero Nextcloud la rechaza como «dominio no
+        confiable».
+        <br>Por eso el orden de la comprobación es: primero que <i>llegue</i> (firewall) y después que
+        <i>acepte</i> (Nextcloud). Averigua tu IPv4 con <code>ipconfig</code> y prueba las dos barreras en el
+        simulador:</p>
       <div class="sim"><label><input type="checkbox" id="c1" checked> Puerto publicado en el compose
           (<code>8080:80</code>)</label>
         <label><input type="checkbox" id="c2"> Regla de entrada en el Firewall de Windows</label>
@@ -770,19 +779,77 @@ docker compose logs db</pre>
           <p>Marca las barreras y lanza la petición…</p>
         </div>
       </div>
-      <pre>New-NetFirewallRule -DisplayName "Nextcloud 8080" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080</pre>
-      <p>(PowerShell <b>como administrador</b>). Verificación:
-        <code>Get-NetFirewallRule -DisplayName "Nextcloud 8080"</code>; el compañero abre
-        <code>http://TU_IP:8080</code>.
-      </p>
-      <div class="fix"><b>Importante:</b> <code>NEXTCLOUD_TRUSTED_DOMAINS</code> solo se aplica en la <b>primera
-          instalación</b>. Como el volumen ya contiene <code>config.php</code>, editar el <code>.env</code> y hacer
-        <code>down</code>/<code>up</code> normalmente <b>no añadirá tu IP</b> (aunque <code>restart</code> tampoco
-        recarga el <code>.env</code>). Comprueba el resultado real y, si falta, añádela con <code>occ</code>:
-        <pre>docker compose exec app php occ config:system:get trusted_domains
-docker compose exec -u www-data app php occ config:system:set trusted_domains 2 --value=192.168.1.50</pre>
-        Lección: tras instalar, la fuente de verdad es <code>config.php</code>, no el <code>.env</code>. Si el aula está
-        clasificada como red <i>Pública</i>, la regla también debe cubrir ese perfil.
+      <p>Ahora abrimos el puerto <code>8080</code> en el Firewall de Windows para que el PC del compañero pueda
+        entrar en el servidor. Sin esta regla, Windows <b>descarta la conexión antes de que llegue a Docker</b> (y por
+        eso no ves nada en los logs de Nextcloud): es la primera barrera que hay que comprobar.</p>
+      <ol>
+        <li><b>Abre PowerShell como administrador</b> (clic derecho sobre el icono → «Ejecutar como administrador»).
+          Las reglas del cortafuegos son configuración del sistema: sin elevación, Windows rechaza el comando.
+        </li>
+        <li><b>Crea la regla</b>:
+          <pre>New-NetFirewallRule -DisplayName "Nextcloud 8080" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080</pre>
+          Y esto es lo que hace cada parte:
+          <ul>
+            <li><code>New-NetFirewallRule</code>: crea una regla nueva (si ya existe una con ese nombre, peta: bórrala
+              antes).</li>
+            <li><code>-DisplayName "Nextcloud 8080"</code>: el nombre con el que la verás en «Firewall de Windows con
+              funciones avanzadas de seguridad», y con el que la consultarás o eliminarás después.</li>
+            <li><code>-Direction Inbound</code>: la regla se aplica a las conexiones que <i>entran</i> al equipo (las
+              del compañero). El tráfico saliente no se filtra.</li>
+            <li><code>-Action Allow</code>: permite el paso en lugar de bloquearlo. Por defecto el cortafuegos
+              bloquea todo lo que no tenga una regla que lo permita.</li>
+            <li><code>-Protocol TCP</code>: el protocolo al que se aplica. HTTP viaja sobre TCP.</li>
+            <li><code>-LocalPort 8080</code>: el puerto de <i>este</i> equipo. Ojo con esto: en el compose publicaste
+              <code>8080:80</code>, así que el puerto que ve Windows es el <b>8080</b>; el <b>80</b> es el puerto
+              interno del contenedor, que el host no ve.</li>
+          </ul>
+        </li>
+        <li><b>Comprueba que la regla existe y está activa</b>:
+          <pre>Get-NetFirewallRule -DisplayName "Nextcloud 8080"
+Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</pre>
+          En la primera orden debes ver <code>Enabled : True</code>; en la segunda, <code>Protocol : TCP</code> y
+          <code>LocalPort : 8080</code>. Si la regla no existiera, la primera orden no devolvería nada.
+        </li>
+        <li><b>Comprueba que hay algo escuchando</b> en ese puerto (desde el propio servidor):
+          <pre>Test-NetConnection -ComputerName TU_IP -Port 8080</pre>
+          Si aparece <code>TcpTestSucceeded : True</code>, la conexión se establece. Si es <code>False</code>, el
+          problema no es el cortafuegos: es que el servicio no está escuchando (Docker no está publicando el puerto).
+        </li>
+        <li><b>Prueba final</b>: el compañero abre en su navegador <code>http://TU_IP:8080</code>, donde
+          <code>TU_IP</code> es la IPv4 del servidor (la que has visto con <code>ipconfig</code>), no la del propio
+          compañero.</li>
+      </ol>
+      <div class="nt"><b>Diagnóstico rápido:</b> si al compañero no le carga nada, la clave es saber <i>en qué
+        barrera</i> se cae. Si el <code>Test-NetConnection</code> da <code>False</code>, el fallo es que no hay
+        servicio escuchando; si da <code>True</code> pero el navegador muestra «dominio no confiable», es que ya has
+        pasado el cortafuegos y lo que falla es <code>trusted_domains</code>. Y para dejar tu equipo como estaba al
+        terminar: <code>Remove-NetFirewallRule -DisplayName "Nextcloud 8080"</code>.</div>
+      <div class="fix"><b>Importante — el <code>.env</code> solo se lee en la primera instalación:</b>
+        <p>La variable <code>NEXTCLOUD_TRUSTED_DOMAINS</code> la usa el instalador web <b>una única vez</b>, al
+          crear <code>config.php</code>. A partir de ese momento la fuente de verdad es ese fichero y el
+          <code>.env</code> ya no manda: editarlo y hacer <code>down</code>/<code>up</code> (o <code>restart</code>)
+          <b>no añadirá tu IP</b>, aunque el contenedor se reinicie entero.</p>
+        <p>Por eso lo primero es <b>comprobar el valor real</b>, no fiarte de lo que pone el <code>.env</code>:</p>
+        <pre>docker compose exec app php occ config:system:get trusted_domains</pre>
+        <p>Si tu IP no aparece en la lista, añádela con <code>occ</code> (la herramienta de administración de
+          Nextcloud):</p>
+        <pre>docker compose exec -u www-data app php occ config:system:set trusted_domains 2 --value=192.168.1.50</pre>
+        <ul>
+          <li><code>occ</code> es la CLI de Nextcloud: escribe en <code>config.php</code> con las mismas validaciones
+            que la web, sin que tengas que editar el fichero a mano (y así no dejas el PHP sin permiso de escritura,
+            que es lo que rompe la web).</li>
+          <li><code>-u www-data</code>: el comando se ejecuta como el usuario de Apache, que es el propietario de
+            <code>config.php</code>. Si lo ejecutas como otro usuario, el fichero queda con permisos que la web ya no
+            puede usar.</li>
+          <li><code>trusted_domains 2</code>: el 2 es el <b>índice de la lista</b>, no un número de versión. El índice
+            <b>0</b> lo ocupa siempre la entrada por defecto (localhost) y el <b>1</b> la que se creó en la
+            instalación; por eso tu IP va en el <b>2</b>.</li>
+          <li><code>--value=192.168.1.50</code>: sustituye esa dirección por la tuya, la que sale de
+            <code>ipconfig</code> en el servidor.</li>
+        </ul>
+        <p><b>Lección:</b> tras instalar, quien manda es <code>config.php</code>, no el <code>.env</code>. Y si el
+          aula está clasificada como red <i>Pública</i>, la regla del cortafuegos debe cubrir también ese perfil, no
+          solo el de red privada.</p>
       </div>
       <div class="cam"><code>trusted_domains</code> con tu IP, regla de firewall y acceso desde otro equipo.</div>
       <div class="nt"><b>Documenta:</b> ¿qué ocurre sin trusted domains? ¿Y sin regla de firewall? ¿Por qué son pasos
@@ -816,17 +883,54 @@ docker compose exec -u www-data app php occ config:system:set trusted_domains 2 
       <div class="nt"><b>Documenta:</b> tabla con usuario, grupo, cuota, estado y destino de los datos.</div>
       <h3>6.3 · Seguridad de acceso (criterio f)</h3>
       <ol>
-        <li><b>Política de contraseñas</b> (Administración → Seguridad): mínimo 10, mayúsculas, minúsculas, números y
-          especiales; intenta crear un usuario con clave débil. <i>(Si no aparece, comprueba que la app Password policy
-            está habilitada.)</i></li>
-        <li><b>2FA forzado:</b> activa <i>Two-Factor TOTP Provider</i> y fuérzalo para el grupo <code>profesores</code>.
+        <li><b>Política de contraseñas</b> — Administración → Seguridad → Política de contraseñas.
+          <ul>
+            <li><b>Qué haces:</b> pon la longitud mínima en 10 y activa mayúsculas, minúsculas, números y caracteres
+              especiales. Después intenta crear un usuario con una clave débil (<code>1234</code>) y comprueba que
+              Nextcloud <b>la rechaza</b>.</li>
+            <li><b>Por qué:</b> una política común hace que el sistema rechace por ti las contraseñas que se
+              descifran en segundos. Es la primera barrera y la más barata de poner.</li>
+            <li><b>Si no aparece la opción:</b> comprueba que la aplicación <i>Password policy</i> está habilitada
+              (Administración → Aplicaciones).</li>
+          </ul>
         </li>
-        <li><b>Advertencias</b> (Administración → Información general): documenta al menos dos y cómo las resolverías.
+        <li><b>2FA forzado (doble factor)</b> — Administración → Seguridad → <i>Two-Factor TOTP Provider</i>.
+          <ul>
+            <li><b>Qué haces:</b> activa el proveedor TOTP y marca la casilla de <b>forzarlo</b> para el grupo
+              <code>profesores</code>. Cada miembro del grupo tendrá que escanear un QR con su app de autenticación y
+              <b>guardar los códigos de respaldo</b>.</li>
+            <li><b>Por qué:</b> la contraseña deja de ser suficiente: hace falta algo que solo tienes tú (el móvil).
+              Así, una contraseña filtrada no sirve para entrar.</li>
+          </ul>
         </li>
-        <li><b>HTTPS en producción</b> (documentado, no ejecutado): certbot/Let's Encrypt, config Apache/Nginx,
-          redirección 301, HSTS.</li>
-        <li><b><code>.env</code> en Windows:</b> por qué <code>icacls</code> y no <code>chmod</code>, y qué riesgo
-          supone que alguien lo lea.</li>
+        <li><b>Advertencias de seguridad</b> — Administración → Información general.
+          <ul>
+            <li><b>Qué haces:</b> lee las advertencias que muestre la instalación y documenta al menos dos: qué dice,
+              por qué aparece y qué harías para resolverla (por ejemplo, «no hay HTTPS» → tu plan de certificados).</li>
+            <li><b>Por qué:</b> es el diagnóstico que hace la propia aplicación de tu montaje: te dice qué queda por
+              endurecer.</li>
+          </ul>
+        </li>
+        <li><b>HTTPS en producción</b> — <b>documentado, no ejecutado</b> (en el aula no hay dominio público).
+          <ul>
+            <li><b>El plan, por escrito:</b> obtener un certificado con <code>certbot</code> (Let's Encrypt),
+              configurar el servidor web (Apache/Nginx) para servir con ese certificado, forzar la <b>redirección
+              301</b> de HTTP a HTTPS y activar la cabecera <code>Strict-Transport-Security</code> (HSTS).</li>
+            <li><b>Por qué las cuatro cosas:</b> el certificado cifra el canal, la redirección 301 evita que el
+              usuario navegue en claro y el HSTS avisa al navegador de que no vuelva nunca a HTTP, aunque alguien se
+              lo pida.</li>
+          </ul>
+        </li>
+        <li><b>Permisos del <code>.env</code> en Windows</b> — repasa lo visto en el despliegue.
+          <ul>
+            <li><b>Por qué <code>icacls</code> y no <code>chmod</code>:</b> <code>chmod</code> pertenece al modelo de
+              permisos de Unix (Linux/macOS). Windows usa ACL, y su herramienta equivalente es
+              <code>icacls</code>.</li>
+            <li><b>El riesgo:</b> el <code>.env</code> guarda la contraseña de la base de datos y la del
+              administrador. Si cualquier usuario del equipo puede leerlo, con leerlo ya basta para entrar como
+              administrador.</li>
+          </ul>
+        </li>
       </ol>
       <div class="fix">El admin no está en <code>profesores</code>, así que no se queda fuera.
         Aprende la regla: nunca fuerces 2FA a quien administra sin haber probado antes. Para <code>ana.garcia</code>
@@ -880,24 +984,7 @@ docker compose exec -u www-data app php occ config:system:set trusted_domains 2 
 
     <section id="ent">
       <h2>8 · Entregable: documentación técnica (criterio h)</h2>
-      <p>Autocontenido, con capturas de <b>todos</b> los pasos y decisiones justificadas. <b>El <code>.env</code> no se
-          entrega</b>; las contraseñas, censuradas. Otra persona debe poder reproducir el despliegue sin ver
-        credenciales.</p>
-      <ol>
-        <li>Portada: nombre, fecha, título.</li>
-        <li>Entorno Windows 11: WSL 2, Docker Desktop, backend.</li>
-        <li>Arquitectura: servicios, volúmenes, red, compose final y <code>docker compose config</code> censurado.</li>
-        <li>Gestión de credenciales: <code>.env</code> censurado, <code>icacls</code>, <code>.gitignore</code>, por qué
-          no en el compose.</li>
-        <li>Decisiones de construcción: <b>MariaDB frente a SQLite</b>, volúmenes (y dónde viven en WSL 2) y puertos.
-        </li>
-        <li>Capturas de inspección.</li>
-        <li>Intranet: trusted domains, firewall, acceso externo y «qué pasaría si no».</li>
-        <li>Usuarios: tabla de ciclo de vida.</li>
-        <li>Seguridad: medidas + plan HTTPS + <code>icacls</code>.</li>
-        <li>Cooperativo e integración.</li>
-      </ol>
-      <div class="fix">SQLite sirve para pruebas, pero Nextcloud no lo recomienda con varios usuarios concurrentes.</div>
+      <p>Crea un documento con capturas de <b>todos</b> los pasos y decisiones que se exigen en la guía. </p>
     </section>
   </main>
   <script>
