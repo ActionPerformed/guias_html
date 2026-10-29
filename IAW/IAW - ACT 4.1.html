@@ -456,7 +456,8 @@
     }
 
     .rev {
-      display: none
+      display: none;
+      white-space: pre-line
     }
 
     .rev.show {
@@ -573,6 +574,10 @@ docker compose version</pre>
         <code>wsl --install</code> y reinicia.
       </div>
       <h3>4.2 · Carpeta de trabajo y <code>.env</code></h3>
+      <p>Crea una carpeta para el proyecto e incluye en ella el fichero .env de secretos. En un entorno
+        real, este fichero se protegería mediante la modificación de sus permisos. Aquí no lo haremos
+        porque solo estamos haciendo pruebas.
+      </p>
       <pre>mkdir C:\ASIR\nextcloud-lab
 cd C:\ASIR\nextcloud-lab</pre>
       <div class="nt">El Bloc de notas puede guardar <code>.env.txt</code>. Comprueba con <code>dir /a</code> que se
@@ -585,18 +590,51 @@ MYSQL_PASSWORD=nextcloud_cambiame_por_una_segura
 NEXTCLOUD_ADMIN_USER=admin
 NEXTCLOUD_ADMIN_PASSWORD=admin_cambiame_por_una_segura
 NEXTCLOUD_TRUSTED_DOMAINS=localhost 127.0.0.1</pre>
-      <p>Cambia los valores por frases largas y aleatorias. <code>NEXTCLOUD_TRUSTED_DOMAINS</code> lleva espacios porque
-        es una lista separada por espacios.</p>
-      <pre>icacls .env /inheritance:r
+      <div class="nt"><code>NEXTCLOUD_TRUSTED_DOMAINS</code> lleva espacios porque es una lista separada por espacios.</div>
+      <pre># --- Protege el .env: en un entorno REAL contiene contraseñas en claro ---
+# (en este laboratorio son de mentira, pero el procedimiento es el mismo)
+#
+# 1) Quitar los permisos HEREDADOS (":r" = remove). Por defecto un fichero
+#    hereda los permisos de la carpeta; si la carpeta deja leer a "Users",
+#    cualquier usuario del equipo podría leer tus contraseñas.
+icacls .env /inheritance:r
+#
+# 2) Fijar la lista de permisos (":r" = replace, sustituye; no añade).
+#    Entra UNA sola entrada: tu cuenta de Windows ($env:USERNAME) con
+#    lectura y escritura -> (R,W).
 icacls .env /grant:r "$($env:USERNAME):(R,W)"
+#
+# 3) Comprobar: solo debe aparecer tu cuenta. NO deben salir "Users",
+#    "Everyone" ni "BUILTIN\Administradores".
 icacls .env</pre>
-      <p>Primero se elimina la herencia; luego solo tu usuario recibe lectura/escritura. <b>No debe aparecer
-          <code>Users</code> ni <code>Everyone</code>.</b></p>
-      <pre>".env" | Out-File -Encoding ascii -Append .gitignore</pre>
-      <div class="cam"><code>.env</code> censurado, <code>icacls .env</code> y <code>.gitignore</code> con la línea
-        <code>.env</code>.
+      <div class="nt">
+        <b>Qué estás haciendo y por qué.</b>
+        <ul>
+          <li><b>Qué es <code>icacls</code>.</b> La herramienta de Windows para ver y cambiar los
+            <b>permisos</b> (ACL, Access Control List) de ficheros y carpetas. En Linux el papel lo
+            juega <code>chmod</code> y <code>chown</code>.</li>
+          <li><b>Por qué hay que restringir</b> el <code>.env</code>: guarda las contraseñas de MariaDB y
+            del administrador de Nextcloud <b>en texto plano</b>, así que <b>en un entorno real</b>
+            nadie más que tú debe poder leerlo (en Linux: <code>chmod 600</code>, sólo el
+            propietario).</li>
+          <li><b><code>/inheritance:r</code></b> corta la herencia: el fichero deja de tomar los
+            permisos de la carpeta que lo contiene.</li>
+          <li><b><code>/grant:r</code></b> <i>reemplaza</i> (no añade) la lista de permisos por una
+            única entrada: la de tu usuario (<code>$env:USERNAME</code>), con lectura y escritura.</li>
+          <li><b>La última orden es la verificación.</b> <code>icacls .env</code> sin modificadores
+            no cambia nada: sólo lista quién tiene acceso ahora mismo.</li>
+        </ul>
       </div>
-      <h3>4.3 · <code>compose.yaml</code></h3>
+      <div class="fix">Aquí <b>no hay nada en juego</b>: el despliegue es una práctica y las contraseñas
+        son de mentira, así que si este paso falla no se rompe nada. Aun así <b>se aplica el procedimiento
+        completo a propósito</b>: cuando montes Nextcloud de verdad —en el centro de trabajo o en
+        producción— ya tendrás automatizado el paso que protege las credenciales, y comprobarás que el
+        <code>.env</code> nunca acaba en un repositorio ni en una copia de seguridad sin cifrar.</div>
+      <pre># Añadir .env al .gitignore: así el fichero con las contraseñas
+# NUNCA se sube a un repositorio (ni por accidente con "git add .").
+".env" | Out-File -Encoding ascii -Append .gitignore</pre>
+      </div>
+      <h3>4.3 · <code>docker-compose.yml</code></h3>
       <p>Es un punto de partida: debes <b>justificar cada decisión</b> (¿por qué MariaDB 11? ¿volúmenes nombrados? ¿red
         bridge explícita? ¿la BD sin puertos? ¿credenciales como <code>${VARIABLE}</code>?).</p>
       <pre>services:
@@ -640,9 +678,19 @@ volumes:
 networks:
   nextcloud-net:
     driver: bridge</pre>
-      <div class="nt"><b>Debes poder justificar:</b> <code>db</code> no publica puertos (menos superficie de ataque) ·
-        los volúmenes persisten aunque se recreen los contenedores · <code>8080:80</code> publica el 80 del contenedor
-        en el 8080 del host (si está ocupado, cámbialo y documéntalo) · el compose no contiene contraseñas en claro.
+      <div class="nt">
+        <b>Fíjate en cuatro decisiones del compose:</b>
+        <ul>
+          <li><b>La base de datos no publica puertos.</b> El servicio <code>db</code> no declara
+            <code>ports:</code>, así que MariaDB sólo se alcanza desde la red interna de Docker:
+            menos superficie de ataque.</li>
+          <li><b>Los volúmenes persisten.</b> Los datos sobreviven a un
+            <code>docker compose down</code> y a la recreación de los contenedores.</li>
+          <li><b><code>8080:80</code> publica el 80 del contenedor en el 8080 del host.</b> Si el
+            puerto está ocupado, cámbialo y documéntalo.</li>
+          <li><b>El compose no contiene contraseñas en claro.</b> Las credenciales llegan por
+            variables (<code>${VARIABLE}</code>) desde el fichero <code>.env</code>.</li>
+        </ul>
       </div>
       <div class="fix"><code>depends_on</code> solo garantiza el <i>orden de arranque</i>, no que
         MariaDB esté lista. ¿Qué crees que pasa si Nextcloud arranca antes que la BD?</div>
@@ -696,13 +744,12 @@ docker compose logs db</pre>
       <div class="cam">Las 5 inspecciones: versión PHP, extensiones, tablas BD, propietario de archivos, credenciales +
         <code>icacls .env</code>.
       </div>
-      <h3>Reflexión guiada</h3>
-      <p>Escribe <b>tu</b> respuesta antes de ver la propuesta. Después, entrégala con tus palabras.</p>
+      <h3>Para reflexionar</h3>
       <div id="qs"></div>
       <h3>✅ Punto de control</h3>
       <ul class="ck">
         <li><label><input type="checkbox"><span>Tabla «Docker vs manual» leída y comprendida</span></label></li>
-        <li><label><input type="checkbox"><span>Respuestas propias a las 5 preguntas</span></label></li>
+        <li><label><input type="checkbox"><span>Leídas y comprendidas las 4 preguntas de reflexión</span></label></li>
         <li><label><input type="checkbox"><span>Capturas de las 5 inspecciones</span></label></li>
       </ul>
       <div class="pb">Si falla la contraseña de BD, revisa las variables con <code>docker compose config</code>. Si
@@ -758,7 +805,7 @@ docker compose exec -u www-data app php occ config:system:set trusted_domains 2 
         </tr>
         <tr>
           <td>Baja</td>
-          <td>Entra como <code>luis.perez</code>, sube un archivo, elimínalo y verifica que no accede. <b>¿Qué pasó con
+          <td>Entra como <code>luis.perez</code>, sube un archivo y luego elimina al usuario. <b>¿Qué pasó con
               su archivo?</b></td>
         </tr>
         <tr>
@@ -864,7 +911,7 @@ docker compose exec -u www-data app php occ config:system:set trusted_domains 2 
       ['VirtualHost', 'docker compose exec app cat /etc/apache2/sites-enabled/000-default.conf', 'VirtualHost preconfigurado en el puerto 80 del contenedor.', 'Crear /etc/apache2/sites-available/nextcloud.conf con DocumentRoot, activarlo con a2ensite y recargar Apache.'],
       ['Base de datos', 'docker compose exec db mariadb -u nextcloud -p nextcloud -e "SHOW TABLES;"', 'mariadb:11 arranca el servidor. Las tablas (prefijo oc_) las crea Nextcloud al completar la instalación.', 'Instalar MariaDB, ejecutar mysql_secure_installation y crear BD y usuario con CREATE DATABASE y GRANT ALL.'],
       ['Propietario', 'docker compose exec app ls -la /var/www/html', 'El propietario es www-data (el usuario de Apache), fijado por la imagen.', 'sudo chown -R www-data:www-data /var/www/nextcloud; sin esto Apache no escribe en config/ ni data/.'],
-      ['Persistencia', 'docker volume ls  ·  docker volume inspect nextcloud-lab_nextcloud_data', 'Volúmenes nombrados que sobreviven a docker compose down. En Windows viven dentro de la VM de WSL 2, no en C:\\. (El prefijo del nombre depende de la carpeta del proyecto.)', 'Datos en /var/lib/mysql y /var/www/nextcloud/data; depende de no borrarlos y de tener copias de seguridad.'],
+      ['Persistencia', 'docker volume ls  ·  docker volume inspect entorno-nextcloud_nextcloud_data', 'Volúmenes nombrados que sobreviven a docker compose down. En Windows viven dentro de la VM de WSL 2, no en C:\\. (El prefijo del nombre depende de la carpeta del proyecto.)', 'Datos en /var/lib/mysql y /var/www/nextcloud/data; depende de no borrarlos y de tener copias de seguridad.'],
       ['Credenciales', 'docker compose config  ·  icacls .env', 'Compose lee el .env e inyecta variables de entorno; el .env no se copia al contenedor.', 'Estarían en config/config.php o en variables del sistema, con permisos restringidos (640, www-data).']];
     const L = $('#ex .l'), R = $('#ex .r');
     C.forEach((c, i) => {
@@ -874,15 +921,18 @@ docker compose exec -u www-data app php occ config:system:set trusted_domains 2 
         R.querySelector('pre').textContent = c[1]; R.querySelectorAll('p')[0].textContent = c[2]; R.querySelectorAll('p')[1].textContent = c[3]
       }; L.appendChild(b)
     }); L.firstChild.click();
-    const Q = [['¿Qué extensión de PHP conecta con MariaDB? ¿Qué pasaría sin ella?', 'Es pdo_mysql. Sin ella la instalación falla en la conexión: Nextcloud no podría leer ni escribir usuarios, archivos ni calendarios, ni siquiera validar el login del admin.'],
-    ['¿Qué tablas contienen usuarios y archivos? ¿Qué relación tienen con data/?', 'oc_users, oc_accounts, oc_filecache y oc_storages. La BD guarda los metadatos (quién, dónde, cuándo); el contenido real está en data/. Sin BD pierdes la organización; sin data/ pierdes el contenido.'],
-    ['De los ocho componentes, ¿cuáles habrías configurado a mano y cuáles vienen de fábrica?', 'De fábrica: PHP, extensiones, Apache y VirtualHost. A mano: la BD, los permisos (chown), la persistencia y copias, y la gestión de credenciales. Aun con Docker debes definir variables, volúmenes y .env.'],
-    ['¿Por qué es peligroso poner contraseñas en el compose.yaml? ¿Alternativas?', 'Se comparte y se versiona, y las credenciales quedan expuestas. Alternativas: .env restringido y fuera de git; Docker secrets o gestores externos (Vault…); variables inyectadas por el orquestador.'],
-    ['¿Docker simplifica la formación o la empobrece? Al menos dos argumentos.', 'Respuesta orientativa: simplifica el despliegue (sin variabilidad entre equipos, rápido), pero puede empobrecer si no abres la caja negra. El enfoque híbrido de esta práctica (desplegar y luego inspeccionar) resuelve ambas cosas. Elabora la tuya con ejemplos.']];
+    /* cd() escapa el texto y convierte `xxx` en <code>xxx</code> */
+    const cd = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`([^`]+)`/g, '<code>$1</code>');
+    const Q = [['¿Qué extensión de PHP conecta con MariaDB? ¿Qué pasaría sin ella?', 'Es `pdo_mysql`, y la imagen `nextcloud:apache` ya la trae compilada y habilitada: lo compruebas con `docker compose exec app php -m`. `PDO` es la capa de acceso a datos de PHP y Nextcloud la exige: no vale con `mysqli`.\n\nQué pasaría sin ella: el instalador web llega al paso de la base de datos y, sin driver para `MySQL`, aborta con «No se ha encontrado ninguna base de datos». Sin base de datos no hay nada: ni usuarios, ni archivos, ni calendarios. Tampoco se puede validar el login del admin: la comprobación de credenciales va contra esa base.\n\nY fíjate: el fallo no es de Docker, que está en marcha y Apache responde: falta una pieza por dentro. Por eso `php -m` es obligatorio en el despliegue.'],
+    ['¿Qué tablas contienen usuarios y archivos? ¿Qué relación tienen con `data/`?', 'Cuatro tablas se reparten el trabajo:\n\n• `oc_users`: los usuarios (login, contraseña cifrada, idioma).\n• `oc_accounts`: las cuentas que pueden autenticarse; aparte porque un usuario puede tener varias (Nextcloud y `LDAP`).\n• `oc_filecache`: el índice de los archivos: una fila por archivo o carpeta (ruta, tamaño, propietario, almacenamiento).\n• `oc_storages`: los almacenamiento disponibles, con su identificador.\n\nLa relación con `data/` es de índice y contenido: la base guarda el catálogo (qué hay, de quién es, dónde); en `data/` están los bytes. La fila de `oc_filecache` no guarda el archivo, sino un id de `oc_storages` que traduce a la ruta física.\n\nDe ahí lo importante: base de datos y `data/` son las dos caras del mismo sistema. Si borras `data/`, el catálogo apunta a archivos inexistentes. Por eso la copia de seguridad debe incluir las dos cosas, restauradas del mismo punto en el tiempo.'],
+    ['De los ocho componentes, ¿cuáles habrías configurado a mano y cuáles vienen de fábrica?', 'Repasemos los ocho componentes y quién pone cada cosa.\n\nDe fábrica (trae la imagen `nextcloud:apache`): `PHP` y sus extensiones, `Apache` y su `VirtualHost`.\n\nLos defines tú: la base de datos (el contenedor `mariadb:11` con usuario, contraseña y volumen), el propietario de los archivos (`/var/www/html` debe pertenecer a `www-data`, el usuario de Apache; si no, Nextcloud no puede escribir en `config/` ni en `data/`), la persistencia (los volúmenes nombrados, que sobreviven a un `docker compose down`) y las credenciales (el `.env`).\n\nLa idea que quiero que te quede: Docker no elimina decisiones, las cambia de sitio. Antes decidías «lo instalo a mano, con este usuario y estos permisos»; ahora decides «lo declaro en el compose». El configurar no desaparece: se escribe en un fichero versionable y auditable.'],
+    ['¿Por qué es peligroso poner contraseñas en el `compose.yaml`? ¿Alternativas?', 'Porque un `compose.yaml` es un fichero de texto que se versiona, se comparte y se lee: en cuanto la contraseña está escrita dentro, deja de ser un secreto.\n\nLos riesgos: el historial de `Git` (la contraseña queda ahí aunque la borres del fichero); la exposición accidental (un `git add .`, una captura, un ZIP a un compañero); las herramientas (`docker compose config` imprime el compose interpolado, con la contraseña en claro); y la rotación (cambiarla obliga a tocar el fichero y redesplegar).\n\nLas alternativas:\n1. Fichero `.env` junto al compose, con permisos restringidos y en el `.gitignore`: es lo que hemos hecho. El compose sólo contiene `${VARIABLE}`.\n2. `Docker secrets`, montados como ficheros dentro del contenedor.\n3. Gestores externos (`Vault`, `AWS Secrets Manager`): la contraseña vive fuera y el contenedor la pide al arrancar.\n4. Variables inyectadas por el orquestador o por `CI/CD`.\n\nY siempre: mínimos permisos, fuera del repositorio y rotación periódica.'],
+    ];
     Q.forEach((q, i) => {
-      const d = document.createElement('details'); d.innerHTML = '<summary>Pregunta ' + (i + 1) + '. ' + q[0] + '</summary><div><textarea placeholder="Tu respuesta (con tus palabras)…"></textarea><p><button class="bt">Ver respuesta propuesta</button></p><div class="rev nt"></div></div>';
-      const t = d.querySelector('textarea'), r = d.querySelector('.rev'), b = d.querySelector('button'); r.textContent = q[1]; let w = 0;
-      b.onclick = () => { if (!t.value.trim() && !w) { w = 1; b.textContent = 'Aún no has escrito nada. ¿Ver igualmente?'; return } r.classList.add('show'); b.style.display = 'none' }; $('#qs').appendChild(d)
+      const d = document.createElement('details');
+      d.innerHTML = '<summary>' + (i + 1) + '. ' + cd(q[0]) + '</summary><div class="rev nt show"></div>';
+      d.querySelector('.rev').innerHTML = cd(q[1]);
+      $('#qs').appendChild(d)
     });
     const out = (s, c) => { const p = document.createElement('p'); p.style.color = c || ''; p.textContent = s; $('#log').appendChild(p) };
     $('#go').onclick = () => {
