@@ -307,6 +307,24 @@
       padding: 14px
     }
 
+    a.chip {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      transition: background .15s, border-color .15s, transform .15s
+    }
+
+    a.chip:hover {
+      background: var(--bl);
+      border-color: var(--b);
+      transform: translateY(-2px)
+    }
+
+    a.chip:focus-visible {
+      outline: 3px solid var(--b);
+      outline-offset: 2px
+    }
+
     .chip b {
       font: 800 26px Manrope;
       color: var(--b)
@@ -521,7 +539,7 @@
 <body>
   <div id="bar"></div>
   <nav><b>☁ Nextcloud · ASIR</b><a href="#obj">Objetivos</a><a href="#s1">S1</a><a href="#s2">S2</a><a
-      href="#s3">S3</a><a href="#s4">S4</a><a href="#ent">Entregable</a><a href="#glo">Glosario</a></nav>
+      href="#s3">S3</a><a href="#s4">S4</a><a href="#s5">S5</a><a href="#ent">Entregable</a><a href="#glo">Glosario</a></nav>
   <header class="hero">
     <h1>Tu propia nube: Nextcloud sobre LEMP en Docker</h1>
     <p>2º ASIR · Implantación de aplicaciones web · 8 h (4 sesiones) · Host Windows 11 + Docker Desktop (WSL 2)</p>
@@ -669,10 +687,12 @@
         uno.</div>
       <h3>Planificación</h3>
       <div class="chips">
-        <div class="chip"><b>S1</b><br>Preparar Docker, compose y <code>.env</code>. Desplegar.</div>
-        <div class="chip"><b>S2</b><br>Inspección Docker vs manual. Instalación web.</div>
-        <div class="chip"><b>S3</b><br>Trusted domains, firewall, usuarios, seguridad.</div>
-        <div class="chip"><b>S4</b><br>Uso cooperativo, integración, documentación.</div>
+        <a class="chip" href="#s1"><b>S1</b><br>Preparar Docker, compose y <code>.env</code>. Desplegar.</a>
+        <a class="chip" href="#s2"><b>S2</b><br>Inspección Docker vs manual. Instalación web.</a>
+        <a class="chip" href="#s3"><b>S3</b><br>Trusted domains, firewall, usuarios, seguridad.</a>
+        <a class="chip" href="#s4"><b>S4</b><br>Uso cooperativo, integración, documentación.</a>
+        <a class="chip" href="#s5"><b>S5</b><br>Copias, actualización, tareas en segundo plano y diagnóstico.
+          <i>(ampliación)</i></a>
       </div>
     </section>
 
@@ -1239,9 +1259,227 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
       </ul>
     </section>
 
+    <section id="s5">
+      <h2><span class="t">S5</span>Mantener el servicio <i>(ampliación)</i></h2>
+      <p>Desplegar es la mitad del trabajo. La otra mitad es que <b>el servicio siga funcionando mañana</b>: que se
+        actualice sin romperse, que sus tareas automáticas se ejecuten y que, cuando algo falle, puedas <b>volver
+        atrás</b>. Un servicio que se instala pero no se mantiene es un servicio que se acaba cayendo.</p>
+      <div class="nt"><b>Este apartado es de ampliación.</b> Forma parte de la guía, pero <b>no es obligatorio</b> ni
+        forma parte de la actividad mínima: los apartados que se evalúan son los que corresponden a los criterios c) a
+        h). Hazlo si has terminado el resto con margen, o si te interesa el perfil de quien mantiene servicios en
+        un centro. Puedes saltártelo sin penalización.</div>
+      <h3>5.1 · Copias de seguridad: qué hay que copiar</h3>
+      <p>Los datos de tu Nextcloud están repartidos en <b>dos sitios distintos</b>, y esto es lo primero que hay que
+        tener claro antes de copiar nada:</p>
+      <table>
+        <tr>
+          <th>Dónde</th>
+          <th>Qué contiene</th>
+          <th>Qué pasa si copias solo esto</th>
+        </tr>
+        <tr>
+          <td>Volumen <code>db_data</code> (MariaDB)</td>
+          <td>El <b>catálogo</b>: usuarios, cuotas, configuración y la tabla que dice qué ficheros hay, de quién son y
+            dónde están (<code>oc_filecache</code>).</td>
+          <td>Los usuarios pueden entrar y ven sus carpetas, pero ningún fichero se abre: el catálogo apunta a
+            archivos que ya no están.</td>
+        </tr>
+        <tr>
+          <td>Volumen <code>nextcloud_data</code></td>
+          <td>Los <b>bytes</b>: los ficheros que sube la gente, las miniaturas y los archivos de configuración.</td>
+          <td>La estructura de carpetas aparece, pero todos los archivos dan error al descargarse.</td>
+        </tr>
+      </table>
+      <div class="nt"><b>Regla:</b> copia <b>las dos cosas</b> y, si puede ser, del <b>mismo momento</b>. Si copias la
+        base de datos de hoy y los ficheros de ayer, el resultado es un Nextcloud que cree tener archivos que ya no
+        existen. Copiar solo la base de datos, o solo los ficheros, es el error clásico.</div>
+      <p><b>Paso 1 · la base de datos.</b> <code>mariadb-dump</code> vuelca el contenido de la base en un fichero
+        <code>.sql</code> que luego puedes volver a meter con <code>mariadb</code>:</p>
+      <pre>mkdir backups
+cmd /c "docker compose exec -T db mariadb-dump -u root -pTU_CONTRASENIA nextcloud &gt; backups\nextcloud.sql"
+dir backups\nextcloud.sql</pre>
+      <div class="nt"><b>Por qué el <code>cmd /c</code> y no el <code>&gt;</code> de PowerShell:</b> PowerShell 5.1
+        guarda la redirección en <b>UTF-16</b>, y MariaDB no sabe importar un <code>.sql</code> en UTF-16 (falla con
+        caracteres estravagantes o con errores de sintaxis en la primera línea). <code>cmd</code> escribe los bytes
+        tal cual. <code>TU_CONTRASENIA</code> es el valor de <code>MYSQL_ROOT_PASSWORD</code> de tu <code>.env</code>.
+        <br><br>Si prefieres no escribir la contraseña en el comando (queda en el historial), puedes dejar que la
+        expansión la haga el contenedor, porque las variables del <code>.env</code> viven en su entorno:
+        <pre>docker compose exec -T db sh -c 'mariadb-dump -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'</pre>
+        Las comillas simples son deliberadas: las expande el shell <i>dentro</i> del contenedor, no PowerShell.</div>
+      <p><b>Paso 2 · los ficheros.</b> Los datos viven en un volumen de Docker. Para empaquetarlo se usa un
+        <b>contenedor auxiliar</b> que monta ese volumen (solo en lectura) y escribe un <code>.tar.gz</code> en tu
+        carpeta de <code>backups</code>:</p>
+      <pre>docker volume ls</pre>
+      <pre>docker run --rm -v nextcloud-lab_nextcloud_data:/datos:ro -v "${PWD}\backups":/backup alpine tar czf /backup/nextcloud_data.tar.gz -C /datos .</pre>
+      <div class="nt"><b>Fíjate en el nombre del volumen:</b> <code>nextcloud-lab_nextcloud_data</code> es
+        <code>&lt;nombre del proyecto&gt;_&lt;nombre del volumen&gt;</code>, y Docker Compose le pone el nombre del
+        proyecto por delante. Por eso el comando de <code>docker volume ls</code> va primero: si tu carpeta se llama
+        de otra forma, el volumen se llama de otra forma. El <code>:ro</code> del final significa «solo lectura»: el
+        contenedor auxiliar no puede tocar tus datos, solo leerlos y empaquetarlos.</div>
+      <div class="cam">Los dos ficheros de copia en la carpeta <code>backups\</code>: el <code>.sql</code> de la base de
+        datos y el <code>.tar.gz</code> de los ficheros.</div>
+      <h3>5.2 · El simulacro: restaurar de verdad</h3>
+      <div class="nt"><b>La frase que te tienes que quedar:</b> <b>una copia que no has restaurado nunca no es una
+        copia, es una esperanza.</b> Por eso la prueba de fuego es obligatoria: <b>rompe algo a propósito, restaura
+        y comprueba que vuelve</b>. Si el simulacro no se hace, el día que lo necesites descubrirás que la copia
+        estaba vacía o truncada, y ese es el peor momento posible para enterarse.</div>
+      <ol>
+        <li><b>Prepara el testigo.</b> Entra como <code>marta.ruiz</code>, sube un fichero con un nombre inconfundible
+          (<code>prueba-restauracion.txt</code>) y anota su nombre. Ese fichero es tu prueba: si vuelve después de
+          restaurar, la copia vale.</li>
+        <li><b>Haz la copia</b> (apartado anterior) y comprueba que los dos ficheros existen: <code>dir backups</code>.</li>
+        <li><b>Rompe el servicio</b>: <code>docker compose down -v</code>. Esta orden <b>borra</b> los volúmenes, es
+          decir, <b>todos los datos</b>. Es justo lo que quieres para el simulacro (como en un servidor real, donde la avería se reproduce en frío), pero hazlo solo en esta práctica y con la copia recién hecha.</li>
+        <li><b>Restaura la base de datos</b> sobre la base vacía que acaba de crear Docker:
+          <pre>cmd /c "docker compose exec -T db mariadb -u root -pTU_CONTRASENIA nextcloud &lt; backups\nextcloud.sql"</pre></li>
+        <li><b>Restaura los ficheros</b> en el volumen:
+          <pre>docker run --rm -v nextcloud-lab_nextcloud_data:/datos -v "${PWD}\backups":/backup alpine sh -c "rm -rf /datos/* &amp;&amp; tar xzf /backup/nextcloud_data.tar.gz -C /datos"</pre></li>
+        <li><b>Arranca y comprueba</b>: <code>docker compose up -d</code>, entra con <code>marta.ruiz</code> y verifica
+          que <b>el fichero testigo sigue ahí</b> y que se abre.</li>
+      </ol>
+      <div class="fix"><b>Ojo con el <code>sh -c</code> del último comando:</b> el contenedor de Alpine necesita dos
+        órdenes seguidas (<code>rm</code> y luego <code>tar</code>), y por eso van dentro de un <code>sh -c</code> con
+        un <code>&amp;&amp;</code> en medio. Las comillas dobles permiten que PowerShell sustituya <code>${PWD}</code>
+        antes de pasárselo al contenedor; dentro, el <code>&amp;&amp;</code> lo interpreta el shell de Alpine, no
+        PowerShell.</div>
+      <div class="cam">Simulacro de restauración completo: copia, borrado de volúmenes, restauración y fichero testigo
+        recuperado en la web.</div>
+      <h3>5.3 · Actualizar sin romper nada</h3>
+      <p>Las imágenes <code>nextcloud:apache</code> y <code>mariadb:11</code> se actualizan solas: cada cierto tiempo
+        sale una versión con <b>parches de seguridad</b>. Actualizar es una operación de varios pasos, en un orden
+        concreto, y saltarse uno es como caer al vacío:</p>
+      <ol>
+        <li><b>Primero, copia.</b> (5.1 y 5.2) Sin copia no se actualiza: si la migración de la base de datos falla a
+          medias, no hay forma de volver atrás.</li>
+        <li><b>Modo mantenimiento</b>:
+          <code>docker compose exec -u www-data app php occ maintenance:mode --on</code>. A partir de este momento la
+          web muestra «Nextcloud está en mantenimiento» en lugar de dejar a los usuarios a medias de una
+          operación.</li>
+        <li><b>Descargar la versión nueva</b>: <code>docker compose pull</code> la descarga y
+          <code>docker compose up -d</code> <b>recrea</b> los contenedores con la imagen nueva.</li>
+        <li><b>Migrar la base de datos</b>:
+          <code>docker compose exec -u www-data app php occ upgrade</code>. <b>Este paso no es opcional:</b> la imagen
+          trae el código nuevo, pero el esquema de la base de datos lo actualiza el propio Nextcloud, y sin este
+          comando la web puede fallar con errores raros.</li>
+        <li><b>Salir del mantenimiento</b>:
+          <code>docker compose exec -u www-data app php occ maintenance:mode --off</code>.</li>
+        <li><b>Verificar</b>: entra en la web, comprueba que se ven tus ficheros y que el aviso de «versión antigua»
+          ha desaparecido de <code>Administration → Overview</code>.</li>
+      </ol>
+      <div class="nt"><b>Por qué esto es más profesional de lo que parece:</b>
+        <code>docker compose up -d</code> <b>recrea</b> los contenedores (no los reinicia): por eso el estado
+        anterior de un contenedor se pierde, pero <b>los volúmenes sobreviven</b>. Una actualización no te borra los
+        ficheros… siempre que los datos estén en volúmenes, que es justo lo que decidiste al escribir el compose.
+        <br><br>Y si en el apartado 4.3 fijaste una versión concreta (<code>nextcloud:31.0.5-apache</code>), el
+        <code>pull</code> no trae nada nuevo hasta que cambies la etiqueta: eso es actualizar de forma
+        <b>controlada</b>, que es lo que se hace en un servidor en producción.</div>
+      <h3>5.4 · Las tareas en segundo plano (cron)</h3>
+      <p>Nextcloud necesita hacer cosas sin que nadie pulse nada: enviar notificaciones, avisar de archivos
+        caducados, avisar de que alguien se pasa de cuota, limpiar temporales, comprobar su propio estado. Eso son las
+        <b>tareas en segundo plano</b>, y se ejecutan con el mecanismo de Unix llamado <b>cron</b> (una entrada de
+        «esta orden, a esta hora»).</p>
+      <div class="inc"><b>⚠️ Si no está configurado, Nextcloud te avisa.</b> En
+        <code>Administration → Overview</code> (Administración → Información general) verás un aviso del tipo «las
+        tareas en segundo plano no se ejecutan con regularidad». <b>Ese aviso forma parte de las advertencias de
+        seguridad que te pide documentar el criterio f)</b>: ahora entiendes qué significa y, sobre todo, cómo se
+        arregla.</div>
+      <p><b>La solución: un tercer servicio en el compose.</b> El cron es un proceso aparte que necesita su propio
+        contenedor, con acceso a los mismos datos que la web:</p>
+      <pre>  cron:
+    image: nextcloud:apache
+    restart: unless-stopped
+    volumes:
+      - nextcloud_data:/var/www/html
+    entrypoint: /cron.sh</pre>
+      <div class="nt"><b>Léelo como una lección de compose:</b> lo que no está declarado en el fichero no existe. El
+        cron no es «un programa que se instala»: es un tercer servicio que se levanta, se reinicia solo si se cae y
+        comparte el volumen de datos con la web. Por eso <code>docker compose up -d</code> ya lo levanta sin ningún
+        comando extra.</div>
+      <p>Y para comprobarlo sin esperar a la próxima hora:</p>
+      <pre>docker compose up -d
+docker compose exec -u www-data app php occ status
+docker compose exec -u www-data app php cron</pre>
+      <div class="cam">El aviso de «tareas en segundo plano» desaparece de
+        <code>Administration → Overview</code> y el servicio <code>cron</code> aparece en
+        <code>docker compose ps</code>.</div>
+      <h3>5.5 · Cuando Nextcloud no responde</h3>
+      <p>Este es el apartado que más se usa en el día a día. La tabla está ordenada por <b>síntoma</b>, que es como te
+        va a llegar el problema:</p>
+      <table>
+        <tr>
+          <th>Síntoma</th>
+          <th>Causa más probable</th>
+          <th>Cómo lo compruebas</th>
+          <th>Qué hago</th>
+        </tr>
+        <tr>
+          <td>La web no carga (error del navegador)</td>
+          <td>El puerto 8080 está cerrado en el firewall, u otro programa lo ocupa</td>
+          <td><code>docker compose ps</code> y <code>netstat -ano | findstr :8080</code></td>
+          <td>Revisa la regla del firewall; si el puerto está ocupado, cambia a <code>"8081:80"</code></td>
+        </tr>
+        <tr>
+          <td>El contenedor <code>app</code> reinicia solo</td>
+          <td>La base de datos no estaba lista al arrancar</td>
+          <td><code>docker compose logs --tail=50 app</code> (busca «database»)</td>
+          <td>Añade el <code>healthcheck</code> del <code>db</code> o haz <code>docker compose restart app</code></td>
+        </tr>
+        <tr>
+          <td>«Acceso a través de un dominio no de confianza»</td>
+          <td>Tu IP no está en <code>trusted_domains</code></td>
+          <td><code>docker compose exec app php occ config:system:get trusted_domains</code></td>
+          <td><code>occ config:system:set trusted_domains 2 --value=TU_IP</code> (ver 6.1)</td>
+        </tr>
+        <tr>
+          <td>Error 500 o «Internal Server Error»</td>
+          <td>Permisos del directorio de datos, o base de datos a medio migrar</td>
+          <td><code>docker compose logs --tail=100 app</code> y
+            <code>docker compose exec app ls -la /var/www/html/data</code></td>
+          <td>Repite la actualización completa (5.3) o revisa los permisos</td>
+        </tr>
+        <tr>
+          <td>Va cada vez más lento</td>
+          <td>Disco lleno o contenedor sin memoria</td>
+          <td><code>docker stats</code> y <code>docker system df</code></td>
+          <td>Libera espacio; en el compose puedes fijar <code>mem_limit</code> y <code>cpus</code></td>
+        </tr>
+      </table>
+      <div class="nt"><b>El método es siempre el mismo</b> (y ya lo aprendiste en la miniguía de logs de 4.4):
+        <b>reproduce → recoge solo lo nuevo → aísla a qué servicio pertenece → arregla y vuelve a probar</b>. La tabla
+        de arriba es el atajo: empieza por el síntoma y te ahorra el paso de aíslar.</div>
+      <div class="pb">
+        <ul>
+          <li><code>mariadb-dump</code> falla con «Access denied»: el usuario o la contraseña no son los del
+            <code>.env</code>.</li>
+          <li>El <code>docker run</code> de Alpine falla al descargar: <code>docker pull alpine</code> y reintenta;
+            puede ser que no haya red.</li>
+          <li><code>occ upgrade</code> dice que no hay nada que actualizar: la imagen ya estaba al día.</li>
+          <li><code>occ maintenance:mode --on</code> no responde: el contenedor <code>app</code> no está en marcha
+            (<code>docker compose ps</code>).</li>
+          <li>Tras actualizar, la web da error: mira <code>docker compose logs --tail=100 app</code> antes de tocar
+            nada más.</li>
+        </ul>
+      </div>
+      <h3>✅ Punto de control</h3>
+      <ul class="ck">
+        <li><label><input type="checkbox"><span>Copia de la base de datos y de los ficheros, con los dos archivos en
+          <code>backups\</code></span></label></li>
+        <li><label><input type="checkbox"><span>Simulacro de restauración con el fichero testigo recuperado</span></label></li>
+        <li><label><input type="checkbox"><span>Actualización completa: mantenimiento → pull → up → upgrade →
+          off</span></label></li>
+        <li><label><input type="checkbox"><span>Servicio <code>cron</code> añadido al compose y aviso de
+          <code>Overview</code> eliminado</span></label></li>
+      </ul>
+    </section>
+
     <section id="ent">
       <h2>8 · Entregable: documentación técnica (criterio h)</h2>
       <p>Crea un documento con capturas de <b>todos</b> los pasos y decisiones exigidos. </p>
+      <div class="nt"><b>Aviso sobre el apartado S5:</b> el apartado «Mantener el servicio» (S5 · copias de seguridad,
+        actualización, tareas en segundo plano y diagnóstico) es material de <b>ampliación</b>: está en la guía, pero
+        <b>no es obligatorio</b> y no forma parte de la actividad mínima. Lo que se documenta y se evalúa son los
+        apartados correspondientes a los criterios c) a h) de la tabla siguiente. Si haces el S5, puedes añadirlo a la
+        memoria como apartado extra, pero no te resta por ello ni te suma por hacerlo.</div>
       <h3>Criterios y evidencias</h3>
       <table>
         <tr>
@@ -1521,6 +1759,21 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
           <td><b>Tarea en segundo plano</b> (<i>cron</i>)</td>
           <td>Proceso programado (mantenimiento, avisos, notificaciones) que se ejecuta cada cierto tiempo. Si no
             está configurado, Nextcloud avisa.</td>
+        </tr>
+        <tr>
+          <td><b><code>mariadb-dump</code></b></td>
+          <td>Herramienta que vuelca el contenido de una base de datos en un fichero <code>.sql</code>, que es el
+            formato de la copia de seguridad de la base.</td>
+        </tr>
+        <tr>
+          <td><b>Modo mantenimiento</b> (<i>maintenance mode</i>)</td>
+          <td>Estado en el que Nextcloud avisa de que está en una operación delicate y rechaza nuevas peticiones.
+            Se activa antes de actualizar y se desactiva al terminar.</td>
+        </tr>
+        <tr>
+          <td><b>Migración</b> (<i>upgrade</i>)</td>
+          <td>Actualización del <b>esquema de la base de datos</b> que hace el propio Nextcloud al cambiar de
+            versión. La imagen trae el código nuevo, pero sin este paso la web puede fallar.</td>
         </tr>
       </table>
       <div class="nt"><b>Truco:</b> si una palabra te frena en mitad de una tarea, no sigue leyendo: busca la
