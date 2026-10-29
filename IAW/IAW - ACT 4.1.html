@@ -424,6 +424,37 @@
       border-top: 4px solid var(--b)
     }
 
+    .vent {
+      background: #eef9f3;
+      border-top: 4px solid var(--ok);
+      border-radius: 10px;
+      padding: 12px
+    }
+
+    .inc {
+      background: #fdecec;
+      border-top: 4px solid var(--rd);
+      border-radius: 10px;
+      padding: 12px
+    }
+
+    .espera {
+      background: #eef9f3;
+      border-top: 4px solid var(--ok);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px
+    }
+
+    .ex .r ul {
+      margin: 6px 0 0;
+      padding-left: 18px
+    }
+
+    .ex .r li {
+      margin: 3px 0
+    }
+
     .mn {
       background: #fff2e0;
       border-top: 4px solid var(--wa)
@@ -490,7 +521,7 @@
 <body>
   <div id="bar"></div>
   <nav><b>☁ Nextcloud · ASIR</b><a href="#obj">Objetivos</a><a href="#s1">S1</a><a href="#s2">S2</a><a
-      href="#s3">S3</a><a href="#s4">S4</a><a href="#ent">Entregable</a></nav>
+      href="#s3">S3</a><a href="#s4">S4</a><a href="#ent">Entregable</a><a href="#glo">Glosario</a></nav>
   <header class="hero">
     <h1>Tu propia nube: Nextcloud sobre LEMP en Docker</h1>
     <p>2º ASIR · Implantación de aplicaciones web · 8 h (4 sesiones) · Host Windows 11 + Docker Desktop (WSL 2)</p>
@@ -504,52 +535,138 @@
           necesita por debajo</b>, <b>configurarlo para una intranet</b>, <b>gestionar usuarios</b> y <b>asegurarlo</b>.
         Cada vez que Docker resuelva algo por ti, mirarás dentro y contrastarás <i>lo que Docker hace</i> con <i>lo que
           harías a mano</i>.</p>
+      <h3>Qué es Nextcloud</h3>
+      <p>Nextcloud es un <b>servidor de archivos y colaboración</b> que instalas <b>en tu propia infraestructura</b>
+        y usas desde el navegador o desde un cliente de escritorio o móvil. Al instalarlo, tus ficheros, tus
+        calendarios y tus contactos <b>se quedan dentro de tu organización</b>: no hay ninguna nube externa de por
+        medio. No es «una carpeta en la nube», sino una plataforma con muchas aplicaciones que se integran entre
+        sí.</p>
+      <div class="nt"><b>Cuatro datos para situarlo:</b>
+        <ul>
+          <li><b>Software libre</b> con licencia <b>AGPLv3</b>: cualquiera puede leer el código, usarlo, modificarlo y
+            redistribuirlo. Lo que lo desarrolla la empresa Nextcloud GmbH junto a miles de colaboradores.</li>
+          <li><b>Nace en 2014</b> como ramal de <code>ownCloud</code>, al que la empresa original dejó de mantenerlo.
+            Hoy es el proyecto de <i>autoalojo</i> (<i>self-hosted</i>) de referencia en Europa.</li>
+          <li><b>No es un programa de un solo servicio</b>: es una aplicación web (PHP) que necesita un servidor web
+            (Apache o Nginx), una base de datos (MariaDB, MySQL o PostgreSQL) y un almacenamiento para los ficheros.
+            <b>Es exactamente lo que vas a desplegar en esta práctica</b>: por eso la guía no se limita a instalar y
+            te hace abrir la caja negra de cada pieza.</li>
+          <li><b>Se actualiza dos veces al año</b> (versiones H1 y H2) y trae <i>apps</i> oficiales que amplían lo
+            que hace sin tocar el núcleo.</li>
+        </ul>
+      </div>
+      <h3>Qué ofrece</h3>
+      <p>Todo esto viene de serie en la imagen que vas a desplegar; solo hay que activarlo o instalarlo desde
+        <code>Apps</code> (Administración → Aplicaciones):</p>
+      <div class="two">
+        <div class="vent"><b>📁 Archivos y compartir</b> <i>(app Files)</i>
+          <ul>
+            <li>Subida, carpetas, <b>versiones</b> de cada fichero, papelera y búsqueda.</li>
+            <li><b>Cuotas</b> por usuario (cuánto disco puede usar cada uno).</li>
+            <li>Carpetas compartidas con permisos distintos: leer, editar, reenviar…</li>
+            <li><b>Enlaces públicos</b> con contraseña y fecha de caducidad, para mandar un archivo sin dar de alta
+              a nadie.</li>
+          </ul>
+        </div>
+        <div class="dk"><b>📅 Agenda, contactos y coordinación</b> <i>(apps Calendar y Groupware)</i>
+          <ul>
+            <li><b>Calendarios</b> (CalDAV) y <b>contactos</b> (CardDAV) que se sincronizan con Thunderbird, con el
+              móvil y con Outlook.</li>
+            <li>Eventos con invitados, calendarios compartidos por grupos.</li>
+            <li><b>Nextcloud Office</b>: editar un Word, un Excel o un PowerPoint <b>en el navegador y en
+              tiempo real</b>, sin instalar nada.</li>
+            <li><b>Talk</b> (chat, audio y vídeo), <b>Mail</b>, <b>Notes</b>, <b>Tasks</b>, <b>Forms</b> y
+              <b>Deck</b> (tablero tipo Kanban).</li>
+          </ul>
+        </div>
+      </div>
+      <p>Y para el perfil de administrador: <b>cifrado en cliente</b> (los ficheros se cifran antes de subir), <b>2FA</b>
+        (doble factor), <b>app de contraseñas</b>, auditoría de actividad y apps como <i>File Drop</i> o
+        <i>Workflows</i>.</p>
+      <h3>Qué necesidades cubre</h3>
+      <table>
+        <tr>
+          <th>Necesidad típica de un centro o una empresa</th>
+          <th>Cómo la cubre Nextcloud</th>
+        </tr>
+        <tr>
+          <td>Ficheros dispersos en carpetas de red, discos USB o correos</td>
+          <td>Un único repositorio con versiones, búsqueda, cuota por usuario y papelera</td>
+        </tr>
+        <tr>
+          <td>Que los datos no salgan de la organización (control y cumplimiento)</td>
+          <td>El servidor y los datos están en tu infraestructura: nadie externo los ve</td>
+        </tr>
+        <tr>
+          <td>Compartir material con compañeros, clientes o proveedores</td>
+          <td>Carpetas compartidas con permisos y enlaces públicos con contraseña y caducidad</td>
+        </tr>
+        <tr>
+          <td>Agenda y contactos del centro, disponibles en el móvil</td>
+          <td>Calendarios y contactos (CalDAV/CardDAV) que se sincronizan con cualquier dispositivo</td>
+        </tr>
+        <tr>
+          <td>Varias personas editando el mismo documento a la vez</td>
+          <td>Nextcloud Office: edición colaborativa en el navegador, con control de versiones</td>
+        </tr>
+        <tr>
+          <td>Sustituir servicios de pago (Drive, OneDrive, Exchange) sin perder datos</td>
+          <td>Un único sistema libre, sin coste de licencia por usuario y con exportación de todo</td>
+        </tr>
+        <tr>
+          <td>Altas y bajas de personal sin tocar nada a mano</td>
+          <td>Integración con el directorio de la organización (LDAP / Active Directory)</td>
+        </tr>
+        <tr>
+          <td>No depender de un proveedor externo</td>
+          <td>Autoalojo: el servicio es tuyo y sigue funcionando aunque el proveedor externo cierre</td>
+        </tr>
+      </table>
+      <h3>Ventajas e inconvenientes</h3>
+      <div class="two">
+        <div class="vent"><b>✅ Ventajas</b>
+          <ul>
+            <li><b>Control y privacidad:</b> los datos no salen de tu infraestructura y el código es auditable
+              (clave en la administración pública).</li>
+            <li><b>Sin coste de licencia:</b> solo pagas la infraestructura y el tiempo de quien lo mantiene.</li>
+            <li><b>Libertad de despliegue:</b> como contenedor, máquina virtual o servidor físico, y con los recursos
+              que necesites.</li>
+            <li><b>Integración con lo que ya tienes:</b> Active Directory/LDAP, correo IMAP/SMTP, CalDAV, CardDAV,
+              WebDAV, almacenamiento S3.</li>
+            <li><b>Extensible:</b> cientos de aplicaciones oficiales y de la comunidad.</li>
+            <li><b>Acceso desde donde sea:</b> navegador, cliente de escritorio y móvil, sin cables y sin descargas manuales.</li>
+          </ul>
+        </div>
+        <div class="inc"><b>⚠️ Inconvenientes</b>
+          <ul>
+            <li><b>Tú eres el responsable:</b> actualizaciones, copias de seguridad, HTTPS, permisos y monitorización.
+              No es «instalar y olvidar»: es un sistema que hay que mantener.</li>
+            <li><b>Cuesta tiempo y recursos:</b> hace falta un servidor disponible y alguien que lo vigile.</li>
+            <li><b>La interfaz es menos pulida</b> que la de Google o Microsoft: es funcional, no es «bonita».</li>
+            <li><b>Las funciones más avanzadas son de pago:</b> retención legal, DLP o soporte prioritario están en la
+              edición Enterprise.</li>
+            <li><b>Migrar el contenido antiguo es trabajo:</b> hay que mover o sincronizar lo que ya había.</li>
+            <li><b>Sin SLA de por medio:</b> si algo se rompe, dependes de la comunidad, de la documentación o de tu
+              proveedor.</li>
+            <li><b>En el aula no es «doble clic y listo»:</b> hace falta WSL 2, Docker Desktop y la virtualización
+              activada en la BIOS.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="fix"><b>Cómo decidir:</b> Nextcloud tiene sentido cuando <b>los datos tienen que quedarse dentro de la
+        organización</b> y hay alguien —un técnico, el profesor, el servicio de informática— que pueda mantenerlo.
+        Si lo que quieres es compartir cuatro fotos con un amigo, o si nadie va a encargarse de las copias de
+        seguridad y de las actualizaciones, un servicio en la nube te va a salir mejor.</div>
       <div class="nt"><b>Windows 11 como host:</b> 1) comandos en <b>PowerShell</b>; 2) los volúmenes viven dentro de la
         VM de WSL 2, <b>no en <code>C:\</code></b>; 3) para acceder desde otros equipos hay que abrir el puerto en el
         <b>Firewall</b> y configurar <i>trusted domains</i>; 4) el <code>.env</code> se protege con <code>icacls</code>,
         no con <code>chmod</code>.
       </div>
       <div class="cam">Debes entregar capturas de cada paso, mostrando el comando y el resultado.</div>
-      <h3>Criterios y evidencias</h3>
-      <table>
-        <tr>
-          <th>Criterio</th>
-          <th>Evidencia mínima</th>
-          <th>Excelencia</th>
-        </tr>
-        <tr>
-          <td><span class="min">c) Instalación</span></td>
-          <td>Nextcloud accesible, login admin, contenedores en marcha</td>
-          <td>Tabla «Docker vs manual» explicada (8 filas)</td>
-        </tr>
-        <tr>
-          <td><span class="min">d) Intranet</span></td>
-          <td>Trusted domain, puerto en firewall, acceso desde otro equipo</td>
-          <td>Propósito de <code>trusted_domains</code> y firewall</td>
-        </tr>
-        <tr>
-          <td><span class="min">e) Usuarios</span></td>
-          <td>Altas, grupos, cuotas, login verificado</td>
-          <td>Ciclo completo: alta, modificación, baja, pérdida de acceso</td>
-        </tr>
-        <tr>
-          <td><span class="min">f) Seguridad</span></td>
-          <td><code>.env</code> restringido, política de contraseñas, 2FA forzado, advertencias</td>
-          <td>Plan HTTPS en producción</td>
-        </tr>
-        <tr>
-          <td>g) Cooperativo</td>
-          <td>Carpeta compartida con permisos + calendario compartido</td>
-          <td>Cliente de escritorio o CalDAV</td>
-        </tr>
-        <tr>
-          <td>h) Documentación</td>
-          <td>Apartados de la sección 8 + capturas</td>
-          <td>Reproducible por terceros, reflexión crítica</td>
-        </tr>
-      </table>
-      <div class="pb" style="border-color:var(--wa);background:#fff5e5"><b>Condición de superación:</b> c), d), e) y f)
-        son <b>mínimos</b>. No superar uno = no superar la actividad.</div>
+      <div class="nt"><b>Qué se evalúa:</b> los <b>criterios y sus evidencias</b> están al final de la guía, en el
+        apartado <b>8 · Entregable</b>. Cada apartado de la práctica indica a qué criterio corresponde
+        (criterio c, d, e…). Lee esa tabla antes de empezar, porque te dice qué tienes que demostrar en cada
+        uno.</div>
       <h3>Planificación</h3>
       <div class="chips">
         <div class="chip"><b>S1</b><br>Preparar Docker, compose y <code>.env</code>. Desplegar.</div>
@@ -633,7 +750,6 @@ icacls .env</pre>
       <pre># Añadir .env al .gitignore: así el fichero con las contraseñas
 # NUNCA se sube a un repositorio (ni por accidente con "git add .").
 ".env" | Out-File -Encoding ascii -Append .gitignore</pre>
-      </div>
       <h3>4.3 · <code>docker-compose.yml</code></h3>
       <p>Es un punto de partida: debes <b>justificar cada decisión</b> (¿por qué MariaDB 11? ¿volúmenes nombrados? ¿red
         bridge explícita? ¿la BD sin puertos? ¿credenciales como <code>${VARIABLE}</code>?).</p>
@@ -693,10 +809,56 @@ networks:
         </ul>
       </div>
       <div class="fix"><code>depends_on</code> solo garantiza el <i>orden de arranque</i>, no que
-        MariaDB esté lista. ¿Qué crees que pasa si Nextcloud arranca antes que la BD?</div>
+        MariaDB esté lista. ¿Qué crees que pasa si Nextcloud arranca antes que la BD?
+        <details>
+          <summary>Respuesta</summary>
+          <div>
+            <p>Lo que ocurre, en orden:</p>
+            <ul>
+              <li>El contenedor <code>app</code> se lanza en cuanto <code>db</code> está <i>creado</i>, no cuando
+                MariaDB acepte conexiones. Y el arranque de la base de datos tarda más de lo normal la primera vez,
+                porque tiene que inicializar el volumen de datos.</li>
+              <li>El instalador de Nextcloud intenta conectar con la base y falla: aparece el error «No se ha
+                encontrado ninguna base de datos» o «Connection refused», y el contenedor de la aplicación queda en
+                estado de error.</li>
+              <li>La aplicación <b>no se recupera sola</b>: hay que reiniciarla cuando la base ya esté
+                (<code>docker compose restart app</code>) o recargar la página del instalador.</li>
+            </ul>
+            <p>Cómo se comprueba que la base ya está lista:
+              <code>docker compose exec db mariadb -u nextcloud -p nextcloud -e "SHOW DATABASES;"</code>
+            </p>
+            <p><b>Cómo se hace bien:</b> se define un <code>healthcheck</code> en el servicio <code>db</code> y se
+              escribe <code>depends_on: db: condition: service_healthy</code>. Así Compose no solo arranca el
+              contenedor en orden, sino que <b>espera a que la base esté sana</b> antes de lanzar la aplicación.</p>
+          </div>
+        </details>
+      </div>
       <div class="fix"><code>nextcloud:apache</code> y <code>mariadb:11</code> son etiquetas «móviles»: ¿qué
         ventaja daría fijar una
-        versión concreta para reproducir la práctica?</div>
+        versión concreta para reproducir la práctica?
+        <details>
+          <summary>Respuesta</summary>
+          <div>
+            <p>Fijar la versión exacta (por ejemplo <code>nextcloud:31.0.5-apache</code> y
+              <code>mariadb:11.4.5</code>) significa que <b>toda la clase y el futuro instructor ejecutan
+              exactamente el mismo software</b>: misma versión de PHP, misma revisión de Nextcloud, mismos parches de
+              seguridad.</p>
+            <ul>
+              <li><b>Reproducibilidad:</b> lo que funciona en tu equipo funciona en el del compañero y en el
+                servidor del centro. Sin esto, cada alumno descarga la última versión y cada uno puede estar
+                ejecutando algo distinto.</li>
+              <li><b>Trazabilidad:</b> se sabe exactamente qué versión está desplegada, y con ella se pueden
+                consultar sus vulnerabilidades y su documentación.</li>
+              <li><b>Control de los cambios:</b> una actualización mayor puede modificar el esquema de la base de
+                datos. Si la etiqueta cambia sola, ese cambio ocurre sin que nadie lo haya previsto ni probado.</li>
+            </ul>
+            <p><b>El precio:</b> no recibes automáticamente las actualizaciones de seguridad. Hay que cambiar la
+              etiqueta a mano, de forma controlada, y <b>siempre después de hacer una copia de seguridad</b>.</p>
+            <p>La etiqueta «móvil» está bien para trastear; para un despliegue que tiene que ser reproducible,
+              conviene fijar versión.</p>
+          </div>
+        </details>
+      </div>
       <div class="cam">Compose completo y salida de <code>docker compose config</code>.</div>
       <h3>4.4 · Desplegar y verificar</h3>
       <pre>docker compose up -d
@@ -704,6 +866,52 @@ docker compose ps
 docker compose logs app
 docker compose logs db</pre>
       <p>Abre <code>http://localhost:8080</code>.</p>
+      <div class="nt"><b>🗒️ Miniguía — leer los logs: tu principal herramienta de diagnóstico.</b>
+        <p>Docker no avisa de los errores con un mensaje legible: cuando algo falla, la información está en el
+          <b>log</b> del contenedor. Antes de tocar nada, aprende a mirarlo.</p>
+        <p><b>1 · Los comandos que necesitas.</b></p>
+        <pre>docker compose logs                  # los dos servicios (últimas 10 líneas)
+docker compose logs app              # solo un servicio
+docker compose logs -f app           # se actualiza solo mientras lo miras (Ctrl+C para salir)
+docker compose logs --tail=50 db     # las últimas 50 líneas de un servicio
+docker compose logs --since 5m app   # solo lo ocurrido en los últimos 5 minutos
+docker compose logs -t app           # añade fecha y hora a cada línea</pre>
+        <ul>
+          <li><code>logs</code> sin más enseña <b>las últimas 10 líneas</b> de cada servicio: es el resumen que
+            debes leer primero.</li>
+          <li><code>-f</code> (<i>follow</i>) deja el log pegado a la pantalla mientras repites la acción en el
+            navegador. Es la forma habitual de depurar en directo.</li>
+          <li><code>--since</code> es el comando estrella: <b>repite la acción</b> que falla (el login, la
+            instalación) y pide <code>--since 1m</code> para ver solo lo que ha pasado en ese minuto. Sin esto
+            acabas leyendo mil líneas antiguas y tu error se te escapa.</li>
+        </ul>
+        <p><b>2 · Qué hay dentro.</b> Cada servicio escribe en su propio log:</p>
+        <ul>
+          <li><b>El servidor web (Apache)</b>: una línea por petición, con la IP, la fecha, la ruta y el código de
+            respuesta. <code>200</code> correcto · <code>302</code> redirección (es lo normal al iniciar sesión) ·
+            <code>404</code> no existe · <code>500</code> error del servidor, y eso ya es un fallo de
+            configuración.</li>
+          <li><b>Nextcloud</b>, que es más útil que el anterior: lo escribe en <code>data/nextcloud.log</code>
+            dentro del contenedor y lo ves en vivo con:
+            <pre>docker compose exec app tail -f data/nextcloud.log</pre>
+            Cada línea lleva un <code>level</code>: 0 depuración · 1 información · 2 aviso · <b>3 error</b> ·
+            4 fatal. Y fíjate en los mensajes: «Admin created», «Nextcloud is now installed» o «Access to untrusted
+            domain» te dicen exactamente en qué punto estás.</li>
+        </ul>
+        <p><b>3 · El método, en cuatro pasos.</b></p>
+        <ol>
+          <li><b>Reproduce</b> el fallo: la acción exacta que falla.</li>
+          <li><b>Recoge</b> solo lo nuevo: <code>docker compose logs --since 1m app</code>.</li>
+          <li><b>Aísla</b> a qué servicio pertenece el error (Apache, base de datos o Nextcloud): cada uno escribe
+            en su sitio, y el sitio te dice la causa.</li>
+          <li><b>Arregla</b> y <b>vuelve a probar</b>: un cambio sin repetir la acción no está verificado.</li>
+        </ol>
+        <p>Y si quieres filtrar el ruido, en PowerShell se hace con
+          <code>docker compose logs app 2&gt;&amp;1 | Select-String "error|Exception"</code>.</p>
+      </div>
+      <div class="fix"><b>Ojo:</b> los logs viven dentro del contenedor, así que un <code>docker compose down</code>
+        los borra con él. Si quieres conservar la evidencia de un fallo, <b>cópialos antes</b> (o redirige la salida
+        a un fichero).</div>
       <div class="pb">
         <ul>
           <li>Puerto ocupado: <code>netstat -ano | findstr :8080</code> y cambia a <code>"8081:80"</code>.
@@ -711,6 +919,9 @@ docker compose logs db</pre>
           <li>Docker colgado: reinícialo desde la bandeja. </li>
           <li><code>.env</code> no se carga: debe estar junto al compose y sin
             <code>.txt</code>.
+          </li>
+          <li>El login no entra: mira <code>docker compose logs app</code> en busca del mensaje del administrador
+            y comprueba <code>docker compose config</code>.
           </li>
         </ul>
       </div>
@@ -731,7 +942,20 @@ docker compose logs db</pre>
     <section id="s2">
       <h2><span class="t">S2</span>Inspección: Docker vs manual</h2>
       <p>Completa la instalación web si aparece (o entra con las credenciales del <code>.env</code>). Después, <b>abre
-          la caja negra</b>: elige un componente, ejecuta el comando y compara.</p>
+          la caja negra</b>: Docker te ha escondido ocho decisiones de configuración que un despliegue manual te
+          obligaría a tomar. Esta sección las recupera una a una.</p>
+      <div class="nt"><b>El método es siempre el mismo (tres pasos):</b>
+        <ol>
+          <li><b>Ejecuta</b> el comando de inspección del componente (columna izquierda: elige el que te interese).</li>
+          <li><b>Compara</b> la columna «qué hace Docker por ti» con la de «qué harías a mano»: pregúntate qué te
+            ahorró el contenedor y qué sigue siendo responsabilidad tuya.</li>
+          <li><b>Contrasta</b> lo que ves en pantalla con «qué tienes que ver»: si no cuadra, algo está mal montado
+            (y saber interpretarlo es lo que te permite distinguir un fallo de configuración de un simple «no
+            funciona»).</li>
+        </ol>
+        Con esto rellenas la tabla que pide el criterio c): <b>Componente · Qué hace Docker · Qué harías a mano ·
+        Qué he visto</b>, una fila por cada uno de los ocho.
+      </div>
       <div class="cam">Login admin correcto.</div>
       <div class="ex" id="ex">
         <div class="l"></div>
@@ -741,7 +965,7 @@ docker compose logs db</pre>
         <b>documenta la que veas tú</b> con <code>php -v</code>. En la fila de la BD, <code>-p</code> sin valor te
         pedirá la contraseña: así no queda escrita en el historial.
       </div>
-      <div class="cam">Las 5 inspecciones: versión PHP, extensiones, tablas BD, propietario de archivos, credenciales +
+      <div class="cam">Las 8 inspecciones: PHP, extensiones, servidor web, VirtualHost, base de datos, propietario, persistencia y credenciales +
         <code>icacls .env</code>.
       </div>
       <h3>Para reflexionar</h3>
@@ -750,7 +974,7 @@ docker compose logs db</pre>
       <ul class="ck">
         <li><label><input type="checkbox"><span>Tabla «Docker vs manual» leída y comprendida</span></label></li>
         <li><label><input type="checkbox"><span>Leídas y comprendidas las 4 preguntas de reflexión</span></label></li>
-        <li><label><input type="checkbox"><span>Capturas de las 5 inspecciones</span></label></li>
+        <li><label><input type="checkbox"><span>Capturas de las 8 inspecciones</span></label></li>
       </ul>
       <div class="pb">Si falla la contraseña de BD, revisa las variables con <code>docker compose config</code>. Si
         falla el login, busca la creación del admin en <code>docker compose logs app</code>.</div>
@@ -758,6 +982,19 @@ docker compose logs db</pre>
 
     <section id="s3">
       <h2><span class="t">S3</span>Intranet, usuarios y seguridad</h2>
+      <div class="nt"><b>⚠️ La interfaz de Nextcloud está en inglés.</b> La imagen oficial arranca con la interfaz en
+        inglés, y es la que vas a ver en el navegador: si buscas «Administración» en español no lo encontrarás. En
+        esta guía, <b>cada ruta se escribe como aparece en pantalla</b> (en inglés) y, entre paréntesis, su
+        traducción, para que puedas comunicarte en clase:
+        <ul>
+          <li><code>Administration → Security</code> (Administración → Seguridad) → <code>Password policy</code>
+            (política de contraseñas).</li>
+          <li><code>Administration → Overview</code> (Administración → Información general), donde están las
+            <i>security warnings</i> (advertencias de seguridad).</li>
+          <li><code>Administration → Apps</code> (Administración → Aplicaciones).</li>
+          <li><code>Administration → Users</code> / <code>Groups</code> (Administración → Usuarios / Grupos).</li>
+        </ul>
+        <b>Haz las capturas en inglés</b>, que son las que vas a entregar.</div>
       <h3>6.1 · Trusted domains y firewall (criterio d)</h3>
       <p>En Windows hay que atravesar <b>dos barreras distintas</b>, y cada una puede cortar la conexión por su
         lado:
@@ -883,7 +1120,8 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
       <div class="nt"><b>Documenta:</b> tabla con usuario, grupo, cuota, estado y destino de los datos.</div>
       <h3>6.3 · Seguridad de acceso (criterio f)</h3>
       <ol>
-        <li><b>Política de contraseñas</b> — Administración → Seguridad → Política de contraseñas.
+        <li><b>Política de contraseñas</b> — <code>Administration → Security → Password policy</code> (Administración →
+          Seguridad → Política de contraseñas).
           <ul>
             <li><b>Qué haces:</b> pon la longitud mínima en 10 y activa mayúsculas, minúsculas, números y caracteres
               especiales. Después intenta crear un usuario con una clave débil (<code>1234</code>) y comprueba que
@@ -891,10 +1129,11 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
             <li><b>Por qué:</b> una política común hace que el sistema rechace por ti las contraseñas que se
               descifran en segundos. Es la primera barrera y la más barata de poner.</li>
             <li><b>Si no aparece la opción:</b> comprueba que la aplicación <i>Password policy</i> está habilitada
-              (Administración → Aplicaciones).</li>
+              (<code>Administration → Apps</code>).</li>
           </ul>
         </li>
-        <li><b>2FA forzado (doble factor)</b> — Administración → Seguridad → <i>Two-Factor TOTP Provider</i>.
+        <li><b>2FA forzado (doble factor)</b> — <code>Administration → Security → Two-Factor TOTP Provider</code>
+          (Administración → Seguridad).
           <ul>
             <li><b>Qué haces:</b> activa el proveedor TOTP y marca la casilla de <b>forzarlo</b> para el grupo
               <code>profesores</code>. Cada miembro del grupo tendrá que escanear un QR con su app de autenticación y
@@ -903,7 +1142,7 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
               Así, una contraseña filtrada no sirve para entrar.</li>
           </ul>
         </li>
-        <li><b>Advertencias de seguridad</b> — Administración → Información general.
+        <li><b>Advertencias de seguridad</b> — <code>Administration → Overview</code> (Administración → Información general).
           <ul>
             <li><b>Qué haces:</b> lee las advertencias que muestre la instalación y documenta al menos dos: qué dice,
               por qué aparece y qué harías para resolverla (por ejemplo, «no hay HTTPS» → tu plan de certificados).</li>
@@ -956,7 +1195,7 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
         </li>
         <li>Comparte un archivo con <b>enlace público con contraseña</b>.</li>
         <li>Crea el calendario <code>reuniones-equipo</code>, compártelo con <code>profesores</code> y crea un evento
-          invitando a otro usuario. <i>(Si no ves Calendario, instálalo desde Aplicaciones.)</i></li>
+          invitando a otro usuario. <i>(Si no ves Calendario, instálalo desde <code>Apps</code>.)</i></li>
         <li>Verifica desde <code>marta.ruiz</code>: ve la carpeta pero no edita.</li>
       </ol>
       <h3>7.2 · Integración heterogénea (elige una)</h3>
@@ -970,9 +1209,27 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
             <code>proyecto-comun</code> y verifica que un archivo creado en el cliente aparece en la web.
           </td>
           <td>Configura <code>reuniones-equipo</code> en Thunderbird (el calendario ya está integrado; Lightning ya no
-            es un complemento aparte) o en Android/iOS con la URL CalDAV, y verifica el evento en ambos lados.</td>
+            es un complemento aparte) o en Android/iOS con la <b>URL CalDAV</b>, que se construye siempre con la misma
+            forma: <code>http://TU_IP:8080/remote.php/dav/calendars/USUARIO/</code> (cambia <code>USUARIO</code> por
+            tu login, p. ej. <code>marta.ruiz</code>). En Thunderbird: «Nuevo calendario» → «Red» → <b>CalDAV</b> →
+            pega la URL. En Android/iOS: «Añadir cuenta» → CalDAV → la misma URL.
+            <br>Si el calendario es de otro usuario, su ruta va detrás:
+            <code>.../calendars/marta.ruiz/reuniones-equipo/</code>. El propio calendario te muestra su URL exacta en
+            su menú <b>⋮ → «Sincronizar con otros dispositivos»</b>.
+            <br><b>Atención:</b> con el 2FA activado el cliente no puede validar el segundo factor, así que hay que
+            usar una <b>contraseña de aplicación</b> (ver el apartado 6.3).</td>
         </tr>
       </table>
+      <div class="nt"><b>Las tres URLs de Nextcloud</b> salen del mismo camino <code>/remote.php/dav/</code>, y solo
+        cambia la parte final:
+        <ul>
+          <li><code>http://TU_IP:8080/remote.php/dav/calendars/USUARIO/</code> → <b>CalDAV</b> (calendarios).</li>
+          <li><code>http://TU_IP:8080/remote.php/dav/addressbooks/users/USUARIO/</code> → <b>CardDAV</b> (contactos).</li>
+          <li><code>http://TU_IP:8080/remote.php/dav/files/USUARIO/</code> → <b>WebDAV</b> (ficheros).</li>
+        </ul>
+        Cambiar de cliente no cambia la URL: por eso un calendario abierto en Thunderbird y en el móvil se
+        sincroniza solo. Y si algún día cambias <code>http</code> por <code>https</code> y el dominio, solo
+        tendrás que tocar la parte de delante de <code>/remote.php/dav/</code>.</div>
       <div class="cam">Cliente configurado y sincronización visible en ambos lados.</div>
       <h3>✅ Punto de control</h3>
       <ul class="ck">
@@ -985,27 +1242,345 @@ Get-NetFirewallRule -DisplayName "Nextcloud 8080" | Get-NetFirewallPortFilter</p
     <section id="ent">
       <h2>8 · Entregable: documentación técnica (criterio h)</h2>
       <p>Crea un documento con capturas de <b>todos</b> los pasos y decisiones que se exigen en la guía. </p>
+      <h3>Criterios y evidencias</h3>
+      <table>
+        <tr>
+          <th>Criterio</th>
+          <th>Evidencia mínima</th>
+          <th>Excelencia</th>
+        </tr>
+        <tr>
+          <td><span class="min">c) Instalación</span></td>
+          <td>Nextcloud accesible, login admin, contenedores en marcha</td>
+          <td>Tabla «Docker vs manual» explicada (8 filas)</td>
+        </tr>
+        <tr>
+          <td><span class="min">d) Intranet</span></td>
+          <td>Trusted domain, puerto en firewall, acceso desde otro equipo</td>
+          <td>Propósito de <code>trusted_domains</code> y firewall</td>
+        </tr>
+        <tr>
+          <td><span class="min">e) Usuarios</span></td>
+          <td>Altas, grupos, cuotas, login verificado</td>
+          <td>Ciclo completo: alta, modificación, baja, pérdida de acceso</td>
+        </tr>
+        <tr>
+          <td><span class="min">f) Seguridad</span></td>
+          <td><code>.env</code> restringido, política de contraseñas, 2FA forzado, advertencias</td>
+          <td>Plan HTTPS en producción</td>
+        </tr>
+        <tr>
+          <td>g) Cooperativo</td>
+          <td>Carpeta compartida con permisos + calendario compartido</td>
+          <td>Cliente de escritorio o CalDAV</td>
+        </tr>
+        <tr>
+          <td>h) Documentación</td>
+          <td>Apartados de la sección 8 + capturas</td>
+          <td>Reproducible por terceros, reflexión crítica</td>
+        </tr>
+      </table>
+      <div class="pb" style="border-color:var(--wa);background:#fff5e5"><b>Condición de superación:</b> c), d), e) y f)
+        son <b>mínimos</b>. No superar uno = no superar la actividad.</div>
+      <div class="nt"><b>Cómo se usa esta tabla:</b> en cada apartado de la guía se indica a qué criterio
+        corresponde (por ejemplo, «criterio d»), pero la nota final sale de aquí: cada fila dice <b>qué
+        evidencia mínima</b> te asegura el aprobado y <b>qué se espera en la excelencia</b>.</div>
+    </section>
+    <section id="glo">
+      <h2><span class="t">Anexo</span>Glosario: los términos que usa esta guía</h2>
+      <p>Cada vez que aparece un término técnico en la guía, aquí tienes qué significa y por qué importa.
+        <b>No hace falta memorizarlo:</b> cuando una palabra te parezca desconocida, vuelve aquí.</p>
+      <table>
+        <tr>
+          <th colspan="2">Nextcloud y su entorno</th>
+        </tr>
+        <tr>
+          <td><b>Nextcloud</b></td>
+          <td>Servidor de archivos y colaboración <b>libre</b> que se instala en tu propia infraestructura y se usa
+            desde el navegador o desde un cliente.</td>
+        </tr>
+        <tr>
+          <td><b>Instancia</b></td>
+          <td>Una instalación concreta de Nextcloud: sus datos, su configuración y su base de datos. Dos instancias
+            no se ven entre sí.</td>
+        </tr>
+        <tr>
+          <td><b>Autoalojo</b> (<i>self-hosted</i>)</td>
+          <td>Instalar y operar el servicio en <b>tu</b> hardware en lugar de usar el de un proveedor. A cambio de
+            cargar con el mantenimiento.</td>
+        </tr>
+        <tr>
+          <td><b>SaaS</b> (<i>software as a service</i>)</td>
+          <td>Software que usas por internet en el servidor de otra empresa (Google Workspace, Microsoft 365). Pagas
+            por uso y cedes el control de los datos.</td>
+        </tr>
+        <tr>
+          <td><b>AGPLv3</b></td>
+          <td>Licencia de software libre con la «cláusula de red»: si modificas Nextcloud y lo ofreces por internet,
+            tienes que publicar también tus modificaciones.</td>
+        </tr>
+        <tr>
+          <td><b>App</b> (aplicación)</td>
+          <td>Módulo que amplía Nextcloud (Calendario, Talk, Nextcloud Office, Forms…). Se activa o instala desde
+            <code>Apps</code> (Administración → Aplicaciones).</td>
+        </tr>
+        <tr>
+          <td><b><code>occ</code></b></td>
+          <td>La <b>CLI de Nextcloud</b>: administra el servidor desde el contenedor (<code>occ config:system:get</code>,
+            <code>occ user:add</code>, <code>occ maintenance:mode</code>…). Es la vía segura de tocar
+            <code>config.php</code>.</td>
+        </tr>
+        <tr>
+          <td><b>Trusted domain</b> (<i>dominio de confianza</i>)</td>
+          <td>Nombre o IP que Nextcloud acepta como propio. Si accedes con otra IP, responde «acceso a través de un
+            dominio no de confianza».</td>
+        </tr>
+        <tr>
+          <td><b>Cuota</b></td>
+          <td>Límite de espacio que se asigna a un usuario. Al superarlo, la subida falla.</td>
+        </tr>
+        <tr>
+          <td><b>Cifrado en cliente</b> (E2EE)</td>
+          <td>El fichero se cifra en el navegador <b>antes</b> de subirlo: el servidor solo guarda el texto cifrado y
+            no puede leerlo.</td>
+        </tr>
+        <tr>
+          <td><b>Auditoría de actividad</b></td>
+          <td>Registro de quién hizo qué (subió, borró, compartió). Sirve para saber qué pasó cuando algo se
+            rompe.</td>
+        </tr>
+        <tr>
+          <th colspan="2">Servidor web, red y seguridad</th>
+        </tr>
+        <tr>
+          <td><b>VirtualHost</b></td>
+          <td>Bloque de configuración de Apache o Nginx que dice «este sitio se sirve en este puerto y desde esta
+            carpeta».</td>
+        </tr>
+        <tr>
+          <td><b>DocumentRoot</b></td>
+          <td>La carpeta del disco de la que un VirtualHost sirve el contenido. Si no apunta a
+            <code>/var/www/html</code>, la web no se ve.</td>
+        </tr>
+        <tr>
+          <td><b>HTTPS</b> / <b>TLS</b></td>
+          <td>Canal cifrado entre cliente y servidor. El certificado es lo que demuestra que el servidor es quien
+            dice ser.</td>
+        </tr>
+        <tr>
+          <td><b>Redirección 301</b></td>
+          <td>Respuesta HTTP permanente: «de aquí en adelante, usa esta otra dirección». En producción, de HTTP a
+            HTTPS.</td>
+        </tr>
+        <tr>
+          <td><b>HSTS</b> (<i>Strict-Transport-Security</i>)</td>
+          <td>Cabecera que ordena al navegador no volver nunca a HTTP, aunque alguien se lo pida.</td>
+        </tr>
+        <tr>
+          <td><b>Proxy inverso</b></td>
+          <td>Servidor que recibe la petición del cliente y la reenvía a otro servidor interno. Aquí, el contenedor
+            de Nextcloud detrás del servidor web.</td>
+        </tr>
+        <tr>
+          <td><b>ACL</b> (<i>Access Control List</i>)</td>
+          <td>Lista de permisos de un fichero: quién puede leerlo o escribirlo. En Windows se gestiona con
+            <code>icacls</code>; en Linux, con <code>chmod</code>.</td>
+        </tr>
+        <tr>
+          <td><b>Firewall</b></td>
+          <td>Filtro del sistema operativo que decide qué conexiones entrantes se permiten. Descarta en silencio lo
+            que no tiene regla.</td>
+        </tr>
+        <tr>
+          <td><b>Perfil de red</b></td>
+          <td>Categoría que Windows asigna a tu red (Privada, Pública o Dominio). Cambia qué reglas de firewall se
+            aplican.</td>
+        </tr>
+        <tr>
+          <td><b>LDAP</b></td>
+          <td>Protocolo de <b>directorio</b>: el estándar con el que un servidor de archivos pregunta a un
+            directorio corporativo (Active Directory, OpenLDAP) quién es cada usuario, en lugar de mantener una
+            lista de cuentas propia.</td>
+        </tr>
+        <tr>
+          <td><b>IMAP</b></td>
+          <td>Protocolo para <b>leer correo</b> desde un servidor, dejando los mensajes en el servidor. Es el que
+            usa el cliente de correo de Nextcloud para conectar con el correo corporativo.</td>
+        </tr>
+        <tr>
+          <td><b>SMTP</b></td>
+          <td>Protocolo para <b>enviar correo</b>. Nextcloud lo usa como servidor de salida para las notificaciones,
+            el formulario de contacto o el correo compartido.</td>
+        </tr>
+        <tr>
+          <td><b>CalDAV</b></td>
+          <td>Estándar para sincronizar <b>calendarios</b> (RFC 4791). Thunderbird, iOS, Androidy Outlook lo
+            hablan.</td>
+        </tr>
+        <tr>
+          <td><b>CardDAV</b></td>
+          <td>Estándar para sincronizar <b>contactos</b>, hermano de CalDAV.</td>
+        </tr>
+        <tr>
+          <td><b>WebDAV</b></td>
+          <td>Estándar para gestionar <b>ficheros</b> por HTTP (subir, mover, compartir) con permisos.</td>
+        </tr>
+        <tr>
+          <td><b>OAuth 2.0</b></td>
+          <td>Protocolo de autorización: permite que una aplicación acceda a tus datos <b>sin</b> darle tu
+            contraseña.</td>
+        </tr>
+        <tr>
+          <td><b>2FA</b> (doble factor)</td>
+          <td>Acceso con dos pruebas: algo que sabes (contraseña) y algo que tienes (el móvil).</td>
+        </tr>
+        <tr>
+          <td><b>TOTP</b></td>
+          <td>Código temporal de 6 dígitos que genera una app de autenticación (Google Authenticator, Aegis…)
+            y que cambia cada 30 segundos.</td>
+        </tr>
+        <tr>
+          <td><b>Contraseña de aplicación</b></td>
+          <td>Contraseña específica para un cliente (escritorio, CalDAV) que no sabe iniciar sesión con 2FA.</td>
+        </tr>
+        <tr>
+          <td><b>SLA</b></td>
+          <td>Compromiso de disponibilidad y tiempo de respuesta de un proveedor. El autoalojo no da SLA: lo das
+            tú.</td>
+        </tr>
+        <tr>
+          <td><b>DLP</b> (<i>Data Loss Prevention</i>)</td>
+          <td>Políticas para evitar que los datos se filtren (no está en la edición gratuita).</td>
+        </tr>
+        <tr>
+          <th colspan="2">Docker y el entorno de trabajo</th>
+        </tr>
+        <tr>
+          <td><b>Imagen</b></td>
+          <td>Plantilla de solo lectura con el software ya instalado (<code>nextcloud:apache</code>,
+            <code>mariadb:11</code>).</td>
+        </tr>
+        <tr>
+          <td><b>Contenedor</b></td>
+          <td>Instancia en ejecución de una imagen, con sus procesos y su sistema de ficheros propio.</td>
+        </tr>
+        <tr>
+          <td><b>Volumen</b></td>
+          <td>Almacenamiento persistente que sobrevive al contenedor (<code>db_data</code> y
+            <code>nextcloud_data</code>).</td>
+        </tr>
+        <tr>
+          <td><b>Red bridge</b></td>
+          <td>Red virtual interna en la que los contenedores se hablan por nombre: por eso el servicio de base de
+            datos se llama <code>db</code>.</td>
+        </tr>
+        <tr>
+          <td><b>Docker Compose</b></td>
+          <td>Fichero (<code>docker-compose.yml</code>) que declara y arranca a la vez todos los servicios de la
+            aplicación.</td>
+        </tr>
+        <tr>
+          <td><b>Variable de entorno</b></td>
+          <td>Valor que se pasa al contenedor desde fuera (el <code>.env</code>), sin escribirlo en el fichero de
+            imagen.</td>
+        </tr>
+        <tr>
+          <td><b>healthcheck</b></td>
+          <td>Prueba que Docker hace al contenedor para saber si está sano. Es lo que permite que el arranque
+            espere a la base de datos.</td>
+        </tr>
+        <tr>
+          <td><b>depends_on</b></td>
+          <td>Dependencia de <b>arranque</b> entre servicios. No garantiza que el otro esté listo para recibir
+            conexiones.</td>
+        </tr>
+        <tr>
+          <td><b>WSL 2</b></td>
+          <td>Subsistema de Linux para Windows 2: las imágenes de Linux se ejecutan en una máquina virtual ligera
+            integrada en Windows.</td>
+        </tr>
+        <tr>
+          <th colspan="2">Datos y operación</th>
+        </tr>
+        <tr>
+          <td><b>Active Directory</b> (<i>AD</i>)</td>
+          <td>Directorio de usuarios y equipos de Windows Server. En un centro es el «listado» oficial de
+            cuentas: al conectarlo con LDAP, el alta de un profesor en Nextcloud se refleja sola.</td>
+        </tr>
+        <tr>
+          <td><b>MariaDB</b></td>
+          <td>Motor de base de datos donde Nextcloud guarda usuarios, ficheros y configuración (tablas
+            <code>oc_*</code>).</td>
+        </tr>
+        <tr>
+          <td><b>S3</b></td>
+          <td>Almacenamiento de objetos en la nube (AWS y compatibles). Nextcloud puede dejar los ficheros
+            grandes fuera de su disco y guardarlos en S3, de forma transparente para el usuario.</td>
+        </tr>
+        <tr>
+          <td><b>Copia de seguridad</b> (<i>backup</i>)</td>
+          <td>Consistencia de datos <b>y</b> base de datos, guardada en otro sitio. Copiar solo una de las dos cosas
+            no sirve de nada.</td>
+        </tr>
+        <tr>
+          <td><b>Tarea en segundo plano</b> (<i>cron</i>)</td>
+          <td>Proceso programado (mantenimiento, avisos, notificaciones) que se ejecuta cada cierto tiempo. Si no
+            está configurado, Nextcloud avisa.</td>
+        </tr>
+      </table>
+      <div class="nt"><b>Truco:</b> si una palabra te frena en mitad de una tarea, no sigue leyendo: busca la
+        entrada en el glosario, vuelve al paso y continúa. Perder tres minutos en una definición ahora te ahorra
+        media hora de prueba y error después.</div>
     </section>
   </main>
   <script>
     const $ = s => document.querySelector(s);
     document.querySelectorAll('pre').forEach(p => { const b = document.createElement('button'); b.textContent = 'Copiar'; b.onclick = () => { navigator.clipboard.writeText(p.firstChild.textContent.trim()); b.textContent = '¡Copiado!'; setTimeout(() => b.textContent = 'Copiar', 1400) }; p.appendChild(b) });
     const cks = [...document.querySelectorAll('.ck input')]; cks.forEach(c => c.onchange = () => $('#bar').style.width = 100 * cks.filter(x => x.checked).length / cks.length + '%');
+    const ul = a => '<ul>' + a.map(x => '<li>' + x + '</li>').join('') + '</ul>';
     const C = [
-      ['PHP', 'docker compose exec app php -v', 'La imagen nextcloud:apache ya trae PHP instalado y configurado.', 'Instalar PHP desde los repositorios, comprobar con php -v y asegurar compatibilidad con tu versión de Nextcloud.'],
-      ['Extensiones PHP', 'docker compose exec app php -m', 'Vienen compiladas y habilitadas: ctype, curl, dom, gd, mbstring, xml, zip, zlib, pdo_mysql…', 'Instalar cada extensión, verificar con php -m y reiniciar el servidor web.'],
-      ['Servidor web', 'docker compose exec app apache2 -v', 'Apache ya instalado y configurado para servir Nextcloud.', 'Instalar Apache, habilitar módulos (a2enmod rewrite headers env dir mime) y configurar un VirtualHost.'],
-      ['VirtualHost', 'docker compose exec app cat /etc/apache2/sites-enabled/000-default.conf', 'VirtualHost preconfigurado en el puerto 80 del contenedor.', 'Crear /etc/apache2/sites-available/nextcloud.conf con DocumentRoot, activarlo con a2ensite y recargar Apache.'],
-      ['Base de datos', 'docker compose exec db mariadb -u nextcloud -p nextcloud -e "SHOW TABLES;"', 'mariadb:11 arranca el servidor. Las tablas (prefijo oc_) las crea Nextcloud al completar la instalación.', 'Instalar MariaDB, ejecutar mysql_secure_installation y crear BD y usuario con CREATE DATABASE y GRANT ALL.'],
-      ['Propietario', 'docker compose exec app ls -la /var/www/html', 'El propietario es www-data (el usuario de Apache), fijado por la imagen.', 'sudo chown -R www-data:www-data /var/www/nextcloud; sin esto Apache no escribe en config/ ni data/.'],
-      ['Persistencia', 'docker volume ls  ·  docker volume inspect entorno-nextcloud_nextcloud_data', 'Volúmenes nombrados que sobreviven a docker compose down. En Windows viven dentro de la VM de WSL 2, no en C:\\. (El prefijo del nombre depende de la carpeta del proyecto.)', 'Datos en /var/lib/mysql y /var/www/nextcloud/data; depende de no borrarlos y de tener copias de seguridad.'],
-      ['Credenciales', 'docker compose config  ·  icacls .env', 'Compose lee el .env e inyecta variables de entorno; el .env no se copia al contenedor.', 'Estarían en config/config.php o en variables del sistema, con permisos restringidos (640, www-data).']];
+      { n: 'PHP', cmd: 'docker compose exec app php -v',
+        dk: ['La imagen <code>nextcloud:apache</code> ya trae PHP compilado y con el <code>php.ini</code> ajustado a lo que Nextcloud necesita.', 'Tú no descargas nada, no instalas nada y no decides la versión.'],
+        mn: ['Instalar PHP desde los repositorios (o el instalador de Windows) y elegir una versión compatible con tu Nextcloud: Nextcloud 31 usa PHP 8.3.', 'Ajustar <code>php.ini</code> (memoria, <code>upload_max_filesize</code>…) y reiniciar el servidor web.'],
+        ver: ['La primera línea: <code>PHP 8.3.x (cli)</code>. <b>Documenta la que veas tú</b>: depende de la imagen que te hayas descargado.', 'La segunda línea: la fecha de compilación, que dice de qué tan reciente es esa versión.'] },
+      { n: 'Extensiones PHP', cmd: 'docker compose exec app php -m',
+        dk: ['Vienen compiladas y habilitadas: <code>ctype</code>, <code>curl</code>, <code>dom</code>, <code>gd</code>, <code>mbstring</code>, <code>xml</code>, <code>zip</code>, <code>zlib</code>, <code>pdo_mysql</code>…', 'El contenedor arranca con su propia configuración de extensiones: no hay nada que tocar.'],
+        mn: ['Instalar cada extensión con el gestor de paquetes (<code>apt install php8.3-mysql php8.3-gd php8.3-curl</code>…).', 'Habilitar las que falten en <code>php.ini</code> y reiniciar Apache o PHP-FPM para que el cambio sirva.'],
+        ver: ['<code>php -m</code> lista los módulos activos: busca <code>pdo_mysql</code>, sin la cual Nextcloud no encuentra la base de datos.', 'Un módulo entre corchetes <code>[ ]</code> está instalado pero deshabilitado: ahí está el fallo.'] },
+      { n: 'Servidor web', cmd: 'docker compose exec app apache2 -v',
+        dk: ['Apache ya está instalado, arrancado y escuchando en el puerto 80 dentro del contenedor.', 'El <code>docker-compose.yml</code> no necesita ni una línea de configuración de Apache.'],
+        mn: ['Instalar Apache y habilitar los módulos que Nextcloud necesita (<code>a2enmod rewrite headers env dir mime</code>).', 'Configurar el VirtualHost y recargar el servicio (<code>systemctl reload apache2</code>).'],
+        ver: ['<code>apache2 -v</code> devuelve la versión y el nombre del servidor.', 'Comprueba que <code>rewrite</code> está cargado (<code>apache2ctl -M | grep rewrite</code>): sin reescritura de URLs la web no se comporta bien.'] },
+      { n: 'VirtualHost', cmd: 'docker compose exec app cat /etc/apache2/sites-enabled/000-default.conf',
+        dk: ['La imagen trae un VirtualHost ya escrito en <code>/etc/apache2/sites-enabled/000-default.conf</code>, apuntando a <code>/var/www/html</code> y escuchando en el puerto 80.', 'Es una de las decisiones que el contenedor toma por ti… y de las más delicadas a mano.'],
+        mn: ['Crear <code>/etc/apache2/sites-available/nextcloud.conf</code> con el <code>DocumentRoot</code> correcto.', 'Activar el sitio con <code>a2ensite</code> y recargar Apache.', 'Ojo con el orden: si hay otro VirtualHost por defecto en el puerto 80, se queda con la petición.'],
+        ver: ['El fichero empieza por <code>&lt;VirtualHost *:80&gt;</code> y su <code>DocumentRoot</code> apunta a <code>/var/www/html</code>.', 'Si el <code>DocumentRoot</code> no coincide, Apache sirve otra cosa y «Nextcloud no existe».'] },
+      { n: 'Base de datos', cmd: 'docker compose exec db mariadb -u nextcloud -p nextcloud -e "SHOW TABLES;"',
+        dk: ['<code>mariadb:11</code> arranca el servidor y guarda los datos en el volumen <code>db_data</code>.', 'Las tablas con prefijo <code>oc_</code> no las crea la imagen: las crea Nextcloud al terminar la instalación web.'],
+        mn: ['Instalar MariaDB y ejecutar <code>mysql_secure_installation</code> (quitar el usuario anónimo, poner contraseña al root, borrar la base de prueba).', 'Crear base y usuario: <code>CREATE DATABASE nextcloud</code> y <code>GRANT ALL ON nextcloud.* TO \'nextcloud\'@\'localhost\'</code>.', 'Dar los permisos de esa base al usuario: un detalle que se olvida a menudo.'],
+        ver: ['La lista de tablas <code>oc_users</code>, <code>oc_accounts</code>, <code>oc_filecache</code>, <code>oc_storages</code>…', 'Si no aparece ninguna, la instalación web no ha terminado: vuelve al instalador.', 'Con <code>-p</code> sin valor, MariaDB te pide la contraseña y no queda escrita en el historial.'] },
+      { n: 'Propietario de archivos', cmd: 'docker compose exec app ls -la /var/www/html',
+        dk: ['El volumen se crea ya con el propietario <code>www-data</code> (el usuario con el que corre Apache), por eso la web puede escribir en <code>config/</code> y en <code>data/</code>.'],
+        mn: ['<code>sudo chown -R www-data:www-data /var/www/nextcloud</code>, con permisos de escritura en los directorios.', 'Sin esto, Apache no puede escribir y Nextcloud avisa de que «no se ha podido escribir el archivo de configuración».', 'Es el fallo más habitual al instalar Nextcloud a mano.'],
+        ver: ['En <code>ls -la</code>, las carpetas <code>config</code> y <code>data</code> muestran <code>www-data www-data</code> como propietario.', 'Fíjate en los permisos: <code>drwxr-xr-x</code> en directorios y <code>-rw-r-----</code> en ficheros.'] },
+      { n: 'Persistencia', cmd: 'docker volume ls  ·  docker volume inspect entorno-nextcloud_nextcloud_data',
+        dk: ['Dos volúmenes nombrados (<code>db_data</code> y <code>nextcloud_data</code>) que sobreviven a <code>docker compose down</code> y a la recreación de los contenedores.', 'En Windows viven dentro de la VM de WSL 2, <b>no</b> en <code>C:\\</code>: por eso no los ves desde el explorador de archivos.'],
+        mn: ['Decidir dónde se guardan los datos (<code>/var/lib/mysql</code> y <code>/var/www/nextcloud/data</code>) y protegerlos.', 'Hacer copias de seguridad: si borras o reinstalas, los datos se van con ellos.'],
+        ver: ['<code>docker volume ls</code> lista los dos volúmenes, con un nombre derivado de la carpeta del proyecto.', '<code>docker volume inspect</code> te da la <b>ruta real</b> del volumen: ese es el sitio que hay que copiar al hacer la copia de seguridad.', 'Haz la prueba: <code>docker compose down</code> y <code>up -d</code>; tus datos siguen ahí.'] },
+      { n: 'Credenciales', cmd: 'docker compose config  ·  icacls .env',
+        dk: ['Compose lee el <code>.env</code> e inyecta las variables de entorno en los contenedores; el <code>.env</code> <b>no se copia</b> dentro del contenedor.', 'El fichero con las contraseñas se queda en tu equipo, fuera de la imagen.'],
+        mn: ['Las credenciales acabarían dentro de <code>config/config.php</code> (en claro) o en variables del sistema, con permisos restringidos (<code>640</code>, propietario <code>www-data</code>).', 'O en un <code>.env</code> junto al compose, con <code>.gitignore</code> y permisos cerrados.'],
+        ver: ['<code>docker compose config</code> imprime el compose ya interpolado: <b>enseña las contraseñas en claro</b>. Por eso el <code>.env</code> va al <code>.gitignore</code> y con permisos restringidos.', '<code>icacls .env</code> debe listar <b>solo tu cuenta</b>: si aparece <code>Users</code>, <code>Everyone</code> o <code>BUILTIN\\Administradores</code>, cualquier usuario del equipo puede leer tus contraseñas.'] }
+    ];
     const L = $('#ex .l'), R = $('#ex .r');
     C.forEach((c, i) => {
-      const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + c[0]; b.onclick = () => {
+      const b = document.createElement('button'); b.textContent = (i + 1) + '. ' + c.n; b.onclick = () => {
         L.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-        R.innerHTML = '<b>Comando de inspección</b><pre></pre><div class="two"><div class="dk"><b>🐳 Qué hace Docker</b><p></p></div><div class="mn"><b>🔧 Qué harías a mano</b><p></p></div></div>';
-        R.querySelector('pre').textContent = c[1]; R.querySelectorAll('p')[0].textContent = c[2]; R.querySelectorAll('p')[1].textContent = c[3]
+        R.innerHTML = '<b>🔎 Comando de inspección</b><pre></pre>' +
+          '<div class="two"><div class="dk"><b>🐳 Qué hace Docker por ti</b>' + ul(c.dk) + '</div>' +
+          '<div class="mn"><b>🔧 Qué tendrías que hacer a mano</b>' + ul(c.mn) + '</div></div>' +
+          '<div class="espera"><b>👀 Qué tienes que ver (salida esperada)</b>' + ul(c.ver) + '</div>';
+        R.querySelector('pre').textContent = c.cmd
       }; L.appendChild(b)
     }); L.firstChild.click();
     /* cd() escapa el texto y convierte `xxx` en <code>xxx</code> */
