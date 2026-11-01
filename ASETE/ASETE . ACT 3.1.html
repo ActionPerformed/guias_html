@@ -33,7 +33,22 @@ button.b{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:8px
 .reto{background:#fff6d6;border:2px dashed var(--amber);border-radius:14px;padding:14px 18px;margin:20px 0}
 .reto .q{font-weight:700}.reto .q span{background:var(--amber);border-radius:6px;padding:1px 9px;margin-right:6px;font:700 13px JetBrains Mono}
 .reto .a{display:none;margin-top:10px;padding:10px 14px;background:#fff;border-left:5px solid var(--teal);border-radius:0 8px 8px 0}.reto.open .a{display:block}
-.task{display:flex;gap:10px;align-items:flex-start;padding:7px 0;cursor:pointer}.task input{width:20px;height:20px;accent-color:var(--red);margin-top:3px;flex:none}.task input:checked+span{text-decoration:line-through;opacity:.55}
+.task{display:flex;gap:10px;align-items:flex-start;padding:7px 0;cursor:pointer}
+.amps{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:18px 0}
+.amp{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:14px 16px;box-shadow:5px 5px 0 var(--ink);display:flex;flex-direction:column}
+.amp.done{background:#eaf7ee;border-color:#2b8a3e;box-shadow:5px 5px 0 #2b8a3e}
+.amp-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.amp-n{font:700 12px JetBrains Mono;background:var(--teal);color:#fff;padding:2px 9px;border-radius:6px}
+.amp-lv{margin-left:auto;font:600 11px JetBrains Mono;background:#ece4d2;border-radius:99px;padding:2px 9px}
+.amp>p{font-size:15px;margin:0 0 10px}
+.amp-h{font-size:14px;margin:0 0 10px}
+.amp-h summary{cursor:pointer;font:600 13px JetBrains Mono;color:var(--teal)}
+.amp-h p{font-size:14px;margin:6px 0 0}
+.amp-done{align-self:flex-start;background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:5px 12px;font:600 13px Figtree;cursor:pointer;color:var(--ink)}
+.amp-done:hover{background:var(--red);border-color:var(--red);color:#fff}
+.amp.done .amp-done{background:#2b8a3e;border-color:#2b8a3e;color:#fff}
+.amp-count{font:13px JetBrains Mono;color:#6b6355;margin:12px 0 0}
+.amp-count b{color:var(--teal)}.task input{width:20px;height:20px;accent-color:var(--red);margin-top:3px;flex:none}.task input:checked+span{text-decoration:line-through;opacity:.55}
 /* flow */
 .flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;justify-content:center;margin:20px 0}
 .node{border:2px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);text-align:center;font-size:13px;min-width:130px}.node b{display:block;font-family:Unbounded;font-size:13px}.node.app{background:#ffe1de}.node.db{background:#dcf0ed}
@@ -51,7 +66,7 @@ button.b{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:8px
 details{background:var(--card);border:2px solid var(--ink);border-radius:10px;margin:8px 0;padding:8px 14px}summary{cursor:pointer;font-weight:700}
 input[type=text],textarea{width:100%;border:2px solid var(--ink);border-radius:8px;padding:9px;font:15px Figtree;background:#fff}
 </style></head><body>
-<nav id="nav"><a href="#obj">Objetivos</a><a href="#s0">Piezas</a><a href="#s1">1 Archivos</a><a href="#s2">2 Proyecto</a><a href="#s3">3 Comprobar</a><a href="#s4">4 Artisan</a><a href="#s5">5 Explorar</a><a href="#s6">6 Cierre</a><a href="#glo">Glosario</a><a href="#ts">SOS</a><div id="bar"><span id="pc">0/0</span><i><b id="pb"></b></i></div></nav>
+<nav id="nav"><a href="#obj">Objetivos</a><a href="#s0">Piezas</a><a href="#s1">1 Archivos</a><a href="#s2">2 Proyecto</a><a href="#s3">3 Comprobar</a><a href="#s4">4 Artisan</a><a href="#s5">5 Explorar</a><a href="#s6">6 Cierre</a><a href="#amp">Ampliaciones</a><a href="#glo">Glosario</a><a href="#ts">SOS</a><div id="bar"><span id="pc">0/0</span><i><b id="pb"></b></i></div></nav>
 <header>
 <span class="badge r">Actividad 3.1</span><span class="badge">2º DAM</span><span class="badge">RA4</span><span class="badge">Continuación de la 2.2</span><span class="badge t">8 horas</span>
 <h1>El taller antes de la obra: <em>Laravel</em> funcionando en tu equipo</h1>
@@ -81,6 +96,31 @@ input[type=text],textarea{width:100%;border:2px solid var(--ink);border-radius:8
 </ul>
 <p><b>Qué necesitas</b>: Docker Desktop funcionando (con WSL 2) y un editor de texto. Si <code>docker --version</code> responde en PowerShell, estás listo.</p>
 </div>
+<h3>No empiezas de cero: lo de la 2.2, aquí</h3>
+<p>La actividad 2.2 terminó con una promesa: <i>«Cuando abras Laravel, reconocerás la estructura. No empezarás de cero»</i>. Vamos a cobrarla. Todo lo que montaste entonces sigue aquí, solo que con otro nombre:</p>
+<table><tr><th>Lo que hiciste en la 2.2</th><th>Dónde lo ves hoy</th></tr>
+<tr><td><code>namespace App\...</code> y PSR-4 en <code>composer.json</code></td><td>Igual: <code>proyecto/composer.json</code> declara <code>"App\\": "app/"</code>. Laravel te lo da configurado, pero la idea es la misma.</td></tr>
+<tr><td><code>require vendor/autoload.php</code></td><td>Lo hace <code>public/index.php</code> por ti. El <code>vendor/</code> que creó Composer en el punto 2.2 es exactamente el mismo.</td></tr>
+<tr><td><code>public/</code> como raíz del servidor web</td><td>Exactamente igual: el <code>sed</code> del <code>Dockerfile</code> le dice a Apache que la raíz es <code>public/</code>.</td></tr>
+<tr><td><code>requireLogin()</code> y <code>$_SESSION</code> a mano</td><td>Ahora son el <i>middleware</i> de autenticación y la variable <code>SESSION_DRIVER</code> del <code>.env</code>: el mismo problema, la solución del framework.</td></tr>
+<tr><td><code>app/Config/db.php</code> con PDO a mano</td><td>Es <code>config/database.php</code> leyendo las variables <code>DB_*</code> de <code>proyecto/.env</code>.</td></tr>
+<tr><td><code>try</code>/<code>catch</code> y tu manejador global</td><td><code>app/Exceptions/Handler.php</code>: el framework captura las excepciones que tú no llegaste a capturar.</td></tr>
+<tr><td><code>declare(strict_types=1)</code></td><td>En todos los archivos que Laravel genera.</td></tr>
+<tr><td>Un fichero por pantalla: <code>public/login.php</code>, <code>material.php</code>…</td><td>Una línea por URL en <code>routes/web.php</code>. Ya has usado una: la de <code>/hola</code>, en el apartado 5.2.</td></tr>
+</table>
+<p>Y la diferencia de fondo, que es la que de verdad importa:</p>
+<pre><span class="f">2.2 · public/index.php</span><code>require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Includes/auth.php';
+
+requireLogin();                 // tú decides quién entra
+$repo = new MaterialRepo();     // tú lo instancias
+$materiales = $repo->findAll(); // tú preguntas</code></pre>
+<pre><span class="f">3.1 · public/index.php</span><code>require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->handleRequest(Request::capture());   // el framework decide</code></pre>
+<p>En la 2.2 el orden lo decidías <b>tú</b>: cargar, autenticar, preguntar. En Laravel, <code>public/index.php</code> solo <b>arranca</b> el framework y se sale: el router lee <code>routes/web.php</code>, encuentra la ruta que corresponde a la URL y ejecuta lo que pone ahí. Lo que antes escribías a mano, ahora lo decide el framework — y por eso <code>routes/web.php</code> es el archivo que más vas a tocar en las próximas actividades.</p>
+<div class="tip"><b>Y lo de la 1.2 tampoco se pierde.</b> El servicio <code>app</code> es el Apache + PHP que montasteis entonces (ahora con la imagen <code>php:8.4-apache</code>), y el servicio <code>db</code> es tu MariaDB de siempre. Lo único que has añadido hoy es <b>el framework en medio</b>: por eso el <code>DocumentRoot</code> se cambia en el <code>Dockerfile</code> y la base de datos se configura con variables de entorno en vez de un <code>db.php</code> escrito a mano.</div>
+<div class="card"><b>Comprobación rápida (2 min).</b> Abre <code>proyecto/</code> en tu editor y compara sus carpetas con las que construiste en la 2.2: <code>app/</code> (la misma, con más subcarpetas), <code>config/</code> (tu <code>app/Config/</code>), <code>public/</code> (igual) y <code>vendor/</code> (igual). Y hay carpetas <b>nuevas</b>: <code>routes/</code>, <code>resources/</code> (las vistas), <code>database/</code> (las migraciones), <code>bootstrap/</code> y <code>storage/</code> (logs y caché). Cuando llegues al apartado 5.1 verás el mapa completo: cada carpeta tiene su equivalente en lo que ya sabes, y esas cinco son lo que vas a aprender a partir de ahora.</div>
 </section>
 
 <section id="s0"><h2><span class="n">0</span>Las piezas <span class="min">30 min · lectura</span></h2>
@@ -93,7 +133,7 @@ input[type=text],textarea{width:100%;border:2px solid var(--ink);border-radius:8
 <tr><td><code>proyecto/.env</code></td><td>Configuración de <b>Laravel</b>: con qué credenciales intenta conectarse a la base de datos.</td></tr>
 <tr><td><code>.gitignore</code></td><td>Le dice a Git qué ficheros <b>no</b> debe guardar: los <code>.env</code> (secretos) y <code>proyecto/vendor/</code> (dependencias). Lo crearás en la Fase 1.</td></tr></table>
 <div class="tip"><b>¿Por qué dos <code>.env</code>?</b> Uno configura al <i>servidor</i> de base de datos (qué contraseña tendrá el usuario) y el otro a la <i>aplicación</i> (con cuál intenta entrar). Son dos lados de la misma puerta: si no coinciden, no se abre. Pruébalo en el laboratorio de más abajo.</div></div>
-<table><tr><th>Contenedor</th><th>Imagen</th><th>Función</th></tr><tr><td><code>app</code></td><td><code>php:8.4-apache</code> (personalizada)</td><td>Apache y PHP juntos (<code>mod_php</code>). Sirve Laravel en el puerto 8080 de tu máquina.</td></tr><tr><td><code>db</code></td><td><code>mariadb:11</code></td><td>Almacena los datos.</td></tr></table>
+<table><tr><th>Contenedor</th><th>Imagen</th><th>Función</th></tr><tr><td><code>app</code></td><td><code>php:8.4-apache</code> (personalizada)</td><td>Apache y PHP juntos (<code>mod_php</code>). Sirve Laravel en el puerto 8080 de tu máquina.</td></tr><tr><td><code>db</code></td><td><code>mariadb:11.4</code></td><td>Almacena los datos. Sin puertos publicados: solo se ve desde la red interna.</td></tr></table>
 <div class="tip"><b>¿Por qué Apache y no Nginx?</b> La imagen <code>php:apache</code> integra PHP dentro de Apache: un solo contenedor hace de servidor web e intérprete, como en tu LAMP anterior. Nginx exigiría un contenedor PHP-FPM aparte y proxy inverso: más piezas sin aportar nada a lo que evaluamos hoy.</div>
 <p><b>¿Qué es Artisan?</b> La herramienta de línea de comandos de Laravel: genera código, ejecuta migraciones, lista rutas… Hoy solo comprobarás que funciona; en la próxima actividad será protagonista.</p>
 
@@ -138,15 +178,13 @@ DB_ROOT_PASSWORD=rootpass</code></pre>
         condition: service_healthy
 
   db:
-    image: mariadb:11
+    image: mariadb:11.4
     container_name: laravel_db
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
       MARIADB_USER: ${DB_USERNAME}
       MARIADB_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -157,8 +195,11 @@ DB_ROOT_PASSWORD=rootpass</code></pre>
 
 volumes:
   db_data:</code></pre>
-<p>Fíjate en los <code>${DB_PASSWORD}</code> y compañía: referencias al <code>.env</code> raíz. Dos líneas que debes dominar:</p>
-<ul><li><code>"8080:80"</code> → <b>puerto_de_tu_PC : puerto_del_contenedor</b>.</li><li><code>./proyecto:/var/www/html</code> → la carpeta <code>proyecto/</code> de tu disco se <i>monta</i> dentro del contenedor: es la misma carpeta vista desde dos sitios.</li></ul>
+<p>Fíjate en los <code>${DB_PASSWORD}</code> y compañía: referencias al <code>.env</code> raíz. Tres líneas que debes dominar:</p>
+<ul><li><code>"8080:80"</code> → <b>puerto_de_tu_PC : puerto_del_contenedor</b>.</li><li><code>./proyecto:/var/www/html</code> → la carpeta <code>proyecto/</code> de tu disco se <i>monta</i> dentro del contenedor: es la misma carpeta vista desde dos sitios.</li><li>El servicio <code>db</code> <b>no publica ningún puerto</b>: a MariaDB solo se llega desde dentro de la red de Docker (te lo explicamos debajo).</li></ul>
+<div class="tip"><b>¿Por qué la base de datos no publica puertos?</b> Porque <b>no hace falta</b>: Laravel y MariaDB ya se ven entre sí dentro de la red de Docker, usando el nombre del servicio (<code>db</code>) y el puerto interno (<code>3306</code>). Publicar el puerto en tu PC solo sirve para que herramientas de escritorio (DBeaver, un cliente SQL) entren desde fuera… y ese es justo el peligro: con el puerto abierto, cualquiera que esté en la <b>red del aula</b> podría intentar entrar con <code>laravel_user</code> y la contraseña que ya conoces. En un servidor real la base de datos casi nunca se publica: se deja accesible solo desde dentro.</div>
+<div class="tip warn"><b>¿Y si algún día la quieres ver desde el escritorio?</b> Puedes publicarla <b>solo en tu propio equipo</b>, atando el puerto al <i>loopback</i>: <code>"127.0.0.1:3307:3306"</code>. Así ni siquiera sale a la red del aula. En esta actividad no hace falta: para mirar las tablas usamos el cliente <code>mariadb</code> <i>dentro</i> del contenedor (apartado 3.3).</div>
+<div class="tip"><b>Por qué la imagen dice <code>mariadb:11.4</code> y no <code>mariadb:11</code>.</b> Las etiquetas de Docker son <i>móviles</i>: <code>mariadb:11</code> significa «cualquier 11.x que exista ahora mismo», y dentro de unas semanas podría ser una 11.5 con cambios. Fijando <code>11.4</code>, <b>todos los equipos del aula montan exactamente la misma base de datos</b>: los resultados son comparables y nadie pierde el rato con «a mí me funciona y a ti no». Con PHP lo hacemos a medias y a propósito: <code>php:8.4-apache</code> ya fija la rama 8.4 (las actualizaciones de parche no cambian la API y no afectan a esta guía) y no fijamos el parche porque una imagen con el parche clavado envejece mal.</div>
 <div data-r="1"></div>
 <h3>1.4 El <code>Dockerfile</code></h3>
 <pre><span class="f">Dockerfile</span><code>FROM php:8.4-apache
@@ -216,7 +257,8 @@ docker compose ps</code></pre>
 <p>La primera vez tarda varios minutos (descarga imágenes y construye la tuya).</p>
 <div class="exp"><b>✅ Debes ver</b> en <code>docker compose ps</code> dos filas: <code>laravel_app</code> con <code>Up</code> y <code>laravel_db</code> con <code>Up (healthy)</code>. Si <code>db</code> se queda en <code>starting</code>, está arrancando MariaDB: espera unos segundos y repite la orden. Si aparece <code>Exit</code> o <code>Restarting</code>, hay un error: mira el <a href="#ts">SOS</a>.</div>
 <h3>2.2 Instala Laravel con Composer</h3>
-<pre><span class="f">powershell</span><code>docker compose exec app composer create-project laravel/laravel .</code></pre>
+<pre><span class="f">powershell</span><code>docker compose exec app composer create-project "laravel/laravel:^12.0" .</code></pre>
+<div class="tip"><b>Qué significa <code>"laravel/laravel:^12.0"</code>.</b> Es una <i>restricción</i> de Composer (ya la usaste en la actividad 2.2): <code>^12.0</code> significa «cualquier versión desde la 12.0 hasta la 12.x, pero nunca la 13». Así el proyecto es siempre Laravel 12, sin que la guía se quede vieja cuando salga la 13 y sin que se instale una versión incompatible. Fíjate en que <b>lleva comillas</b>: es una cadena con caracteres especiales, y sin ellas el <code>^</code> da problemas en algunas terminales.</div>
 <div class="tip warn"><b>Ojo al punto final.</b> Estás en <code>/var/www/html</code>, que es tu carpeta <code>proyecto/</code>. El <code>.</code> instala Laravel <i>ahí</i>. Si escribieras un nombre de carpeta, quedaría anidado (<code>proyecto/proyecto/</code>) y Apache serviría una ruta vacía. Composer avisará de que se ejecuta como root: es normal en este entorno.</div>
 <p>Descarga Laravel y sus dependencias dentro del contenedor y, gracias al volumen, aparece en tu carpeta local <code>proyecto/</code>. Al terminar, Composer ya ha generado un <code>proyecto/.env</code> y una <code>APP_KEY</code>.</p>
 <div class="exp"><b>✅ Debes ver</b> un listado largo de paquetes (<code>Package operations: … installs, … updates</code>) y, al final, un mensaje parecido a <code>Application key set successfully.</code> Tarda varios minutos: es normal. Y en tu disco, la carpeta <code>proyecto/</code> que estaba vacía ahora tiene contenido.</div>
@@ -237,8 +279,14 @@ DB_HOST=db
 DB_PORT=3306
 DB_DATABASE=laravel
 DB_USERNAME=laravel_user
-DB_PASSWORD=laravel_pass</code></pre>
+DB_PASSWORD=laravel_pass
+
+# estas tres ya vienen así: no hay que tocarlas
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database</code></pre>
 <p>Fíjate en <code>DB_HOST=db</code>: no es <code>localhost</code>, es el <b>nombre del servicio</b> del compose. Docker lo resuelve dentro de su red interna.</p>
+<p>Las tres últimas líneas (<code>SESSION_DRIVER</code>, <code>CACHE_STORE</code> y <code>QUEUE_CONNECTION</code>) <b>ya vienen así</b> en el <code>.env</code> que generó Composer: no tienes que tocarlas, pero conviene que sepas qué significan, porque son la razón de que el apartado 3.1 empiece con las migraciones.</p>
 <p>Comprueba que la clave existe (y, solo si apareciera vacía, genérala). En PowerShell:</p>
 <pre><span class="f">powershell</span><code>Select-String -Path proyecto\.env -Pattern "APP_KEY"
 docker compose exec app php artisan key:generate   # solo si APP_KEY está vacía</code></pre>
@@ -261,7 +309,10 @@ docker compose up -d</code></pre>
 <h3>3.1 Conecta Laravel con MariaDB</h3>
 <pre><span class="f">powershell</span><code>docker compose exec app php artisan migrate</code></pre>
 <div class="exp"><b>✅ Debes ver</b> la cabecera <code>INFO Running migrations.</code> y una lista de migraciones terminada en <code>DONE</code>. Son las tablas que Laravel crea: <code>users</code>, <code>password_reset_tokens</code>, <code>sessions</code>, <code>cache</code>, <code>jobs</code>…</div>
-<p>Si ves las migraciones ejecutándose, <b>la conexión con MariaDB funciona</b>. Si no, revisa <code>DB_HOST=db</code> y que las contraseñas coincidan. Hazlo <b>antes</b> de abrir el navegador: Laravel guarda las sesiones en la base de datos y necesita que sus tablas existan.</p>
+<p>Si ves las migraciones ejecutándose, <b>la conexión con MariaDB funciona</b>. Si no, revisa <code>DB_HOST=db</code> y que las contraseñas coincidan.</p>
+<div class="tip"><b>¿Por qué las migraciones van <i>antes</i> de abrir el navegador?</b> Porque en Laravel 11 y 12 las sesiones, la caché y las colas <b>se guardan en la base de datos</b>, no en ficheros. Lo decides con tres variables de <code>proyecto/.env</code>: <code>SESSION_DRIVER=database</code> (las sesiones), <code>CACHE_STORE=database</code> (la caché) y <code>QUEUE_CONNECTION=database</code> (los trabajos en cola). Vienen así por defecto y no hay que cambiarlas, pero conviene saberlo: es la causa de que este apartado empiece por las migraciones y no por el navegador.</div>
+<div class="tip warn"><b>Qué pasa si te saltas este paso.</b> La primera visita al navegador intenta guardar la sesión y se encuentra con que la tabla no existe: la página responde con un error 500 y un mensaje del tipo «<code>Table 'laravel.sessions' doesn't exist</code>». No es un fallo de la contraseña ni de la base de datos: es que falta la tabla. La solución es la de siempre, <code>php artisan migrate</code> (la tienes en el <a href="#ts">SOS</a>).</div>
+<div class="tip"><b>¿Y qué tablas crea?</b> <code>migrations</code> (el historial de lo que ya se aplicó), <code>users</code>, <code>password_reset_tokens</code>, <code>sessions</code> (las sesiones), <code>cache</code> y <code>cache_locks</code> (la caché), y <code>jobs</code>, <code>job_batches</code> y <code>failed_jobs</code> (las colas). En el apartado 3.3 las ves todas desde el cliente de MariaDB.</div>
 <div data-r="5"></div>
 <h3>3.2 Accede a Laravel</h3>
 <p>Visita <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>: debe aparecer la pantalla de bienvenida de Laravel.</p>
@@ -282,7 +333,7 @@ SHOW TABLES;</code></pre>
 <section id="s4"><h2><span class="n">4</span>Artisan y el ciclo de vida de una petición <span class="min">60 min</span></h2>
 <pre><span class="f">powershell</span><code>docker compose exec app php artisan --version
 docker compose exec app php artisan route:list</code></pre>
-<div class="exp"><b>✅ Debes ver</b> en la primera orden <code>Laravel Framework 12.x.x</code> (o la versión estable que se haya descargado) y en la segunda una <b>línea por ruta</b>, con su método (<code>GET|HEAD</code>), su URL y su destino: <code>/</code> apuntando a <code>routes/web.php</code> y también <code>up</code>. Guarda esta salida: te vendrá bien en la actividad siguiente.</div>
+<div class="exp"><b>✅ Debes ver</b> en la primera orden <code>Laravel Framework 12.x.x</code> (con la restricción <code>^12.0</code> será la 12 más reciente) y en la segunda una <b>línea por ruta</b>, con su método (<code>GET|HEAD</code>), su URL y su destino: <code>/</code> apuntando a <code>routes/web.php</code> y también <code>up</code>. Guarda esta salida: te vendrá bien en la actividad siguiente.</div>
 <div data-r="9"></div>
 <p>Observa con calma la salida de <code>route:list</code>: añade <code>-v</code> si quieres ver también el middleware.</p>
 <div data-r="10"></div><div data-r="11"></div>
@@ -297,7 +348,7 @@ docker compose exec app php artisan route:list</code></pre>
 
 <section id="s5"><h2><span class="n">5</span>Exploración guiada: demuestra que no eres pasivo <span class="min">60 min</span></h2>
 <h3>5.1 Mapa de carpetas</h3>
-<p>Abre <code>proyecto/</code> en tu editor. Pulsa para ver qué guarda cada carpeta.</p>
+<p>Abre <code>proyecto/</code> en tu editor. Pulsa para ver qué guarda cada carpeta. <b>Cada una te va a resultar familiar</b>: en <a href="#obj">«No empiezas de cero»</a> tienes la tabla que conecta estas carpetas con las que construiste en la actividad 2.2.</p>
 <div class="fol" id="fol"></div><div class="tip" id="fd">Elige una carpeta.</div>
 <h3>5.2 Tu primera modificación</h3>
 <p>Añade al final de <code>proyecto/routes/web.php</code>:</p>
@@ -359,6 +410,54 @@ docker compose exec app php artisan route:list</code></pre>
 <li><a href="https://getcomposer.org/doc/" target="_blank" rel="noopener">Composer</a>: el manual de la herramienta.</li>
 </ul>
 <p><b>Lo que viene después:</b> en la próxima actividad usarás <b>este mismo proyecto</b> para ver cómo una petición atraviesa rutas, controlador, modelo y vista, con comandos como <code>make:model</code> y <code>make:controller</code>. Si algo falla hoy, lo arrastrarás: déjalo funcionando.</p>
+<p>¿Has terminado antes de la hora? Entonces tienes <a href="#amp">retos de ampliación</a>: seis retos <b>sin solución publicada</b> y <b>sin nota</b>, pero tocan el taller, así que hazlos al final de la sesión.</p>
+</section>
+
+<section id="amp"><h2><span class="n">★</span>Retos de ampliación <span class="min">opcional · sin entrega</span></h2>
+<p>Los 14 retos de la guía son de <b>explicar</b>: qué hace cada pieza. Los retos de este bloque son de <b>hacer</b>: tocan el taller, lo modifican y te obligan a justificar por qué. <b>No tienen solución publicada</b> (para eso están los retos con solución) y <b>no cuentan para la nota</b>: el criterio sigue siendo que el taller funcione.</p>
+<div class="tip warn"><b>Ojo: estos retos tocan tu taller.</b> Como la próxima actividad parte de este mismo proyecto, hazlos <b>al final de la sesión</b> o sobre una copia de la carpeta <code>laravel-docker/</code>. Cada reto termina indicando cómo <b>dejarlo como estaba</b>: si terminas el bloque y el taller ya no funciona, no has ganado nada.</div>
+<h3>Cómo están ordenados</h3>
+<p>De menor a mayor dificultad. Los tres primeros se resuelven con órdenes y variables que ya conoces; a partir del cuarto hay que tocar el <code>docker-compose.yml</code>, y el sexto exige además construir una imagen. Si te atascas en uno, sáltalo y vuelve luego: no están atados entre sí.</p>
+<div class="amps">
+<div class="amp" data-amp="A1">
+  <div class="amp-head"><span class="amp-n">A1</span><b>Documenta el estado de tu taller</b><span class="amp-lv">nivel 1 · 15 min</span></div>
+  <p>Crea un fichero <code>estado.md</code> en <code>laravel-docker/</code> con cuatro datos: la versión de PHP, la de Laravel, la de MariaDB y el estado de los contenedores. Y después responde: <b>¿para qué sirve este fichero?</b> Piensa en un compañero que dice «a mí no me funciona»: ¿qué parte de su problema te diría este documento?</p>
+  <details class="amp-h"><summary>Pista</summary><p>Las órdenes ya las usaste: <code>php -v</code> y <code>php artisan --version</code> dentro del contenedor (<code>docker compose exec app …</code>), <code>docker compose exec db mariadb --version</code> para MariaDB y <code>docker compose ps</code> para el estado. Mira el apartado 4.</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+<div class="amp" data-amp="A2">
+  <div class="amp-head"><span class="amp-n">A2</span><b>MariaDB, solo en tu propio equipo</b><span class="amp-lv">nivel 2 · 20 min</span></div>
+  <p>Añade al servicio <code>db</code> del compose la línea <code>ports: – "127.0.0.1:3307:3306"</code>, levanta el taller y comprueba en <code>docker compose ps</code> que ahora la base de datos aparece con puerto. Entra con un cliente SQL desde tu PC si tienes uno. Después, quita la línea y vuelve a levantar. Responde: <b>¿qué cambia respecto a publicar <code>3307:3306</code> a secas?</b> ¿Por qué en un aula con 25 equipos esto no es un detalle menor?</p>
+  <details class="amp-h"><summary>Pista</summary><p>La explicación está en el aviso del apartado 2.4. La diferencia entre <code>127.0.0.1:3307:3306</code> y <code>3307:3306</code> está en a quién escucha el reenvío: uno solo en tu equipo y el otro en toda la red. Lo que no cambia: la aplicación sigue hablando con <code>db:3306</code>.</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+<div class="amp" data-amp="A3">
+  <div class="amp-head"><span class="amp-n">A3</span><b>Sesiones en ficheros: qué pasa si la base no tiene esas tablas</b><span class="amp-lv">nivel 3 · 30 min</span></div>
+  <p>En <code>proyecto/.env</code> cambia <code>SESSION_DRIVER=database</code> por <code>SESSION_DRIVER=file</code> y <code>CACHE_STORE=database</code> por <code>CACHE_STORE=file</code>. Reinicia y navega por la web: funciona igual. Comprueba ahora que la tabla <code>sessions</code> <b>sigue vacía</b> (por ejemplo con <code>docker compose exec db mariadb -ularavel_user -p laravel_pass laravel -e "SELECT COUNT(*) FROM sessions;"</code>). Responde: <b>¿qué has ganado y qué has perdido?</b> ¿En qué tipo de aplicación elegirías cada opción?</p>
+  <details class="amp-h"><summary>Pista</summary><p>Si las tablas <code>sessions</code> y <code>cache</code> ya no se usan, la web no necesita que existan: ese es el punto. Para volver al estado anterior, devuelve las dos variables a <code>database</code> y ejecuta <code>docker compose exec app php artisan migrate</code> otra vez (no hace daño repetirla).</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+<div class="amp" data-amp="A4">
+  <div class="amp-head"><span class="amp-n">A4</span><b>Healthcheck: qué pasa si la base de datos no está sana</b><span class="amp-lv">nivel 4 · 35 min</span></div>
+  <p>El compose tiene un <code>healthcheck</code> en el servicio <code>db</code>, pero el servicio <code>app</code> no espera a que esté sano: los dos arrancan a la vez. Averigua cómo se hace que <code>app</code> espere (pista: <code>depends_on</code> con <code>condition: service_healthy</code>) y aplícalo. Después, rompe la conexión a propósito: pon <code>DB_HOST=db2</code> en <code>proyecto/.env</code> y mira el error que aparece en los logs <b>antes</b> y <b>después</b> de aplicar el <code>depends_on</code>. Responde: <b>¿qué te dice cada uno de los dos errores?</b></p>
+  <details class="amp-h"><summary>Pista</summary><p>Los logs están en el apartado 5.3. La diferencia entre los dos casos: sin <code>depends_on</code> Laravel falla al intentar conectar (error de conexión); con él, Docker no arranca siquiera la aplicación (el error habla del servicio, no de la base de datos). Para volver a como estaba: <code>DB_HOST=db</code> y quita el <code>depends_on</code> añadido.</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+<div class="amp" data-amp="A5">
+  <div class="amp-head"><span class="amp-n">A5</span><b>Un cliente web para ver la base de datos</b><span class="amp-lv">nivel 5 · 45 min</span></div>
+  <p>Añade un tercer servicio al compose, <code>adminer</code> (una imagen que es un cliente web de bases de datos), y publícale el puerto <code>8081</code>. Entra en <code>http://localhost:8081</code> desde el navegador y conéctate con las credenciales del <code>.env</code> raíz. <b>No publiques ningún puerto en MariaDB</b>: el objetivo del reto es precisamente ver que no hace falta. Responde: <b>¿cómo ha llegado adminer hasta MariaDB si la base de datos no publica puertos?</b> ¿qué le has abierto a la red del aula?</p>
+  <details class="amp-h"><summary>Pista</summary><p>Dos servicios se ven si comparten red: el compose ya ha creado la suya. La imagen se descarga sola al hacer <code>docker compose up -d</code> (necesitas internet). Para volver a como estaba, quita el servicio <code>adminer</code> y el puerto 8081 del compose, y comprueba que la web sigue en pie en el 8080.</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+<div class="amp" data-amp="A6">
+  <div class="amp-head"><span class="amp-n">A6</span><b>Tu propia imagen, sin tocar el compose de la guía</b><span class="amp-lv">nivel 6 · 60 min</span></div>
+  <p>No edites el <code>docker-compose.yml</code>: crea un <code>compose.override.yaml</code> en la misma carpeta con una imagen propia (se construye con un <code>Dockerfile</code> propio derivado de <code>php:8.4-apache</code>, al que le añades una extensión que no esté, por ejemplo <code>intl</code> o <code>gd</code>) y comprueba que PHP la ve. Después, <b>renombra</b> el fichero a otra cosa y mira qué pasa al levantar. Responde: <b>¿qué ficheros lee Compose al arrancar?</b> ¿por qué el <code>docker-compose.yml</code> original queda intacto y eso es una ventaja?</p>
+  <details class="amp-h"><summary>Pista</summary><p>Compose carga siempre un <code>compose.override.yaml</code> si existe, y lo aplica <b>encima</b> del fichero base: lo que está en el override gana. Para comprobar la extensión: <code>docker compose exec app php -m</code> (el <code>-m</code> lista los módulos de PHP). Para volver a como estaba: borra el <code>override</code> y haz <code>docker compose up -d --build</code>.</p></details>
+  <button class="amp-done" type="button">Marcar como resuelta</button>
+</div>
+</div>
+<p class="amp-count">Ampliaciones resueltas: <b id="ampN">0</b> de 6</p>
+<div class="tip"><b>¿Y si los haces todos?</b> Tendrás un taller con tres servicios, una base de datos a la que puedes entrar desde tu propio equipo, sesiones en ficheros y una imagen propia construida por ti. Eso ya no es «seguir la guía»: es <b>administrar tu entorno</b>, que es exactamente lo que se te pedirá en las actividades siguientes. Anota en tu <code>README</code> cuáles has resuelto: el generador de abajo recoge las que marques.</div>
 </section>
 
 <section id="glo"><h2><span class="n">Glosario</span>Los términos de hoy</h2>
@@ -393,11 +492,14 @@ docker compose exec app php artisan route:list</code></pre>
 <tr><td><b>Middleware</b></td><td>Capa que se ejecuta antes de la ruta: sesión, cookies, protección CSRF…</td></tr>
 <tr><td><b>CSRF</b></td><td>Protección contra peticiones falsificadas desde otro sitio. Laravel la aplica con tokens en los formularios.</td></tr>
 <tr><td><b>Sesión</b></td><td>Datos del usuario entre peticiones. Con <code>SESSION_DRIVER=database</code> se guardan en la tabla <code>sessions</code>.</td></tr>
+<tr><td><b><code>SESSION_DRIVER</code></b></td><td>Dónde guarda Laravel la sesión. Con <code>database</code> (valor por defecto en Laravel 11 y 12) usa la tabla <code>sessions</code> de MariaDB; con <code>file</code>, ficheros en <code>storage/framework/sessions</code>.</td></tr>
+<tr><td><b><code>CACHE_STORE</code></b></td><td>Dónde guarda Laravel la caché. Con <code>database</code> (por defecto) usa las tablas <code>cache</code> y <code>cache_locks</code>.</td></tr>
+<tr><td><b><code>QUEUE_CONNECTION</code></b></td><td>Dónde se encolan los trabajos pendientes (los que se ejecutan en segundo plano). Con <code>database</code> (por defecto) usa las tablas <code>jobs</code>, <code>job_batches</code> y <code>failed_jobs</code>.</td></tr>
 <tr><td><b><code>DB_HOST</code></b></td><td>Host de la base de datos. Dentro de Docker es <code>db</code> (el nombre del servicio), nunca <code>localhost</code>.</td></tr>
 <tr><td><b>Healthcheck</b></td><td>Prueba que Docker ejecuta en un contenedor para saber si está listo. Cuando pasa, el contenedor figura como <code>healthy</code>.</td></tr>
 <tr><td><b><code>depends_on</code></b></td><td>Dependencia entre servicios: <code>app</code> no arranca hasta que <code>db</code> está <code>healthy</code>.</td></tr>
 <tr><td><b><code>composer create-project</code></b></td><td>Descarga un proyecto Laravel completo en la carpeta actual (el <code>.</code>).</td></tr>
-<tr><td><b>Puerto publicado (<code>8080:80</code>)</b></td><td>El puerto de tu PC (8080) se reenvía al del contenedor (80). MariaDB hace lo mismo con <code>3307:3306</code>.</td></tr>
+<tr><td><b>Puerto publicado (<code>8080:80</code>)</b></td><td>El puerto de tu PC (8080) se reenvía al del contenedor (80). Solo el servicio <code>app</code> publica puertos: la base de datos se queda dentro de la red de Docker.</td></tr>
 <tr><td><b><code>docker compose exec</code></b></td><td>Ejecuta una orden dentro de un contenedor ya en marcha (p. ej. <code>php artisan migrate</code>).</td></tr>
 </tbody></table>
 </section>
@@ -419,7 +521,7 @@ const R=[
 ["¿Qué es <code>php artisan</code>? ¿En qué se diferencia de ejecutar un archivo PHP como hacías antes?","Es la interfaz de línea de comandos de Laravel: un conjunto de comandos del framework (<code>migrate</code>, <code>route:list</code>, <code>make:controller</code>…). Antes ejecutabas <b>tu código</b>; Artisan ejecuta <b>código del framework</b> que a su vez crea o modifica cosas de tu proyecto: automatiza tareas repetitivas."],
 ["¿Qué muestra <code>route:list</code>? ¿Cuál responde a <code>/</code>?","Una línea por ruta con su método HTTP (<code>GET|HEAD</code>), la URI y, si la tiene, su nombre y destino. Aparecen <code>/</code> (bienvenida), <code>up</code> (comprobación de estado) y probablemente <code>storage/{path}</code>. Con <code>-v</code> se ve también el middleware. <code>/</code> está definida en <code>routes/web.php</code> y devuelve la vista <code>welcome</code>."],
 ["En la ruta <code>/</code> por defecto, ¿cuál es el «controlador»? (No hay clase controladora.)","Una <b>closure</b> (función anónima) escrita directamente en <code>routes/web.php</code>. En la próxima actividad moverás esa lógica a un controlador real en <code>app/Http/Controllers/</code>, que es la práctica recomendada en MVC."],
-["¿Por qué Laravel usa <code>DB_PORT=3306</code> si en el compose publicamos MariaDB como <code>3307:3306</code>?","En <code>3307:3306</code>, el 3307 es el puerto <b>de tu PC</b> (para un cliente externo, p. ej. DBeaver en <code>localhost:3307</code>) y el 3306 el del <b>contenedor</b>. Laravel vive dentro de la red de Docker y habla directamente con <code>db:3306</code>."],
+["Ahora que MariaDB no publica ningún puerto, ¿por qué Laravel sigue usando <code>DB_HOST=db</code> y <code>DB_PORT=3306</code>?","Porque Laravel <b>no sale de la red de Docker</b>: se dirige al contenedor <code>db</code> por su nombre y, dentro del contenedor, el puerto de MariaDB es siempre el <b>3306</b>. El puerto que se publica en el PC (3307 antes, ahora ninguno) solo sirve para herramientas de escritorio como DBeaver, que entran desde fuera. Publicarlo exponía la base de datos a toda la red del aula: cualquiera con la contraseña podía entrar."],
 ["¿Por qué <code>/up</code> te sirve para saber si las URLs amigables funcionan? ¿Qué sospecharías si <code>/</code> carga pero <code>/up</code> da un 404 de Apache?","<code>/</code> la resuelve el índice por defecto, pero <code>/up</code> no es un archivo físico: el <code>.htaccess</code> de <code>public/</code> y <code>mod_rewrite</code> la redirigen a <code>index.php</code>. Si <code>/</code> funciona y <code>/up</code> no, el rewrite no está activo (<code>a2enmod rewrite</code> o permisos de <code>.htaccess</code>)."],
 ["Has editado <code>routes/web.php</code> y <code>/hola</code> funciona al instante. ¿Por qué no hizo falta reconstruir ni reiniciar nada?","Porque <code>./proyecto</code> está montado como volumen en <code>/var/www/html</code>: contenedor y tu editor ven los mismos archivos. Además PHP lee el código en cada petición. Solo reconstruirías (<code>--build</code>) si cambias el <code>Dockerfile</code>."]];
 const P=[0,1,2,3,4,6,5,7,11,8,9,10,12,13];const RR=P.map(i=>R[i]);R.length=0;R.push(...RR);
@@ -449,14 +551,18 @@ S.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s[0];b.
 const F={app:'Tu código de aplicación: modelos (<code>Models/</code>), controladores (<code>Http/Controllers/</code>)…',bootstrap:'Arranque del framework (<code>app.php</code>) y caché (<code>cache/</code>, que debe ser escribible).',config:'Archivos de configuración; leen valores del <code>.env</code> con <code>env()</code>.',database:'Migraciones, <i>factories</i> y <i>seeders</i>: el historial de la base de datos.',public:'Único directorio expuesto: <code>index.php</code> y assets públicos.',resources:'Vistas Blade (<code>views/</code>), CSS y JS sin compilar.',routes:'Definición de rutas: <code>web.php</code> es la que usas hoy.',storage:'Logs, caché de vistas y archivos subidos. Debe ser escribible por Apache.',vendor:'Dependencias instaladas por Composer. No se edita ni se sube al repositorio.','.env':'Configuración y secretos de esta instalación. Nunca al repositorio.'};
 Object.keys(F).forEach(k=>{const b=document.createElement('button');b.textContent=k+(k[0]=='.'?'':'/');b.onclick=()=>{$$('#fol button').forEach(x=>x.className='');b.className='on';$('#fd').innerHTML='<b>'+b.textContent+'</b> — '+F[k]};$('#fol').appendChild(b)});
 // SOS
-const X=[['Error de puerto al hacer <code>up</code>','puerto 8080 3307 ocupado','Otro proceso usa 8080 o 3307.','Cambia el número de la <b>izquierda</b> en <code>ports</code> (p. ej. <code>"8081:80"</code>) y usa esa URL.'],['Laravel da error 500','500 key clave','Falta <code>APP_KEY</code> o faltan permisos de escritura.','Comprueba <code>APP_KEY</code> en <code>proyecto/.env</code> y repite el <code>chown</code> de la Fase 2.'],['Error 500: «Table laravel.sessions doesn\'t exist»','500 sessions tabla migrate','No has ejecutado las migraciones y Laravel guarda sesiones en la base de datos.','<code>docker compose exec app php artisan migrate</code>. Recuerda repetirlo tras un <code>down -v</code>.'],['<code>migrate</code> da error de conexión','conexión migrate access denied 1045 2002 contraseña','Contraseñas no sincronizadas, <code>DB_HOST</code> mal o <code>db</code> aún no <code>healthy</code>.','Revisa ambos <code>.env</code> y que <code>DB_HOST=db</code>; espera al estado <code>healthy</code>.'],['Cambié la contraseña y no funciona','contraseña volumen password','El volumen conserva la antigua.','<code>docker compose down -v</code> y vuelve a levantar (después, <code>migrate</code>).'],['<code>${DB_PASSWORD}</code> no se sustituye (aviso «variable is not set»)','variable env compose sustituye','El <code>.env</code> no está junto al compose o el nombre de la variable no coincide.','Ponlo en la misma carpeta que <code>docker-compose.yml</code> y ejecuta <code>docker compose</code> desde ahí.'],['Se creó <code>proyecto/proyecto/</code> o Apache da 403/404','403 404 anidada carpeta create-project','Ejecutaste <code>create-project</code> con un nombre de carpeta en vez de <code>.</code>.','Vacía <code>proyecto/</code> y repite con <code>composer create-project laravel/laravel .</code>.'],['<code>/</code> carga pero otras rutas dan 404','404 rewrite rutas up htaccess','El rewrite de Apache no está activo.','Verifica <code>a2enmod rewrite</code> en el Dockerfile y reconstruye con <code>docker compose up -d --build</code>.'],['«Permission denied» al escribir en <code>storage</code>','permisos permission storage logs','Apache (<code>www-data</code>) no puede escribir.','<code>docker compose exec app chown -R www-data:www-data storage bootstrap/cache</code>']];
+const X=[['Error de puerto al hacer <code>up</code>','puerto 8080 ocupado','Otro proceso usa el 8080.','Cambia el número de la <b>izquierda</b> en <code>ports</code> (p. ej. <code>"8081:80"</code>) y usa esa URL.'],['Laravel da error 500','500 key clave','Falta <code>APP_KEY</code> o faltan permisos de escritura.','Comprueba <code>APP_KEY</code> en <code>proyecto/.env</code> y repite el <code>chown</code> de la Fase 2.'],['Error 500: «Table laravel.sessions doesn\'t exist»','500 sessions tabla migrate','No has ejecutado las migraciones y Laravel guarda sesiones en la base de datos.','<code>docker compose exec app php artisan migrate</code>. Recuerda repetirlo tras un <code>down -v</code>.'],['<code>migrate</code> da error de conexión','conexión migrate access denied 1045 2002 contraseña','Contraseñas no sincronizadas, <code>DB_HOST</code> mal o <code>db</code> aún no <code>healthy</code>.','Revisa ambos <code>.env</code> y que <code>DB_HOST=db</code>; espera al estado <code>healthy</code>.'],['Cambié la contraseña y no funciona','contraseña volumen password','El volumen conserva la antigua.','<code>docker compose down -v</code> y vuelve a levantar (después, <code>migrate</code>).'],['<code>${DB_PASSWORD}</code> no se sustituye (aviso «variable is not set»)','variable env compose sustituye','El <code>.env</code> no está junto al compose o el nombre de la variable no coincide.','Ponlo en la misma carpeta que <code>docker-compose.yml</code> y ejecuta <code>docker compose</code> desde ahí.'],['Se creó <code>proyecto/proyecto/</code> o Apache da 403/404','403 404 anidada carpeta create-project','Ejecutaste <code>create-project</code> con un nombre de carpeta en vez de <code>.</code>.','Vacía <code>proyecto/</code> y repite con <code>composer create-project laravel/laravel .</code>.'],['<code>/</code> carga pero otras rutas dan 404','404 rewrite rutas up htaccess','El rewrite de Apache no está activo.','Verifica <code>a2enmod rewrite</code> en el Dockerfile y reconstruye con <code>docker compose up -d --build</code>.'],['«Permission denied» al escribir en <code>storage</code>','permisos permission storage logs','Apache (<code>www-data</code>) no puede escribir.','<code>docker compose exec app chown -R www-data:www-data storage bootstrap/cache</code>']];
 function tl(q=''){$('#tl').innerHTML=X.filter(x=>(x[0]+x[1]).toLowerCase().includes(q.toLowerCase())).map(x=>`<details><summary>${x[0]}</summary><p><b>Causa:</b> ${x[2]}</p><p><b>Solución:</b> ${x[3]}</p></details>`).join('')||'<p>Sin coincidencias.</p>'}
 $('#fq').oninput=e=>tl(e.target.value);tl();
 // glosario
 const GR=$$('#glo tbody tr');function gl(q=''){GR.forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none')}
 $('#gq').oninput=e=>gl(e.target.value);gl();
+// ampliaciones
+const AMPS=$$('.amp');
+AMPS.forEach(a=>{const b=a.querySelector('.amp-done');b.onclick=()=>{const d=a.classList.toggle('done');b.textContent=d?'✓ Resuelta':'Marcar como resuelta';$('#ampN').textContent=$$('.amp.done').length}});
+const AMPDONE=()=>$$('.amp.done').map(a=>'- [x] '+a.dataset.amp+' · '+a.querySelector('b').textContent);
 // README
-$('#dl').onclick=()=>{const done=T.filter(t=>t.checked).map(t=>'- [x] '+t.nextElementSibling.textContent.trim());const md=`# Actividad 3.1: Laravel con Docker\n\n**Alumno/a:** ${$('#nm').value||'(nombre)'}\n\n## Tareas completadas\n${done.join('\n')||'(ninguna marcada)'}\n\n## Respuestas a los retos\n${R.map((r,i)=>'### Reto '+(i+1)+'\n(tu respuesta)\n').join('\n')}\n## Reflexión\n${$('#rf').value||'(escribe aquí tu reflexión)'}\n\n## Capturas\n- php artisan --version\n- http://localhost:8080\n`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='README.md';document.body.appendChild(a);a.click();a.remove()};
+$('#dl').onclick=()=>{const done=T.filter(t=>t.checked).map(t=>'- [x] '+t.nextElementSibling.textContent.trim());let md=`# Actividad 3.1: Laravel con Docker\n\n**Alumno/a:** ${$('#nm').value||'(nombre)'}\n\n## Tareas completadas\n${done.join('\n')||'(ninguna marcada)'}\n\n## Respuestas a los retos\n${R.map((r,i)=>'### Reto '+(i+1)+'\n(tu respuesta)\n').join('\n')}\n## Reflexión\n${$('#rf').value||'(escribe aquí tu reflexión)'}\n\n## Ampliaciones resueltas\n${AMPDONE().join('\n')||'(ninguna marcada)'}\n\n## Capturas\n- php artisan --version\n- http://localhost:8080\n`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='README.md';document.body.appendChild(a);a.click();a.remove()};
 // scrollspy
 const L=$$('#nav a'),io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)L.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-40% 0px -55% 0px'});$$('section').forEach(s=>io.observe(s));
 </script></body></html>
