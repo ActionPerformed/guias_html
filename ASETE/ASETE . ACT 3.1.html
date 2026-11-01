@@ -22,6 +22,7 @@ h3{font-size:17px;margin-top:1.6em}
 .card{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:5px 5px 0 var(--ink)}
 .tip{border-left:6px solid var(--teal);background:#e6f3f1;padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
 .warn{border-left-color:var(--red);background:#ffe9e6}
+.exp{border-left:6px solid #2b8a3e;background:#eaf7ee;padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-size:15px}
 code{font-family:JetBrains Mono,monospace;font-size:.88em;background:#ece4d2;padding:1px 6px;border-radius:5px}
 pre{position:relative;background:#1d1b1a;color:#f5f0e6;border-radius:12px;padding:16px;overflow-x:auto;font:13px/1.55 JetBrains Mono,monospace;margin:14px 0}pre code{background:none;padding:0;color:inherit}
 pre .f{position:absolute;top:0;right:0;background:var(--amber);color:var(--ink);font:600 11px JetBrains Mono;padding:2px 10px;border-radius:0 12px 0 8px}
@@ -175,7 +176,11 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 WORKDIR /var/www/html</code></pre>
-<ul><li><code>FROM php:8.4-apache</code>: imagen oficial con Apache y PHP 8.4.</li><li><code>git unzip libzip-dev</code> + extensión <code>zip</code>: Composer los usa para descargar y descomprimir paquetes.</li><li><code>pdo_mysql</code>: permite a PHP hablar con MariaDB.</li><li><code>a2enmod rewrite</code>: activa las URLs amigables (sin <code>.php</code>).</li><li>Los <code>sed</code>: cambian la carpeta que Apache sirve por <code>public/</code>. <b>Es crítico.</b></li></ul>
+<ul><li><code>FROM php:8.4-apache</code>: imagen oficial con Apache y PHP 8.4.</li><li><code>git unzip libzip-dev</code> + extensión <code>zip</code>: Composer los usa para descargar y descomprimir paquetes.</li><li><code>pdo_mysql</code>: permite a PHP hablar con MariaDB.</li><li><code>a2enmod rewrite</code>: activa las URLs amigables (sin <code>.php</code>).</li><li>Los <code>sed</code>: reescriben la configuración de Apache para que sirva <code>public/</code> en lugar de la carpeta raíz del proyecto. <b>Son las líneas más importantes del fichero</b> (te lo explicamos justo debajo).</li>
+</ul>
+<div class="tip"><b>¿Por qué son tan importantes los <code>sed</code>?</b> Por defecto, la imagen oficial <code>php:8.4-apache</code> sirve <b>la carpeta entera</b> del proyecto (<code>/var/www/html</code>). Y esa carpeta contiene tu <code>proyecto/.env</code> con la <code>APP_KEY</code> y la contraseña de MariaDB, además de todo el código fuente. Si alguien pidiera <code>http://localhost:8080/.env</code>, Apache le entregaría el fichero con los secretos, tal cual.</div>
+<div class="tip"><b>Qué hace exactamente cada línea.</b> <code>ENV APACHE_DOCUMENT_ROOT=/var/www/html/public</code> <i>declara</i> la carpeta correcta. El primer <code>sed</code> la aplica al <code>DocumentRoot</code> del sitio (el fichero de virtualhost <code>000-default.conf</code>), que es quien decide qué carpeta se sirve. El segundo <code>sed</code> toca la configuración global (<code>apache2.conf</code>) y el bloque <code>Directory</code> de <code>docker-php.conf</code>: sin él, Apache seguiría sin dar permiso sobre la carpeta nueva y te respondería con un <b>403 Forbidden</b>. El resultado es que <b>solo se expone <code>public/</code></b> y todas las peticiones entran por su único <code>index.php</code>.</div>
+<div class="tip warn"><b>Comprobación opcional (5 min).</b> Si te queda la duda, quita las dos líneas <code>sed</code> del <code>Dockerfile</code>, ejecuta <code>docker compose up -d --build</code> y pide <code>http://localhost:8080/.env</code>: verás el fichero con la contraseña de la base de datos. Vuelve a poner las líneas y reconstruye: así queda demostrado por qué eran obligatorias.</div>
 <div data-r="2"></div>
 <h3>1.5 El <code>.gitignore</code></h3>
 <p>El <code>.gitignore</code> es el fichero que le dice a <b>Git</b> (la herramienta de control de versiones) qué ficheros <b>no</b> debe guardar nunca en el historial. En la ampliación A6 de la actividad 2.2 viste el caso de <code>vendor/</code>; aquí lo montas entero, con los secretos del proyecto.</p>
@@ -206,15 +211,19 @@ proyecto/storage/framework/cache/</code></pre>
 
 <section id="s2"><h2><span class="n">2</span>Crear el proyecto Laravel dentro del contenedor <span class="min">120 min</span></h2>
 <h3>2.1 Levanta los contenedores (aún sin proyecto)</h3>
-<pre><code>docker compose up -d --build
+<pre><span class="f">powershell</span><code>docker compose up -d --build
 docker compose ps</code></pre>
-<p>La primera vez tarda varios minutos (descarga imágenes y construye la tuya). Deben aparecer <code>laravel_app</code> y <code>laravel_db</code>; si <code>db</code> está en <code>starting</code>, espera a <code>healthy</code>.</p>
+<p>La primera vez tarda varios minutos (descarga imágenes y construye la tuya).</p>
+<div class="exp"><b>✅ Debes ver</b> en <code>docker compose ps</code> dos filas: <code>laravel_app</code> con <code>Up</code> y <code>laravel_db</code> con <code>Up (healthy)</code>. Si <code>db</code> se queda en <code>starting</code>, está arrancando MariaDB: espera unos segundos y repite la orden. Si aparece <code>Exit</code> o <code>Restarting</code>, hay un error: mira el <a href="#ts">SOS</a>.</div>
 <h3>2.2 Instala Laravel con Composer</h3>
-<pre><code>docker compose exec app composer create-project laravel/laravel .</code></pre>
+<pre><span class="f">powershell</span><code>docker compose exec app composer create-project laravel/laravel .</code></pre>
 <div class="tip warn"><b>Ojo al punto final.</b> Estás en <code>/var/www/html</code>, que es tu carpeta <code>proyecto/</code>. El <code>.</code> instala Laravel <i>ahí</i>. Si escribieras un nombre de carpeta, quedaría anidado (<code>proyecto/proyecto/</code>) y Apache serviría una ruta vacía. Composer avisará de que se ejecuta como root: es normal en este entorno.</div>
 <p>Descarga Laravel y sus dependencias dentro del contenedor y, gracias al volumen, aparece en tu carpeta local <code>proyecto/</code>. Al terminar, Composer ya ha generado un <code>proyecto/.env</code> y una <code>APP_KEY</code>.</p>
-<p>Deja que Apache (usuario <code>www-data</code>) pueda escribir en las carpetas donde Laravel guarda caché y logs:</p>
-<pre><code>docker compose exec app chown -R www-data:www-data storage bootstrap/cache</code></pre>
+<div class="exp"><b>✅ Debes ver</b> un listado largo de paquetes (<code>Package operations: … installs, … updates</code>) y, al final, un mensaje parecido a <code>Application key set successfully.</code> Tarda varios minutos: es normal. Y en tu disco, la carpeta <code>proyecto/</code> que estaba vacía ahora tiene contenido.</div>
+<p>Necesitas que Apache (usuario <code>www-data</code>) pueda escribir en las carpetas donde Laravel guarda caché y logs:</p>
+<pre><span class="f">powershell</span><code>docker compose exec app chown -R www-data:www-data storage bootstrap/cache</code></pre>
+<div class="tip"><b>¿Por qué hace falta? Son tres hechos encadenados.</b> <b>1)</b> Composer se ha ejecutado dentro del contenedor como <b>root</b> (te lo avisó al instalarse), así que todos los ficheros de <code>proyecto/</code> pertenecen a <code>root</code>. <b>2)</b> Apache nunca sirve páginas como <code>root</code>: lo hace como <code>www-data</code>, un usuario sin permisos. <b>3)</b> Laravel necesita <b>escribir</b> en <code>storage/</code> (logs y caché de vistas) y en <code>bootstrap/cache/</code> (los ficheros compilados del framework).</div>
+<div class="tip warn"><b>Qué pasa si te lo saltas.</b> El proyecto «funciona» pero Laravel no puede escribir ni su log: verás un «Permission denied» en <code>storage/logs/</code> y una pantalla en blanco o un error 500 sin explicación. Por eso el <code>chown</code> va <b>justo después</b> de instalar Composer, y no al final. El <code>-R</code> significa «recursivamente»: también los ficheros que hay dentro de esas carpetas.</div>
 <h3>2.3 Configura <code>proyecto/.env</code></h3>
 <p>Ábrelo con tu editor y <b>modifica</b> (no lo sustituyas entero) las líneas de conexión: cambia <code>DB_CONNECTION</code> de <code>sqlite</code> a <code>mysql</code> y descomenta/ajusta el resto.</p>
 <pre><span class="f">proyecto/.env</span><code>APP_NAME=Laravel
@@ -237,7 +246,7 @@ docker compose exec app php artisan key:generate   # solo si APP_KEY está vací
 <div data-r="3"></div>
 <h3>2.4 Reto de sincronización: cambia la contraseña</h3>
 <p>Cambia la contraseña de MariaDB a <code>dam2024pass</code> en <b>los dos</b> archivos (<code>DB_PASSWORD=dam2024pass</code>) y recrea el volumen:</p>
-<pre><code>docker compose down -v
+<pre><span class="f">powershell</span><code>docker compose down -v
 docker compose up -d</code></pre>
 <p><code>-v</code> elimina el volumen <code>db_data</code>. MariaDB solo aplica la contraseña nueva <b>la primera vez</b> que inicializa un volumen. ¡Vuelve al laboratorio de la Fase 0 y predice el resultado antes de ejecutar!</p>
 <div data-r="4"></div>
@@ -250,17 +259,19 @@ docker compose up -d</code></pre>
 
 <section id="s3"><h2><span class="n">3</span>Comprobar que Laravel responde y conecta <span class="min">75 min</span></h2>
 <h3>3.1 Conecta Laravel con MariaDB</h3>
-<pre><code>docker compose exec app php artisan migrate</code></pre>
-<p>Si ves las migraciones ejecutándose, <b>la conexión funciona</b>. Si no, revisa <code>DB_HOST=db</code> y que las contraseñas coincidan. Hazlo <b>antes</b> de abrir el navegador: Laravel guarda las sesiones en la base de datos y necesita que sus tablas existan.</p>
+<pre><span class="f">powershell</span><code>docker compose exec app php artisan migrate</code></pre>
+<div class="exp"><b>✅ Debes ver</b> la cabecera <code>INFO Running migrations.</code> y una lista de migraciones terminada en <code>DONE</code>. Son las tablas que Laravel crea: <code>users</code>, <code>password_reset_tokens</code>, <code>sessions</code>, <code>cache</code>, <code>jobs</code>…</div>
+<p>Si ves las migraciones ejecutándose, <b>la conexión con MariaDB funciona</b>. Si no, revisa <code>DB_HOST=db</code> y que las contraseñas coincidan. Hazlo <b>antes</b> de abrir el navegador: Laravel guarda las sesiones en la base de datos y necesita que sus tablas existan.</p>
 <div data-r="5"></div>
 <h3>3.2 Accede a Laravel</h3>
 <p>Visita <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>: debe aparecer la pantalla de bienvenida de Laravel.</p>
 <div data-r="6"></div>
 <h3>3.3 Mira las tablas en MariaDB</h3>
-<pre><code>docker compose exec db mariadb -u laravel_user -p</code></pre>
+<pre><span class="f">powershell</span><code>docker compose exec db mariadb -u laravel_user -p</code></pre>
 <p>Introduce la contraseña (<code>dam2024pass</code>) y, dentro:</p>
-<pre><code>USE laravel;
+<pre><span class="f">mariadb</span><code>USE laravel;
 SHOW TABLES;</code></pre>
+<div class="exp"><b>✅ Debes ver</b> una lista de tablas que incluye <code>migrations</code>, <code>users</code> y <code>sessions</code>. Si saliera vacía, es que faltan las migraciones del apartado 3.1. Para salir del cliente, escribe <code>exit</code> y pulsa Intro.</div>
 <div data-r="7"></div><div data-r="8"></div>
 <div class="card"><b>✅ Checklist de la fase</b>
 <label class="task"><input type="checkbox" class="t"><span><code>php artisan migrate</code> ejecutado sin errores</span></label>
@@ -269,17 +280,18 @@ SHOW TABLES;</code></pre>
 </section>
 
 <section id="s4"><h2><span class="n">4</span>Artisan y el ciclo de vida de una petición <span class="min">60 min</span></h2>
-<pre><code>docker compose exec app php artisan --version
+<pre><span class="f">powershell</span><code>docker compose exec app php artisan --version
 docker compose exec app php artisan route:list</code></pre>
-<p>Debes ver <code>Laravel Framework 12.x.x</code> (o la versión estable posterior que haya descargado Composer). <b>Captura esta salida.</b></p>
+<div class="exp"><b>✅ Debes ver</b> en la primera orden <code>Laravel Framework 12.x.x</code> (o la versión estable que se haya descargado) y en la segunda una <b>línea por ruta</b>, con su método (<code>GET|HEAD</code>), su URL y su destino: <code>/</code> apuntando a <code>routes/web.php</code> y también <code>up</code>. Guarda esta salida: te vendrá bien en la actividad siguiente.</div>
 <div data-r="9"></div>
 <p>Observa con calma la salida de <code>route:list</code>: añade <code>-v</code> si quieres ver también el middleware.</p>
 <div data-r="10"></div><div data-r="11"></div>
 <div class="card"><h3 style="margin-top:0">🧭 Recorrido de una petición a <code>localhost:8080</code></h3><p>Pulsa los pasos (o <b>Siguiente</b>) para seguirla.</p>
 <div class="st" id="st"></div><div id="sd" class="tip"></div><button class="b" id="nx">Siguiente ▶</button></div>
 <div data-r="12"></div>
+<p>Y de paso, <b>prueba <code>http://localhost:8080/up</code></b>: es una ruta que Laravel añade para comprobar que la aplicación está viva (un «health check»). Si te devuelve <b>200</b> y una página casi vacía, todo va bien. Si te devuelve un <b>404 de Apache</b>, el <code>mod_rewrite</code> no está activo y las URLs amigables no funcionarían.</p>
 <div class="card"><b>✅ Checklist de la fase</b>
-<label class="task"><input type="checkbox" class="t"><span>Captura de <code>php artisan --version</code> hecha</span></label>
+<label class="task"><input type="checkbox" class="t"><span>He ejecutado <code>php artisan --version</code> y <code>route:list</code> y entiendo su salida</span></label>
 <label class="task"><input type="checkbox" class="t"><span>He probado <code>http://localhost:8080/up</code> en el navegador</span></label></div>
 </section>
 
@@ -295,9 +307,14 @@ docker compose exec app php artisan route:list</code></pre>
 <p>Guarda y visita <code>http://localhost:8080/hola</code>. Después ejecuta <code>route:list</code> otra vez.</p>
 <div data-r="13"></div>
 <h3>5.3 Mira por dentro cuando algo falla</h3>
-<pre><code>docker compose logs app
-docker compose exec app tail -n 20 storage/logs/laravel.log</code></pre>
-<p>Primero, la salida de Apache; después, el log propio de Laravel (aparece cuando hay errores). Para provocar uno de forma controlada, escribe mal a propósito el nombre de la ruta de la vista en <code>/hola</code> (<code>return view('no_existe');</code>), recarga y observa la página de error con <code>APP_DEBUG=true</code>. Luego déjalo bien.</p>
+<p>Cuando algo va mal no adivines ni pruebes órdenes al azar: sigue siempre los mismos <b>cuatro pasos</b>.</p>
+<div class="card"><ol>
+<li><b>Reproduce</b> el fallo: haz exactamente la acción que lo provocó (abrir una URL, ejecutar una orden) y anota la hora.</li>
+<li><b>Recoge solo lo nuevo</b>: <code>docker compose logs --since 5m app</code> enseña únicamente los últimos 5 minutos. Sin ese filtro te pierdes entre cientos de líneas y no sabrás si tu error es viejo o nuevo.</li>
+<li><b>Separa Apache de Laravel</b>: <code>docker compose logs app</code> es el log del <b>servidor web</b> (peticiones, 404, 500); <code>docker compose exec app tail -n 20 storage/logs/laravel.log</code> es el log del <b>framework</b> (excepciones de PHP, SQL, avisos) y solo existe si ha habido errores. Ojo con una cosa: la primera orden se escribe en PowerShell, pero la segunda <b>se ejecuta dentro del contenedor</b> (por eso usa <code>tail</code>, una orden de Linux). Si el error aparece en el segundo log, el problema es de tu código; si aparece en el primero, es de configuración.</li>
+<li><b>Arregla y repite</b>: corrige, repite el paso 1 y comprueba que el log <b>deja de crecer</b>. Un log que sigue creciendo es un error que no has corregido.</li>
+</ol></div>
+<p>Para provocar un error de forma controlada, escribe mal a propósito el nombre de la vista en <code>/hola</code> (<code>return view('no_existe');</code>), recarga y observa la página de error con <code>APP_DEBUG=true</code>: verás el archivo, la línea exacta y el motivo. Después déjalo bien.</p>
 <div class="tip warn"><b>Piénsalo:</b> esa página de error muestra rutas del servidor y fragmentos de código. Por eso, en un servidor real, <code>APP_DEBUG</code> debe estar en <code>false</code>.</div>
 <div class="card"><b>✅ Checklist de la fase</b>
 <label class="task"><input type="checkbox" class="t"><span><code>/hola</code> responde sin haber reconstruido nada</span></label>
@@ -329,6 +346,18 @@ docker compose exec app tail -n 20 storage/logs/laravel.log</code></pre>
 <p>No hay nada que subir al aula virtual, pero guarda un <code>README.md</code> en <code>laravel-docker/</code>: documenta tu taller y te sirve de red de seguridad si algo se rompe. Con: tus datos; las respuestas a los <b>14 retos</b> (con tus palabras, al menos los que te hayan costado); una <b>reflexión de 5-8 líneas</b> (¿qué te ha costado más? ¿qué has entendido ahora de cómo se conectan Docker, Apache, PHP, Laravel y MariaDB?); la captura de <code>php artisan --version</code> y la captura de <code>localhost:8080</code>.</p>
 <div class="card"><h3 style="margin-top:0">📝 Borrador de README</h3><p>Escribe tu nombre y tu reflexión; descarga un esqueleto con tus tareas marcadas y rellena después las respuestas.</p>
 <input type="text" id="nm" placeholder="Nombre y apellidos"><br><br><textarea id="rf" rows="5" placeholder="Reflexión (5-8 líneas)"></textarea><br><br><button class="b" id="dl">⬇ Descargar README.md</button></div>
+<h3>Para seguir cuando algo no esté aquí</h3>
+<p>La documentación oficial es la mejor fuente cuando una duda no aparece en la guía:</p>
+<ul>
+<li><a href="https://laravel.com/docs/12.x" target="_blank" rel="noopener">Documentación de Laravel 12</a>: el manual completo, con buscador.</li>
+<li><a href="https://laravel.com/docs/12.x/installation" target="_blank" rel="noopener">Instalación</a>: la configuración oficial por pasos (es, sobre otro sistema, lo que has hecho aquí).</li>
+<li><a href="https://laravel.com/docs/12.x/artisan" target="_blank" rel="noopener">Artisan</a>: todos los comandos de la línea de órdenes.</li>
+<li><a href="https://laravel.com/docs/12.x/migrations" target="_blank" rel="noopener">Migraciones</a>: qué son y cómo se escriben.</li>
+<li><a href="https://laravel.com/docs/12.x/configuration" target="_blank" rel="noopener">Configuración</a>: el papel de cada variable del <code>.env</code>.</li>
+<li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose</a>: la referencia del <code>docker-compose.yml</code>.</li>
+<li><a href="https://docs.docker.com/reference/dockerfile/" target="_blank" rel="noopener">Dockerfile</a>: todas las instrucciones posibles.</li>
+<li><a href="https://getcomposer.org/doc/" target="_blank" rel="noopener">Composer</a>: el manual de la herramienta.</li>
+</ul>
 <p><b>Lo que viene después:</b> en la próxima actividad usarás <b>este mismo proyecto</b> para ver cómo una petición atraviesa rutas, controlador, modelo y vista, con comandos como <code>make:model</code> y <code>make:controller</code>. Si algo falla hoy, lo arrastrarás: déjalo funcionando.</p>
 </section>
 
