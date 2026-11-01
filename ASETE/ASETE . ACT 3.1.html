@@ -48,7 +48,17 @@ button.b{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:8px
 .amp-done:hover{background:var(--red);border-color:var(--red);color:#fff}
 .amp.done .amp-done{background:#2b8a3e;border-color:#2b8a3e;color:#fff}
 .amp-count{font:13px JetBrains Mono;color:#6b6355;margin:12px 0 0}
-.amp-count b{color:var(--teal)}.task input{width:20px;height:20px;accent-color:var(--red);margin-top:3px;flex:none}.task input:checked+span{text-decoration:line-through;opacity:.55}
+.amp-count b{color:var(--teal)}
+.navh{display:none}
+.fl{display:block;font:600 13px JetBrains Mono;margin:0 0 6px;color:#6b6355}
+@media (min-width:1200px){
+  html{scroll-padding-top:24px}
+  body{padding-left:238px}
+  nav{position:fixed;top:0;left:0;bottom:0;width:238px;height:100vh;flex-direction:column;align-items:stretch;overflow-x:hidden;overflow-y:auto;border-right:4px solid var(--ink);padding:16px 10px}
+  nav a{text-align:left;padding:8px 12px;border-radius:8px}
+  .navh{display:block;font:700 11px JetBrains Mono;color:var(--amber);letter-spacing:.1em;text-transform:uppercase;padding:2px 12px 12px}
+  #bar{margin-left:0;margin-top:auto;padding-top:14px}
+}.task input{width:20px;height:20px;accent-color:var(--red);margin-top:3px;flex:none}.task input:checked+span{text-decoration:line-through;opacity:.55}
 /* flow */
 .flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;justify-content:center;margin:20px 0}
 .node{border:2px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);text-align:center;font-size:13px;min-width:130px}.node b{display:block;font-family:Unbounded;font-size:13px}.node.app{background:#ffe1de}.node.db{background:#dcf0ed}
@@ -66,7 +76,7 @@ button.b{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:8px
 details{background:var(--card);border:2px solid var(--ink);border-radius:10px;margin:8px 0;padding:8px 14px}summary{cursor:pointer;font-weight:700}
 input[type=text],textarea{width:100%;border:2px solid var(--ink);border-radius:8px;padding:9px;font:15px Figtree;background:#fff}
 </style></head><body>
-<nav id="nav"><a href="#obj">Objetivos</a><a href="#s0">Piezas</a><a href="#s1">1 Archivos</a><a href="#s2">2 Proyecto</a><a href="#s3">3 Comprobar</a><a href="#s4">4 Artisan</a><a href="#s5">5 Explorar</a><a href="#s6">6 Cierre</a><a href="#amp">Ampliaciones</a><a href="#glo">Glosario</a><a href="#ts">SOS</a><div id="bar"><span id="pc">0/0</span><i><b id="pb"></b></i></div></nav>
+<nav id="nav" aria-label="Índice de la guía"><span class="navh">Índice</span><a href="#obj">Objetivos</a><a href="#s0">Piezas</a><a href="#s1">1 Archivos</a><a href="#s2">2 Proyecto</a><a href="#s3">3 Comprobar</a><a href="#s4">4 Artisan</a><a href="#s5">5 Explorar</a><a href="#s6">6 Cierre</a><a href="#amp">Ampliaciones</a><a href="#glo">Glosario</a><a href="#ts">SOS</a><div id="bar"><span id="pc" aria-live="polite">0/0</span><i><b id="pb"></b></i></div></nav>
 <header>
 <span class="badge r">Actividad 3.1</span><span class="badge">2º DAM</span><span class="badge">RA4</span><span class="badge">Continuación de la 2.2</span><span class="badge t">8 horas</span>
 <h1>El taller antes de la obra: <em>Laravel</em> funcionando en tu equipo</h1>
@@ -133,7 +143,7 @@ $app->handleRequest(Request::capture());   // el framework decide</code></pre>
 <tr><td><code>proyecto/.env</code></td><td>Configuración de <b>Laravel</b>: con qué credenciales intenta conectarse a la base de datos.</td></tr>
 <tr><td><code>.gitignore</code></td><td>Le dice a Git qué ficheros <b>no</b> debe guardar: los <code>.env</code> (secretos) y <code>proyecto/vendor/</code> (dependencias). Lo crearás en la Fase 1.</td></tr></table>
 <div class="tip"><b>¿Por qué dos <code>.env</code>?</b> Uno configura al <i>servidor</i> de base de datos (qué contraseña tendrá el usuario) y el otro a la <i>aplicación</i> (con cuál intenta entrar). Son dos lados de la misma puerta: si no coinciden, no se abre. Pruébalo en el laboratorio de más abajo.</div></div>
-<table><tr><th>Contenedor</th><th>Imagen</th><th>Función</th></tr><tr><td><code>app</code></td><td><code>php:8.4-apache</code> (personalizada)</td><td>Apache y PHP juntos (<code>mod_php</code>). Sirve Laravel en el puerto 8080 de tu máquina.</td></tr><tr><td><code>db</code></td><td><code>mariadb:11.4</code></td><td>Almacena los datos. Sin puertos publicados: solo se ve desde la red interna.</td></tr></table>
+<table><tr><th>Contenedor</th><th>Imagen</th><th>Función</th><th>Reinicio</th></tr><tr><td><code>app</code></td><td><code>php:8.4-apache</code> (personalizada)</td><td>Apache y PHP juntos (<code>mod_php</code>). Sirve Laravel en el puerto 8080 de tu máquina.</td><td><code>unless-stopped</code></td></tr><tr><td><code>db</code></td><td><code>mariadb:11.4</code></td><td>Almacena los datos. Sin puertos publicados: solo se ve desde la red interna.</td><td><code>unless-stopped</code></td></tr></table>
 <div class="tip"><b>¿Por qué Apache y no Nginx?</b> La imagen <code>php:apache</code> integra PHP dentro de Apache: un solo contenedor hace de servidor web e intérprete, como en tu LAMP anterior. Nginx exigiría un contenedor PHP-FPM aparte y proxy inverso: más piezas sin aportar nada a lo que evaluamos hoy.</div>
 <p><b>¿Qué es Artisan?</b> La herramienta de línea de comandos de Laravel: genera código, ejecuta migraciones, lista rutas… Hoy solo comprobarás que funciona; en la próxima actividad será protagonista.</p>
 
@@ -142,7 +152,7 @@ $app->handleRequest(Request::capture());   // el framework decide</code></pre>
 <label class="opt"><input type="checkbox" id="l1"> Edito el <code>.env</code> de la <b>raíz</b></label>
 <label class="opt"><input type="checkbox" id="l2"> Edito <code>proyecto/.env</code> (Laravel)</label>
 <label class="opt"><input type="checkbox" id="l3"> Ejecuto <code>docker compose down -v</code> y vuelvo a levantar (se borra el volumen)</label>
-<div class="lab"><div class="box">🗄️ MariaDB tiene la contraseña<br><code id="dbp"></code></div><div class="box">🐘 Laravel envía la contraseña<br><code id="lp"></code></div><div id="verd"></div></div></div>
+<div class="lab"><div class="box">🗄️ MariaDB tiene la contraseña<br><code id="dbp"></code></div><div class="box">🐘 Laravel envía la contraseña<br><code id="lp"></code></div><div id="verd" role="status" aria-live="polite"></div></div></div>
 </section>
 
 <section id="s1"><h2><span class="n">1</span>Crear los archivos de configuración <span class="min">75 min</span></h2>
@@ -169,6 +179,7 @@ DB_ROOT_PASSWORD=rootpass</code></pre>
       context: .
       dockerfile: Dockerfile
     container_name: laravel_app
+    restart: unless-stopped
     ports:
       - "8080:80"
     volumes:
@@ -180,6 +191,7 @@ DB_ROOT_PASSWORD=rootpass</code></pre>
   db:
     image: mariadb:11.4
     container_name: laravel_db
+    restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
@@ -195,10 +207,11 @@ DB_ROOT_PASSWORD=rootpass</code></pre>
 
 volumes:
   db_data:</code></pre>
-<p>Fíjate en los <code>${DB_PASSWORD}</code> y compañía: referencias al <code>.env</code> raíz. Tres líneas que debes dominar:</p>
-<ul><li><code>"8080:80"</code> → <b>puerto_de_tu_PC : puerto_del_contenedor</b>.</li><li><code>./proyecto:/var/www/html</code> → la carpeta <code>proyecto/</code> de tu disco se <i>monta</i> dentro del contenedor: es la misma carpeta vista desde dos sitios.</li><li>El servicio <code>db</code> <b>no publica ningún puerto</b>: a MariaDB solo se llega desde dentro de la red de Docker (te lo explicamos debajo).</li></ul>
+<p>Fíjate en los <code>${DB_PASSWORD}</code> y compañía: referencias al <code>.env</code> raíz. Cuatro líneas que debes dominar:</p>
+<ul><li><code>"8080:80"</code> → <b>puerto_de_tu_PC : puerto_del_contenedor</b>.</li><li><code>./proyecto:/var/www/html</code> → la carpeta <code>proyecto/</code> de tu disco se <i>monta</i> dentro del contenedor: es la misma carpeta vista desde dos sitios.</li><li>El servicio <code>db</code> <b>no publica ningún puerto</b>: a MariaDB solo se llega desde dentro de la red de Docker (te lo explicamos debajo).</li><li><code>restart: unless-stopped</code> → <b>política de reinicio</b>: si el equipo o Docker se reinician, los contenedores vuelven solos.</li></ul>
 <div class="tip"><b>¿Por qué la base de datos no publica puertos?</b> Porque <b>no hace falta</b>: Laravel y MariaDB ya se ven entre sí dentro de la red de Docker, usando el nombre del servicio (<code>db</code>) y el puerto interno (<code>3306</code>). Publicar el puerto en tu PC solo sirve para que herramientas de escritorio (DBeaver, un cliente SQL) entren desde fuera… y ese es justo el peligro: con el puerto abierto, cualquiera que esté en la <b>red del aula</b> podría intentar entrar con <code>laravel_user</code> y la contraseña que ya conoces. En un servidor real la base de datos casi nunca se publica: se deja accesible solo desde dentro.</div>
 <div class="tip warn"><b>¿Y si algún día la quieres ver desde el escritorio?</b> Puedes publicarla <b>solo en tu propio equipo</b>, atando el puerto al <i>loopback</i>: <code>"127.0.0.1:3307:3306"</code>. Así ni siquiera sale a la red del aula. En esta actividad no hace falta: para mirar las tablas usamos el cliente <code>mariadb</code> <i>dentro</i> del contenedor (apartado 3.3).</div>
+<div class="tip"><b>Qué significa <code>restart: unless-stopped</code>.</b> Es la política de reinicio del contenedor: si apagas el equipo, se reinicia Windows o se cae Docker Desktop, los contenedores <b>vuelven solos</b> al arrancar, sin que tengas que ir a encenderlos. La alternativa sería tener que levantar el taller a mano cada vez que enciendes el portátil. Y no contradice el «no pares los contenedores» del final: <code>docker compose down</code> los para igualmente, porque esa orden es una parada <i>explícita</i>.</div>
 <div class="tip"><b>Por qué la imagen dice <code>mariadb:11.4</code> y no <code>mariadb:11</code>.</b> Las etiquetas de Docker son <i>móviles</i>: <code>mariadb:11</code> significa «cualquier 11.x que exista ahora mismo», y dentro de unas semanas podría ser una 11.5 con cambios. Fijando <code>11.4</code>, <b>todos los equipos del aula montan exactamente la misma base de datos</b>: los resultados son comparables y nadie pierde el rato con «a mí me funciona y a ti no». Con PHP lo hacemos a medias y a propósito: <code>php:8.4-apache</code> ya fija la rama 8.4 (las actualizaciones de parche no cambian la API y no afectan a esta guía) y no fijamos el parche porque una imagen con el parche clavado envejece mal.</div>
 <div data-r="1"></div>
 <h3>1.4 El <code>Dockerfile</code></h3>
@@ -338,7 +351,7 @@ docker compose exec app php artisan route:list</code></pre>
 <p>Observa con calma la salida de <code>route:list</code>: añade <code>-v</code> si quieres ver también el middleware.</p>
 <div data-r="10"></div><div data-r="11"></div>
 <div class="card"><h3 style="margin-top:0">🧭 Recorrido de una petición a <code>localhost:8080</code></h3><p>Pulsa los pasos (o <b>Siguiente</b>) para seguirla.</p>
-<div class="st" id="st"></div><div id="sd" class="tip"></div><button class="b" id="nx">Siguiente ▶</button></div>
+<div class="st" id="st"></div><div id="sd" class="tip" role="status" aria-live="polite"></div><button class="b" id="nx">Siguiente ▶</button></div>
 <div data-r="12"></div>
 <p>Y de paso, <b>prueba <code>http://localhost:8080/up</code></b>: es una ruta que Laravel añade para comprobar que la aplicación está viva (un «health check»). Si te devuelve <b>200</b> y una página casi vacía, todo va bien. Si te devuelve un <b>404 de Apache</b>, el <code>mod_rewrite</code> no está activo y las URLs amigables no funcionarían.</p>
 <div class="card"><b>✅ Checklist de la fase</b>
@@ -349,7 +362,7 @@ docker compose exec app php artisan route:list</code></pre>
 <section id="s5"><h2><span class="n">5</span>Exploración guiada: demuestra que no eres pasivo <span class="min">60 min</span></h2>
 <h3>5.1 Mapa de carpetas</h3>
 <p>Abre <code>proyecto/</code> en tu editor. Pulsa para ver qué guarda cada carpeta. <b>Cada una te va a resultar familiar</b>: en <a href="#obj">«No empiezas de cero»</a> tienes la tabla que conecta estas carpetas con las que construiste en la actividad 2.2.</p>
-<div class="fol" id="fol"></div><div class="tip" id="fd">Elige una carpeta.</div>
+<div class="fol" id="fol"></div><div class="tip" id="fd" role="status" aria-live="polite">Elige una carpeta.</div>
 <h3>5.2 Tu primera modificación</h3>
 <p>Añade al final de <code>proyecto/routes/web.php</code>:</p>
 <pre><span class="f">routes/web.php</span><code>Route::get('/hola', function () {
@@ -396,7 +409,8 @@ docker compose exec app php artisan route:list</code></pre>
 <h3>README (opcional, solo para ti)</h3>
 <p>No hay nada que subir al aula virtual, pero guarda un <code>README.md</code> en <code>laravel-docker/</code>: documenta tu taller y te sirve de red de seguridad si algo se rompe. Con: tus datos; las respuestas a los <b>14 retos</b> (con tus palabras, al menos los que te hayan costado); una <b>reflexión de 5-8 líneas</b> (¿qué te ha costado más? ¿qué has entendido ahora de cómo se conectan Docker, Apache, PHP, Laravel y MariaDB?); la captura de <code>php artisan --version</code> y la captura de <code>localhost:8080</code>.</p>
 <div class="card"><h3 style="margin-top:0">📝 Borrador de README</h3><p>Escribe tu nombre y tu reflexión; descarga un esqueleto con tus tareas marcadas y rellena después las respuestas.</p>
-<input type="text" id="nm" placeholder="Nombre y apellidos"><br><br><textarea id="rf" rows="5" placeholder="Reflexión (5-8 líneas)"></textarea><br><br><button class="b" id="dl">⬇ Descargar README.md</button></div>
+<label class="fl" for="nm">Nombre y apellidos</label><input type="text" id="nm" placeholder="Nombre y apellidos"><br><br><label class="fl" for="rf">Reflexión (5-8 líneas)</label><textarea id="rf" rows="5" placeholder="Reflexión (5-8 líneas)"></textarea><br><br><button class="b" id="dl">⬇ Descargar README.md</button></div>
+<div class="tip warn"><b>Y si esto fuera un servidor de verdad.</b> Dos cosas cambiarían: <code>APP_ENV=production</code> y <code>APP_DEBUG=false</code>. Con <code>APP_DEBUG=true</code> (como está hoy, a propósito) la página de error te enseña las rutas del servidor y fragmentos de tu código: es justo lo que te ha servido para depurar, y es una fuga de información si se queda puesto. En producción el visitante vería un «Internal Server Error» genérico y el detalle se quedaría solo en el log. Y las contraseñas seguirían en el <code>.env</code>, nunca escritas en el código: eso ya lo haces bien desde hoy.</div>
 <h3>Para seguir cuando algo no esté aquí</h3>
 <p>La documentación oficial es la mejor fuente cuando una duda no aparece en la guía:</p>
 <ul>
@@ -530,7 +544,7 @@ $$('[data-r]').forEach(e=>{const k=e.dataset.r;const i=+k;const [q,a]=R[i];
  e.className='reto';e.innerHTML=`<div class="q"><span>Reto ${rn=i+1}</span>${q}</div><button class="b" style="margin-top:8px">Ver solución</button><div class="a">${a}</div>`;
  e.querySelector('button').onclick=function(){e.classList.toggle('open');this.textContent=e.classList.contains('open')?'Ocultar solución':'Ver solución'}});
 // copiar
-$$('pre').forEach(p=>{const b=document.createElement('button');b.textContent='Copiar';b.onclick=()=>{navigator.clipboard.writeText(p.querySelector('code').innerText);b.textContent='¡Copiado!';setTimeout(()=>b.textContent='Copiar',1200)};p.appendChild(b)});
+$$('pre').forEach(p=>{const b=document.createElement('button');b.textContent='Copiar';b.setAttribute('aria-live','polite');b.title='Copiar el código de este bloque';b.onclick=()=>{navigator.clipboard.writeText(p.querySelector('code').innerText);b.textContent='¡Copiado!';setTimeout(()=>b.textContent='Copiar',1200)};p.appendChild(b)});
 // progreso
 const T=$$('.t');const up=()=>{const n=T.filter(x=>x.checked).length;$('#pc').textContent=n+'/'+T.length;$('#pb').style.width=100*n/T.length+'%'};T.forEach(t=>t.onchange=up);up();
 // plan 8h
