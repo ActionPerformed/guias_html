@@ -87,6 +87,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [PMDM - ACT 2.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.1.html) | Actividad 2.1 — Pantalla de Login con Jetpack Compose — simulación interactiva en el navegador |
 | [PMDM - ACT 2.2.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%202.2.html) | Actividad 2.2 — NavHost, Registro, Scaffold y Dialogos — amplía la actividad 2.1 de login |
 | [PMDM - ACT 3.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%203.1.html) | Actividad 3.1 — CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue |
+| [PMDM - ACT 4.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%204.1.html) | Actividad 4.1 — Conectividad avanzada: Red, Bluetooth y SMS |
 
 ---
 
