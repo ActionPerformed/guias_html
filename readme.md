@@ -64,6 +64,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [ASETE - ACT 2.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%202.1.html) | Actividad 2.1 — MiniApp de Biblioteca (POO en PHP) |
 | [ASETE - ACT 2.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%202.2.html) | Actividad 2.2 — Composer y autoloading |
 | [ASETE - ACT 3.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%203.1.html) | Actividad 3.1 — Taller Laravel con Docker: monta Laravel, Apache, PHP y MariaDB en contenedores y deja el taller funcionando |
+| [ASETE - ACT 3.1 - PUENTE.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html) | Puente de la 3.1 — De la MiniApp a Laravel: cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade |
 
 ### IAW (Implantación de Aplicaciones Web)
 

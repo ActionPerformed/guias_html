@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AC 3.1 · Puente — De la MiniApp a Laravel · ASETE</title>
+  <meta name="description"
+    content="Guía de enlace entre la MiniApp de Biblioteca (actividad 2.2, PHP con Composer) y Laravel: cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade.">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f0e6;
+      --ink: #1d1b1a;
+      --red: #ff2d20;
+      --teal: #0f766e;
+      --amber: #e8a317;
+      --card: #fffdf8;
+      --line: #d9cfba;
+      --ok: #2b8a3e;
+      --ok-bg: #eaf7ee;
+      --ko: #c92a2a;
+      --ko-bg: #ffe9e6;
+      --muted: #6b6355
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper) radial-gradient(#d9cfba 1px, transparent 1px) 0 0/22px 22px;
+      color: var(--ink);
+      font: 16px/1.6 Figtree, sans-serif
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: Unbounded, sans-serif;
+      line-height: 1.15;
+      margin: 0 0 .6em
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 9;
+      background: var(--ink);
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 8px 12px;
+      align-items: center
+    }
+
+    nav a {
+      color: #f5f0e6;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 99px;
+      white-space: nowrap
+    }
+
+    nav a:hover,
+    nav a.on {
+      background: var(--red)
+    }
+
+    #bar {
+      margin-left: auto;
+      min-width: 160px;
+      color: #f5f0e6;
+      font: 12px JetBrains Mono
+    }
+
+    #bar i {
+      display: block;
+      height: 6px;
+      background: #444;
+      border-radius: 9px;
+      margin-top: 3px
+    }
+
+    #bar b {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--amber);
+      border-radius: 9px;
+      transition: .3s
+    }
+
+    header {
+      padding: 56px 6vw 40px;
+      border-bottom: 4px solid var(--ink)
+    }
+
+    header h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      max-width: 900px
+    }
+
+    header h1 em {
+      color: var(--red);
+      font-style: normal
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      font: 600 12px JetBrains Mono;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin: 0 6px 6px 0
+    }
+
+    .badge.r {
+      background: var(--red)
+    }
+
+    .badge.t {
+      background: var(--teal)
+    }
+
+    .badge.a {
+      background: var(--amber);
+      color: var(--ink)
+    }
+
+    .lede {
+      max-width: 820px;
+      font-size: 18px;
+      color: #33302c
+    }
+
+    main {
+      max-width: 980px;
+      margin: auto;
+      padding: 0 5vw 80px
+    }
+
+    section {
+      margin-top: 56px
+    }
+
+    h2 {
+      font-size: 26px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    h2 .n {
+      background: var(--red);
+      color: #fff;
+      border-radius: 10px;
+      padding: 2px 12px;
+      font-size: 20px
+    }
+
+    h2 .min {
+      font: 600 12px JetBrains Mono;
+      background: var(--amber);
+      color: var(--ink);
+      padding: 3px 9px;
+      border-radius: 99px
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 1.6em
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      box-shadow: 5px 5px 0 var(--ink)
+    }
+
+    .tip {
+      border-left: 6px solid var(--teal);
+      background: #e6f3f1;
+      padding: 12px 16px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0
+    }
+
+    .tip.warn {
+      border-left-color: var(--red);
+      background: var(--ko-bg)
+    }
+
+    .exp {
+      border-left: 6px solid var(--ok);
+      background: var(--ok-bg);
+      padding: 10px 14px;
+      border-radius: 0 10px 10px 0;
+      margin: 12px 0;
+      font-size: 15px
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: .88em;
+      background: #ece4d2;
+      padding: 1px 6px;
+      border-radius: 5px
+    }
+
+    pre {
+      position: relative;
+      background: #1d1b1a;
+      color: #f5f0e6;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      font: 13px/1.6 JetBrains Mono, monospace;
+      margin: 0
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit
+    }
+
+    .src .k {
+      color: #ffb4ae
+    }
+
+    .src .s {
+      color: #a8e6a3
+    }
+
+    .src .c {
+      color: #9aa39b;
+      font-style: italic
+    }
+
+    .src .n {
+      color: #ffd76a
+    }
+
+    .src .t {
+      color: #7fd4ff
+    }
+
+    .code {
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 14px 0;
+      background: #1d1b1a
+    }
+
+    .code-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #2b2a28;
+      color: #f5f0e6;
+      font: 600 12px JetBrains Mono;
+      padding: 7px 12px
+    }
+
+    .code-head .lbl {
+      background: var(--amber);
+      color: var(--ink);
+      padding: 2px 9px;
+      border-radius: 99px
+    }
+
+    .code-head .lbl.b {
+      background: var(--teal);
+      color: #fff
+    }
+
+    .code-head .lbl.r {
+      background: var(--red);
+      color: #fff
+    }
+
+    .code-head button {
+      margin-left: auto;
+      background: #fff2;
+      color: #fff;
+      border: 1px solid #fff5;
+      border-radius: 6px;
+      font: 12px JetBrains Mono;
+      padding: 3px 9px;
+      cursor: pointer
+    }
+
+    .code-head button:hover {
+      background: var(--red)
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: var(--card);
+      border: 2px solid var(--ink);
+      font-size: 14px;
+      margin: 14px 0
+    }
+
+    th {
+      background: var(--ink);
+      color: #fff;
+      text-align: left
+    }
+
+    th,
+    td {
+      padding: 8px 11px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top
+    }
+
+    tbody tr:nth-child(even) {
+      background: #faf6ec
+    }
+
+    button.b {
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font: 600 14px Figtree;
+      cursor: pointer
+    }
+
+    button.b:hover {
+      background: var(--red)
+    }
+
+    button.b.ghost {
+      background: var(--card);
+      color: var(--ink);
+      border: 2px solid var(--ink)
+    }
+
+    button.b.ghost:hover {
+      background: var(--amber)
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0
+    }
+
+    /* ── comparador antes/después (vertical: arriba / abajo) ── */
+    .duo {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 16px 0
+    }
+
+    .duo .col {
+      min-width: 0
+    }
+
+    .duo.hide-a .col.a {
+      display: none
+    }
+
+    .duo.hide-b .col.b {
+      display: none
+    }
+
+    .duo .col.b {
+      border-top: 2px dashed var(--line);
+      padding-top: 16px
+    }
+
+    .duo.hide-a .col.b,
+    .duo.hide-b .col.b {
+      border-top: 0;
+      padding-top: 0
+    }
+
+    .duo .cap {
+      font: 700 11px JetBrains Mono;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 6px
+    }
+
+    /* ── árboles ── */
+    .ftree {
+      font: 13px/1.7 JetBrains Mono;
+      background: #fbf7ef;
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 10px 0;
+      overflow-x: auto;
+      white-space: pre
+    }
+
+    .ftree .dir {
+      color: var(--teal);
+      font-weight: 600
+    }
+
+    .ftree .new {
+      background: var(--ok-bg);
+      border-radius: 4px;
+      padding: 0 4px
+    }
+
+    .ftree .same {
+      background: #ece4d2;
+      border-radius: 4px;
+      padding: 0 4px
+    }
+
+    .ftree .gone {
+      color: var(--ko);
+      text-decoration: line-through
+    }
+
+    .legend {
+      font: 12px JetBrains Mono;
+      color: var(--muted);
+      margin: -4px 0 12px
+    }
+
+    .legend b {
+      padding: 1px 6px;
+      border-radius: 4px
+    }
+
+    /* ── flujo ── */
+    .flow2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    @media (max-width: 780px) {
+      .flow2 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .step {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin: 6px 0;
+      font: 13px/1.5 JetBrains Mono;
+      cursor: pointer
+    }
+
+    .step:hover {
+      border-color: var(--ink)
+    }
+
+    .step b {
+      color: var(--teal)
+    }
+
+    .step.hit {
+      border-color: var(--red);
+      background: var(--ko-bg)
+    }
+
+    .step .who {
+      float: right;
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    /* ── pestañas ── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 14px 0 0
+    }
+
+    .tabs button {
+      background: var(--card);
+      border: 2px solid var(--ink);
+      border-radius: 99px;
+      padding: 6px 15px;
+      font: 600 13px Figtree;
+      cursor: pointer
+    }
+
+    .tabs button.on {
+      background: var(--ink);
+      color: #fff
+    }
+
+    .pane {
+      border: 2px solid var(--ink);
+      border-top: 0;
+      border-radius: 0 0 14px 14px;
+      padding: 16px 18px;
+      background: var(--card)
+    }
+
+    .pane[hidden] {
+      display: none
+    }
+
+    /* ── retos ── */
+    .reto {
+      background: #fff6d6;
+      border: 2px dashed var(--amber);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin: 16px 0
+    }
+
+    .reto .q {
+      font-weight: 700
+    }
+
+    .reto .q span {
+      background: var(--amber);
+      border-radius: 6px;
+      padding: 1px 9px;
+      margin-right: 6px;
+      font: 700 13px JetBrains Mono
+    }
+
+    .reto .a {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #fff;
+      border-left: 5px solid var(--teal);
+      border-radius: 0 8px 8px 0
+    }
+
+    .reto.open .a {
+      display: block
+    }
+
+    .reto button {
+      margin-top: 10px
+    }
+
+    /* ── plan ── */
+    .plan {
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      background: var(--card);
+      padding: 16px 18px;
+      margin: 14px 0
+    }
+
+    .plan ol {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: p
+    }
+
+    .plan li {
+      counter-increment: p;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--line)
+    }
+
+    .plan li:last-child {
+      border-bottom: 0
+    }
+
+    .plan li::before {
+      content: counter(p);
+      background: var(--ink);
+      color: #fff;
+      border-radius: 6px;
+      font: 700 12px JetBrains Mono;
+      padding: 2px 8px;
+      flex: none
+    }
+
+    .plan li.done::before {
+      background: var(--ok)
+    }
+
+    .plan li.done {
+      color: var(--muted)
+    }
+
+    .plan input {
+      margin-top: 4px;
+      accent-color: var(--teal);
+      width: 17px;
+      height: 17px;
+      flex: none
+    }
+
+    .plan .n {
+      font: 600 12px JetBrains Mono;
+      background: var(--amber);
+      border-radius: 99px;
+      padding: 1px 9px;
+      margin-left: 6px
+    }
+
+    /* ── glosario ── */
+    .glo input {
+      font: inherit;
+      padding: 9px 12px;
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 10px
+    }
+
+    .kicker {
+      font: 700 11px JetBrains Mono;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 22px 0 6px
+    }
+
+    footer {
+      border-top: 4px solid var(--ink);
+      padding: 26px 6vw;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0)
+    }
+
+    @media print {
+      nav,
+      .btns,
+      .tabs {
+        display: none
+      }
+
+      body {
+        background: #fff
+      }
+
+      .card,
+      .duo,
+      .pane {
+        box-shadow: none;
+        break-inside: avoid
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav aria-label="Secciones">
+    <a href="#intro">Antes de empezar</a>
+    <a href="#mapa">Lo que ya tienes</a>
+    <a href="#rutas">De páginas a rutas</a>
+    <a href="#clases">Tus clases</a>
+    <a href="#caminos">Dos caminos</a>
+    <a href="#pagina">Una página</a>
+    <a href="#dentro">Por dentro</a>
+    <a href="#plan">Plan de trabajo</a>
+    <a href="#igual">Lo que no cambia</a>
+    <a href="#retos">Retos</a>
+    <a href="#glosario">Glosario</a>
+    <div id="bar">Avance de lectura<i><b id="barFill"></b></i></div>
+  </nav>
+
+  <header>
+    <span class="badge r">ASETE · 2º DAM</span><span class="badge t">Puente</span><span
+      class="badge a">lectura · sin entrega</span><span class="badge">complemento de la 3.1</span>
+    <h1>De la MiniApp <em>a Laravel</em></h1>
+    <p class="lede">En la actividad 2.2 montaste una biblioteca a mano: páginas, conexión, CRUD, escapado.
+      En la 3.1 levantaste Laravel y viste su estructura. Este documento es el <b>puente entre las dos cosas</b>:
+      <b>tu misma aplicación</b>, con <b>tus mismas clases</b>, escrita con las herramientas del framework.
+      No es una actividad: es la explicación que va antes de la actividad en la que lo harás.</p>
+  </header>
+
+  <main>
+
+    <!-- ═══════════════ INTRO ═══════════════ -->
+    <section id="intro">
+      <h2><span class="n">0</span> Antes de empezar</h2>
+
+      <div class="card">
+        <div class="kicker">La idea en una frase</div>
+        <p style="font-size:19px;margin:0"><b>Lo que montaste en la 2.2 es el edificio y las tuberías.
+          Laravel es el montaje interior.</b> Con PHP puro, cada página que escribiste lleva dentro, a mano, las mismas
+          cinco cosas: <i>dónde está la ruta, cómo me conecto a la base de datos, cómo valido el formulario, cómo escapo el
+          HTML y cómo redirijo si no estoy logueado</i>. Escribes PHP para <b>usar</b> PHP, no para resolver un problema
+          de negocio.</p>
+        <p style="margin-bottom:0">Laravel no te da un lenguaje nuevo: es <b>el mismo PHP</b>, con esas cinco piezas ya
+          resueltas, mantenidas y conectadas entre sí. Tú escribes solo <b>tu aplicación</b> —las clases, las reglas, el
+          dominio— y el framework se encarga del resto. Lo que cambia no es <i>qué</i> sabes, es <i>dónde</i> va cada
+          cosa.</p>
+      </div>
+
+      <div class="kicker">Cómo usar este documento</div>
+      <table>
+        <tbody>
+          <tr>
+            <td style="width:190px"><b>Para el profesor</b></td>
+            <td>Las <b>secciones 1, 2 y 3</b> son el guion del adelanto: en diez minutos puedes recorrer el árbol, la tabla
+              de rutas y el antes/después de las clases. Las <b>secciones 6 y 7</b> son el resumen que cabe en una
+              diapositiva.</td>
+          </tr>
+          <tr>
+            <td><b>Para el alumnado</b></td>
+            <td>Las <b>secciones 4 a 5</b> (los dos caminos y cómo se escribe una página) son el corazón: léelas antes de
+              la actividad en la que trasladas la biblioteca. La <b>sección 7</b> es el guion de esa actividad, paso a
+              paso.</td>
+          </tr>
+          <tr>
+            <td><b>Para nadie</b></td>
+            <td>No hay cronometro, ni checklist de entregables, ni nota. Es un documento de lectura. Puedes imprimirlo o
+              leerlo en el móvil; funciona sin conexión.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip">
+        <p style="margin:0"><b>Antes de seguir:</b> la actividad 3.1 ya tiene una tabla que conecta la 2.2 con Laravel
+          (lo称作 «No empiezas de cero»): composer, PSR-4, el <code>public/</code>, las sesiones, el PDO, las
+          excepciones. Esa tabla conecta <b>la infraestructura</b>. Este documento conecta <b>la aplicación</b>: tus
+          páginas, tus clases, tu repositorio y tus vistas.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ MAPA ═══════════════ -->
+    <section id="mapa">
+      <h2><span class="n">1</span> Lo que ya tienes <span class="min">lectura</span></h2>
+
+      <p>La estructura con la que terminaste la 2.2 ya es, casi exactamente, la de un proyecto Laravel. Mira los dos
+        bloques, uno encima del otro:</p>
+
+      <div class="btns">
+        <button class="b ghost" type="button" id="tBoth">Ver las dos</button>
+        <button class="b ghost" type="button" id="tOnly22">Solo la 2.2</button>
+        <button class="b ghost" type="button" id="tOnlyLaravel">Solo Laravel</button>
+      </div>
+
+      <div class="duo" id="arboles">
+        <div class="col a">
+          <div class="cap">Tu proyecto al final de la 2.2</div>
+          <div class="ftree"><span class="dir">proyecto/</span>
+├── <span class="dir">app/</span>                    <span class="same">← igual en Laravel</span>
+│   ├── <span class="dir">Classes/</span>             <span class="same">Libro, Revista, DVD, Prestable, Traits/</span>
+│   ├── <span class="dir">Repos/</span>               <span class="same">MaterialRepo</span>
+│   ├── <span class="dir">Config/</span>              <span class="gone">db.php</span>
+│   ├── <span class="dir">Exceptions/</span>          <span class="same">MaterialNoEncontradoException…</span>
+│   ├── <span class="dir">Services/</span>            <span class="same">PrestamoService</span>
+│   └── <span class="dir">Includes/</span>            <span class="gone">auth.php, header.php, footer.php, exceptions.php</span>
+├── <span class="dir">public/</span>                 <span class="new">Laravel: un único index.php</span>
+│   ├── <span class="gone">login.php</span>
+│   ├── <span class="gone">logout.php</span>
+│   ├── <span class="gone">index.php</span>
+│   ├── <span class="gone">material.php</span>
+│   ├── <span class="gone">prestar.php</span>
+│   └── <span class="gone">admin.php</span>
+├── <span class="dir">vendor/</span>                 <span class="same">Composer, igual</span>
+├── <span class="same">composer.json</span>           <span class="same">"App\\": "app/" — idéntico</span>
+└── <span class="gone">mariadb/init.sql</span>        <span class="new">Laravel: migraciones</span></div>
+        </div>
+
+        <div class="col b">
+          <div class="cap">Un proyecto Laravel</div>
+          <div class="ftree"><span class="dir">app/</span>
+├── <span class="dir">Http/Controllers/</span>      <span class="new">NUEVO</span>
+├── <span class="dir">Models/</span>                  <span class="new">NUEVO (o tu Classes/, da igual)</span>
+├── <span class="dir">Services/</span>               <span class="same">PrestamoService — sin tocar</span>
+├── <span class="dir">Exceptions/</span>             <span class="same">tus excepciones — sin tocar</span>
+├── <span class="dir">Repos/</span>                   <span class="same">MaterialRepo — si eliges el camino B</span>
+├── <span class="dir">Classes/</span>                <span class="same">MaterialBiblioteca, Libro… — sin tocar</span>
+├── <span class="dir">Providers/</span>
+├── <span class="dir">Http/Middleware/</span>
+│   └── <span class="new">HandleInertiaRequests…</span> <span class="same">el tuyo: rol:admin</span>
+└── <span class="dir">bootstrap/app.php</span>        <span class="new">NUEVO</span>
+
+<span class="dir">routes/</span>
+└── <span class="new">web.php</span>                   <span class="new">NUEVO: la tabla de rutas</span>
+
+<span class="dir">resources/views/</span>
+├── <span class="new">layouts/app.blade.php</span>     <span class="new">sustituye a header.php + footer.php</span>
+└── <span class="new">materiales/{index,show}.blade.php</span>
+
+<span class="dir">public/</span>
+└── <span class="new">index.php</span>                <span class="new">el front controller</span>
+
+<span class="dir">config/database.php</span>           <span class="new">sustituye a app/Config/db.php</span>
+<span class="dir">database/migrations/</span>          <span class="new">sustituye a init.sql</span></div>
+        </div>
+      </div>
+
+      <p class="legend"><b class="same" style="background:#ece4d2">gris</b> = igual &nbsp;·&nbsp;
+        <b class="new" style="background:var(--ok-bg)">verde</b> = nuevo &nbsp;·&nbsp;
+        <b class="gone" style="background:var(--ko-bg);text-decoration:line-through">tachado</b> = desaparece</p>
+
+      <div class="exp">
+        <p style="margin:0"><b>Lo importante:</b> <code>app/</code> con PSR-4, <code>public/</code> como raíz del servidor
+          web y <code>vendor/</code> de Composer <b>es literalmente el esqueleto de Laravel</b>. Por eso la 2.2 está
+          escrita como está: no es casualidad, es el puente. Cuando crees el proyecto Laravel, <b>copiarás tu carpeta
+          <code>app/</code> casi tal cual</b> y tu <code>composer.json</code> te servirá tal cual.</p>
+      </div>
+
+      <div class="tip warn">
+        <p style="margin:0"><b>Y lo mejor:</b> el paso de copiar esa carpeta es el que más satisfacción da en el aula.
+          No escribes casi nada, y <b>todo sigue funcionando</b>, porque el PSR-4 que escribiste en la 2.2 es el mismo que
+          usa Laravel.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ RUTAS ═══════════════ -->
+    <section id="rutas">
+      <h2><span class="n">2</span> De «páginas» a «rutas»</h2>
+
+      <p>En la 2.2, cada página <b>es un fichero</b> y la URL <b>es el nombre del fichero</b>. En Laravel hay <b>un único
+        punto de entrada</b> y una <b>tabla que dice qué URL ejecuta qué función</b>.</p>
+
+      <div class="code">
+        <div class="code-head"><span class="lbl r">ANTES</span> La URL <b>es</b> el fichero<span
+            class="lbl">PHP</span></div>
+        <pre class="src"><code>/material.php?id=3   →  Apache ejecuta public/material.php
+/prestar.php         →  Apache ejecuta public/prestar.php
+/admin.php           →  Apache ejecuta public/admin.php</code></pre>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="lbl b">DESPUÉS</span> La URL es una <b>fila de una tabla</b><span
+            class="lbl">PHP</span></div>
+        <pre class="src"><code><span class="c">// routes/web.php</span>
+Route::get(<span class="s">'/materiales'</span>,          [MaterialController::class, <span class="s">'index'</span>])->middleware(<span class="s">'auth'</span>);
+Route::get(<span class="s">'/materiales/{id}'</span>,     [MaterialController::class, <span class="s">'show'</span>])->middleware(<span class="s">'auth'</span>);
+Route::post(<span class="s">'/prestamos'</span>,          [PrestamoController::class, <span class="s">'store'</span>])->middleware(<span class="s">'auth'</span>);
+Route::get(<span class="s">'/admin'</span>,               [AdminController::class, <span class="s">'index'</span>])->middleware([<span class="s">'auth'</span>, <span class="s">'rol:admin'</span>]);</code></pre>
+      </div>
+
+      <h3>Tus seis ficheros, uno a uno</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:210px">Tu fichero de la 2.2</th>
+            <th style="width:290px">En Laravel</th>
+            <th>Por qué</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>public/login.php</code></td>
+            <td><code>GET /login</code> + <code>POST /login</code></td>
+            <td>El scaffolding de autenticación de Laravel te da el login y el logout ya hechos.</td>
+          </tr>
+          <tr>
+            <td><code>public/logout.php</code></td>
+            <td><code>POST /logout</code> con middleware <code>auth</code></td>
+            <td>En vez de <code>logout(); header('Location: login.php')</code> → <code>return redirect()->route('login')</code>.</td>
+          </tr>
+          <tr>
+            <td><code>public/index.php</code><br><span style="font-size:13px;color:var(--muted)">catálogo</span></td>
+            <td><code>GET /materiales</code> → <code>MaterialController@index</code></td>
+            <td>El <code>requireLogin()</code> y el <code>new MaterialRepo()</code> los pone el controlador.</td>
+          </tr>
+          <tr>
+            <td><code>public/material.php?id=3</code><br><span style="font-size:13px;color:var(--muted)">ficha individual</span></td>
+            <td><code>GET /materiales/{id}</code> → <code>MaterialController@show</code></td>
+            <td>El <code>?id=3</code> se convierte en <b>parámetro de ruta</b>: el controlador lo recibe <b>tipado</b>
+              (<code>int $id</code>), sin <code>$_GET</code>.</td>
+          </tr>
+          <tr>
+            <td><code>public/prestar.php</code></td>
+            <td><code>POST /prestamos</code> → <code>PrestamoController@store</code></td>
+            <td>El controlador <b>traduce excepciones a respuestas</b>: es exactamente lo que ya haces con tu
+              <code>try/catch</code>.</td>
+          </tr>
+          <tr>
+            <td><code>public/admin.php</code></td>
+            <td><code>GET /admin</code> + middleware <code>rol:admin</code></td>
+            <td>El <code>requireAdmin()</code> se pone <b>en la ruta</b>, no en el fichero: se escribe una vez y protege a
+              todas las rutas que quieras.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>El recorrido de un clic, comparados</h3>
+
+      <p>Pulsa cualquier paso: se-iluminará su equivalente en la otra columna. Es el mismo clic, con el mismo
+        resultado, contado de otra manera.</p>
+
+      <div class="flow2" id="flow">
+        <div>
+          <div class="cap" style="font:700 11px JetBrains Mono;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Tu PHP de la 2.2</div>
+          <button class="step" data-pair="1"><span class="who">1</span> El navegador pide <b>/material.php?id=3</b></button>
+          <button class="step" data-pair="2"><span class="who">2</span> Apache busca el <b>fichero</b> material.php</button>
+          <button class="step" data-pair="3"><span class="who">3</span> <b>requireLogin()</b> mira <b>$_SESSION</b></button>
+          <button class="step" data-pair="4"><span class="who">4</span> <b>new MaterialRepo()</b> + <b>db()</b> (PDO)</button>
+          <button class="step" data-pair="5"><span class="who">5</span> <b>SELECT</b> y <b>hidratar()</b> a <b>Libro</b></button>
+          <button class="step" data-pair="6"><span class="who">6</span> <b>echo</b> del HTML con <b>header.php</b></button>
+        </div>
+        <div>
+          <div class="cap" style="font:700 11px JetBrains Mono;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">En Laravel</div>
+          <button class="step" data-pair="1"><span class="who">1</span> El navegador pide <b>/materiales/3</b></button>
+          <button class="step" data-pair="2"><span class="who">2</span> <b>public/index.php</b> (front controller)</button>
+          <button class="step" data-pair="3"><span class="who">3</span> El <b>middleware auth</b> comprueba la sesión</button>
+          <button class="step" data-pair="4"><span class="who">4</span> Laravel <b>inyecta</b> el <b>MaterialRepo</b></button>
+          <button class="step" data-pair="5"><span class="who">5</span> <b>Eloquent</b> trae la fila → <b>hidratar()</b></button>
+          <button class="step" data-pair="6"><span class="who">6</span> <b>return view(...)</b> → <b>Blade</b></button>
+        </div>
+      </div>
+
+      <div class="tip">
+        <p style="margin:0"><b>Lo grande no es el dibujo:</b> es que <b>el mismo flujo se escribe en el mismo sitio</b>,
+          con nombres que lo dicen todo. <code>routes/web.php</code> <b>es</b> la tabla de rutas; el middleware <b>es</b>
+          el <code>requireLogin()</code>; la validación <b>es</b> el <code>if</code> que escribiste a mano.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ CLASES ═══════════════ -->
+    <section id="clases">
+      <h2><span class="n">3</span> Tus clases, una a una</h2>
+
+      <p>Esta es la parte que más sorprende: <b>casi nada de tu código cambia</b>. Cambia de sitio, y el origen de los
+        datos se mueve de PDO a Eloquent.</p>
+
+      <div class="btns">
+        <button class="b ghost" type="button" id="dBoth">Ver los dos lados</button>
+        <button class="b ghost" type="button" id="dOnlyA">Solo el tuyo</button>
+        <button class="b ghost" type="button" id="dOnlyB">Solo el de Laravel</button>
+      </div>
+
+      <h3>1 · La clase de dominio: <code>Libro</code> / <code>MaterialBiblioteca</code></h3>
+
+      <div class="duo" id="c1">
+        <div class="col a">
+          <div class="cap">Tu versión (2.2) — no cambia</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl r">app/Classes/Libro.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">declare</span>(strict_types=1);
+<span class="k">namespace</span> App\Classes;
+
+<span class="k">class</span> Libro <span class="k">extends</span> MaterialBiblioteca
+{
+    <span class="c">// ... resto igual, SIN require_once ...</span>
+}</code></pre>
+          </div>
+        </div>
+        <div class="col b">
+          <div class="cap">En Laravel — la misma clase</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl b">app/Classes/Libro.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">declare</span>(strict_types=1);
+<span class="k">namespace</span> App\Classes;
+
+<span class="k">class</span> Libro <span class="k">extends</span> MaterialBiblioteca
+{
+    <span class="c">// ... resto igual, SIN require_once ...</span>
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp">
+        <p style="margin:0"><b>Exactamente el mismo fichero.</b> Puedes dejar tus clases en <code>app/Classes/</code>:
+          Laravel <b>no te obliga</b> a renombrar tus namespaces. Solo añade <code>App\Http\Controllers</code> y
+          <code>App\Models</code>; lo demás sigue donde lo tienes.</p>
+      </div>
+
+      <h3>2 · El repositorio: <code>MaterialRepo</code></h3>
+
+      <div class="duo" id="c2">
+        <div class="col a">
+          <div class="cap">Tu versión (2.2) — PDO</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl r">app/Repos/MaterialRepo.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">public function</span> findById(<span class="n">int</span> $id): MaterialBiblioteca
+{
+    $stmt = db()->prepare(<span class="s">'SELECT * FROM materiales WHERE id = ?'</span>);
+    $stmt->execute([$id]);
+    $fila = $stmt->fetch();
+    <span class="k">if</span> ($fila === <span class="k">false</span>) {
+        <span class="k">throw new</span> MaterialNoEncontradoException($id);
+    }
+    <span class="k">return</span> $this->hidratar($fila);
+}</code></pre>
+          </div>
+        </div>
+        <div class="col b">
+          <div class="cap">En Laravel — Eloquent por dentro</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl b">app/Repos/MaterialRepo.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">public function</span> findById(<span class="n">int</span> $id): MaterialBiblioteca
+{
+    $fila = Material::find($id);              <span class="c">// ← solo cambia esta línea</span>
+    <span class="k">if</span> ($fila === <span class="k">null</span>) {
+        <span class="k">throw new</span> MaterialNoEncontradoException($id);  <span class="c">// ← tu excepción, intacta</span>
+    }
+    <span class="k">return</span> $this->hidratar($fila->toArray());         <span class="c">// ← tu hidratación, intacta</span>
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>3 · El servicio de negocio: <code>PrestamoService</code></h3>
+
+      <div class="duo" id="c3">
+        <div class="col a">
+          <div class="cap">Tu versión (2.2)</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl r">app/Services/PrestamoService.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">class</span> PrestamoService
+{
+    <span class="k">public function</span> __construct(<span class="k">private</span> MaterialRepo $repo) {}
+
+    <span class="k">public function</span> prestar(<span class="n">int</span> $materialId, <span class="n">int</span> $usuarioId): <span class="k">void</span>
+    {
+        $material = $this->repo->findById($materialId);
+        <span class="k">if</span> (!$material->prestar()) {
+            <span class="k">throw new</span> MaterialNoDisponibleException($material->getTitulo());
+        }
+        $this->repo->setDisponible($materialId, <span class="k">false</span>);
+        $this->repo->registrarPrestamo($materialId, $usuarioId);
+    }
+}</code></pre>
+          </div>
+        </div>
+        <div class="col b">
+          <div class="cap">En Laravel — con transacción</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl b">app/Services/PrestamoService.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">class</span> PrestamoService
+{
+    <span class="k">public function</span> __construct(<span class="k">private</span> MaterialRepo $repo) {}
+
+    <span class="k">public function</span> prestar(<span class="n">int</span> $materialId, <span class="n">int</span> $usuarioId): <span class="k">void</span>
+    {
+        DB::transaction(<span class="k">function</span> () <span class="k">use</span> ($materialId, $usuarioId) {
+            $material = $this->repo->findById($materialId);
+            <span class="k">if</span> (!$material->prestar()) {
+                <span class="k">throw new</span> MaterialNoDisponibleException($material->getTitulo());
+            }
+            $this->repo->setDisponible($materialId, <span class="k">false</span>);
+            $this->repo->registrarPrestamo($materialId, $usuarioId);
+        });
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <p style="margin:0"><b>El único cambio real:</b> las dos operaciones (marcar no disponible + registrar el
+          préstamo) ahora van dentro de <code>DB::transaction()</code>. Si la segunda falla, la primera se deshace. En PHP
+          puro eso lo tenías que hacer a mano con <code>beginTransaction()</code> / <code>rollBack()</code>… o no hacerlo.</p>
+      </div>
+
+      <h3>4 · Tus excepciones propias</h3>
+
+      <div class="duo" id="c4">
+        <div class="col a">
+          <div class="cap">Tu versión (2.2)</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl r">app/Exceptions/</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">class</span> MaterialNoEncontradoException <span class="k">extends</span> RuntimeException
+{
+    <span class="k">public function</span> __construct(<span class="n">int</span> $id)
+    {
+        parent::__construct(<span class="s">"No existe un material con id {$id}"</span>);
+    }
+}</code></pre>
+          </div>
+        </div>
+        <div class="col b">
+          <div class="cap">En Laravel — idénticas</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl b">app/Exceptions/</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">class</span> MaterialNoEncontradoException <span class="k">extends</span> RuntimeException
+{
+    <span class="k">public function</span> __construct(<span class="n">int</span> $id)
+    {
+        parent::__construct(<span class="s">"No existe un material con id {$id}"</span>);
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>5 · La conexión a la base de datos</h3>
+
+      <div class="duo" id="c5">
+        <div class="col a">
+          <div class="cap">Tu versión (2.2)</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl r">app/Config/db.php</span><span class="lbl">PHP</span></div>
+            <pre class="src"><code><span class="k">namespace</span> App\Config;
+
+<span class="k">function</span> db(): PDO
+{
+    <span class="k">static</span> $pdo = <span class="k">null</span>;
+    <span class="k">if</span> ($pdo === <span class="k">null</span>) {
+        $pdo = <span class="k">new</span> PDO(<span class="s">'mysql:host=…'</span>, <span class="s">'biblioteca'</span>, <span class="s">'…'</span>);
+    }
+    <span class="k">return</span> $pdo;
+}</code></pre>
+          </div>
+        </div>
+        <div class="col b">
+          <div class="cap">En Laravel — en el .env</div>
+          <div class="code">
+            <div class="code-head"><span class="lbl b">proyecto/.env</span><span class="lbl">bash</span></div>
+            <pre class="src"><code>DB_CONNECTION=mysql
+DB_HOST=<span class="s">biblioteca-db</span>
+DB_PORT=<span class="s">3306</span>
+DB_DATABASE=<span class="s">biblioteca</span>
+DB_USERNAME=<span class="s">app</span>
+DB_PASSWORD=<span class="s">secreto</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ CAMINOS ═══════════════ -->
+    <section id="caminos">
+      <h2><span class="n">4</span> Los dos caminos</h2>
+
+      <p>Al llegar al repositorio hay una decisión de diseño real. No es un detalle: define cuánto de tu trabajo
+        sobrevive. Estas son las dos opciones, con sus ventajas e inconvenientes.</p>
+
+      <div class="tabs" id="tabsCam">
+        <button type="button" class="on" data-tab="a">Camino A · Eloquent puro</button>
+        <button type="button" data-tab="b">Camino B · Tu dominio intacto</button>
+        <button type="button" data-tab="c">¿Cuál elijo?</button>
+      </div>
+
+      <div class="pane" id="pane-a">
+        <p><b>El repositorio desaparece.</b> Eloquent se encarga de todo y tú escribes modelos.</p>
+
+        <div class="code">
+          <div class="code-head"><span class="lbl b">app/Models/Material.php</span><span class="lbl">PHP</span></div>
+          <pre class="src"><code><span class="k">class</span> Material <span class="k">extends</span> Model
+{
+    <span class="k">protected</span> $fillable = [<span class="s">'titulo'</span>, <span class="s">'autor'</span>, <span class="s">'tipo'</span>];
+    <span class="k">protected</span> $casts = [<span class="s">'disponible'</span> => <span class="s">'boolean'</span>];
+}
+
+<span class="c">// y en el controlador</span>
+$material = Material::findOrFail($id);   <span class="c">// el 404 ya lo pone el framework</span></code></pre>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50%">Ganas</th>
+              <th>Pierdes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Menos código: CRUD, validaciones y <code>findOrFail</code> gratis.</td>
+              <td>Tu jerarquía <code>Libro extends MaterialBiblioteca</code> y tu excepción
+                <code>MaterialNoEncontradoException</code>.</td>
+            </tr>
+            <tr>
+              <td>Relaciones, <code>with()</code>, <code>whereHas()</code> y paginación nativa.</td>
+              <td>El control fino del SQL: Eloquent escribe por ti y a veces por encima.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pane" id="pane-b" hidden>
+        <p><b>Tu aplicación no se toca; solo cambia de dónde salen los datos.</b> Las clases siguen siendo las tuyas y
+          Eloquent trabaja <i>por debajo</i>.</p>
+
+        <div class="code">
+          <div class="code-head"><span class="lbl b">app/Models/Material.php</span><span class="lbl">PHP</span></div>
+          <pre class="src"><code><span class="k">class</span> Material <span class="k">extends</span> Model
+{
+    <span class="k">protected</span> $table = <span class="s">'materiales'</span>;   <span class="c">// tabla única</span>
+    <span class="k">protected</span> $fillable = [<span class="s">'titulo'</span>, <span class="s">'autor'</span>, <span class="s">'tipo'</span>];
+}</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span class="lbl b">app/Repos/MaterialRepo.php</span><span class="lbl">PHP</span></div>
+          <pre class="src"><code><span class="k">public function</span> findById(<span class="n">int</span> $id): MaterialBiblioteca
+{
+    $fila = Material::find($id);
+    <span class="k">if</span> ($fila === <span class="k">null</span>) {
+        <span class="k">throw new</span> MaterialNoEncontradoException($id);
+    }
+    <span class="k">return</span> $this->hidratar($fila->toArray());
+}</code></pre>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50%">Ganas</th>
+              <th>Pierdes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Todo tu código 2.2 sobrevive</b>: dominio, excepciones, traits, servicio.</td>
+              <td>Escribes «a mano» el mapeo entre filas y objetos (tu <code>hidratar()</code>).</td>
+            </tr>
+            <tr>
+              <td>El repositorio sigue siendo <b>tu</b>: decides tú qué se consulta y cómo.</td>
+              <td>Relaciones y paginación las montas tú sobre Eloquent.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tip warn">
+          <p style="margin:0"><b>La dificultad de Eloquent con jerarquías:</b> una tabla <code>materiales</code> con
+            columna <code>tipo</code> es «herencia de tabla única». Eloquent, por defecto, te devuelve un
+            <code>Material</code> genérico: hay que enseñarle a hidratar un <code>Libro</code> cuando
+            <code>tipo='libro'</code> (con un <code>newFromBuilder()</code> en el modelo base o con una factoría). Es
+            el precio de usar el ORM con una jerarquía: <b>tu jerarquía la controlas tú</b>.</p>
+        </div>
+      </div>
+
+      <div class="pane" id="pane-c" hidden>
+        <p><b>Mi recomendación para esta actividad: el camino B.</b> Y no por comodidad, sino por lo que enseña:</p>
+
+        <ul>
+          <li>Porque <b>el objetivo de la actividad es el salto conceptual</b>, no el ahorro de líneas. Con el camino B
+            el alumno ve que <b>Laravel no le obliga a rediseñar su aplicación</b>: le deja cambiar la infraestructura.
+            Ese es, de verdad, el mensaje del módulo.</li>
+          <li>Porque <b>lo que hay que evaluar en un examen es su dominio</b> (que la excepción se lance en el sitio
+            correcto, que el servicio lance <code>MaterialNoDisponibleException</code> cuando toca). Si el camino A
+            borra las clases, dejas de poder evaluar eso.</li>
+          <li>Porque con el camino B el cambio es <b>de una línea</b> (<code>Material::find($id)</code> en lugar del
+            <code>prepare/execute</code>), y se ve con claridad que la app <b>sigue siendo la suya</b>.</li>
+        </ul>
+        <div class="exp">
+          <p style="margin:0"><b>Y un apunte honesto:</b> en un proyecto real de producción, el camino A (Eloquent
+            puro) suele ganar, porque las relaciones y la paginación hacen buena parte del trabajo. No presentes el
+            camino B como «el único correcto», sino como <b>el camino que te deja medir lo que has aprendido</b>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ PAGINA ═══════════════ -->
+    <section id="pagina">
+      <h2><span class="n">5</span> Cómo se escribe una página</h2>
+
+      <p>Tres piezas: la <b>ruta</b> (qué URL hace qué), el <b>controlador</b> (qué hace) y la <b>vista</b> (cómo se ve).
+        Vamos a escribir la ficha de un material, que es tu <code>public/material.php</code>.</p>
+
+      <div class="tabs" id="tabsPag">
+        <button type="button" class="on" data-tab="r">1 · La ruta</button>
+        <button type="button" data-tab="c">2 · El controlador</button>
+        <button type="button" data-tab="v">3 · La vista</button>
+        <button type="button" data-tab="l">4 · La plantilla</button>
+      </div>
+
+      <div class="pane" id="pane-r">
+        <div class="code">
+          <div class="code-head"><span class="lbl b">routes/web.php</span><span class="lbl">PHP</span></div>
+          <pre class="src"><code><span class="k">use</span> App\Http\Controllers\MaterialController;
+
+Route::get(<span class="s">'/materiales/{id}'</span>, [MaterialController::class, <span class="s">'show'</span>])
+    ->middleware(<span class="s">'auth'</span>);</code></pre>
+        </div>
+        <ul>
+          <li><code>{id}</code> es un <b>parámetro de ruta</b>: la URL <code>/materiales/3</code> lo entrega al
+            controlador. Ya no hay <code>?id=3</code> ni <code>$_GET</code>.</li>
+          <li><code>->middleware('auth')</code> es tu <code>requireLogin()</code>, pero <b>escrito una vez</b> y
+            protegido por el framework.</li>
+          <li>Para verlo: <code>php artisan route:list</code>. Te dice qué URL existe, qué método y qué
+            middleware.</li>
+        </ul>
+      </div>
+
+      <div class="pane" id="pane-c" hidden>
+        <div class="code">
+          <div class="code-head"><span class="lbl b">app/Http/Controllers/MaterialController.php</span><span class="lbl">PHP</span></div>
+          <pre class="src"><code><span class="k">class</span> MaterialController <span class="k">extends</span> Controller
+{
+    <span class="k">public function</span> __construct(<span class="k">private</span> MaterialRepo $repo) {}
+
+    <span class="k">public function</span> show(<span class="n">int</span> $id)
+    {
+        <span class="k">try</span> {
+            $material = $this->repo->findById($id);   <span class="c">// lanza TU excepción</span>
+        } <span class="k">catch</span> (MaterialNoEncontradoException $e) {
+            abort(<span class="n">404</span>, $e->getMessage());        <span class="c">// tu 404 de siempre</span>
+        }
+
+        <span class="k">return</span> view(<span class="s">'materiales.show'</span>, [<span class="s">'material'</span> =&gt; $material]);
+    }
+}</code></pre>
+        </div>
+        <ul>
+          <li>El <code>try/catch</code> con tu excepción propia <b>sigue igual</b>. Lo que cambia es que ahora el
+            <code>catch</code> produce una <b>respuesta</b> (<code>abort(404)</code>) en lugar de
+            <code>http_response_code(404); exit(...)</code>.</li>
+          <li><code>private MaterialRepo $repo</code> en el constructor: ya lo escribiste en
+            <code>PrestamoService</code> (inyección por constructor, PHP 8+). En Laravel, además, <b>el framework
+            instancia el repositorio por ti</b> y te lo inyecta: es el <i>contenedor de dependencias</i>. Desaparecen los
+            <code>new MaterialRepo()</code>.</li>
+          <li>El controlador <b>no hace <code>echo</code></b>: <b>devuelve</b>. El framework convierte ese retorno en
+            una respuesta HTTP.</li>
+        </ul>
+      </div>
+
+      <div class="pane" id="pane-v" hidden>
+        <div class="code">
+          <div class="code-head"><span class="lbl b">resources/views/materiales/show.blade.php</span><span class="lbl">blade</span></div>
+          <pre class="src"><code>@extends(<span class="s">'layouts.app'</span>)
+
+@section(<span class="s">'titulo'</span>, $material->getTitulo())
+
+@section(<span class="s">'contenido'</span>)
+    &lt;h1&gt;{{ $material->getTitulo() }}&lt;/h1&gt;
+    &lt;p&gt;{{ $material->getAutor() }}&lt;/p&gt;
+
+    @if (!$material->estaDisponible())
+        &lt;form method=<span class="s">"POST"</span> action=<span class="s">"{{ route('prestamos.store') }}"</span>&gt;
+            @csrf
+            &lt;button type=<span class="s">"submit"</span>&gt;Prestar&lt;/button&gt;
+        &lt;/form&gt;
+    @endif
+@endsection</code></pre>
+        </div>
+        <ul>
+          <li><code>{{ }}</code> <b>escapa el HTML por ti</b>: es tu <code>htmlspecialchars()</code> resuelto. Y el
+            <code>{{ }}</code> de Blade, no el de JavaScript: la interpolación es de PHP.</li>
+          <li><code>{{ route('prestamos.store') }}</code> genera la URL: <b>nunca más escribes la URL a mano</b>. Si
+            cambias la ruta en <code>routes/web.php</code>, la vista se actualiza sola.</li>
+          <li><code>@csrf</code> es el token de seguridad: en Laravel es obligatorio en los formularios
+            <code>POST</code>.</li>
+        </ul>
+      </div>
+
+      <div class="pane" id="pane-l" hidden>
+        <div class="code">
+          <div class="code-head"><span class="lbl b">resources/views/layouts/app.blade.php</span><span class="lbl">blade</span></div>
+          <pre class="src"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=<span class="s">"es"</span>&gt;
+&lt;head&gt;
+    &lt;title&gt;@yield(<span class="s">'titulo'</span>)&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    @include(<span class="s">'partials.navbar'</span>)
+    @yield(<span class="s">'contenido'</span>)
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </div>
+        <ul>
+          <li><code>@extends</code> + <code>@yield</code> sustituyen a tu <code>require header.php</code> y
+            <code>require footer.php</code>: el esqueleto se declara <b>una vez</b> y cada página rellena sus huecos.</li>
+          <li>Es el mismo concepto que tu <code>header.php</code>, pero con dos ventajas: las páginas se nombran
+            (<code>materiales.show</code>) y no son ficheros sueltos en un directorio.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ═══════════════ DENTRO ═══════════════ -->
+    <section id="dentro">
+      <h2><span class="n">6</span> Lo que cambia por dentro</h2>
+
+      <p>El resumen que cabe en una diapositiva. Cada fila es un trozo de PHP que ya conoces y su equivalente.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:44%">En la 2.2</th>
+            <th style="width:30%">En Laravel</th>
+            <th>Qué has ganado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>$_POST['titulo']</code></td>
+            <td><code>$request->input('titulo')</code></td>
+            <td>Con un <b>Form Request</b>, la validación ocurre <b>antes</b> de que el controlador se ejecute.</td>
+          </tr>
+          <tr>
+            <td><code>trim($_POST['titulo']) === ''</code></td>
+            <td><code>'titulo' => 'required|max:150'</code></td>
+            <td>Una línea en lugar de un <code>if</code>; y devuelve <b>422</b> con los errores ya formateados.</td>
+          </tr>
+          <tr>
+            <td><code>password_hash()</code> / <code>password_verify()</code></td>
+            <td><code>Hash::make()</code> / <code>Auth::attempt()</code></td>
+            <td>El login completo (sesión, «recuérdame», regeneración de token) ya resuelto.</td>
+          </tr>
+          <tr>
+            <td><code>session_start()</code> / <code>$_SESSION['rol']</code></td>
+            <td><code>auth()->user()</code> + middleware</td>
+            <td>El <code>requireLogin()</code> se pone <b>en la ruta</b>, una vez, y protege a todas.</td>
+          </tr>
+          <tr>
+            <td><code>db()->prepare(...)</code></td>
+            <td><code>Material::find()</code>, <code>-&gt;where()</code></td>
+            <td>El SQL sigue existiendo: solo cambia quién lo escribe.</td>
+          </tr>
+          <tr>
+            <td><code>mariadb/init.sql</code></td>
+            <td>migraciones (<code>php artisan migrate</code>)</td>
+            <td>El esquema pasa a ser <b>código versionado</b>: si mañana añades una columna, lamigration la añade.</td>
+          </tr>
+          <tr>
+            <td><code>header('Location: index.php')</code></td>
+            <td><code>return redirect()->route('materiales.index')</code></td>
+            <td>La URL la pone el framework; tú nombras la ruta.</td>
+          </tr>
+          <tr>
+            <td><code>http_response_code(404); exit(...)</code></td>
+            <td><code>abort(404)</code></td>
+            <td>Idéntico en intención, y ahora la página 404 la puede diseñar el framework.</td>
+          </tr>
+          <tr>
+            <td><code>set_exception_handler()</code> (tu manejador global)</td>
+            <td>el manejador del framework</td>
+            <td>Además <b>loguea</b> solo lo que tú no capturaste. Lo mismo, con <i>logging</i> de serie.</td>
+          </tr>
+          <tr>
+            <td>tu trait <code>Loggable</code></td>
+            <td><code>Log::info(...)</code></td>
+            <td>El mismo destino: el log de la aplicación.</td>
+          </tr>
+          <tr>
+            <td><code>setDisponible()</code> + <code>registrarPrestamo()</code> sueltos</td>
+            <td><code>DB::transaction(function () {…})</code></td>
+            <td>Si la segunda falla, la primera se deshace. Atomicidad.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════════════ PLAN ═══════════════ -->
+    <section id="plan">
+      <h2><span class="n">7</span> Plan de trabajo</h2>
+
+      <p>El guion de la actividad en la que trasladarás la biblioteca. <b>No hay que hacerlo ahora</b>: está aquí para que
+        sepas exactamente a dónde vas. Puedes ir marcando los pasos según los vayas haciendo.</p>
+
+      <div class="plan" id="planLista">
+        <ol>
+          <li><label class="task"><input type="checkbox" data-p="1"><span>Crear el proyecto:
+              <code>composer create-project laravel/laravel biblioteca-laravel</code></span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="2"><span>Copiar dentro de <code>app/</code> tus carpetas
+              <code>Classes/</code>, <code>Services/</code>, <code>Exceptions/</code> y <code>Repos/</code>. El
+              <code>composer.json</code> de Laravel ya trae <code>"App\\": "app/"</code>: <b>los namespaces siguen
+              funcionando</b>.</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="3"><span>Traducir tu <code>init.sql</code> a migraciones:
+              <code>php artisan make:migration create_materiales_table</code> (y otra para
+              <code>prestamos</code>).</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="4"><span><code>php artisan migrate</code> y comprobar las
+              tablas en MariaDB.</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="5"><span>Crear el modelo:
+              <code>php artisan make:model Material</code>. <b>Decidir aquí el camino</b> (A o B).</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="6"><span>Crear los controladores:
+              <code>php artisan make:controller MaterialController</code> y
+              <code>PrestamoController</code>.</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="7"><span>Crear las vistas:
+              <code>php artisan make:view layouts/app</code>,
+              <code>php artisan make:view materiales/index</code>,
+              <code>php artisan make:view materiales/show</code>.</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="8"><span>Declarar las rutas en <code>routes/web.php</code>
+              y colgar los middleware (<code>auth</code>, <code>rol:admin</code>).</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="9"><span>Comprobar la tabla de rutas:
+              <code>php artisan route:list</code>. Es el comando que sustituye a «puede ser que no
+              funcione».</span></label></li>
+          <li><label class="task"><input type="checkbox" data-p="10"><span>Reclamar el esqueleto de autenticación
+              (<code>composer require laravel/ui</code> + <code>php artisan ui:auth</code>, o Breeze) y colgar
+              <code>auth</code> en las rutas.</span></label></li>
+        </ol>
+        <p style="margin:12px 0 0;font:600 13px JetBrains Mono;color:var(--teal)" id="planN">0 / 10 pasos</p>
+      </div>
+
+      <div class="exp">
+        <p style="margin:0"><b>El paso 2 es el que más satisfacción da en el aula.</b> Copias una carpeta, no escribes
+          casi nada, y todo sigue funcionando porque el PSR-4 que escribiste en la 2.2 es el mismo. Enseñar eso es el
+          mejor argumento para el salto a Laravel.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ IGUAL ═══════════════ -->
+    <section id="igual">
+      <h2><span class="n">8</span> Lo que no cambia</h2>
+
+      <p>Para cerrar: la lista de lo que no cambia. Si alguien pregunta «¿y ahora tengo que saberme Laravel?», la respuesta es
+        esta.</p>
+
+      <div class="card">
+        <ul style="margin:0">
+          <li><b>PHP.</b> El mismo lenguaje. Tus clases, tus traits, tus interfaces, tus excepciones, tu
+            <code>declare(strict_types=1)</code>.</li>
+          <li><b>Los namespaces y PSR-4.</b> Ya los dominas: en Laravel son idénticos.</li>
+          <li><b>Composer.</b> El mismo fichero, la misma clave <code>psr-4</code>.</li>
+          <li><b>MariaDB y el SQL.</b> Solo cambia quién escribe el <code>SELECT</code>.</li>
+          <li><b>La lógica de negocio.</b> <code>PrestamoService</code> sigue siendo tuyo y sigue siendo lo más
+            valioso de tu aplicación.</li>
+          <li><b>El <code>try/catch</code> con excepciones propias.</b> Sigue siendo la forma correcta de manejar «material
+            no encontrado» o «no disponible».</li>
+          <li><b>La inyección por constructor.</b> Ya la usas en <code>PrestamoService</code>. Laravel simplemente la
+            completa.</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <p style="margin:0"><b>La frase para el aula:</b> «En la 2.2 habéis construido la biblioteca a mano: las páginas,
+          la conexión, el CRUD, el escapado. En Laravel seguís teniendo <b>la misma biblioteca</b> —vuestras mismas
+          clases, con vuestro mismo Composer y vuestros mismos namespaces—; lo que cambia es que el framework se
+          encarga de la fontanería: las rutas, la base de datos, las plantillas y los errores. Vosotros ya habéis hecho la
+          parte difícil.»</p>
+      </div>
+
+      <div class="tip warn">
+        <p style="margin:0"><b>Y un matiz honesto:</b> Laravel tiene curva de aprendizaje propia. No es «PHP con más
+          cosas»: es una <b>forma de organizar</b> (convención sobre configuración). La 2.1 y la 2.2 (POO, repositorio,
+          namespaces, Composer) existen precisamente para que el salto sea manejable: vas a escribir código <b>dentro</b>
+          de sus convenciones, no a aprender un lenguaje nuevo.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ RETOS ═══════════════ -->
+    <section id="retos">
+      <h2><span class="n">9</span> Retos de comprensión</h2>
+
+      <p>Seis preguntas para comprobar que el puente está entendido. Sirven como repaso en el aula o como
+        autoevaluación antes de la actividad.</p>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>1</span>En tu proyecto de la 2.2, la URL <code>/material.php?id=3</code> carga la ficha de
+          un material. En Laravel, ¿qué URL carga esa misma ficha y por qué cambia?</div>
+        <div class="a">En Laravel la URL es <code>/materiales/3</code>. La razón es que <b>la URL deja de ser el nombre
+          del fichero</b>: pasa a ser una fila de la tabla de <code>routes/web.php</code>, y el <code>3</code> es un
+          <b>parámetro de ruta</b> (<code>{id}</code>) que llega al controlador ya tipado como <code>int</code>. Con la
+          ruta antigua habría que recibirlo en <code>$_GET</code> y validarlo a mano.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>2</span>Tu <code>public/material.php</code> empieza con <code>requireLogin()</code>. En
+          Laravel, ¿dónde va esa comprobación y qué se gana?</div>
+        <div class="a">Va <b>en la ruta</b>: <code>-&gt;middleware('auth')</code>. Se gana que se escribe <b>una
+          vez</b> y protege a todas las rutas que quieras; además el framework responde con su propia página de login en
+          lugar de tu <code>exit()</code>. Y el rol se resuelve igual con un middleware
+          <code>rol:admin</code>.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>3</span>En la 2.2 escribiste <code>db()->prepare('SELECT …')</code> dentro de
+          <code>MaterialRepo</code>. En el camino B, ¿qué línea sustituye a ese <code>prepare</code> y qué queda
+          intacto?</div>
+        <div class="a">La sustituye <code>$fila = Material::find($id);</code> (Eloquent). Qeda intacto <b>todo lo
+          demás</b>: tu excepción <code>MaterialNoEncontradoException</code>, tu <code>hidratar()</code> y el contrato
+          del método. Lo único que cambia es <b>de dónde sale la fila</b>.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>4</span>Tu <code>PrestamoService</code> ya usa inyección de dependencias por constructor
+          (<code>private MaterialRepo $repo</code>). ¿Qué cambia al llevarlo a Laravel?</div>
+        <div class="a">El <b>constructor no cambia</b>. Lo que cambia es que <b>el framework instancia el
+          repositorio por ti</b> y te lo inyecta en el controlador: no escribes <code>new MaterialRepo()</code> en
+          ninguna parte. Eso es el <i>contenedor de dependencias</i> de Laravel. La inyección por constructor ya la
+          entendías tú.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>5</span>En tu <code>header.php</code> y <code>footer.php</code> usabas
+          <code>require</code> y <code>htmlspecialchars()</code>. ¿Qué los sustituye en Blade?</div>
+        <div class="a"><code>@extends</code> + <code>@yield</code> sustituyen a los <code>require</code>: el esqueleto
+          se declara una vez en <code>layouts/app.blade.php</code> y cada vista rellena sus huecos. Y
+          <code>{{ }}</code> sustituye a <code>htmlspecialchars()</code>: Blade <b>escapa por defecto</b>. Además
+          <code>{{ route('prestamos.store') }}</code> genera las URLs.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+
+      <div class="reto" data-reto>
+        <div class="q"><span>6</span>Tu <code>mariadb/init.sql</code> creaba las tablas. ¿Qué lo sustituye en Laravel y
+          qué ventaja tiene?</div>
+        <div class="a">Las <b>migraciones</b>: ficheros PHP versionados, uno por cambio de esquema, que se aplican con
+          <code>php artisan migrate</code>. La ventaja es que el esquema pasa a ser <b>código</b>: cuando añadas una
+          columna escribirás una migración nueva y <code>migrate</code> la aplica, en vez de editar el SQL a mano y
+          acordarte de ejecutarlo en los seis ordenadores del aula.</div>
+        <button class="b" type="button">Ver solución</button>
+      </div>
+    </section>
+
+    <!-- ═══════════════ GLOSARIO ═══════════════ -->
+    <section id="glosario">
+      <h2><span class="n">10</span> Glosario: de PHP a Laravel</h2>
+
+      <p>Busca un término de PHP y mira su equivalente en Laravel (o al revés).</p>
+
+      <div class="glo">
+        <label class="sr" for="gloQ">Buscar en el glosario</label>
+        <input type="search" id="gloQ" placeholder="Busca: ruta, middleware, vista, PDO, sesión…">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:30%">En PHP puro (tu 2.2)</th>
+              <th style="width:30%">En Laravel</th>
+              <th>Qué es</th>
+            </tr>
+          </thead>
+          <tbody id="gloBody">
+            <tr>
+              <td><code>public/index.php</code> (cada página)</td>
+              <td><code>routes/web.php</code></td>
+              <td>La <b>ruta</b>: qué URL ejecuta qué función. Es la tabla que sustituye a los ficheros sueltos.</td>
+            </tr>
+            <tr>
+              <td><code>public/index.php</code> (el primero)</td>
+              <td><code>public/index.php</code> (front controller)</td>
+              <td>El único punto de entrada: todo pasa por él.</td>
+            </tr>
+            <tr>
+              <td><code>requireLogin()</code></td>
+              <td>middleware <code>auth</code></td>
+              <td>Capa que se ejecuta antes del controlador. Es la «puerta» de la ruta.</td>
+            </tr>
+            <tr>
+              <td>Tu <code>public/material.php</code> entero</td>
+              <td><code>MaterialController@show</code></td>
+              <td>El <b>controlador</b>: recibe la petición y devuelve una respuesta.</td>
+            </tr>
+            <tr>
+              <td><code>$_POST['x']</code></td>
+              <td><code>$request->input('x')</code></td>
+              <td>El <b>Request</b>: los datos de la petición, ya tipados.</td>
+            </tr>
+            <tr>
+              <td>Un <code>if</code> de validación</td>
+              <td>Form Request</td>
+              <td>Validación que ocurre <b>antes</b> del controlador y devuelve los errores ya formateados.</td>
+            </tr>
+            <tr>
+              <td><code>db()->prepare()</code></td>
+              <td><code>Material::find()</code> (Eloquent)</td>
+              <td>El <b>ORM</b>: consultas escritas a partir del modelo.</td>
+            </tr>
+            <tr>
+              <td><code>MaterialRepo</code> (a mano)</td>
+              <td>Eloquent <b>o</b> tu repo con Eloquent por dentro</td>
+              <td>El <b>repositorio</b>: decide qué se consulta y cómo se traduce a objetos.</td>
+            </tr>
+            <tr>
+              <td><code>init.sql</code></td>
+              <td>migraciones</td>
+              <td>El <b>esquema</b> como código versionado.</td>
+            </tr>
+            <tr>
+              <td><code>header.php</code> + <code>footer.php</code></td>
+              <td>Blade: <code>@extends</code> / <code>@yield</code></td>
+              <td>La <b>plantilla</b> y las <b>vistas</b>.</td>
+            </tr>
+            <tr>
+              <td><code>htmlspecialchars()</code></td>
+              <td><code>{{ }}</code></td>
+              <td>El escapado, hecho por el motor de plantillas.</td>
+            </tr>
+            <tr>
+              <td><code>session_start()</code> / <code>$_SESSION</code></td>
+              <td><code>auth()->user()</code>, <code>session()</code></td>
+              <td>La <b>sesión</b>, gestionada por el framework.</td>
+            </tr>
+            <tr>
+              <td><code>password_verify()</code></td>
+              <td><code>Auth::attempt()</code></td>
+              <td>La <b>autenticación</b>: login, logout, registro y «recuérdame».</td>
+            </tr>
+            <tr>
+              <td><code>header('Location: …')</code></td>
+              <td><code>return redirect()->route(…)</code></td>
+              <td>La <b>redirección</b>.</td>
+            </tr>
+            <tr>
+              <td><code>http_response_code(404)</code></td>
+              <td><code>abort(404)</code></td>
+              <td>La <b>respuesta</b> de error.</td>
+            </tr>
+            <tr>
+              <td><code>set_exception_handler()</code></td>
+              <td>el manejador del framework</td>
+              <td>El <b>manejador global</b> de errores, con <i>logging</i> de serie.</td>
+            </tr>
+            <tr>
+              <td><code>composer.json</code> con PSR-4</td>
+              <td><code>composer.json</code> con PSR-4</td>
+              <td><b>Idéntico</b>. Por eso copiar tu carpeta <code>app/</code> funciona.</td>
+            </tr>
+            <tr>
+              <td>tu <code>PrestamoService</code></td>
+              <td>tu <code>PrestamoService</code></td>
+              <td><b>Idéntico</b>: la lógica de negocio no la escribe el framework.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p><b>Puente · De la MiniApp a Laravel</b> — documento de lectura del módulo ASETE (2º DAM). Complementa la
+      actividad 3.1 (taller de Laravel con Docker) y la actividad 2.2 (MiniApp de Biblioteca con Composer y POO).
+      Archivo único: funciona sin conexión y sin instalar nada.</p>
+    <p>Las piezas de código de la columna «tu versión» son las que construiste en la actividad 2.2
+      (<code>app/Classes/</code>, <code>app/Repos/</code>, <code>app/Services/</code>, <code>app/Exceptions/</code>).</p>
+  </footer>
+
+  <script>
+    /* ═════════════ UTILIDADES ═════════════ */
+    const $ = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    /* ═════════════ COLOREADO DE CÓDIGO ═════════════ */
+    const PHP_KW = ["abstract", "and", "array", "as", "bool", "break", "callable", "case", "catch", "class", "const", "continue", "declare", "default", "do", "echo", "else", "elseif", "empty", "exit", "extends", "final", "finally", "float", "fn", "for", "foreach", "function", "global", "if", "implements", "insteadof", "instanceof", "int", "interface", "isset", "list", "match", "mixed", "new", "null", "or", "parent", "print", "private", "protected", "public", "readonly", "require", "require_once", "return", "self", "static", "string", "switch", "this", "throw", "trait", "true", "false", "try", "unset", "use", "var", "void", "while"];
+
+    function hlGeneric(code, kw, lineComment) {
+      let out = "", i = 0;
+      const n = code.length;
+      while (i < n) {
+        const c = code[i];
+        if (lineComment && code.startsWith(lineComment, i)) {
+          let j = code.indexOf("\n", i); if (j < 0) j = n;
+          out += '<span class="c">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+        }
+        if (c === "'" || c === '"') {
+          const q = c; let j = i + 1;
+          while (j < n && code[j] !== q) { if (code[j] === "\\") j++; j++; }
+          j = Math.min(j + 1, n);
+          out += '<span class="s">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+        }
+        if (/[A-Za-z_]/.test(c)) {
+          let j = i; while (j < n && /[A-Za-z0-9_]/.test(code[j])) j++;
+          const w = code.slice(i, j);
+          out += kw.indexOf(w.toLowerCase()) >= 0 ? '<span class="k">' + esc(w) + '</span>' : esc(w);
+          i = j; continue;
+        }
+        if (/[0-9]/.test(c)) {
+          let j = i; while (j < n && /[0-9.]/.test(code[j])) j++;
+          out += '<span class="n">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+        }
+        out += esc(c); i++;
+      }
+      return out;
+    }
+
+    /* Blade: las directivas @xxx y las expresiones {{ }} */
+    function hlBlade(code) {
+      let out = "", i = 0;
+      const n = code.length;
+      while (i < n) {
+        if (code.startsWith("{{", i)) {
+          const j = code.indexOf("}}", i);
+          const end = j < 0 ? n : j + 2;
+          out += '<span class="t">' + esc(code.slice(i, end)) + '</span>'; i = end; continue;
+        }
+        if (code[i] === "@" && /[A-Za-z]/.test(code[i + 1] || "")) {
+          let j = i + 1; while (j < n && /[A-Za-z]/.test(code[j])) j++;
+          out += '<span class="k">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+        }
+        if (code[i] === "'" || code[i] === '"') {
+          const q = code[i]; let j = i + 1;
+          while (j < n && code[j] !== q) { if (code[j] === "\\") j++; j++; }
+          j = Math.min(j + 1, n);
+          out += '<span class="s">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+        }
+        out += esc(code[i]); i++;
+      }
+      return out;
+    }
+
+    function hl(code, lang) {
+      if (lang === "blade") return hlBlade(code);
+      if (lang === "bash") return hlGeneric(code, [], "#");
+      return hlGeneric(code, PHP_KW, ["//", "#"]);
+    }
+
+    $$('pre.src').forEach(p => {
+      const code = p.querySelector('code').textContent;
+      p.querySelector('code').innerHTML = hl(code, p.dataset.lang || 'php');
+    });
+
+    /* ═════════════ BOTONES DE COPIAR ═════════════ */
+    $$('.code').forEach(box => {
+      const head = box.querySelector('.code-head');
+      const pre = box.querySelector('pre');
+      if (!head || !pre) return;
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = 'Copiar';
+      b.addEventListener('click', () => {
+        const txt = pre.querySelector('code').textContent;
+        const ta = document.createElement('textarea');
+        ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) { }
+        ta.remove();
+        b.textContent = '¡Copiado!';
+        setTimeout(() => b.textContent = 'Copiar', 1300);
+      });
+      head.appendChild(b);
+    });
+
+    /* ═════════════ ÁRBOLES: 2.2 / LARAVEL / AMBOS ═════════════ */
+    const arboles = $('#arboles');
+    function setArbol(what) {
+      arboles.classList.toggle('hide-a', what === 'l');
+      arboles.classList.toggle('hide-b', what === 'a');
+      ['tBoth', 'tOnly22', 'tOnlyLaravel'].forEach(id => {
+        const on = id === 'tBoth' ? what === 'both' : id === 'tOnly22' ? what === 'a' : what === 'l';
+        $('#' + id).style.background = on ? 'var(--amber)' : '';
+        $('#' + id).style.borderColor = on ? 'var(--ink)' : '';
+      });
+    }
+    $('#tBoth').addEventListener('click', () => setArbol('both'));
+    $('#tOnly22').addEventListener('click', () => setArbol('a'));
+    $('#tOnlyLaravel').addEventListener('click', () => setArbol('l'));
+
+    /* ═════════════ COMPARADOR DE CÓDIGO ═════════════ */
+    const duos = $$('.duo').filter(d => d.id.startsWith('c'));
+    function setDuo(what) {
+      duos.forEach(d => {
+        d.classList.toggle('hide-a', what === 'b');
+        d.classList.toggle('hide-b', what === 'a');
+      });
+      ['dBoth', 'dOnlyA', 'dOnlyB'].forEach(id => {
+        const on = id === 'dBoth' ? what === 'both' : id === 'dOnlyA' ? what === 'a' : what === 'b';
+        $('#' + id).style.background = on ? 'var(--amber)' : '';
+      });
+    }
+    $('#dBoth').addEventListener('click', () => setDuo('both'));
+    $('#dOnlyA').addEventListener('click', () => setDuo('a'));
+    $('#dOnlyB').addEventListener('click', () => setDuo('b'));
+
+    /* ═════════════ PASOS DEL FLUJO ═════════════ */
+    $$('#flow .step').forEach(s => {
+      s.addEventListener('click', () => {
+        const p = s.dataset.pair;
+        $$('#flow .step').forEach(x => x.classList.remove('hit'));
+        $$('#flow .step[data-pair="' + p + '"]').forEach(x => x.classList.add('hit'));
+      });
+    });
+
+    /* ═════════════ PESTAÑAS ═════════════ */
+    function montaTabs(cont) {
+      const btns = $$('button[data-tab]', cont);
+      btns.forEach(b => {
+        b.addEventListener('click', () => {
+          btns.forEach(x => x.classList.remove('on'));
+          b.classList.add('on');
+          const id = b.dataset.tab;
+          const pane = cont.parentElement.querySelector('#pane-' + id);
+          if (!pane) return;
+          $$('.pane', cont.parentElement).forEach(p => p.hidden = true);
+          pane.hidden = false;
+        });
+      });
+    }
+    montaTabs($('#tabsCam'));
+    montaTabs($('#tabsPag'));
+
+    /* ═════════════ RETOS ═════════════ */
+    $$('.reto').forEach(r => {
+      const b = r.querySelector('button');
+      b.addEventListener('click', () => {
+        const open = r.classList.toggle('open');
+        b.textContent = open ? 'Ocultar solución' : 'Ver solución';
+      });
+    });
+
+    /* ═════════════ PLAN DE TRABAJO ═════════════ */
+    const plan = $('#planLista');
+    function actualizaPlan() {
+      const cs = $$('#planLista input[type=checkbox]');
+      const n = cs.filter(c => c.checked).length;
+      $('#planN').textContent = n + ' / ' + cs.length + ' pasos';
+      cs.forEach(c => c.closest('li').classList.toggle('done', c.checked));
+    }
+    $$('#planLista input[type=checkbox]').forEach(c => c.addEventListener('change', actualizaPlan));
+    actualizaPlan();
+
+    /* ═════════════ GLOSARIO ═════════════ */
+    const gloQ = $('#gloQ');
+    gloQ.addEventListener('input', () => {
+      const q = gloQ.value.toLowerCase().trim();
+      $$('#gloBody tr').forEach(r => {
+        r.style.display = !q || r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+
+    /* ═════════════ AVANCE DE LECTURA + NAV ═════════════ */
+    const secs = $$('section');
+    function avance() {
+      const alto = document.body.scrollHeight - window.innerHeight;
+      const p = alto > 0 ? (window.scrollY / alto) * 100 : 0;
+      $('#barFill').style.width = Math.min(100, Math.max(0, p)) + '%';
+      let actual = secs[0];
+      secs.forEach(s => { if (s.getBoundingClientRect().top <= 120) actual = s; });
+      $$('nav a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + actual.id));
+    }
+    window.addEventListener('scroll', avance, { passive: true });
+    window.addEventListener('resize', avance);
+    avance();
+  </script>
+
+</body>
+
+</html>
