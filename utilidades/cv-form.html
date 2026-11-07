@@ -68,6 +68,12 @@ code, pre { font-family: 'JetBrains Mono', monospace; }
   font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted);
   border: 1px solid var(--line); padding: 3px 10px; border-radius: 99px;
 }
+.topbar .back {
+  font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted);
+  text-decoration: none; border: 1px solid var(--line); padding: 3px 10px; border-radius: 99px;
+  transition: color .15s, border-color .15s;
+}
+.topbar .back:hover { color: var(--cyan); border-color: var(--cyan); }
 
 .intro { padding: 36px 0 28px; border-bottom: 1px dashed var(--line); margin-bottom: 28px; }
 .intro p { color: var(--muted); font-size: 15.5px; max-width: 60ch; }
@@ -267,6 +273,7 @@ textarea.output {
 <header class="topbar">
   <div class="sig"><b>CV</b> Formulario FEOE</div>
   <div class="spacer"></div>
+  <a class="back" href="../index.html">← Índice</a>
   <div class="badge">ASIR · 2º</div>
 </header>
 

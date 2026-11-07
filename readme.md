@@ -90,6 +90,15 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [PMDM - ACT 3.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%203.1.html) | Actividad 3.1 — CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue |
 | [PMDM - ACT 4.1.html](https://actionperformed.github.io/guias_html/PMDM/PMDM%20-%20ACT%204.1.html) | Actividad 4.1 — Conectividad avanzada: Red, Bluetooth y SMS |
 
+### Utilidades
+
+Herramientas de apoyo para el alumnado, también en HTML único:
+
+| Utilidad | Descripción |
+|----------|-------------|
+| [cv-form.html](https://actionperformed.github.io/guias_html/utilidades/cv-form.html) | Formulario FEOE — rellena tus datos y genera tu CV profesional en Markdown |
+| [cv-pdf.html](https://actionperformed.github.io/guias_html/utilidades/cv-pdf.html) | Generador de CV en PDF — pega el Markdown del formulario, previsualiza e imprime o guarda como PDF |
+
 ---
 
 *Todas las guías son archivos HTML únicos, sin dependencias externas más allá de Google Fonts.*
