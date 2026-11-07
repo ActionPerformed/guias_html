@@ -833,7 +833,7 @@ $app->handleRequest(Request::capture());   // el framework decide</code></pre>
     </section>
 
     <section id="s0">
-      <h2><span class="n">0</span>Las piezas <span class="min">30 min · lectura</span></h2>
+      <h2><span class="n">0</span>Las piezas <span class="min">15 min · lectura</span></h2>
       <p>Lee esto antes de ejecutar nada: entender qué hace cada pieza forma parte de la evaluación. Trabajarás con
         <b>cinco archivos</b> y <b>dos contenedores</b>.</p>
       <div class="card">
@@ -915,7 +915,7 @@ $app->handleRequest(Request::capture());   // el framework decide</code></pre>
     </section>
 
     <section id="s1">
-      <h2><span class="n">1</span>Crear los archivos de configuración <span class="min">75 min</span></h2>
+      <h2><span class="n">1</span>Crear los archivos de configuración <span class="min">40 min</span></h2>
       <h3>1.1 Estructura de carpetas</h3>
       <p>Las órdenes siguientes van en <b>PowerShell</b>, la terminal que viene con Windows 11. Crea la carpeta donde
         vivirá el proyecto y entra en ella:</p>
@@ -1092,7 +1092,7 @@ proyecto/storage/framework/cache/</code></pre>
     </section>
 
     <section id="s2">
-      <h2><span class="n">2</span>Crear el proyecto Laravel dentro del contenedor <span class="min">120 min</span></h2>
+      <h2><span class="n">2</span>Crear el proyecto Laravel dentro del contenedor <span class="min">60 min</span></h2>
       <h3>2.1 Levanta los contenedores (aún sin proyecto)</h3>
       <pre><span class="f">powershell</span><code>docker compose up -d --build
 docker compose ps</code></pre>
@@ -1186,7 +1186,7 @@ docker compose up -d</code></pre>
     </section>
 
     <section id="s3">
-      <h2><span class="n">3</span>Comprobar que Laravel responde y conecta <span class="min">75 min</span></h2>
+      <h2><span class="n">3</span>Comprobar que Laravel responde y conecta <span class="min">40 min</span></h2>
       <h3>3.1 Conecta Laravel con MariaDB</h3>
       <pre><span class="f">powershell</span><code>docker compose exec app php artisan migrate</code></pre>
       <div class="exp"><b>✅ Debes ver</b> la cabecera <code>INFO Running migrations.</code> y una lista de migraciones
@@ -1235,7 +1235,7 @@ SHOW TABLES;</code></pre>
     </section>
 
     <section id="s4">
-      <h2><span class="n">4</span>Artisan y el ciclo de vida de una petición <span class="min">60 min</span></h2>
+      <h2><span class="n">4</span>Artisan y el ciclo de vida de una petición <span class="min">30 min</span></h2>
       <pre><span class="f">powershell</span><code>docker compose exec app php artisan --version
 docker compose exec app php artisan route:list</code></pre>
       <div class="exp"><b>✅ Debes ver</b> en la primera orden <code>Laravel Framework 12.x.x</code> (con la restricción
@@ -1267,7 +1267,7 @@ docker compose exec app php artisan route:list</code></pre>
     </section>
 
     <section id="s5">
-      <h2><span class="n">5</span>Exploración guiada: demuestra que no eres pasivo <span class="min">60 min</span></h2>
+      <h2><span class="n">5</span>Exploración guiada: demuestra que no eres pasivo <span class="min">30 min</span></h2>
       <h3>5.1 Mapa de carpetas</h3>
       <p>Abre <code>proyecto/</code> en tu editor. Pulsa para ver qué guarda cada carpeta. <b>Cada una te va a resultar
           familiar</b>: en <a href="#obj">«No empiezas de cero»</a> tienes la tabla que conecta estas carpetas con las
@@ -1313,7 +1313,7 @@ docker compose exec app php artisan route:list</code></pre>
     </section>
 
     <section id="s6">
-      <h2><span class="n">6</span>Cierre: deja el taller funcionando <span class="min">60 min</span></h2>
+      <h2><span class="n">6</span>Cierre: deja el taller funcionando <span class="min">25 min</span></h2>
       <h3>Aquí no hay entrega</h3>
       <p>El entorno que has montado es el soporte de las próximas actividades, así que <b>se queda en tu máquina</b> y
         en la siguiente clase se sigue trabajando sobre él. La prueba de que esta actividad está superada es una sola:
@@ -1420,7 +1420,7 @@ docker compose exec app php artisan route:list</code></pre>
       <p><b>Lo que viene después:</b> en la próxima actividad usarás <b>este mismo proyecto</b> para ver cómo una
         petición atraviesa rutas, controlador, modelo y vista, con comandos como <code>make:model</code> y
         <code>make:controller</code>. Si algo falla hoy, lo arrastrarás: déjalo funcionando.</p>
-      <p>¿Has terminado antes de la hora? Entonces tienes <a href="#amp">retos de ampliación</a>: seis retos <b>sin
+      <p>¿Has terminado antes de tiempo? Entonces tienes <a href="#amp">retos de ampliación</a>: seis retos <b>sin
           solución publicada</b> y <b>sin nota</b>, pero tocan el taller, así que hazlos al final de la sesión.</p>
     </section>
 
@@ -1441,7 +1441,7 @@ docker compose exec app php artisan route:list</code></pre>
       <div class="amps">
         <div class="amp" data-amp="A1">
           <div class="amp-head"><span class="amp-n">A1</span><b>Documenta el estado de tu taller</b><span
-              class="amp-lv">nivel 1 · 15 min</span></div>
+              class="amp-lv">nivel 1 · 10 min</span></div>
           <p>Crea un fichero <code>estado.md</code> en <code>laravel-docker/</code> con cuatro datos: la versión de PHP,
             la de Laravel, la de MariaDB y el estado de los contenedores. Y después responde: <b>¿para qué sirve este
               fichero?</b> Piensa en un compañero que dice «a mí no me funciona»: ¿qué parte de su problema te diría
@@ -1456,7 +1456,7 @@ docker compose exec app php artisan route:list</code></pre>
         </div>
         <div class="amp" data-amp="A2">
           <div class="amp-head"><span class="amp-n">A2</span><b>MariaDB, solo en tu propio equipo</b><span
-              class="amp-lv">nivel 2 · 20 min</span></div>
+              class="amp-lv">nivel 2 · 15 min</span></div>
           <p>Añade al servicio <code>db</code> del compose la línea <code>ports: – "127.0.0.1:3307:3306"</code>, levanta
             el taller y comprueba en <code>docker compose ps</code> que ahora la base de datos aparece con puerto. Entra
             con un cliente SQL desde tu PC si tienes uno. Después, quita la línea y vuelve a levantar. Responde: <b>¿qué
@@ -1472,7 +1472,7 @@ docker compose exec app php artisan route:list</code></pre>
         </div>
         <div class="amp" data-amp="A3">
           <div class="amp-head"><span class="amp-n">A3</span><b>Sesiones en ficheros: qué pasa si la base no tiene esas
-              tablas</b><span class="amp-lv">nivel 3 · 30 min</span></div>
+              tablas</b><span class="amp-lv">nivel 3 · 20 min</span></div>
           <p>En <code>proyecto/.env</code> cambia <code>SESSION_DRIVER=database</code> por
             <code>SESSION_DRIVER=file</code> y <code>CACHE_STORE=database</code> por <code>CACHE_STORE=file</code>.
             Reinicia y navega por la web: funciona igual. Comprueba ahora que la tabla <code>sessions</code> <b>sigue
@@ -1489,7 +1489,7 @@ docker compose exec app php artisan route:list</code></pre>
         </div>
         <div class="amp" data-amp="A4">
           <div class="amp-head"><span class="amp-n">A4</span><b>Healthcheck: qué pasa si la base de datos no está
-              sana</b><span class="amp-lv">nivel 4 · 35 min</span></div>
+              sana</b><span class="amp-lv">nivel 4 · 25 min</span></div>
           <p>El compose tiene un <code>healthcheck</code> en el servicio <code>db</code>, pero el servicio
             <code>app</code> no espera a que esté sano: los dos arrancan a la vez. Averigua cómo se hace que
             <code>app</code> espere (pista: <code>depends_on</code> con <code>condition: service_healthy</code>) y
@@ -1507,7 +1507,7 @@ docker compose exec app php artisan route:list</code></pre>
         </div>
         <div class="amp" data-amp="A5">
           <div class="amp-head"><span class="amp-n">A5</span><b>Un cliente web para ver la base de datos</b><span
-              class="amp-lv">nivel 5 · 45 min</span></div>
+              class="amp-lv">nivel 5 · 30 min</span></div>
           <p>Añade un tercer servicio al compose, <code>adminer</code> (una imagen que es un cliente web de bases de
             datos), y publícale el puerto <code>8081</code>. Entra en <code>http://localhost:8081</code> desde el
             navegador y conéctate con las credenciales del <code>.env</code> raíz. <b>No publiques ningún puerto en
@@ -1524,7 +1524,7 @@ docker compose exec app php artisan route:list</code></pre>
         </div>
         <div class="amp" data-amp="A6">
           <div class="amp-head"><span class="amp-n">A6</span><b>Tu propia imagen, sin tocar el compose de la
-              guía</b><span class="amp-lv">nivel 6 · 60 min</span></div>
+              guía</b><span class="amp-lv">nivel 6 · 40 min</span></div>
           <p>No edites el <code>docker-compose.yml</code>: crea un <code>compose.override.yaml</code> en la misma
             carpeta con una imagen propia (se construye con un <code>Dockerfile</code> propio derivado de
             <code>php:8.4-apache</code>, al que le añades una extensión que no esté, por ejemplo <code>intl</code> o
@@ -1773,8 +1773,8 @@ docker compose exec app php artisan route:list</code></pre>
     $$('pre').forEach(p => { const b = document.createElement('button'); b.textContent = 'Copiar'; b.setAttribute('aria-live', 'polite'); b.title = 'Copiar el código de este bloque'; b.onclick = () => { navigator.clipboard.writeText(p.querySelector('code').innerText); b.textContent = '¡Copiado!'; setTimeout(() => b.textContent = 'Copiar', 1200) }; p.appendChild(b) });
     // progreso
     const T = $$('.t'); const up = () => { const n = T.filter(x => x.checked).length; $('#pc').textContent = n + '/' + T.length; $('#pb').style.width = 100 * n / T.length + '%' }; T.forEach(t => t.onchange = up); up();
-    // plan 8h
-    [['0 · Piezas', 30, '#1d1b1a'], ['1 · Archivos', 75, '#ff2d20'], ['2 · Proyecto', 120, '#0f766e'], ['3 · Comprobar', 75, '#b45309'], ['4 · Artisan', 60, '#6d28d9'], ['5 · Explorar', 60, '#0369a1'], ['6 · Cierre', 60, '#be185d']].forEach(([n, m, c]) => { const d = document.createElement('div'); d.style.cssText = `flex:${m};background:${c}`; d.title = n + ' · ' + m + ' min'; d.textContent = m + "'"; $('#plan').appendChild(d) });
+    // plan 4h
+    [['0 · Piezas', 15, '#1d1b1a'], ['1 · Archivos', 40, '#ff2d20'], ['2 · Proyecto', 60, '#0f766e'], ['3 · Comprobar', 40, '#b45309'], ['4 · Artisan', 30, '#6d28d9'], ['5 · Explorar', 30, '#0369a1'], ['6 · Cierre', 25, '#be185d']].forEach(([n, m, c]) => { const d = document.createElement('div'); d.style.cssText = `flex:${m};background:${c}`; d.title = n + ' · ' + m + ' min'; d.textContent = m + "'"; $('#plan').appendChild(d) });
     // laboratorio
     function lab() {
       const a = $('#l1').checked, b = $('#l2').checked, v = $('#l3').checked, N = 'dam2024pass', O = 'laravel_pass';

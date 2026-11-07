@@ -697,7 +697,7 @@
         { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo" },
       ],
       asete: [
-        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Introducción", descripcion: "Introducción a la seguridad informática" },
+        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Lenguajes de guiones de servidor", descripcion: "PHP 8.x con referencias comparativas a Node.js, Python y Java" },
         { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Entorno PHP para 2º ASIR/DAM" },
         { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP para 2º DAM" },
         { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker" },
@@ -734,7 +734,10 @@
       pmdm: '#60A5FA',
     };
 
-    const BASE_URL = 'https://actionperformed.github.io/guias_html/';
+    // Las rutas de las guías son relativas al propio index.html, así que el
+    // catálogo funciona igual abierto en local (file://) o publicado en
+    // GitHub Pages, sin duplicar la URL base en dos sitios.
+    const BASE_URL = '';
 
     // ── Renderizar tarjetas ──
     function crearTarjeta(guia, cat) {

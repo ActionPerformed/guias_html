@@ -56,7 +56,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 
 | Guía | Descripción |
 |------|-------------|
-| [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Introducción a la seguridad |
+| [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Lenguajes de guiones de servidor: PHP 8.x con referencias comparativas a Node.js, Python y Java |
 | [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Banco de pruebas PHP para 2º ASIR/DAM |
 | [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Mini-Biblioteca PHP para 2º DAM |
 | [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP con Docker |
