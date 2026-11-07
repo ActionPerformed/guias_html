@@ -198,6 +198,199 @@
       flex-shrink: 0;
     }
 
+    /* ---------- Buscador ---------- */
+    .search {
+      position: relative;
+      flex-shrink: 0;
+      margin-left: .5rem;
+    }
+
+    .search input {
+      width: 165px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Inter';
+      font-size: .8rem;
+      padding: .4rem .6rem .4rem 1.9rem;
+      border-radius: 999px;
+      transition: .15s;
+    }
+
+    .search input::placeholder {
+      color: var(--text-faint);
+    }
+
+    .search input:focus {
+      outline: none;
+      border-color: var(--purple);
+      width: 220px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: .55rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-faint);
+      font-size: .78rem;
+      line-height: 1;
+    }
+
+    .search-results {
+      position: absolute;
+      top: calc(100% + .5rem);
+      right: 0;
+      width: 330px;
+      max-height: 60vh;
+      overflow-y: auto;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
+      display: none;
+      z-index: 120;
+    }
+
+    .search-results.open {
+      display: block;
+    }
+
+    .search-hit {
+      display: block;
+      padding: .55rem .8rem;
+      border-bottom: 1px solid var(--border-soft);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .search-hit:last-child {
+      border-bottom: none;
+    }
+
+    .search-hit:hover {
+      background: var(--surface);
+    }
+
+    .search-hit b {
+      display: block;
+      color: var(--text);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+
+    .search-hit span {
+      display: block;
+      color: var(--text-faint);
+      font-size: .72rem;
+      margin-top: .12rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .search-empty {
+      padding: .8rem;
+      color: var(--text-faint);
+      font-size: .78rem;
+    }
+
+    /* ---------- Índice de apartados ---------- */
+    .toc {
+      columns: 2;
+      column-gap: 2rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .toc li {
+      break-inside: avoid;
+      margin-bottom: .28rem;
+    }
+
+    .toc a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: .87rem;
+    }
+
+    .toc a:hover {
+      color: var(--purple);
+    }
+
+    .toc .toc-sec {
+      display: block;
+      margin-top: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      font-size: .85rem;
+      text-transform: none;
+    }
+
+    /* ---------- Ritmo: tiempo estimado por sección ---------- */
+    .sec-time {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      margin: .1rem 0 .2rem;
+      padding: .2rem .6rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text-faint);
+      font-size: .74rem;
+      font-family: 'Inter';
+    }
+
+    /* ---------- Glosario ---------- */
+    .glossary {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: .7rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .glos-item {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: .7rem .85rem;
+    }
+
+    .glos-item dt {
+      font-family: 'JetBrains Mono';
+      font-size: .82rem;
+      color: var(--purple);
+      font-weight: 600;
+      margin-bottom: .25rem;
+    }
+
+    .glos-item dd {
+      margin: 0;
+      font-size: .82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* ---------- Resalte al saltar desde el índice o el buscador ---------- */
+    @keyframes flashTarget {
+      0% {
+        box-shadow: 0 0 0 0 rgba(134, 87, 255, .55);
+      }
+
+      100% {
+        box-shadow: 0 0 0 14px rgba(134, 87, 255, 0);
+      }
+    }
+
+    .flash {
+      animation: flashTarget 1.1s ease-out;
+      border-radius: 8px;
+    }
+
     @media (max-width:900px) {
       .navlinks {
         display: none;
@@ -216,6 +409,23 @@
 
       .navlinks.open {
         display: flex;
+      }
+
+      .search {
+        margin-left: auto;
+        margin-right: .5rem;
+      }
+
+      .search input {
+        width: 120px;
+      }
+
+      .search input:focus {
+        width: 150px;
+      }
+
+      .search-results {
+        width: 290px;
       }
 
       .navlinks a {
@@ -370,6 +580,23 @@
     .terminal-title {
       font-size: .75rem;
       color: var(--text-faint);
+    }
+
+    .terminal-note {
+      padding: .55rem .9rem;
+      font-size: .76rem;
+      line-height: 1.45;
+      color: var(--text-faint);
+      background: rgba(255, 145, 56, .06);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .terminal-note strong {
+      color: var(--text-dim);
+    }
+
+    .terminal-note a {
+      color: var(--purple);
     }
 
     .terminal-select {
@@ -1048,6 +1275,154 @@
     ul.plain li {
       margin-bottom: .35rem;
     }
+
+    /* ===== IMPRESIÓN =====
+       La guía se usa mucho impresa (o en PDF) para repasar antes de un examen.
+       Esta hoja convierte el documento oscuro en algo legible en papel: fondo
+       blanco, texto negro, todos los acordeones abiertos y sin elementos
+       interactivos. */
+    @media print {
+      @page {
+        margin: 16mm 14mm;
+      }
+
+      :root {
+        --bg: #fff;
+        --bg-soft: #fff;
+        --surface: #fff;
+        --surface-2: #f4f4f6;
+        --border: #c9c9d2;
+        --border-soft: #e2e2e8;
+        --text: #16161c;
+        --text-dim: #33333d;
+        --text-faint: #5c5c6a;
+        --purple: #4a2ca8;
+        --purple-2: #4a2ca8;
+      }
+
+      body {
+        background: #fff;
+        color: #16161c;
+        font-size: 10.5pt;
+        line-height: 1.45;
+      }
+
+      /* Elementos que solo tienen sentido en pantalla */
+      .nav,
+      .progress-wrap,
+      .back-top,
+      .search,
+      .reveal-row,
+      .copy-btn,
+      .tabs,
+      .snippet-btn,
+      .run-btn,
+      .terminal-select,
+      .terminal-note,
+      .skip-link {
+        display: none !important;
+      }
+
+      /* Las pestañas solo muestran un panel activo: en papel se ven todos */
+      .tab-panel {
+        display: block !important;
+      }
+
+      /* Los paneles desplegables (pistas y resoluciones) se abren */
+      .reveal-panel {
+        display: block !important;
+      }
+
+      /* Los acordeones se abren todos: en papel no se puede hacer clic */
+      .acc-panel {
+        display: block !important;
+        max-height: none !important;
+      }
+
+      .acc-head {
+        border-bottom: 1px solid #d8d8e0;
+      }
+
+      main,
+      .block,
+      .acc-panel-inner {
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      /* Los bloques de código no se parten entre dos páginas */
+      pre.code,
+      .codewrap,
+      .callout,
+      .glos-item,
+      table,
+      tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      pre.code {
+        background: #f7f7f9 !important;
+        border: 1px solid #d8d8e0 !important;
+        color: #16161c !important;
+        font-size: 8.6pt;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      pre.code .kw {
+        color: #6b3fa0;
+      }
+
+      pre.code .str {
+        color: #1c6b3a;
+      }
+
+      pre.code .cmt {
+        color: #6a6a78;
+      }
+
+      pre.code .fn {
+        color: #a03a1e;
+      }
+
+      .callout {
+        background: #f7f7f9 !important;
+        border-left: 3px solid #4a2ca8 !important;
+      }
+
+      h2 {
+        break-after: avoid;
+        page-break-after: avoid;
+        border-bottom: 1px solid #d8d8e0;
+        padding-bottom: .2rem;
+      }
+
+      h3,
+      h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: #16161c;
+        text-decoration: none;
+      }
+
+      /* Los enlaces externos se siguen mostrando, pero con la URL al lado */
+      a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 7.6pt;
+        color: #6a6a78;
+        word-break: break-all;
+      }
+
+      footer {
+        border-top: 1px solid #d8d8e0;
+        color: #5c5c6a;
+      }
+    }
   </style>
 </head>
 
@@ -1077,6 +1452,7 @@
       </button>
       <nav class="navlinks" id="navLinks">
         <a href="#inicio">Inicio</a>
+        <a href="#s1">Introducción</a>
         <a href="#fundamentos">Fundamentos</a>
         <a href="#poo">POO</a>
         <a href="#funcional">Funcional</a>
@@ -1088,7 +1464,14 @@
         <a href="#actividades">Actividades</a>
         <a href="#proyecto">Proyecto</a>
         <a href="#recursos">Recursos</a>
+        <a href="#glosario">Glosario</a>
       </nav>
+      <div class="search">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="searchInput" placeholder="Buscar concepto…" aria-label="Buscar en la guía"
+          autocomplete="off" aria-describedby="searchResults">
+        <div class="search-results" id="searchResults" role="listbox" aria-label="Resultados de la búsqueda"></div>
+      </div>
     </div>
   </header>
 
@@ -1101,9 +1484,11 @@
       <p class="lede">Una base sólida, práctica y contextualizada de Kotlin para el desarrollo Android: desde la
         sintaxis básica hasta corrutinas y scope functions, con ejemplos ejecutables en cada parada.</p>
       <div class="hero-meta">
-        <span>12 secciones</span>
+        <span>13 secciones</span>
+        <span>24 apartados</span>
         <span>10 actividades resueltas</span>
         <span>1 proyecto integrador</span>
+        <span>⏱ ≈ 11 h de estudio</span>
       </div>
 
       <div class="terminal" id="heroTerminal">
@@ -1112,6 +1497,9 @@
           <div class="terminal-title">main.kt — consola interactiva</div>
           <div style="width:60px"></div>
         </div>
+        <div class="terminal-note">⚠️ <strong>Salida esperada.</strong> Este terminal <strong>no ejecuta Kotlin</strong>: reproduce
+          la salida correcta de cada fragmento para que veas qué debes obtener. Para ejecutarlo de verdad, copia el código
+          en el <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a>.</div>
         <div class="terminal-select" id="snippetTabs">
           <button class="snippet-btn active" data-snip="snip-1">01 · Hola DAM</button>
           <button class="snippet-btn" data-snip="snip-2">02 · Templates</button>
@@ -1228,6 +1616,7 @@
       <h2>Introducción y configuración</h2>
       <p class="lede">Por qué Kotlin ha ganado terreno en Android y qué necesitas instalado antes de escribir la primera
         línea.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>15 min</b> de lectura</p>
 
       <h3 style="margin-top:1.6rem;">Al terminar esta guía serás capaz de…</h3>
       <ol class="plain" style="padding-left:1.4rem;">
@@ -1249,6 +1638,49 @@
         <strong>secciones 02 a 09 → proyecto integrador → actividades (10)</strong>, y el <strong>proyecto</strong>
         es el que te obliga a usar todo lo aprendido. Si el tiempo es corto, el <strong>mínimo imprescindible</strong>
         son las secciones 02, 03 y 07 (fundamentos, POO y corrutinas) más el proyecto.</div>
+
+      <h3 style="margin-top:1.8rem;">Índice de contenidos</h3>
+      <p>Los <strong>24 apartados</strong> de las secciones 02, 03 y 04 están plegados para que la página no sea un muro
+        de texto. Este índice te da acceso directo a cada uno: haz clic y el apartado se abre solo.</p>
+      <ul class="toc">
+        <li><a class="toc-sec" href="#s1">01 · Introducción y configuración</a></li>
+        <li><a class="toc-sec" href="#fundamentos">02 · Fundamentos del lenguaje</a></li>
+        <li><a href="#acc-2-1">2.1 · Variables y tipos de datos</a></li>
+        <li><a href="#acc-2-2">2.2 · Null Safety (seguridad ante nulos)</a></li>
+        <li><a href="#acc-2-3">2.3 · Sistema de tipos (Any · Unit · Nothing)</a></li>
+        <li><a href="#acc-2-4">2.4 · Strings y templates</a></li>
+        <li><a href="#acc-2-5">2.5 · Rangos (ranges)</a></li>
+        <li><a href="#acc-2-6">2.6 · Estructuras de control</a></li>
+        <li><a href="#acc-2-7">2.7 · Comprobación y conversión de tipos (is · as · smart cast)</a></li>
+        <li><a href="#acc-2-8">2.8 · Igualdad e identidad (== · === · equals())</a></li>
+        <li><a class="toc-sec" href="#poo">03 · Programación orientada a objetos</a></li>
+        <li><a href="#acc-3-1">3.1 · Clases y propiedades</a></li>
+        <li><a href="#acc-3-2">3.2 · Herencia y clases abiertas</a></li>
+        <li><a href="#acc-3-3">3.3 · Interfaces</a></li>
+        <li><a href="#acc-3-4">3.4 · Data classes (modelos de datos)</a></li>
+        <li><a href="#acc-3-5">3.5 · Sealed classes (modelar estados)</a></li>
+        <li><a href="#acc-3-6">3.6 · Objetos y companion object</a></li>
+        <li><a href="#acc-3-7">3.7 · Getters/setters personalizados</a></li>
+        <li><a href="#acc-3-8">3.8 · Delegación de propiedades y de clases (by lazy · by)</a></li>
+        <li><a class="toc-sec" href="#funcional">04 · Programación funcional y colecciones</a></li>
+        <li><a href="#acc-4-1">4.1 · Lambdas y funciones de orden superior</a></li>
+        <li><a href="#acc-4-2">4.2 · Colecciones: List, Map, Set</a></li>
+        <li><a href="#acc-4-3">4.3 · Operadores esenciales</a></li>
+        <li><a href="#acc-4-4">4.4 · Operadores avanzados</a></li>
+        <li><a href="#acc-4-5">4.5 · Predicados (any · all · none)</a></li>
+        <li><a href="#acc-4-6">4.6 · Secuencias (Sequence)</a></li>
+        <li><a href="#acc-4-7">4.7 · Funciones de extensión</a></li>
+        <li><a href="#acc-4-8">4.8 · Operadores de la librería estándar</a></li>
+        <li><a class="toc-sec" href="#scope">05 · Scope functions</a></li>
+        <li><a class="toc-sec" href="#excepciones">06 · Manejo de excepciones</a></li>
+        <li><a class="toc-sec" href="#corrutinas">07 · Corrutinas</a></li>
+        <li><a class="toc-sec" href="#interop">08 · Interoperabilidad con Java</a></li>
+        <li><a class="toc-sec" href="#android">09 · Kotlin en Android</a></li>
+        <li><a class="toc-sec" href="#actividades">10 · Actividades propuestas</a></li>
+        <li><a class="toc-sec" href="#proyecto">11 · Proyecto integrador</a></li>
+        <li><a class="toc-sec" href="#recursos">12 · Recursos adicionales</a></li>
+        <li><a class="toc-sec" href="#glosario">13 · Glosario</a></li>
+      </ul>
 
       <h3 style="margin-top:1.8rem;">¿Por qué Kotlin?</h3>
       <ul class="plain">
@@ -1439,9 +1871,10 @@ println(p.nombre)        <span class="cmt">// Bea</span>
       <h2>Fundamentos del lenguaje</h2>
       <p class="lede">Variables, tipos, seguridad ante nulos, cadenas, rangos y estructuras de control: la caja de
         herramientas que usarás en cada línea de código.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>75 min</b> · 30 min de práctica</p>
       <div class="accordion" id="accFundamentos">
 
-        <div class="acc-item open">
+        <div class="acc-item open" id="acc-2-1">
           <button class="acc-head"><span>2.1 · Variables y tipos de datos</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1497,7 +1930,7 @@ println(p.nombre)        <span class="cmt">// Bea</span>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-2">
           <button class="acc-head"><span>2.2 · Null Safety (seguridad ante nulos)</span><svg class="acc-chevron"
               width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1629,7 +2062,7 @@ ciudad?.let {
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-3">
           <button class="acc-head"><span>2.3 · Sistema de tipos <span class="tag">Any · Unit · Nothing</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1692,7 +2125,7 @@ ciudad?.let {
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-4">
           <button class="acc-head"><span>2.4 · Strings y templates</span><svg class="acc-chevron" width="18" height="18"
               viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1720,7 +2153,7 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-5">
           <button class="acc-head"><span>2.5 · Rangos (ranges)</span><svg class="acc-chevron" width="18" height="18"
               viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1751,7 +2184,7 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-6">
           <button class="acc-head"><span>2.6 · Estructuras de control</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1868,7 +2301,7 @@ println(conA2)  <span class="cmt">// [Ana, Ana]</span>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-7">
           <button class="acc-head"><span>2.7 · Comprobación y conversión de tipos <span class="tag">is · as · smart
                 cast</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1980,7 +2413,7 @@ println(error?.mensaje)    <span class="cmt">// null (no es un Error)</span>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-2-8">
           <button class="acc-head"><span>2.8 · Igualdad e identidad <span class="tag">== · === · equals()</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2091,9 +2524,10 @@ println(a.contentEquals(b))          <span class="cmt">// true  -> compara el co
       <h2>Programación orientada a objetos</h2>
       <p class="lede">Clases, herencia, interfaces, data classes y sealed classes: el vocabulario con el que Kotlin
         modela el mundo Android.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>75 min</b> · 30 min de práctica</p>
       <div class="accordion" id="accPoo">
 
-        <div class="acc-item open">
+        <div class="acc-item open" id="acc-3-1">
           <button class="acc-head"><span>3.1 · Clases y propiedades</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2158,7 +2592,7 @@ println(conEmail.email)   <span class="cmt">// bea@email.com</span></code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-2">
           <button class="acc-head"><span>3.2 · Herencia y clases abiertas</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2202,7 +2636,7 @@ println(perro.sonido())  <span class="cmt">// Guau!</span></code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-3">
           <button class="acc-head"><span>3.3 · Interfaces</span><svg class="acc-chevron" width="18" height="18"
               viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2224,7 +2658,7 @@ println(perro.sonido())  <span class="cmt">// Guau!</span></code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-4">
           <button class="acc-head"><span>3.4 · Data classes <span class="tag">modelos de datos</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2270,7 +2704,7 @@ println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> 
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-5">
           <button class="acc-head"><span>3.5 · Sealed classes <span class="tag">modelar estados</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2361,7 +2795,7 @@ println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> 
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-6">
           <button class="acc-head"><span>3.6 · Objetos y companion object</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2417,7 +2851,7 @@ MiActivity.TAG</code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-7">
           <button class="acc-head"><span>3.7 · Getters/setters personalizados</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2450,7 +2884,7 @@ MiActivity.TAG</code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-3-8">
           <button class="acc-head"><span>3.8 · Delegación de propiedades y de clases <span class="tag">by lazy · by</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2510,9 +2944,10 @@ println(repo.listar())          <span class="cmt">// [Ana, Bea]</span></code></p
       <h2>Programación funcional y colecciones</h2>
       <p class="lede">Lambdas, listas, mapas y los operadores que convierten cinco líneas de bucles en una sola cadena
         legible.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>90 min</b> · con las actividades 1 y 2</p>
       <div class="accordion" id="accFuncional">
 
-        <div class="acc-item open">
+        <div class="acc-item open" id="acc-4-1">
           <button class="acc-head"><span>4.1 · Lambdas y funciones de orden superior</span><svg class="acc-chevron"
               width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2551,7 +2986,7 @@ println(repo.listar())          <span class="cmt">// [Ana, Bea]</span></code></p
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-2">
           <button class="acc-head"><span>4.2 · Colecciones: List, Map, Set</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2577,7 +3012,7 @@ mapaMutable[<span class="str">"edad"</span>] = <span class="str">"25"</span>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-3">
           <button class="acc-head"><span>4.3 · Operadores esenciales</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2612,7 +3047,7 @@ alumnos.forEach { println(it) }
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-4">
           <button class="acc-head"><span>4.4 · Operadores avanzados</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2641,7 +3076,7 @@ alumnos.forEach { println(it) }
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-5">
           <button class="acc-head"><span>4.5 · Predicados <span class="tag">any · all · none</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2660,7 +3095,7 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-6">
           <button class="acc-head"><span>4.6 · Secuencias (Sequence)</span><svg class="acc-chevron" width="18"
               height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2689,7 +3124,7 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-7">
           <button class="acc-head"><span>4.7 · Funciones de extensión <span class="tag">añadir métodos a
                 cualquier tipo</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24"
               fill="none">
@@ -2740,7 +3175,7 @@ println(raton.esBarato())        <span class="cmt">// true</span></code></pre>
           </div>
         </div>
 
-        <div class="acc-item">
+        <div class="acc-item" id="acc-4-8">
           <button class="acc-head"><span>4.8 · Operadores de la librería estándar <span class="tag">sumOf · fold ·
                 chunked · zip</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24"
               fill="none">
@@ -2842,6 +3277,7 @@ println(emptyList&lt;Int&gt;().maxOrNull())  <span class="cmt">// null  (max() l
       <p class="lede">Cinco funciones que permiten trabajar «dentro» de un objeto: <code>let</code>, <code>run</code>,
         <code>apply</code>, <code>also</code> y <code>with</code>. Se diferencian en cómo se referencia al objeto y en
         qué devuelven.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>45 min</b> · 15 min de práctica</p>
 
       <div class="tblwrap">
         <table>
@@ -3018,6 +3454,7 @@ with(persona) {
       <h2>Manejo de excepciones</h2>
       <p class="lede">En Kotlin, <code>try</code> también puede ser una expresión, y <code>runCatching</code> lleva ese
         estilo funcional hasta el manejo de errores.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>30 min</b></p>
 
       <h3 style="margin-top:1.6rem;">try-catch como expresión</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -3107,6 +3544,7 @@ with(persona) {
       </h2>
       <p class="lede">La forma en la que Kotlin resuelve las operaciones que tardan (red, disco, temporizadores) sin
         bloquear el hilo principal ni encadenar callbacks.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>75 min</b> · con la actividad 8</p>
 
       <div class="codewrap"><button class="copy-btn">Copiar</button>
         <pre class="code"><code><span class="cmt">// build.gradle.kts</span>
@@ -3432,6 +3870,7 @@ dependencies {
       <h2>Interoperabilidad con Java</h2>
       <p class="lede">La mayoría de proyectos Android conviven con código Java heredado. Estas anotaciones suavizan la
         frontera entre los dos lenguajes.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>30 min</b></p>
 
       <div class="tblwrap">
         <table>
@@ -3534,6 +3973,7 @@ println(saludo)   <span class="cmt">// Sin nombre</span>
         estado. Esta es la vía <strong style="color:#fff">Views</strong> (XML + <code>ViewBinding</code>), la que verás
         en el código heredado de muchas apps. Al final de la sección tienes el <strong style="color:#fff">puente a
         Compose</strong>, que es la vía con la que trabajan el resto de actividades del módulo.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>45 min</b> · solo si vas a tocar Android</p>
 
       <div class="callout key"><strong>ViewBinding frente a Compose: dos formas de hacer la misma pantalla.</strong> No
         son detractores: son dos maneras de describir la interfaz, y conviene saber distinguirla antes de que te la
@@ -3851,6 +4291,7 @@ dependencies {
       <h2>Actividades propuestas</h2>
       <p class="lede">Diez ejercicios progresivos. Lee el enunciado, intenta resolverlo tú primero y usa la pista o la
         resolución solo si te atascas.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>3 h 10 min</b> · las 10 actividades, con las pistas</p>
       <div id="activitiesRoot">
 
         <div class="activity">
@@ -4348,6 +4789,7 @@ dependencies {
       <h2>Proyecto integrador</h2>
       <p class="lede"><strong style="color:#fff">Sistema de gestión de productos.</strong> Implementa un sistema que
         reúna todo lo visto en la guía.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>2 h 30 min</b> · el proyecto integrador completo</p>
 
       <ol class="plain" style="padding-left:1.4rem;">
         <li><strong style="color:#fff">Modelo de datos:</strong>
@@ -4527,6 +4969,7 @@ dependencies {
     <section class="block" id="recursos">
       <div class="eyebrow-row"><span class="section-num">12</span></div>
       <h2>Recursos adicionales</h2>
+      <p class="sec-time">⏱ Tiempo estimado: <b>10 min</b> · de consulta</p>
 
       <h3 style="margin-top:1rem;">Enlaces útiles</h3>
       <p>
@@ -4536,9 +4979,17 @@ dependencies {
             style="color:inherit; text-decoration:none;">Kotlin Playground</a></span>
         <span class="pill"><a href="https://developer.android.com/kotlin" target="_blank" rel="noopener"
             style="color:inherit; text-decoration:none;">Android Developers · Kotlin</a></span>
-        <span class="pill"><a href="https://kotlinlang.org/docs/kotlin-koans.html" target="_blank" rel="noopener"
+        <span class="pill"><a href="https://github.com/Kotlin/Kotlin-Koans" target="_blank" rel="noopener"
             style="color:inherit; text-decoration:none;">Kotlin Koans</a></span>
+        <span class="pill"><a href="https://kotlinlang.org/docs/coding-conventions.html" target="_blank" rel="noopener"
+            style="color:inherit; text-decoration:none;">Convenciones de código</a></span>
+        <span class="pill"><a href="https://kotlinlang.org/docs/kotlin-evolution-principles.html" target="_blank"
+            rel="noopener" style="color:inherit; text-decoration:none;">Principios de evolución</a></span>
       </p>
+      <div class="callout tip"><strong>Kotlin Koans</strong> es una colección de ejercicios con huecos para rellenar,
+        para practicar la sintaxis como quien rellena un crucigrama. Ojo: la versión que enlazamos es el
+        <strong>repositorio vivo</strong> en GitHub; la página antigua de la documentación oficial
+        (<code>kotlinlang.org/docs/kotlin-koans.html</code>) está archivada y ya no se actualiza.</div>
 
       <h3 style="margin-top:1.6rem;">Tu ruta dentro del módulo PMDM</h3>
       <p>Esta guía es el <strong>punto de partida</strong>: el lenguaje, sin Android. A partir de aquí, el módulo avanza
@@ -4682,14 +5133,268 @@ dependencies {
       </div>
 
       <h3 style="margin-top:1.6rem;">Buenas prácticas</h3>
+      <p>Estas son las recomendaciones <strong>oficiales</strong> del equipo de Kotlin (las
+        <a href="https://kotlinlang.org/docs/coding-conventions.html" target="_blank" rel="noopener">Kotlin Coding
+          Conventions</a>), con los avisos que suelen hacer falta en un aula.</p>
       <ol class="plain" style="padding-left:1.4rem;">
         <li>Preferir <code>val</code> sobre <code>var</code> siempre que sea posible</li>
         <li>Usar <code>data class</code> para modelos de datos</li>
-        <li>Aprovechar scope functions para código más limpio</li>
-        <li>Usar sealed classes para modelar estados</li>
-        <li>Siempre manejar nullables con safe call (<code>?.</code>) y Elvis (<code>?:</code>)</li>
+        <li>Aprovechar las scope functions para código más limpio</li>
+        <li>Usar jerarquías selladas (<code>sealed class</code> / <code>sealed interface</code>) para modelar
+          estados</li>
+        <li>Manejar los nullables con safe call (<code>?.</code>) y Elvis (<code>?:</code>) en lugar de
+          <code>!!</code></li>
         <li>Aprovechar la programación funcional en colecciones</li>
+        <li>Nombrar las funciones y las propiedades de forma que se lean como una frase en español
+          (<code>cargarProductos()</code>, <code>totalCarrito</code>)</li>
+        <li>Preferir la iteración idiomática (<code>forEach</code>, <code>map</code>, <code>filter</code>) a los
+          bucles con índice, salvo que necesites el índice</li>
       </ol>
+      <div class="callout warn"><strong>Tres de estos consejos tienen trampa.</strong> No los sigas a ciegas:
+        <ul style="margin:.5rem 0 0 1.1rem;">
+          <li><strong><code>data class</code> solo mira el constructor primario.</strong> Las propiedades declaradas en
+            el cuerpo del clase <strong>quedan fuera</strong> del <code>equals()</code>, del <code>hashCode()</code> y
+            del <code>toString()</code> generados. Además una <code>data class</code> no puede ser <code>open</code> ni
+            <code>abstract</code>: si necesitas herencia, no es una <code>data class</code>.</li>
+          <li><strong>Las scope functions son un condimento, no la base.</strong> Encadenar
+            <code>apply { }.let { }.also { }</code> sobre el mismo objeto deja de ser legible. Úsala cuando el bloque
+            tiene un sentido claro (configurar, transformar, registrar) y vuelve a la sintaxis normal en cuanto la
+            cadena crezca.</li>
+          <li><strong>El <code>when</code> sobre una jerarquía sellada no necesita <code>else</code>, pero sobre un
+            <code>Int</code> o un <code>String</code> sí.</strong> Añadir <code>else</code> a una jerarquía sellada
+            desactiva la comprobación del compilador y es justo lo que quieres evitar.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 13: GLOSARIO ============ -->
+    <section class="block" id="glosario">
+      <div class="eyebrow-row"><span class="section-num">13</span></div>
+      <h2>Glosario</h2>
+      <p class="lede">Los términos que la guía usa, con su definición y el equivalente en Java cuando lo hay. Si una
+        palabra te frena, búscala aquí antes de volver al apartado.</p>
+      <p class="sec-time">⏱ Tiempo estimado: <b>15 min</b> · de consulta</p>
+
+      <h3 style="margin-top:1.6rem;">Tipos y nulabilidad</h3>
+      <dl class="glossary">
+        <div class="glos-item">
+          <dt>Any</dt>
+          <dd>Superclase de <strong>todos</strong> los tipos <strong>no anulables</strong>. Equivale a <code>Object</code>
+            en Java, salvo que <code>Object</code> en Java admite <code>null</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Any?</dt>
+          <dd>El equivalente real al <code>Object</code> de Java: cualquier tipo, <code>null</code> incluido. Se escribe
+            con <code>?</code> detrás.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Unit</dt>
+          <dd>El tipo de retorno de una función que no devuelve nada. Equivale a <code>void</code> en Java, pero
+            <code>Unit</code> es un <strong>valor</strong> que se puede devolver.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Nothing</dt>
+          <dd>El tipo de una función que nunca termina de forma normal (lanza siempre). No tiene equivalente en Java. Al
+            ser el <em>tipo inferior</em>, se acepta donde se espera cualquier otro.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Nullable</dt>
+          <dd>Un tipo que admite <code>null</code>. Se escribe <code>String?</code>. Sin <code>?</code>, el compilador
+            <strong>prohíbe</strong> asignar <code>null</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Safe call (<code>?.</code>)</dt>
+          <dd>Operador que ejecuta lo que viene detrás <strong>solo si</strong> el receptor no es <code>null</code>. Si lo
+            es, el resultado es <code>null</code> y no hay excepción.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Elvis (<code>?:</code>)</dt>
+          <dd>Operador que sustituye al <code>null</code> por un valor por defecto: <code>ciudad ?: "Desconocida"</code>.
+            En Java sería el <code>ternario</code> con comprobación de <code>null</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Platform type</dt>
+          <dd>Tipo que viene de una API de <strong>Java</strong> sin anotaciones de nulabilidad (se muestra como
+            <code>String!</code>). Kotlin no te obliga a comprobar el <code>null</code>: el danger está en la
+            desreferenciación posterior.</dd>
+        </div>
+      </dl>
+
+      <h3 style="margin-top:1.8rem;">Objetos y clases</h3>
+      <dl class="glossary">
+        <div class="glos-item">
+          <dt>Backing field</dt>
+          <dd>El campo privado que el compilador genera <strong>por debajo</strong> de una propiedad cuando esta necesita
+            guardar un valor. Kotlin nunca lo escribe: solo se usa con <code>field</code> dentro de un
+            <code>get</code>/<code>set</code> personalizado.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Propiedad calculada</dt>
+          <dd>Propiedad <strong>sin</strong> backing field: su valor se recalcula cada vez que se lee
+            (<code>val esMayor: Boolean get() = edad &gt;= 18</code>).</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>data class</code></dt>
+          <dd>Clase que genera <code>equals()</code>, <code>hashCode()</code>, <code>toString()</code>, <code>copy()</code>
+            y <code>componentN()</code>. Solo mira el <strong>constructor primario</strong> y no puede ser
+            <code>open</code> ni <code>abstract</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Jerarquía sellada</dt>
+          <dd><code>sealed class</code> o <code>sealed interface</code>: sus subclases están <strong>cerradas</strong> y
+            solo pueden declararse en el mismo fichero. Permite un <code>when</code> <strong>exhaustivo</strong>, sin
+            <code>else</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>data object</code></dt>
+          <dd>Un <code>object</code> que además genera <code>equals()</code> y <code>toString()</code> propios. Se usa
+            para los <em>estados objeto</em> de una jerarquía sellada (Kotlin 1.9+).</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Smart cast</dt>
+          <dd>Conversión automática que hace el compilador tras comprobar con <code>is</code>: a partir de ahí, la
+            variable se trata como su tipo concreto. <strong>No funciona</strong> con propiedades delegadas ni con
+            <code>var</code> locales.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>companion object</code></dt>
+          <dd>Objeto <strong>singleton</strong> asociado a una clase, que hace las veces de sus miembros estáticos. No
+            es <code>static</code>: desde Java se ve como <code>MiClase.Companion.TAG</code> salvo que se anote con
+            <code>@JvmStatic</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Delegación de propiedades</dt>
+          <dd><code>val x by lazy { … }</code>: la propiedad guarda el resultado de la expresión y lo calcula solo la
+            primera vez que se usa. <code>lazy</code> es <em>thread-safe</em> por defecto.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Delegación de clases</dt>
+          <dd><code>class C(b: B) : B by b</code>: la clase <strong>encamina</strong> a otra los miembros que no
+            sobrescribe. Equivale a la herencia de una interfaz, pero sin duplicar código.</dd>
+        </div>
+      </dl>
+
+      <h3 style="margin-top:1.8rem;">Funciones y colecciones</h3>
+      <dl class="glossary">
+        <div class="glos-item">
+          <dt>Lambda</dt>
+          <dd>Función sin nombre que se pasa como valor. En Kotlin se escribe entre llaves: <code>{ x -&gt; x * 2 }</code>.
+            Si tiene un solo parámetro, se puede abreviar como <code>it</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Trailing lambda</dt>
+          <dd>Pasar la lambda <strong>fuera</strong> de los paréntesis: <code>operar(5, 3) { a, b -&gt; a + b }</code>. Es
+            la forma más legible cuando la lambda es el último argumento.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Función de orden superior</dt>
+          <dd>Función que <strong>recibe</strong> otra función como parámetro o la <strong>devuelve</strong>. En Java
+            las lambdas existen, pero el concepto de «función como valor» se usa mucho menos.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Función de extensión</dt>
+          <dd>Función que añade un método a un tipo que no es tuyo: <code>fun String.toInitials()</code>. Se resuelve en
+            <strong>tiempo de compilación</strong> y se puede importar de forma aislada.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Scope function</dt>
+          <dd>Función que ejecuta un bloque con un <em>contexto</em> implícito (<code>it</code> o <code>this</code>):
+            <code>let</code>, <code>run</code>, <code>apply</code>, <code>also</code>, <code>with</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Operador de colección</dt>
+          <dd>Función que recibe una lambda y devuelve una colección transformada: <code>map</code>, <code>filter</code>,
+            <code>sortedBy</code>, <code>groupBy</code>, <code>associate</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>sumOf</code></dt>
+          <dd>Equivalente a <code>sum()</code> pero para valores que no son <code>Int</code> ni <code>Double</code>
+            (por ejemplo, <code>BigDecimal</code> o <code>Long</code>).</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>joinToString</code></dt>
+          <dd>Convierte una colección en un <code>String</code> uniendo los elementos con un separador:
+            <code>listOf(1, 2).joinToString(" + ")</code> → <code>"1 + 2"</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Secuencia (<code>Sequence</code>)</dt>
+          <dd>Colección <strong>perezosa</strong>: los elementos se calculan uno a uno según se piden, no todos de golpe.
+            Se crea con <code>asSequence()</code> y se consume con <code>toList()</code>.</dd>
+        </div>
+      </dl>
+
+      <h3 style="margin-top:1.8rem;">Corrutinas y Android</h3>
+      <dl class="glossary">
+        <div class="glos-item">
+          <dt>Corrutina</dt>
+          <dd>Tarea que se puede <strong>suspender</strong> y reanudar, sin bloquear un hilo. En Kotlin son funciones
+            <code>suspend</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>suspend</code></dt>
+          <dd>Modificador de una función que <strong> puede pausarse</strong> en un punto de espera (<code>delay</code>) y
+            seguir después. Solo se puede llamar desde otra función <code>suspend</code> o desde un
+            <code>coroutineScope</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>Dispatcher</dt>
+          <dd>El <strong>contexto</strong> que decide en qué hilo corre la corrutina. <code>Dispatchers.IO</code> para
+            entrada/salida (red, disco), <code>Dispatchers.Default</code> para cálculo pesado, <code>Dispatchers.Main</code>
+            para la interfaz.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>launch</code> / <code>async</code></dt>
+          <dd><code>launch</code> lanza una corrutina y devuelve un <code>Job</code> (sin resultado).
+            <code>async</code> devuelve un <code>Deferred</code>, que además lleva el resultado y se espera con
+            <code>await()</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>awaitAll()</code></dt>
+          <dd>Espera a varias corrutinas <code>async</code> a la vez y devuelve la lista de resultados. Si una falla,
+            relanza su excepción.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>CancellationException</code></dt>
+          <dd>La excepción <strong>especial</strong> con la que se cancela una corrutina. No es un error: hay que
+            <strong>relanzarla</strong> en el <code>catch</code> en lugar de tragársela.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>Flow</code></dt>
+          <dd>Flujo de valores que se recolectan (<code>collect</code>). Es «frío»: no produce nada hasta que alguien
+            lo escucha.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>StateFlow</code></dt>
+          <dd>Un <code>Flow</code> que <strong>siempre tiene un valor actual</strong>. Es el que se expone a la interfaz
+            desde el <code>ViewModel</code>.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>viewModelScope</code></dt>
+          <dd>El <code>CoroutineScope</code> que da Android a cada <code>ViewModel</code>. Se cancela solo cuando se
+            cierra la pantalla: por eso las corrutinas de un ViewModel no se cancelan a mano.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>stateIn</code></dt>
+          <dd>Convierte un <code>Flow</code> «frío» en un <code>StateFlow</code> compartido, decidiendo con
+            <code>SharingStarted</code> cuánto tiempo se mantiene vivo.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>collectAsStateWithLifecycle</code></dt>
+          <dd>Recoge el <code>StateFlow</code> del ViewModel desde una pantalla Compose y lo convierte en un
+            <code>State</code> que la interfaz puede leer.</dd>
+        </div>
+        <div class="glos-item">
+          <dt>ViewBinding</dt>
+          <dd>Generador de clases que menemukan las vistas por su <code>id</code> sin <code>findViewById</code>. Es la
+            alternativa a <code>synthetic views</code> (<code>kotlin-android-extensions</code>), obsoleto desde Kotlin
+            1.8.</dd>
+        </div>
+        <div class="glos-item">
+          <dt><code>@Composable</code></dt>
+          <dd>Una función de Compose que <strong>describe interfaz</strong> en lugar de dibujarla directamente. Puede
+            llamar a otras funciones <code>@Composable</code> y debe ejecutarse en un <code>Composition</code>.</dd>
+        </div>
+      </dl>
     </section>
 
   </main>
@@ -4896,6 +5601,161 @@ dependencies {
         next();
       });
       loadSnippet('snip-1');
+
+      /* ---------- Índice: abrir el acordeón al que se salta ---------- */
+      /* Al pulsar un apartado del índice (o un resultado del buscador) hay que
+         abrir el acordeón que lo contiene, porque si no el destino está oculto. */
+      function openAncestors(el) {
+        var node = el;
+        while (node && node !== document.body) {
+          if (node.classList && node.classList.contains('acc-item')) {
+            node.classList.add('open');
+          }
+          node = node.parentElement;
+        }
+      }
+
+      function goToTarget(id) {
+        var target = document.getElementById(id);
+        if (!target) return false;
+        openAncestors(target);
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.classList.remove('flash');
+        void target.offsetWidth;
+        target.classList.add('flash');
+        return true;
+      }
+
+      document.querySelectorAll('.toc a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          var id = a.getAttribute('href').slice(1);
+          if (!id) return;
+          e.preventDefault();
+          history.replaceState(null, '', '#' + id);
+          goToTarget(id);
+        });
+      });
+
+      /* ---------- Buscador ---------- */
+      /* Índice de búsqueda construido sobre el DOM real: cada sección, cada
+         apartado de acordeón y cada término del glosario. */
+      var searchInput = document.getElementById('searchInput');
+      var searchResults = document.getElementById('searchResults');
+      var searchIndex = [];
+
+      (function buildSearchIndex() {
+        var plain = function (el) {
+          return (el.textContent || '').replace(/\s+/g, ' ').trim();
+        };
+        document.querySelectorAll('main section[id], main section.block').forEach(function (sec) {
+          var h = sec.querySelector('h2');
+          if (!h || !sec.id) return;
+          searchIndex.push({
+            title: plain(h),
+            sub: 'Sección',
+            text: plain(sec).toLowerCase(),
+            id: sec.id
+          });
+        });
+        document.querySelectorAll('.acc-item[id]').forEach(function (item) {
+          var head = item.querySelector('.acc-head');
+          if (!head) return;
+          searchIndex.push({
+            title: plain(head),
+            sub: 'Apartado',
+            text: plain(item).toLowerCase(),
+            id: item.id
+          });
+        });
+        document.querySelectorAll('.glos-item').forEach(function (g) {
+          var dt = g.querySelector('dt');
+          var dd = g.querySelector('dd');
+          if (!dt) return;
+          searchIndex.push({
+            title: plain(dt),
+            sub: 'Glosario',
+            text: plain(g).toLowerCase(),
+            id: ''
+          });
+        });
+      })();
+
+      function normalize(s) {
+        return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      function renderSearch(query) {
+        var q = normalize(query);
+        var hits = [];
+        searchIndex.forEach(function (entry) {
+          var title = normalize(entry.title);
+          var idx = title.indexOf(q);
+          if (idx > -1) {
+            hits.push({ entry: entry, score: 100 - idx, snippet: entry.sub });
+          } else if (entry.text.indexOf(q) > -1) {
+            var pos = entry.text.indexOf(q);
+            var snippet = entry.text.substr(Math.max(0, pos - 40), 110);
+            hits.push({ entry: entry, score: 40 - Math.min(30, pos / 50), snippet: snippet });
+          }
+        });
+        hits.sort(function (a, b) { return b.score - a.score; });
+        hits = hits.slice(0, 12);
+
+        if (!hits.length) {
+          searchResults.innerHTML = '<div class="search-empty">Sin resultados para «' + query.replace(/[<>&]/g, '') + '»</div>';
+        } else {
+          searchResults.innerHTML = hits.map(function (h) {
+            return '<a class="search-hit" href="#' + h.entry.id + '" data-goto="' + h.entry.id + '">' +
+              '<b>' + h.entry.title.replace(/[<>&]/g, '') + '</b>' +
+              '<span>' + h.snippet.replace(/[<>&]/g, '') + '</span></a>';
+          }).join('');
+          searchResults.querySelectorAll('[data-goto]').forEach(function (a) {
+            a.addEventListener('click', function (e) {
+              var id = a.getAttribute('data-goto');
+              if (!id) return;   // entrada de glosario: solo se lleva el término al input
+              e.preventDefault();
+              searchResults.classList.remove('open');
+              searchInput.value = '';
+              history.replaceState(null, '', '#' + id);
+              goToTarget(id);
+            });
+          });
+        }
+        searchResults.classList.add('open');
+      }
+
+      searchInput.addEventListener('input', function () {
+        var q = searchInput.value.trim();
+        if (q.length < 2) {
+          searchResults.classList.remove('open');
+          searchResults.innerHTML = '';
+          return;
+        }
+        renderSearch(q);
+      });
+
+      searchInput.addEventListener('focus', function () {
+        if (searchInput.value.trim().length >= 2) renderSearch(searchInput.value.trim());
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.search')) {
+          searchResults.classList.remove('open');
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          searchResults.classList.remove('open');
+          searchInput.blur();
+        }
+        /* Ctrl/Cmd + K enfoca el buscador */
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+      });
 
     })();
   </script>
