@@ -1211,11 +1211,16 @@
 
       <h3 style="margin-top:1.8rem;">¿Por qué Kotlin?</h3>
       <ul class="plain">
-        <li><strong style="color:#fff">Lenguaje oficial</strong> para Android desde 2019.</li>
-        <li><strong style="color:#fff">100% interoperable</strong> con Java.</li>
-        <li><strong style="color:#fff">Null Safety</strong>: el compilador evita <code>NullPointerException</code>.</li>
-        <li><strong style="color:#fff">Conciso</strong>: reduce el código repetitivo (boilerplate) ~40% frente a Java.
-        </li>
+        <li><strong style="color:#fff">Lenguaje preferido</strong> para Android desde 2019; su soporte oficial por parte de
+          Google se anunció en 2017.</li>
+        <li><strong style="color:#fff">Interoperable con Java de forma práctica</strong>: puedes llamar a clases Java desde
+          Kotlin y al revés, aunque hay diferencias que conviene conocer (los <em>platform types</em>, el
+          <code>null</code> de Java y las excepciones <em>checked</em>).</li>
+        <li><strong style="color:#fff">Null Safety</strong>: el compilador <em>traslada</em> el error de nulos al momento de
+          compilar y te obliga a decidir qué hacer. No desaparece: si más tarde usas <code>!!</code> o llamas a una API
+          de Java, la <code>NullPointerException</code> sigue siendo posible.</li>
+        <li><strong style="color:#fff">Conciso</strong>: elimina la mayor parte del <em>boilerplate</em> de getters/setters,
+          constructores y campos finales. Cuánto código te ahorra depende de cómo escribías el Java de partida.</li>
         <li><strong style="color:#fff">Moderno</strong>: combina programación orientada a objetos y funcional.</li>
       </ul>
 
@@ -1246,6 +1251,12 @@
       </div>
 
       <h3 style="margin-top:1.8rem;">Entorno de desarrollo</h3>
+      <div class="callout key"><strong>Requisitos:</strong> <strong style="color:#fff">Kotlin 2.x</strong> y
+        <strong style="color:#fff">JDK 17</strong> (Kotlin 2.x no arranca con JDK 8 ni con JDK 11). En la práctica no
+        tienes que instalar nada más: <strong style="color:#fff">Android Studio ya trae Kotlin y un JDK embebido</strong>, y
+        el <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a> lleva su propio
+        compilador. Si instalas IntelliJ IDEA por separado, marca el JDK 17 en
+        <em>Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK</em>.</div>
       <div class="tblwrap">
         <table>
           <thead>
@@ -1263,13 +1274,13 @@
             </tr>
             <tr>
               <td><strong style="color:#fff">Android Studio</strong></td>
-              <td>Desarrollo de apps Android</td>
+              <td>Desarrollo de apps Android (incluye Kotlin y JDK)</td>
               <td><a href="https://developer.android.com/studio" target="_blank"
                   rel="noopener">developer.android.com</a></td>
             </tr>
             <tr>
               <td><strong style="color:#fff">Kotlin Playground</strong></td>
-              <td>Ejecución rápida online</td>
+              <td>Ejecución rápida online (no requiere instalar nada)</td>
               <td><a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">play.kotlinlang.org/</a></td>
             </tr>
           </tbody>
@@ -1314,17 +1325,23 @@
                   <tbody>
                     <tr>
                       <td><code>val</code></td>
-                      <td>Inmutable (read-only)</td>
+                      <td>La <strong>referencia</strong> no se puede reasignar. El objeto al que apunta puede seguir siendo
+                        mutable</td>
                       <td><strong style="color:#fff">Siempre por defecto</strong></td>
                     </tr>
                     <tr>
                       <td><code>var</code></td>
-                      <td>Mutable</td>
+                      <td>La <strong>referencia</strong> se puede reasignar</td>
                       <td>Solo cuando realmente necesite cambiar</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
+              <div class="callout warn"><strong>Trampa al venir de Java:</strong> en Java, <code>final</code> congela la
+                <em>referencia</em> también, pero allí casi siempre se combina con una clase inmutable, así que parece
+                que congela el objeto. En Kotlin <code>val</code> congela <strong>la referencia, no el objeto</strong>:
+                <code>val lista = mutableListOf("A")</code> sigue siendo mutable y puedes seguir añadiendo elementos.
+                Para que el contenido tampoco cambie, el objeto debe ser inmutable por sí mismo.</div>
               <p style="margin-top:1rem;"><strong style="color:#fff">Inferencia de tipos:</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="kw">val</span> nombre = <span class="str">"Ana"</span>        <span class="cmt">// String (inferido)</span>
@@ -1359,6 +1376,17 @@
                   class="code"><code><span class="kw">var</span> ciudad: String? = <span class="kw">null</span>   <span class="cmt">// ✅ Válido (nullable)</span>
 <span class="kw">var</span> pais: String = <span class="kw">null</span>      <span class="cmt">// ❌ ERROR de compilación</span></code></pre>
               </div>
+              <p style="margin-top:.8rem;"><strong style="color:#fff">El mensaje real del compilador</strong> es el que te
+                dice qué ha pasado. Para la segunda línea, Kotlin muestra:</p>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre
+                  class="code"><code><span class="cmt">// Type mismatch: inferred type is Nothing? but String was expected</span></code></pre>
+              </div>
+              <p><strong style="color:#fff">Qué significa:</strong> a <code>pais</code> le has asignado
+                <code>null</code>, y el compilador deduce que su tipo sería <code>Nothing?</code> (el tipo de
+                <code>null</code>). Pero la variable está declarada como <code>String</code>, que no admite nulos: por eso
+                no encajan. Fíjate en que el error te dice <em>el tipo que ha deducido</em> y <em>el que esperabas</em>;
+                es la misma idea que el mensaje de Java, solo que más explícito.</p>
 
               <div class="tblwrap">
                 <table>
@@ -1410,7 +1438,38 @@ ciudad?.let {
 
               <div class="callout warn"><strong>Cuidado con <code>!!</code>:</strong> reintroduce el mismo riesgo de
                 <code>NullPointerException</code> que Kotlin intenta evitar. Úsalo solo cuando estés absolutamente
-                seguro de que el valor no será nulo.</div>
+                seguro de que el valor no será nulo. Antes de recurrir a él, elige la alternativa que corresponda:</div>
+              <div class="tblwrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Situación</th>
+                      <th>Alternativa a <code>!!</code></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>El nulo es <strong>posible</strong> y hay una acción alternativa</td>
+                      <td><code>ciudad?.length</code> (operador <em>safe call</em>)</td>
+                    </tr>
+                    <tr>
+                      <td>El nulo es posible y hay un <strong>valor por defecto</strong></td>
+                      <td><code>ciudad ?: "Desconocida"</code> (operador <em>Elvis</em>)</td>
+                    </tr>
+                    <tr>
+                      <td>Solo quieres trabajar <strong>si no es nulo</strong></td>
+                      <td><code>ciudad?.let { … }</code> o <code>ciudad?.run { … }</code></td>
+                    </tr>
+                    <tr>
+                      <td>El nulo es un <strong>bug de lógica</strong>, no un caso previsto</td>
+                      <td><code>requireNotNull(ciudad) { "La ciudad no puede ser nula" }</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="margin-top:.8rem;">La última es la clave: <code>requireNotNull</code> no lanza una NPE
+                genérica, sino un <code>IllegalArgumentException</code> con el mensaje que tú escribas. Si el nulo es
+                un error de programación, esto documenta la intención y falla en el sitio correcto.</p>
 
               <p style="margin-top:1.4rem;"><strong style="color:#fff">Pruébalo tú mismo:</strong> elige un operador y
                 decide si la variable es nula o no.</p>
@@ -1454,8 +1513,15 @@ ciudad?.let {
                   <tbody>
                     <tr>
                       <td><code>Any</code></td>
-                      <td>Superclase de todos los tipos (como <code>Object</code> en Java)</td>
+                      <td>Supertipo de todos los tipos <strong>no anulables</strong>. Es el equivalente a
+                        <code>Object</code> en Java</td>
                       <td><code>val obj: Any = "Hola"</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>Any?</code></td>
+                      <td>Supertipo de <strong>todos</strong> los tipos, anulables incluidos. Es el equivalente real a
+                        <code>Object</code> en Java (que también admite <code>null</code>)</td>
+                      <td><code>val obj: Any? = null</code></td>
                     </tr>
                     <tr>
                       <td><code>Unit</code></td>
@@ -1464,12 +1530,17 @@ ciudad?.let {
                     </tr>
                     <tr>
                       <td><code>Nothing</code></td>
-                      <td>Representa «nunca retorna» (ej: lanzar excepción)</td>
+                      <td>Representa «nunca retorna» (ej: lanzar excepción). Como es el <em>tipo inferior</em>, una función
+                        que devuelve <code>Nothing</code> sirve donde se espera cualquier tipo</td>
                       <td><code>fun error(): Nothing = throw Exception()</code></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
+              <div class="callout key"><strong>El detalle que se suele pasar por alto:</strong> <code>Any</code> es el
+                supertipo de los tipos <strong>no anulables</strong>, no de todos. Si asignas <code>null</code> a un
+                <code>Any</code>, el compilador se queja; necesitas <code>Any?</code>. En Java, <code>Object</code> sí
+                admite <code>null</code>, así que el equivalente exacto de <code>Object</code> es <code>Any?</code>.</div>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="cmt">// Unit es redundante (se puede omitir)</span>
 <span class="kw">fun</span> <span class="fn">saludar</span>(): Unit = println(<span class="str">"Hola"</span>)   <span class="cmt">// Explícito</span>
@@ -1555,7 +1626,13 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
               <p><strong style="color:#fff">if como expresión:</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre
-                  class="code"><code><span class="kw">val</span> max = <span class="kw">if</span> (a > b) a <span class="kw">else</span> b  <span class="cmt">// Devuelve valor</span></code></pre>
+                  class="code"><code><span class="kw">val</span> a = 5
+<span class="kw">val</span> b = 3
+
+<span class="kw">val</span> max = <span class="kw">if</span> (a > b) a <span class="kw">else</span> b  <span class="cmt">// Devuelve valor</span>
+<span class="cmt">// Pero la librería estándar ya lo hace: mejor usar maxOf / minOf</span>
+<span class="kw">val</span> max2 = maxOf(a, b)   <span class="cmt">// 5</span>
+<span class="kw">val</span> min2 = minOf(a, b)   <span class="cmt">// 3</span></code></pre>
               </div>
               <p><strong style="color:#fff">when (vs switch de Java):</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -1575,6 +1652,25 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
     <span class="kw">else</span> -> <span class="str">"Día laborable"</span>
 }</code></pre>
               </div>
+              <p><strong style="color:#fff">when sin sujeto</strong> (el más parecido al <code>switch</code> de Java):</p>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">val</span> nota = 7
+<span class="kw">val</span> calificacion = <span class="kw">when</span> {
+    nota < 5 -> <span class="str">"Suspenso"</span>
+    nota < 7 -> <span class="str">"Aprobado"</span>
+    nota < 9 -> <span class="str">"Notable"</span>
+    <span class="kw">else</span> -> <span class="str">"Sobresaliente"</span>
+}</code></pre>
+              </div>
+              <div class="callout key"><strong>Exhaustividad: cuándo es obligatorio el <code>else</code>.</strong>
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li>Con <code>Int</code>, <code>String</code> o cualquier tipo abierto: el <code>else</code> es
+                    <strong>obligatorio</strong>, porque puede haber valores que no has cubierto.</li>
+                  <li>Con un <code>sealed class</code> o un <code>enum class</code>: el <code>else</code> es
+                    <strong>opcional</strong>, porque el conjunto de casos posibles está <em>cerrado</em>. Si añades un
+                    caso nuevo a la jerarquía y no lo cubres, el compilador deja de compilar: eso es exactamente lo que se
+                    busca, para que nadie se olvide de un estado.</li>
+                </ul></div>
               <p><strong style="color:#fff">Bucles:</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="cmt">// for con rango</span>
@@ -1650,12 +1746,17 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
           <div class="acc-panel">
             <div class="acc-panel-inner">
               <ul class="plain">
-                <li>Las clases son <code>final</code> por defecto (no se pueden heredar).</li>
-                <li>Usar <code>open</code> para permitir herencia.</li>
+                <li>Las clases son <code>final</code> por defecto: <strong>no se pueden heredar</strong>. Hay que marcarlas
+                  <code>open</code>.</li>
+                <li>Los <strong>miembros también son <code>final</code> por defecto</strong>: un método no se puede
+                  sobrescribir salvo que esté marcado <code>open</code>. El modificador <code>override</code> no sustituye
+                  al <code>open</code>: se necesitan <strong>los dos</strong>.</li>
+                <li>Las propiedades <code>val</code> no se pueden sobrescribir nunca (no tienen setter).</li>
               </ul>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="kw">open class</span> <span class="fn">Animal</span>(<span class="kw">val</span> nombre: String) {
-    <span class="kw">open fun</span> <span class="fn">sonido</span>() = <span class="str">"Sonido genérico"</span>
+    <span class="kw">open fun</span> <span class="fn">sonido</span>() = <span class="str">"Sonido genérico"</span>  <span class="cmt">// open: se puede sobrescribir</span>
+    <span class="kw">fun</span> <span class="fn">respirar</span>() = println(<span class="str">"Respirando"</span>)     <span class="cmt">// final: nadie lo puede cambiar</span>
 }
 
 <span class="kw">class</span> <span class="fn">Perro</span>(nombre: String, <span class="kw">val</span> raza: String) : Animal(nombre) {
@@ -1666,6 +1767,13 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
 <span class="kw">val</span> perro = Perro(<span class="str">"Max"</span>, <span class="str">"Labrador"</span>)
 println(perro.sonido())  <span class="cmt">// Guau!</span></code></pre>
               </div>
+              <div class="callout tip"><strong>Ojo con los parámetros del constructor que no llevan <code>val</code> ni
+                <code>var</code>:</strong> en <code>Perro(nombre: String, ...)</code>, <code>nombre</code> es
+                <strong>solo un parámetro</strong>: se usa para pasárselo al constructor del padre
+                (<code>Animal(nombre)</code>) y luego desaparece; no existe como propiedad de <code>Perro</code>. La
+                propiedad <code>nombre</code> vive en <code>Animal</code>. Si quisieras <em>redeclararla</em> en
+                <code>Perro</code>, tendrías que escribir <code>override val nombre: String</code> en el constructor
+                primario y pasarle el valor al padre.</div>
             </div>
           </div>
         </div>
@@ -1709,6 +1817,25 @@ println(perro.sonido())  <span class="cmt">// Guau!</span></code></pre>
 <span class="kw">val</span> usuario2 = usuario1.copy(nombre = <span class="str">"Ana María"</span>)  <span class="cmt">// Copia con modificación</span>
 println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@email.com)</span></code></pre>
               </div>
+              <div class="callout key"><strong>Dos detalles que conviene saber:</strong>
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li><code>data class</code> solo mira las propiedades declaradas en el <strong>constructor
+                    primario</strong>. Las propiedades del cuerpo de la clase (<code>val activo = true</code>) o de un
+                    constructor secundario <strong>no</strong> entran en el <code>equals()</code> ni en el
+                    <code>toString()</code> generados.</li>
+                  <li>Además genera <code>component1()</code>, <code>component2()</code>, … por cada propiedad del
+                    constructor primario, lo que permite <strong>destructurar</strong> una instancia con el
+                    <code>val (a, b) = punto</code>.</li>
+                </ul></div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">data class</span> <span class="fn">Punto</span>(<span class="kw">val</span> x: Int, <span class="kw">val</span> y: Int) {
+    <span class="kw">val</span> etiqueta: String = <span class="str">"sin etiqueta"</span>  <span class="cmt">// NO entra en equals() ni en toString()</span>
+}
+
+<span class="kw">val</span> (px, py) = Punto(3, 4)          <span class="cmt">// Desestructuración: px=3, py=4</span>
+println(px + py)                      <span class="cmt">// 7</span>
+println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> la etiqueta no aparece</span></code></pre>
+              </div>
             </div>
           </div>
         </div>
@@ -1729,7 +1856,7 @@ println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@emai
                 como valor inicial de cualquiera.</p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
-    object Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;()
     <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
     <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
 }
@@ -1743,6 +1870,22 @@ println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@emai
     }
 }</code></pre>
               </div>
+              <div class="callout key"><strong>Qué significa <code>sealed</code> (sellada):</strong>
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li><strong>Jerarquía cerrada:</strong> las subclases se declaran <em>dentro</em> de la clase sellada
+                    (en el mismo archivo, en Kotlin 1.5+). Nadie puede añadir un caso nuevo desde fuera, así que el
+                    conjunto de estados posibles es <strong>conocido y finito</strong>.</li>
+                  <li><strong>Sigue siendo <code>final</code>:</strong> una <code>sealed class</code> no se puede heredar
+                    de ella; solo se ramifica por sus subclases.</li>
+                  <li><strong>El <code>when</code> es exhaustivo:</strong> no hace falta <code>else</code>, y el
+                    compilador <strong>obliga</strong> a cubrir todos los casos. Si añades <code>data object
+                    Vacio</code> a la jerarquía y no lo tratas, el código deja de compilar. Eso es justo lo que se
+                    busca: ningún estado se queda sin atender.</li>
+                  <li>También existe <code>sealed interface</code> (Kotlin 1.5+), que hace lo mismo pero con una
+                    <em>interfaz</em>: útil cuando los casos no comparten implementación. Y <code>data object</code>
+                    (Kotlin 1.9+) es la forma moderna de escribir <code>object Cargando</code>: le da <code>toString()</code>
+                    y <code>equals()</code> propios, como cualquier <code>data class</code>.</li>
+                </ul></div>
             </div>
           </div>
         </div>
@@ -1781,6 +1924,24 @@ println(Configuracion.URL_API)</code></pre>
 <span class="cmt">// Uso como "estático" en Java</span>
 MiActivity.TAG</code></pre>
               </div>
+              <div class="callout tip"><strong>No es exactamente un bloque <code>static</code> de Java:</strong> el
+                <code>companion object</code> es un <strong>objeto</strong> —una única instancia que vive asociada a la
+                clase—, y sus miembros son miembros de <em>ese</em> objeto. Por eso, desde Java, una función del
+                companion se llama <code>MiActivity.Companion.crearIntent(contexto)</code> (y
+                <code>MiActivity.Companion.TAG</code>), salvo que le pongas <code>@JvmStatic</code>, que genera además
+                un método estático real.</div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">class</span> <span class="fn">MiActivity</span> {
+    companion object {
+        <span class="kw">const val</span> TAG = <span class="str">"MiActivity"</span>
+        <span class="kw">@JvmStatic</span>
+        <span class="kw">fun</span> <span class="fn">crearIntent</span>(contexto: Context) = Intent(contexto, MiActivity::class.java)
+    }
+}
+
+<span class="cmt">// Desde Java, con @JvmStatic:  MiActivity.crearIntent(contexto)</span>
+<span class="cmt">// Desde Java, sin  @JvmStatic:  MiActivity.Companion.crearIntent(contexto)</span></code></pre>
+              </div>
             </div>
           </div>
         </div>
@@ -1803,12 +1964,23 @@ MiActivity.TAG</code></pre>
         }
 }</code></pre>
               </div>
+              <div class="callout key"><strong>Qué es <code>field</code> (la «propiedad de respaldo»):</strong> es el
+                <strong>campo privado que el compilador genera</strong> por ti detrás de la propiedad, donde se guarda de
+                verdad el valor. No lo escribes nunca: dentro de un <code>get</code> o un <code>set</code> accedes a él
+                con la palabra reservada <code>field</code>. Es la única forma de leer o escribir el valor almacenado
+                desde dentro del propio accesor.</div>
+              <div class="callout tip"><strong>La propiedad calculada <code>area</code> no tiene <code>field</code>:</strong>
+                no almacena nada, se <strong>recalcula en cada acceso</strong> (<code>rect.area</code> ejecuta
+                <code>ancho * alto</code> otra vez). Por eso no se le puede asignar un valor: al no existir un campo donde
+                guardar lo que le asignes, Kotlin da un error de compilación. Si necesitaras guardarla, tendrías que
+                escribir <code>private val areaCalculado = ancho * alto</code> y exponerla con
+                <code>val area get() = areaCalculado</code>.</div>
             </div>
           </div>
         </div>
 
         <div class="acc-item">
-          <button class="acc-head"><span>3.8 · Delegación de propiedades <span class="tag">by lazy</span></span><svg
+          <button class="acc-head"><span>3.8 · Delegación de propiedades y de clases <span class="tag">by lazy · by</span></span><svg
               class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round" />
@@ -1823,6 +1995,36 @@ MiActivity.TAG</code></pre>
         listOf(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>)  <span class="cmt">// Solo se ejecuta la primera vez</span>
     }
 }</code></pre>
+              </div>
+              <p><strong style="color:#fff">Delegación de clases</strong> (<code>by</code> con una interfaz): la clase
+                <em>delega</em> en otra la implementación de todos sus miembros, sin tener que escribirlos uno a uno. Es el
+                equivalente en Kotlin al <em>patrón de delegación</em> de Java, pero en una línea.</p>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">interface</span> <span class="fn">Dao</span> {
+    <span class="kw">fun</span> <span class="fn">insertar</span>(nombre: String)
+    <span class="kw">fun</span> <span class="fn">listar</span>(): List&lt;String&gt;
+}
+
+<span class="cmt">// Implementación real (habitualmente, con Room o con una API)</span>
+<span class="kw">class</span> <span class="fn">DaoReal</span> : Dao {
+    <span class="kw">override fun</span> <span class="fn">insertar</span>(nombre: String) = println(<span class="str">"Guardado: $nombre"</span>)
+    <span class="kw">override fun</span> <span class="fn">listar</span>(): List&lt;String&gt; = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>)
+}
+
+<span class="cmt">// La delegación: TODOS los métodos de Dao se reenvían a dao</span>
+<span class="kw">class</span> <span class="fn">Repositorio</span>(<span class="kw">private val</span> dao: Dao) : Dao <span class="kw">by</span> dao
+
+<span class="cmt">// Se puede añadir comportamiento propio encima</span>
+<span class="kw">class</span> <span class="fn">RepositorioConLog</span>(<span class="kw">private val</span> dao: Dao) : Dao <span class="kw">by</span> dao {
+    <span class="kw">override fun</span> <span class="fn">insertar</span>(nombre: String) {
+        println(<span class="str">"Insertando..."</span>)
+        dao.insertar(nombre)
+    }
+}
+
+<span class="kw">val</span> repo = Repositorio(DaoReal())
+repo.insertar(<span class="str">"Ana"</span>)       <span class="cmt">// Guardado: Ana</span>
+println(repo.listar())          <span class="cmt">// [Ana, Bea]</span></code></pre>
               </div>
             </div>
           </div>
@@ -1853,6 +2055,12 @@ MiActivity.TAG</code></pre>
                   class="code"><code><span class="kw">val</span> suma: (Int, Int) -> Int = { a, b -> a + b }
 <span class="kw">val</span> cuadrado: (Int) -> Int = { it * it }  <span class="cmt">// "it" cuando hay un solo parámetro</span></code></pre>
               </div>
+              <div class="callout tip"><strong>El <code>it</code> implícito solo existe con <em>un</em> parámetro.</strong> En
+                cuanto la lambda tiene <strong>dos o más</strong>, Kotlin exige que los nombres: <code>{ x, y -&gt; x + y }</code>.
+                Si uno de ellos no lo vas a usar, puedes ponerlo como <code>_</code> (guion bajo) desde Kotlin 1.9:
+                <code>{ x, _ -&gt; x }</code>. Y un consejo de estilo: el <code>it</code> implícito está bien para una
+                lambda corta, pero en cuanto haya que leerlo dos veces, nombra el parámetro — <code>{ precio -&gt;
+                precio * 1.21 }</code> se entiende mucho mejor que <code>{ it * 1.21 }</code>.</div>
               <p><strong style="color:#fff">Función que recibe lambda:</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="kw">fun</span> <span class="fn">operar</span>(a: Int, b: Int, operacion: (Int, Int) -> Int): Int {
@@ -1862,6 +2070,12 @@ MiActivity.TAG</code></pre>
 <span class="cmt">// Uso</span>
 <span class="kw">val</span> resultado = operar(5, 3) { x, y -> x * y }  <span class="cmt">// 15</span></code></pre>
               </div>
+              <div class="callout key"><strong>La «trailing lambda»:</strong> cuando el último parámetro de una función es
+                de tipo función, Kotlin permite <strong>sacar la lambda fuera de los paréntesis</strong>. Por eso
+                <code>operar(5, 3) { x, y -&gt; x * y }</code> es equivalente a
+                <code>operar(5, 3, { x, y -&gt; x * y })</code>: la lambda es el último argumento y se escribe detrás de los
+                paréntesis. Es el estilo habitual de Kotlin y aparece en las colecciones
+                (<code>lista.map { it * 2 }</code>) y en las funciones de la librería estándar.</div>
             </div>
           </div>
         </div>
@@ -2061,6 +2275,28 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
         </table>
       </div>
 
+      <div class="callout key"><strong>Regla de elección: ¿cuál uso?</strong> No hace falta memorizar las cinco: decide
+        primero <em>qué quieres que devuelva</em> la expresión y <em>qué necesitas del objeto</em>.
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><strong><code>let</code></strong>: quieres <em>transformar</em> el objeto y devolver <strong>otro valor
+            distinto</strong> (o una cadena). Es la que usas con los <code>nullable</code>, porque solo se ejecuta si no
+            es <code>null</code>.</li>
+          <li><strong><code>apply</code></strong>: quieres <em>configurar</em> el objeto y devolver <strong>el mismo
+            objeto</strong>, para encadenar. Es el patrón «builder».</li>
+          <li><strong><code>also</code></strong>: quieres un <strong>efecto secundario</strong> (log, validación, métricas)
+            y devolver el objeto <strong>sin tocarlo</strong>.</li>
+          <li><strong><code>with</code></strong>: quieres <em>agrupar</em> varias llamadas sobre un objeto que ya sabes
+            que no es nulo. <strong>No es una función de extensión</strong>: se escribe
+            <code>with(objeto) { ... }</code> con el objeto <em>dentro</em> de los paréntesis, y no admite
+            <code>?.</code> ni <code>?:</code> porque el objeto se evalúa antes de entrar.</li>
+          <li><strong><code>run</code></strong>: como <code>let</code> pero con <code>this</code> en lugar de
+            <code>it</code>. Útil cuando dentro de la lambda necesitas llamar a varios métodos del propio objeto.</li>
+        </ul>
+        <p style="margin-top:.5rem;">Resumen en una frase: <code>let</code> <strong>transforma</strong>,
+          <code>apply</code> <strong>configura</strong>, <code>also</code> <strong>registra</strong>,
+          <code>with</code> <strong>agrupa</strong>, <code>run</code> es <code>let</code> con <code>this</code>.</p>
+      </div>
+
       <div class="tabs" id="sfTabs">
         <button class="tab-btn active" data-tab="sf-let">let</button>
         <button class="tab-btn" data-tab="sf-run">run</button>
@@ -2179,6 +2415,11 @@ with(persona) {
     -1  <span class="cmt">// Valor por defecto si falla</span>
 }</code></pre>
       </div>
+      <div class="callout key"><strong>El <code>catch</code> debe devolver el <em>mismo tipo</em> que el <code>try</code>:</strong>
+        el <code>try</code> devuelve un <code>Int</code> (<code>numero * 2</code>), así que el <code>catch</code> está
+        obligado a devolver también un <code>Int</code>: por eso el <code>-1</code>. Si el <code>catch</code> devolviera
+        un <code>String</code>, el compilador se quejaría de que los dos caminos no tienen el mismo tipo. Y si te da igual
+        el valor, la forma idiomática es <code>catch (e: Exception) { null }</code> con un tipo <code>Int?</code>.</div>
 
       <h3 style="margin-top:1.6rem;">runCatching (funcional)</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -2201,6 +2442,35 @@ with(persona) {
       <div class="callout tip"><strong>Tip:</strong> <code>runCatching</code> devuelve un <code>Result&lt;T&gt;</code>,
         así que encaja bien en cadenas funcionales donde no quieres romper el flujo con un <code>try/catch</code>
         tradicional.</div>
+      <div class="callout key"><strong>La API de <code>Result&lt;T&gt;</code> que vas a necesitar:</strong>
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><code>isSuccess</code> / <code>isFailure</code>: si funcionó o no.</li>
+          <li><code>getOrThrow()</code>: devuelve el valor o relanza la excepción (útil en un <code>try/catch</code>
+            normal).</li>
+          <li><code>onSuccess { }</code> / <code>onFailure { }</code>: ejecuta una acción según el caso y
+            <strong>devuelve el mismo <code>Result</code></code>, así que se pueden encadenar.</li>
+          <li><code>mapCatching { }</code>: transforma el valor si funcionó; si falla, propaga el fallo.</li>
+          <li><code>recoverCatching { }</code>: si falló, ejecuta otro bloque para <em>recuperar</em> un valor válido
+            (por ejemplo, devolver una lista vacía).</li>
+          <li><code>fold(onSuccess, onFailure)</code>: como un <code>if/else</code> sobre el resultado.</li>
+        </ul></div>
+      <div class="callout warn"><strong><code>getOrElse { -1 }</code> confunde dos cosas:</strong> si el valor real fuera
+        <code>-1</code>, no sabrías si la operación funcionó o no. La lambda de <code>getOrElse</code> <strong>recibe la
+        excepción</strong> como parámetro (<code>{ e -&gt; ... }</code>), así que puedes usarla:
+        <code>getOrElse { e -&gt; -1 }</code>. Si necesitas distinguir los casos, usa
+        <code>getOrNull()</code> junto con <code>isFailure</code>, o <code>fold</code>, que te da las dos ramas por
+        separado.</div>
+      <div class="callout warn"><strong><code>runCatching</code> se traga la cancelación de las corrutinas.</strong> Captura
+        <em>cualquier</em> <code>Throwable</code>, y eso incluye la <code>CancellationException</code> que Kotlin usa para
+        cancelar una corrutina: si la tragas, la corrutina «sigue viva» cuando debería detenerse, y la cancelación se
+        pierde. <strong>Dentro de una corrutina, usa <code>try/catch</code> normal</strong> y captura solo las
+        excepciones que te interesen.</div>
+      <div class="callout key"><strong>Kotlin no tiene excepciones «checked» (comprobadas).</strong> En Java, el
+        compilador te obligaba a declarar o capturar las excepciones checked que declara un método. En Kotlin
+        <strong>no existen</strong>: ninguna función necesita <code>throws</code> y el compilador no te fuerza a
+        capturarlas. Solo se capturan las que tú decidas. Esto cambia la interoperabilidad: cuando llames a una API de
+        <strong>Java</strong> que declare <code>throws IOException</code>, Kotlin te deja llamarla sin nada; el
+        compilador no te avisa, así que la responsabilidad de comprobarla es tuya.</div>
     </section>
 
     <!-- ============ SECTION 7: CORRUTINAS ============ -->
@@ -2239,7 +2509,7 @@ dependencies {
             </tr>
             <tr>
               <td><code>Dispatchers</code></td>
-              <td>Hilo donde se ejecuta (Main, IO, Default)</td>
+              <td><strong>Contexto</strong> que decide en qué hilo se ejecuta el código (Main, IO, Default)</td>
             </tr>
             <tr>
               <td><code>Job</code></td>
@@ -2247,14 +2517,76 @@ dependencies {
             </tr>
             <tr>
               <td><code>launch</code></td>
-              <td>Lanza corrutina sin retorno</td>
+              <td>Lanza corrutina y devuelve un <code>Job</code></td>
             </tr>
             <tr>
               <td><code>async</code></td>
-              <td>Lanza corrutina con retorno (<code>Deferred</code>)</td>
+              <td>Lanza corrutina y devuelve un <code>Deferred&lt;T&gt;</code> (un <code>Job</code> que además lleva el
+                resultado)</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="callout key"><strong>Un <code>Dispatcher</code> no es un hilo: es un <em>contexto</em>.</strong> Un hilo
+        es un recurso del sistema; un contexto es «en qué tipo de hilo y con qué prioridad se ejecuta esto». El criterio
+        para elegir:
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><code>Dispatchers.IO</code> → trabajo <strong>bloqueante</strong>: red, disco, base de datos, leer un
+            fichero. Es un pool de hilos pensado para esperar.</li>
+          <li><code>Dispatchers.Default</code> → trabajo <strong>de CPU</strong>: cálculos, compresión, análisis de
+            ficheros en memoria. Si el trabajo no espera nada y solo calcula, es este.</li>
+          <li><code>Dispatchers.Main</code> → el hilo principal de Android, el único que puede tocar la interfaz. En
+            Android Studio con Compose o con Views, la UI se actualiza desde aquí.</li>
+        </ul>
+        <p style="margin-top:.5rem;">Una corrutina <strong>puede cambiar de dispatcher</strong> en mitad de su ejecución
+          con <code>withContext(Dispatchers.IO) { ... }</code>: dentro del bloque se ejecuta en IO y al salir vuelve al
+          dispatcher anterior.</p>
+      </div>
+      <div class="callout key"><strong><code>launch</code> frente a <code>async</code>:</strong> los dos devuelven algo.
+        <code>launch</code> devuelve un <code>Job</code>, que sirve para <em>esperar</em> (<code>join()</code>) o
+        <em>cancelar</em> (<code>cancel()</code>), pero no lleva resultado. <code>async</code> devuelve un
+        <code>Deferred&lt;T&gt;</code>, que es un <code>Job</code> que además transporta el valor, y se lee con
+        <code>await()</code>. <strong>Regla práctica:</strong> si no vas a usar el valor, usa <code>launch</code>;
+        un <code>async</code> al que nunca llamas <code>await()</code> es un error de estilo (además, su excepción se
+        queda guardada y no se propaga).</div>
+      <div class="callout key"><strong><code>join()</code> frente a <code>await()</code>:</strong> <code>join()</code>
+        <em>espera</em> a que la corrutina termine, pero no te da nada y <strong>no relanza</strong> la excepción si la
+        hubo. <code>await()</code> espera <em>y además</em> devuelve el resultado; si la corrutina falló, relanza la
+        excepción en el punto de la llamada, como si el <code>try/catch</code> lo rodease. Y <code>runBlocking</code>
+        <strong>bloquea el hilo</strong> en el que se ejecuta: solo tiene sentido en el <code>main</code> de una
+        aplicación de consola o en una prueba unitaria. <strong>En Android nunca debes usarlo</strong>, porque bloquearías
+        el hilo principal y la interfaz se congelaría.</div>
+      <div class="callout key"><strong>Concurrencia estructurada:</strong> toda corrutina pertenece a un
+        <code>CoroutineScope</code>, y cuando ese ámbito se cancela o termina, <strong>todas</strong> sus corrutinas
+        hijas se cancelan también. No hay corrutinas «sueltas»: por eso Android ofrece <code>viewModelScope</code>
+        (se cancela solo cuando el ViewModel se destruye) y <code>lifecycleScope</code> (idem al destruirse la pantalla).
+        Para crear un ámbito anidado dentro de una función <code>suspend</code>, usa
+        <code>coroutineScope { }</code>: es el equivalente idiomático a <code>runBlocking</code>, pero no bloquea el
+        hilo y propaga los errores al ámbito padre.</div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="kw">suspend fun</span> <span class="fn">obtenerUsuarios</span>(): List&lt;String&gt; {
+    delay(100)
+    <span class="kw">return</span> listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>)
+}
+
+<span class="kw">suspend fun</span> <span class="fn">obtenerPedidos</span>(): List&lt;String&gt; {
+    delay(200)
+    <span class="kw">return</span> listOf(<span class="str">"Pedido 1"</span>)
+}
+
+<span class="cmt">// coroutineScope: ámbito anidado, espera a que terminen y propaga los errores</span>
+<span class="kw">suspend fun</span> <span class="fn">cargarTodo</span>(): List&lt;String&gt; = <span class="kw">coroutineScope</span> {
+    <span class="kw">val</span> usuarios = async { obtenerUsuarios() }
+    <span class="kw">val</span> pedidos = async { obtenerPedidos() }
+    usuarios.await() + pedidos.await()
+}
+
+<span class="cmt">// El ámbito espera a las dos y devuelve el resultado</span>
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    println(cargarTodo())
+}</code></pre>
       </div>
 
       <h3 style="margin-top:1.6rem;">launch vs async</h3>
@@ -2298,6 +2630,33 @@ dependencies {
     job.join()
 }</code></pre>
       </div>
+      <div class="callout warn"><strong><code>CoroutineExceptionHandler</code> tiene dos limitaciones que conviene
+        conocer:</strong>
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><strong>No se aplica a <code>async</code>.</strong> En una corrutina creada con <code>async</code>, la
+            excepción no se propaga de inmediato: queda <em>guardada</em> en el <code>Deferred</code> y se relanza en el
+            punto donde llames a <code>await()</code>. Por eso el <code>try/catch</code> alrededor del <code>await()</code>
+            es lo que la captura, no el handler.</li>
+          <li><strong>Una excepción no capturada en un <code>launch</code> cancela el ámbito padre.</strong> Es el
+            comportamiento de la concurrencia estructurada: si una corrutina hija falla, las hermanas se cancelan y el
+            error sube hasta el <code>scope</code>. Si quieres que una corrutina pueda fallar sin arrastrar a las demás,
+            usa un <code>SupervisorJob</code> como padre del ámbito.</li>
+        </ul></div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="cmt">// Con async, la excepción se relanza en el await(): ahí se captura</span>
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="kw">val</span> deferred = async {
+        <span class="kw">throw</span> RuntimeException(<span class="str">"Error en corrutina"</span>)
+    }
+    <span class="kw">try</span> {
+        deferred.await()
+    } <span class="kw">catch</span> (e: RuntimeException) {
+        println(<span class="str">"Error capturado: ${e.message}"</span>)
+    }
+}</code></pre>
+      </div>
 
       <h3 style="margin-top:1.6rem;">En Android (viewModelScope)</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -2310,21 +2669,34 @@ dependencies {
     <span class="kw">private val</span> _estado = MutableStateFlow&lt;EstadoUI&lt;List&lt;String&gt;&gt;&gt;(EstadoUI.Cargando)
 
     <span class="kw">fun</span> <span class="fn">cargarDatos</span>() {
-        viewModelScope.launch(Dispatchers.IO) {
+        <span class="cmt">// viewModelScope ya usa Dispatchers.Main.immediate: no hay que cambiarlo aquí</span>
+        viewModelScope.launch {
+            _estado.value = EstadoUI.Cargando
             <span class="kw">try</span> {
-                <span class="kw">val</span> datos = apiService.obtenerDatos()
-                withContext(Dispatchers.Main) {
-                    _estado.value = EstadoUI.Exito(datos)
-                }
+                <span class="kw">val</span> datos = apiService.obtenerDatos()   <span class="cmt">// La API suspend ya devuelve en IO</span>
+                _estado.value = EstadoUI.Exito(datos)
+            } <span class="kw">catch</span> (e: CancellationException) {
+                <span class="kw">throw</span> e   <span class="cmt">// La cancelación se propaga: NO se captura</span>
             } <span class="kw">catch</span> (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _estado.value = EstadoUI.Error(e.message ?: <span class="str">"Error"</span>)
-                }
+                _estado.value = EstadoUI.Error(e.message ?: <span class="str">"Error"</span>)
             }
         }
     }
 }</code></pre>
       </div>
+      <div class="callout warn"><strong>Dos anti-patrones que verás mucho en tutoriales y conviene no copiar:</strong>
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><strong><code>viewModelScope.launch(Dispatchers.IO)</code></strong>: <code>viewModelScope</code> ya viene
+            configurado con <code>Dispatchers.Main.immediate</code>. Cambiarlo a IO no aporta nada y, si el ViewModel
+            actualiza estado que la UI lee, complica la vida. El dispatcher se decide <em>dentro</em> del repositorio, en
+            la capa que hace la E/S.</li>
+          <li><strong><code>withContext(Dispatchers.Main) { _estado.value = ... }</code></strong>: no hace falta.
+            <code>StateFlow.value</code> es <em>thread-safe</em>: puedes escribirlo desde cualquier hilo, y la UI
+            recibe el cambio de forma segura. El salto a <code>Main</code> es ruido.</li>
+          <li><strong><code>catch (e: Exception)</code> sin más</strong>: <code>CancellationException</code> es una
+            <code>Exception</code>, así que ese <code>catch</code> se traga la cancelación de la corrutina y la deja en
+            un estado raro. Captúrala y vuelve a lanzarla, como en el ejemplo de arriba.</li>
+        </ul></div>
     </section>
 
     <!-- ============ SECTION 8: INTEROP JAVA ============ -->
@@ -2357,7 +2729,7 @@ dependencies {
             </tr>
             <tr>
               <td><code>@JvmName</code></td>
-              <td>Cambia el nombre de la función en Java</td>
+              <td>Cambia el <strong>nombre generado en la JVM</strong> (no el de Kotlin)</td>
             </tr>
           </tbody>
         </table>
@@ -2377,6 +2749,52 @@ dependencies {
 <span class="cmt">// En Java:
 // Utilidades.saludar();                 // Estático
 // new Utilidades().saludarCon("Ana");   // Hola Ana</span></code></pre>
+      </div>
+      <div class="callout key"><strong><code>@JvmName</code> actúa sobre el nombre que ve la JVM.</strong> Su uso más
+        habitual no es en una función, sino a <strong>nivel de archivo</strong>:
+        <code>@file:JvmName("Utils")</code> en la primera línea del archivo. Sirve para darle a un archivo un nombre de
+        clase concreto (en Kotlin, un archivo <code>Utilidades.kt</code> genera la clase <code>UtilidadesKt</code>), o
+        para <strong>evitar colisiones de firma</strong> que la JVM no puede expresar: la JVM no admite sobrecargas que
+        solo difieran en los tipos genéricos, y <code>@JvmName</code> te permite renombrar una de ellas.</div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="cmt">// En la primera línea del archivo (fuera de cualquier clase)</span>
+<span class="ann">@file:JvmName("Utils")</span>
+
+<span class="kw">package</span> com.example.util
+
+<span class="kw">fun</span> <span class="fn">saludar</span>(nombre: String) = <span class="str">"Hola $nombre"</span>
+
+<span class="cmt">// En Java la clase se llama Utils, no UtilidadesKt</span></code></pre>
+      </div>
+      <div class="callout warn"><strong>Los <em>platform types</em> (<code>String!</code>): la trampa de la interoperabilidad.</strong>
+        Cuando Kotlin llama a una API escrita en <strong>Java</strong>, los tipos de retorno vienen marcados con
+        <code>!</code>: <code>String!</code> significa <em>«esto <strong>podría</strong> ser nulo, pero Java no lo
+        garantiza, así que Kotlin no te obliga a comprobarlo»</em>. Es un <em>platform type</em>: ni <code>String</code>
+        ni <code>String?</code>, sino «el compilador deja de vigilarlo».
+        <p style="margin-top:.5rem;">La consecuencia práctica: si una API de Java devuelve <code>null</code> y escribes
+          <code>val n: String = api.getNombre()</code>, el compilador <strong>no se queja</strong>… y el
+          <code>NullPointerException</code> salta en la línea <em>siguiente</em>, cuando ya no sabes de dónde vino. La
+          solución es tipar la API de Java como anulable: <code>val n: String? = api.getNombre()</code>, y comprobar
+          el <code>null</code> con <code>?.</code> o <code>?:</code>.</p>
+      </div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="cmt">// Clase de JAVA (en un archivo .java): el método puede devolver null</span>
+<span class="cmt">// public class UsuarioJava { public String getNombre() { return null; } }</span>
+
+<span class="cmt">// Equivalente escrito en Kotlin, para poder probarlo aquí:</span>
+<span class="kw">class</span> <span class="fn">UsuarioJava</span> {
+    <span class="kw">fun</span> <span class="fn">getNombre</span>(): String? = null
+}
+
+<span class="kw">val</span> usuarioJava = UsuarioJava()
+
+<span class="cmt">// La forma segura: tipar el resultado como anulable y comprobarlo</span>
+<span class="kw">val</span> nombre: String? = usuarioJava.getNombre()
+<span class="kw">val</span> saludo = nombre?.let { <span class="str">"Hola $it"</span> } ?: <span class="str">"Sin nombre"</span>
+println(saludo)   <span class="cmt">// Sin nombre</span>
+
+<span class="cmt">// Si el método de Java se tipara como String (no anulable) y devolviera null,</span>
+<span class="cmt">// el NPE saltaría en la línea siguiente, sin relación aparente con el origen.</span></code></pre>
       </div>
     </section>
 
