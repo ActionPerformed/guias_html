@@ -1395,7 +1395,9 @@
               </div>
 
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="cmt">// Ejemplos prácticos</span>
+                <pre class="code"><code><span class="kw">var</span> ciudad: String? = <span class="str">"Bilbao"</span>
+
+<span class="cmt">// Ejemplos prácticos</span>
 <span class="kw">val</span> longitud: Int? = ciudad?.length
 <span class="kw">val</span> nombreSeguro = ciudad ?: <span class="str">"Desconocida"</span>
 <span class="kw">val</span> forzado = ciudad!!.length  <span class="cmt">// Lanza NPE si es nulo</span>
@@ -1470,8 +1472,9 @@ ciudad?.let {
               </div>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="cmt">// Unit es redundante (se puede omitir)</span>
-<span class="kw">fun</span> <span class="fn">saludar</span>(): Unit = println(<span class="str">"Hola"</span>)  <span class="cmt">// Equivale a:</span>
-<span class="kw">fun</span> <span class="fn">saludar</span>() = println(<span class="str">"Hola"</span>)        <span class="cmt">// Esto</span>
+<span class="kw">fun</span> <span class="fn">saludar</span>(): Unit = println(<span class="str">"Hola"</span>)   <span class="cmt">// Explícito</span>
+<span class="cmt">// Equivale a esta otra (no pueden coexistir: misma firma):</span>
+<span class="cmt">// fun saludar() = println("Hola")</span>
 
 <span class="cmt">// Nothing: función que siempre lanza excepción</span>
 <span class="kw">fun</span> <span class="fn">fail</span>(mensaje: String): Nothing {
@@ -1528,6 +1531,7 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
 <span class="kw">for</span> (i in 1..5) { println(i) }
 
 <span class="cmt">// Uso en when</span>
+<span class="kw">val</span> nota = 7
 <span class="kw">when</span> (nota) {
     in 0..4 -> <span class="str">"Insuficiente"</span>
     in 5..6 -> <span class="str">"Suficiente"</span>
@@ -1555,12 +1559,20 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
               </div>
               <p><strong style="color:#fff">when (vs switch de Java):</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="kw">val</span> resultado = <span class="kw">when</span> (dia) {
+                <pre class="code"><code><span class="kw">val</span> dia = 3
+<span class="kw">val</span> resultado = <span class="kw">when</span> (dia) {
     1 -> <span class="str">"Lunes"</span>
     2 -> <span class="str">"Martes"</span>
     in 3..5 -> <span class="str">"Miércoles a Viernes"</span>
-    <span class="str">"SÁBADO"</span>, <span class="str">"DOMINGO"</span> -> <span class="str">"Fin de semana"</span>
+    6, 7 -> <span class="str">"Fin de semana"</span>
     <span class="kw">else</span> -> <span class="str">"Día inválido"</span>
+}
+
+<span class="cmt">// El valor del 'when' tiene un único tipo: si es String, todos los valores son String</span>
+<span class="kw">val</span> nombreDia = <span class="str">"SÁBADO"</span>
+<span class="kw">val</span> tipo = <span class="kw">when</span> (nombreDia) {
+    <span class="str">"SÁBADO"</span>, <span class="str">"DOMINGO"</span> -> <span class="str">"Fin de semana"</span>
+    <span class="kw">else</span> -> <span class="str">"Día laborable"</span>
 }</code></pre>
               </div>
               <p><strong style="color:#fff">Bucles:</strong></p>
@@ -1710,17 +1722,22 @@ println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@emai
           <div class="acc-panel">
             <div class="acc-panel-inner">
               <div class="callout key"><strong>Importante para Android:</strong> modelar estados de UI.</div>
+              <p><strong style="color:#fff">Con un tipo genérico,</strong> el mismo <code>sealed class</code> sirve para
+                estados con contenidos distintos: <code>EstadoUI&lt;List&lt;String&gt;&gt;</code> en un caso y
+                <code>EstadoUI&lt;List&lt;Producto&gt;&gt;</code> en otro. El <code>out</code> indica que ese tipo solo se
+                <em>entrega</em>, nunca se recibe: por eso <code>EstadoUI&lt;Nothing&gt;</code> —el estado «sin datos»— sirve
+                como valor inicial de cualquiera.</p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span> {
-    object Cargando : EstadoUI()
-    <span class="kw">data class</span> <span class="fn">Exito</span>(<span class="kw">val</span> datos: List&lt;String&gt;) : EstadoUI()
-    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI()
+                <pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
+    object Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
 }
 
 <span class="cmt">// Uso con when (cubre todos los casos)</span>
-<span class="kw">fun</span> <span class="fn">manejarEstado</span>(estado: EstadoUI) {
+<span class="kw">fun</span> <span class="fn">manejarEstado</span>(estado: EstadoUI&lt;List&lt;String&gt;&gt;) {
     <span class="kw">when</span> (estado) {
-        EstadoUI.Cargando -> println(<span class="str">"Mostrar loading..."</span>)
+        is EstadoUI.Cargando -> println(<span class="str">"Mostrar loading..."</span>)
         is EstadoUI.Exito -> println(<span class="str">"Datos: ${estado.datos}"</span>)
         is EstadoUI.Error -> println(<span class="str">"Error: ${estado.mensaje}"</span>)
     }
@@ -1752,10 +1769,12 @@ println(Configuracion.URL_API)</code></pre>
               </div>
               <p><strong style="color:#fff"><code>companion object</code> (miembros estáticos):</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="kw">class</span> <span class="fn">MiActivity</span> {
+                <pre class="code"><code><span class="kw">import</span> android.content.Intent
+
+<span class="kw">class</span> <span class="fn">MiActivity</span> {
     companion object {
         <span class="kw">const val</span> TAG = <span class="str">"MiActivity"</span>
-        <span class="kw">fun</span> <span class="fn">crearIntent</span>() = Intent(<span class="cmt">/* ... */</span>)
+        <span class="kw">fun</span> <span class="fn">crearIntent</span>(contexto: Context) = Intent(contexto, MiActivity::class.java)
     }
 }
 
@@ -1917,17 +1936,21 @@ alumnos.forEach { println(it) }
           <div class="acc-panel">
             <div class="acc-panel-inner">
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="cmt">// flatMap: Aplana listas de listas</span>
+                <pre class="code"><code><span class="kw">val</span> alumnos = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>, <span class="str">"Ana"</span>, <span class="str">"David"</span>)
+
+<span class="cmt">// flatMap: Aplana listas de listas</span>
 <span class="kw">val</span> listas = listOf(listOf(1, 2), listOf(3, 4))
 <span class="kw">val</span> aplanada = listas.flatMap { it }  <span class="cmt">// [1, 2, 3, 4]</span>
 
 <span class="cmt">// associate: Convierte lista a mapa</span>
 <span class="kw">val</span> alumnosMap = alumnos.associate { it to it.length }
-<span class="cmt">// {"Ana"=3, "Bea"=3, "Carlos"=6, "David"=5}</span>
+<span class="cmt">// {Ana=3, Bea=3, Carlos=6, David=5}</span>
+<span class="cmt">// Ojo: "Ana" está repetida en la lista, pero en el mapa solo cabe una.</span>
+<span class="cmt">// associate sobrescribe la clave repetida (la última gana).</span>
 
-<span class="cmt">// groupBy: Agrupa elementos por clave</span>
+<span class="cmt">// groupBy: Agrupa elementos por clave (¡no deduplica!)</span>
 <span class="kw">val</span> porLongitud = alumnos.groupBy { it.length }
-<span class="cmt">// {3=["Ana", "Bea"], 6=["Carlos"], 5=["David"]}</span></code></pre>
+<span class="cmt">// {3=[Ana, Bea, Ana], 6=[Carlos], 5=[David]}</span></code></pre>
               </div>
             </div>
           </div>
@@ -1962,14 +1985,16 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
             <div class="acc-panel-inner">
               <p><strong style="color:#fff">Optimización para operaciones encadenadas:</strong></p>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
-                <pre class="code"><code><span class="cmt">// Con listas (Eager): ejecuta todas las operaciones</span>
-<span class="kw">val</span> listaResultado = lista
+                <pre class="code"><code><span class="kw">val</span> numeros = listOf(3, 7, 9, 12)
+
+<span class="cmt">// Con listas (Eager): ejecuta todas las operaciones</span>
+<span class="kw">val</span> listaResultado = numeros
     .filter { it > 5 }   <span class="cmt">// Crea lista intermedia</span>
     .map { it * 2 }      <span class="cmt">// Crea otra lista</span>
     .take(3)
 
 <span class="cmt">// Con secuencias (Lazy): ejecuta solo cuando se necesita</span>
-<span class="kw">val</span> secuenciaResultado = lista.asSequence()
+<span class="kw">val</span> secuenciaResultado = numeros.asSequence()
     .filter { it > 5 }
     .map { it * 2 }
     .take(3)
@@ -2052,7 +2077,10 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
           </div>
           <div class="codewrap"><button class="copy-btn">Copiar</button>
             <pre class="code"><code><span class="cmt">// let: útil para nullables</span>
-<span class="kw">val</span> email: String? = getEmail()
+<span class="kw">fun</span> <span class="fn">leerEmail</span>(): String? = <span class="str">"ana@email.com"</span>
+<span class="kw">fun</span> <span class="fn">enviarEmail</span>(destino: String) = println(<span class="str">"Enviado a $destino"</span>)
+
+<span class="kw">val</span> email: String? = leerEmail()
 email?.let {
     enviarEmail(it)  <span class="cmt">// 'it' es el email no nulo</span>
 }</code></pre>
@@ -2066,6 +2094,9 @@ email?.let {
           </div>
           <div class="codewrap"><button class="copy-btn">Copiar</button>
             <pre class="code"><code><span class="cmt">// run: configura y calcula</span>
+<span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String, <span class="kw">var</span> edad: Int)
+
+<span class="kw">val</span> usuario = Persona(<span class="str">"Ana"</span>, 30)
 <span class="kw">val</span> resultado = usuario.run {
     <span class="cmt">// 'this' es usuario</span>
     <span class="kw">val</span> nombreMayus = nombre.uppercase()
@@ -2082,6 +2113,13 @@ email?.let {
           </div>
           <div class="codewrap"><button class="copy-btn">Copiar</button>
             <pre class="code"><code><span class="cmt">// apply: configuración fluida (builder)</span>
+<span class="cmt">// Necesita propiedades 'var': con 'val' no se puede asignar nada</span>
+<span class="kw">class</span> <span class="fn">Producto</span> {
+    <span class="kw">var</span> nombre = <span class="str">""</span>
+    <span class="kw">var</span> precio = 0.0
+    <span class="kw">var</span> stock = 0
+}
+
 <span class="kw">val</span> producto = Producto().apply {
     nombre = <span class="str">"Laptop"</span>
     precio = 1200.0
@@ -2097,9 +2135,10 @@ email?.let {
           </div>
           <div class="codewrap"><button class="copy-btn">Copiar</button>
             <pre class="code"><code><span class="cmt">// also: para efectos secundarios</span>
-<span class="kw">val</span> usuario = Usuario(<span class="str">"Ana"</span>).also {
+<span class="kw">data class</span> <span class="fn">Usuario</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> email: String)
+
+<span class="kw">val</span> usuario = Usuario(1, <span class="str">"Ana"</span>, <span class="str">"ana@email.com"</span>).also {
     println(<span class="str">"Usuario creado: ${it.nombre}"</span>)
-    logService.registrar(it)
 }</code></pre>
           </div>
         </div>
@@ -2110,7 +2149,11 @@ email?.let {
             <div><b>Uso típico</b>agrupar operaciones en un objeto</div>
           </div>
           <div class="codewrap"><button class="copy-btn">Copiar</button>
-            <pre class="code"><code><span class="cmt">// with: agrupa operaciones</span>
+            <pre class="code"><code><span class="cmt">// with: agrupa operaciones (no es extensión: se escribe with(objeto) { })</span>
+<span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String, <span class="kw">var</span> edad: Int)
+
+<span class="kw">val</span> persona = Persona(<span class="str">"Ana"</span>, 30)
+
 with(persona) {
     println(<span class="str">"Nombre: $nombre"</span>)
     println(<span class="str">"Edad: $edad"</span>)
@@ -2243,7 +2286,9 @@ dependencies {
 
       <h3 style="margin-top:1.6rem;">Manejo de errores</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
-        <pre class="code"><code><span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
     <span class="kw">val</span> handler = CoroutineExceptionHandler { _, exception ->
         println(<span class="str">"Error capturado: ${exception.message}"</span>)
     }
@@ -2256,7 +2301,14 @@ dependencies {
 
       <h3 style="margin-top:1.6rem;">En Android (viewModelScope)</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
-        <pre class="code"><code><span class="kw">class</span> <span class="fn">MiViewModel</span> : ViewModel() {
+        <pre class="code"><code><span class="cmt">// apiService sería el cliente HTTP (Retrofit, Ktor...) inyectado en el ViewModel</span>
+<span class="kw">interface</span> <span class="fn">ApiService</span> {
+    <span class="kw">suspend fun</span> <span class="fn">obtenerDatos</span>(): List&lt;String&gt;
+}
+
+<span class="kw">class</span> <span class="fn">MiViewModel</span>(<span class="kw">private val</span> apiService: ApiService) : ViewModel() {
+    <span class="kw">private val</span> _estado = MutableStateFlow&lt;EstadoUI&lt;List&lt;String&gt;&gt;&gt;(EstadoUI.Cargando)
+
     <span class="kw">fun</span> <span class="fn">cargarDatos</span>() {
         viewModelScope.launch(Dispatchers.IO) {
             <span class="kw">try</span> {
@@ -2385,9 +2437,25 @@ dependencies {
 
       <h3 style="margin-top:1.6rem;">ViewModel con StateFlow</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
-        <pre class="code"><code><span class="kw">class</span> <span class="fn">ProductosViewModel</span> : ViewModel() {
-    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&gt;(EstadoUI.Cargando)
-    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&gt; = _uiState.asStateFlow()
+        <pre class="code"><code><span class="cmt">// Modelo de datos y "fuente de datos" del proyecto</span>
+<span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double)
+
+<span class="kw">class</span> <span class="fn">RepositorioProductos</span> {
+    <span class="kw">private val</span> productos = listOf(
+        Producto(1, <span class="str">"Laptop"</span>, 1200.0),
+        Producto(2, <span class="str">"Ratón"</span>, 25.0)
+    )
+
+    <span class="cmt">// 'suspend' porque simula una llamada lenta (red o base de datos)</span>
+    <span class="kw">suspend fun</span> <span class="fn">obtenerProductos</span>(): List&lt;Producto&gt; = productos
+}
+
+<span class="kw">class</span> <span class="fn">ProductosViewModel</span> : ViewModel() {
+    <span class="kw">private val</span> repositorio = RepositorioProductos()
+
+    <span class="cmt">// EstadoUI&lt;List&lt;Producto&gt;&gt;: el tipo genérico indica QUÉ datos lleva el estado</span>
+    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&lt;List&lt;Producto&gt;&gt;&gt;(EstadoUI.Cargando)
+    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&lt;List&lt;Producto&gt;&gt;&gt; = _uiState.asStateFlow()
 
     <span class="kw">fun</span> <span class="fn">cargarProductos</span>() {
         viewModelScope.launch {
@@ -2594,6 +2662,10 @@ dependencies {
     manejarDescarga(EstadoDescarga.Progreso(50))
 }</code></pre>
             </div>
+            <div class="callout warn"><strong>Ojo con <code>ByteArray</code>:</strong> una <code>data class</code> compara
+              sus propiedades con <code>==</code>, pero <code>ByteArray</code> se compara por <em>referencia</em>, no por
+              contenido. Por eso <code>Completada(byteArrayOf(1, 2)) == Completada(byteArrayOf(1, 2))</code> es
+              <code>false</code>. Si necesitas comparar el contenido, usa <code>.contentEquals()</code>.</div>
           </div>
         </div>
 
@@ -2678,7 +2750,7 @@ dependencies {
             <h4>Operadores de colecciones</h4>
           </div>
           <p>Dada una lista de enteros del 1 al 20, obtén una lista con los pares, multiplícalos por 2, y agrupa por
-            decenas (0-9, 10-19, 20-29).</p>
+            decenas (0-9, 10-19, 20-29 y un grupo final para el resto).</p>
           <div class="reveal-row">
             <button class="reveal-btn" data-target="hint-9">💡 Mostrar pista</button>
             <button class="reveal-btn" data-target="sol-9">✅ Ver resolución</button>
@@ -2701,7 +2773,8 @@ dependencies {
             }
         }
     println(resultado)
-    <span class="cmt">// {0-9=[4, 8, 12, 16], 10-19=[20, 24, 28, 32, 36], 20-29=[40]}</span>
+    <span class="cmt">// {0-9=[4, 8], 10-19=[12, 16], 20-29=[20, 24, 28], Otros=[32, 36, 40]}</span>
+    <span class="cmt">// Ojo: los grupos son las decenas DEL NÚMERO YA DUPLICADO, no del original.</span>
 }</code></pre>
             </div>
           </div>
@@ -2749,7 +2822,10 @@ dependencies {
     <span class="kw">val</span> vm = SimuladorViewModel()
     vm.cargarDatos()
 
-    vm.estado.collect { estado ->
+    <span class="cmt">// first() lee el valor ACTUAL del StateFlow y termina.</span>
+    <span class="cmt">// collect() sobre un StateFlow se queda escuchando para siempre:</span>
+    <span class="cmt">// dentro de runBlocking el programa NO terminaría nunca.</span>
+    vm.estado.first().let { estado ->
         <span class="kw">when</span> (estado) {
             EstadoDatos.Cargando -> println(<span class="str">"Cargando..."</span>)
             is EstadoDatos.Exito -> println(<span class="str">"Datos: ${estado.datos}"</span>)
@@ -2784,10 +2860,19 @@ dependencies {
 
       <h3 style="margin-top:1.6rem;">Esqueleto base</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
-        <pre class="code"><code><span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double, <span class="kw">val</span> categoria: String)
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.delay
+
+<span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double, <span class="kw">val</span> categoria: String)
 
 <span class="kw">class</span> <span class="fn">RepositorioProductos</span> {
-    <span class="kw">private val</span> productos = listOf(<span class="cmt">/* ... */</span>)
+    <span class="cmt">// En un proyecto real estos datos vendrían de una BD o de una API.</span>
+    <span class="kw">private val</span> productos = listOf(
+        Producto(1, <span class="str">"Laptop"</span>, 1200.0, <span class="str">"Informática"</span>),
+        Producto(2, <span class="str">"Ratón"</span>, 25.0, <span class="str">"Informática"</span>),
+        Producto(3, <span class="str">"Teclado"</span>, 45.0, <span class="str">"Informática"</span>),
+        Producto(4, <span class="str">"Sudadera"</span>, 30.0, <span class="str">"Ropa"</span>),
+        Producto(5, <span class="str">"Gorra"</span>, 15.0, <span class="str">"Ropa"</span>)
+    )
 
     <span class="kw">suspend fun</span> <span class="fn">obtenerPorCategoria</span>(categoria: String): List&lt;Producto&gt; {
         delay(500)
@@ -2807,10 +2892,23 @@ dependencies {
 
       <h3 style="margin-top:1.6rem;">Uso en un ViewModel simulado</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
-        <pre class="code"><code><span class="kw">class</span> <span class="fn">ProductosViewModel</span> {
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+<span class="kw">import</span> kotlinx.coroutines.flow.*
+<span class="kw">import</span> androidx.lifecycle.ViewModel
+<span class="kw">import</span> androidx.lifecycle.viewModelScope
+
+<span class="cmt">// Estados de la operación (misma sealed class genérica de la sección 3.5)</span>
+<span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">object</span> Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
+}
+
+<span class="cmt">// Hereda de ViewModel: así dispone de viewModelScope (se cancela solo al cerrar la pantalla)</span>
+<span class="kw">class</span> <span class="fn">ProductosViewModel</span> : ViewModel() {
     <span class="kw">private val</span> repo = RepositorioProductos()
-    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&gt;(EstadoUI.Cargando)
-    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&gt; = _uiState.asStateFlow()
+    <span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&lt;List&lt;Producto&gt;&gt;&gt;(EstadoUI.Cargando)
+    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&lt;List&lt;Producto&gt;&gt;&gt; = _uiState.asStateFlow()
 
     <span class="kw">fun</span> <span class="fn">cargarCategoria</span>(categoria: String) {
         viewModelScope.launch {
