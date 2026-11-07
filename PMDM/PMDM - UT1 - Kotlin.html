@@ -3549,10 +3549,15 @@ with(persona) {
       <div class="codewrap"><button class="copy-btn">Copiar</button>
         <pre class="code"><code><span class="cmt">// build.gradle.kts</span>
 dependencies {
-    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"</span>)
-    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"</span>)
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"</span>)
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"</span>)
 }</code></pre>
       </div>
+      <div class="callout tip"><strong>En una app Android basta con una sola línea.</strong>
+        <code>kotlinx-coroutines-android</code> ya trae <code>kotlinx-coroutines-core</code> como dependencia transitiva,
+        así que declarar las dos es redundante. Y las <strong>versiones son las mismas que usa el resto del
+          módulo</strong> (1.9.0), no las últimas absolutas: es mejor que un alumno copie un proyecto de una guía a
+        otra y no encuentre números distintos.</div>
 
       <h3 style="margin-top:1.6rem;">Conceptos básicos</h3>
       <div class="tblwrap">
@@ -4083,6 +4088,13 @@ dependencies {
     }
 }</code></pre>
       </div>
+      <div class="callout warn"><strong>No busques <code>kotlin-android-extensions</code>.</strong> Era el plugin que
+        daba acceso a las vistas por su <code>id</code> directamente (<code>binding.textView.text</code>), y
+        <strong>está obsoleto desde Kotlin 1.8</strong>: se ha retirado del soporte oficial y no funciona con las
+        versiones actuales del plugin de Android. Si en un tutorial antiguo o en un proyecto viejo ves
+        <code>apply plugin: 'kotlin-android-extensions'</code>, ese proyecto está parado: usa <strong>ViewBinding</strong>
+        (que es lo que se explica aquí) o, en el módulo, <strong>Compose</strong>.</div>
+
       <div class="callout key"><strong>Qué es <code>lateinit</code>.</strong> Es un modificador que permite
         <strong>inicializar una propiedad más tarde</strong> (normalmente en <code>onCreate</code>) y que solo funciona
         con tipos <strong>no anulables</strong>. Sin él, el compilador te obligaría a darle un valor inicial
