@@ -904,6 +904,26 @@
       font-size: 1.02rem;
     }
 
+    .activity-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem .9rem;
+      margin: .1rem 0 .6rem;
+      font-size: .82rem;
+      color: var(--text-muted);
+    }
+
+    .activity-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+    }
+
+    .activity-meta b {
+      color: var(--text);
+      font-weight: 600;
+    }
+
     .reveal-row {
       display: flex;
       gap: .6rem;
@@ -1209,6 +1229,27 @@
       <p class="lede">Por qué Kotlin ha ganado terreno en Android y qué necesitas instalado antes de escribir la primera
         línea.</p>
 
+      <h3 style="margin-top:1.6rem;">Al terminar esta guía serás capaz de…</h3>
+      <ol class="plain" style="padding-left:1.4rem;">
+        <li>Declarar variables con el tipo correcto y <strong>sin nulos implícitos</strong>, decidiendo en cada
+          <code>val</code> si puede o no valer <code>null</code>.</li>
+        <li>Modelar datos con <code>data class</code> y estados con <code>sealed class</code>/<code>sealed
+          interface</code>, y escribir un <code>when</code> <strong>exhaustivo</strong> que no deje ningún caso sin
+          tratar.</li>
+        <li>Escribir POO en Kotlin: herencia, interfaces, <code>override</code>, <code>companion object</code> y
+          delegación de propiedades.</li>
+        <li>Transformar colecciones con lambdas y <em>scope functions</em> eligiendo la que toca en cada caso.</li>
+        <li>Programar asíncrono con <strong>corrutinas</strong> y publicar el estado de la pantalla con
+          <code>StateFlow</code>.</li>
+        <li>Entender cómo se aplica todo esto en un proyecto Android real, con Gradle, un <code>ViewModel</code> y
+          una jerarquía de estados.</li>
+      </ol>
+      <div class="callout tip"><strong>Cómo está pensada la guía.</strong> La sección 01 es el único punto donde hace
+        falta <strong>tener Java en la cabeza</strong>: el resto del temario es Kotlin puro. El recorrido natural es
+        <strong>secciones 02 a 09 → proyecto integrador → actividades (10)</strong>, y el <strong>proyecto</strong>
+        es el que te obliga a usar todo lo aprendido. Si el tiempo es corto, el <strong>mínimo imprescindible</strong>
+        son las secciones 02, 03 y 07 (fundamentos, POO y corrutinas) más el proyecto.</div>
+
       <h3 style="margin-top:1.8rem;">¿Por qué Kotlin?</h3>
       <ul class="plain">
         <li><strong style="color:#fff">Lenguaje preferido</strong> para Android desde 2019; su soporte oficial por parte de
@@ -1278,6 +1319,72 @@ println(p.nombre)        <span class="cmt">// Bea</span>
 
 <span class="cmt">// p.nombre = "Luis"  -> error de compilación: la escritura es privada</span></code></pre>
       </div>
+
+      <h3 style="margin-top:1.8rem;">Requisitos previos</h3>
+      <p>Antes de empezar, comprueba que cumples esto. La mayoría de la guía se puede hacer <strong>sin instalar
+        nada</strong> (con el Playground online o con IntelliJ), pero la sección 9 y el proyecto necesitan un entorno
+        Android.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Requisito</th>
+              <th>Versión</th>
+              <th>¿Obligatorio?</th>
+              <th>Para qué</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#fff">Conceptos de Java</strong></td>
+              <td>Java SE 8 o superior</td>
+              <td><strong style="color:#fff">Sí</strong></td>
+              <td>La guía contrasta cada tema con Java: variables, POO, genéricos, lambdas, excepciones</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">JDK</strong></td>
+              <td>17</td>
+              <td>Solo para la sección 9</td>
+              <td>Con AGP 8.x el proyecto Android <strong>no compila</strong> con JDK 8 ni con JDK 11</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Android Studio</strong></td>
+              <td>Estable más reciente</td>
+              <td>Solo para la sección 9</td>
+              <td>Trae Kotlin y un JDK embebido: no hace falta instalar el compilador aparte</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Emulador (AVD)</strong></td>
+              <td>—</td>
+              <td>No</td>
+              <td>Solo si quieres probar la Activity; la guía no lo exige para nada</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Gradle y Kotlin DSL</strong></td>
+              <td>Los que trae Android Studio</td>
+              <td>Solo para la sección 9</td>
+              <td>El <code>build.gradle.kts</code> de la sección 9 es un archivo real</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Conexión a Internet</strong></td>
+              <td>—</td>
+              <td>Solo la primera vez</td>
+              <td>Gradle descarga las dependencias de AndroidX y de las corrutinas</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Git</strong></td>
+              <td>Cualquier versión actual</td>
+              <td>Recomendado</td>
+              <td>El módulo lo usa en las actividades para entregar el proyecto</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout tip"><strong>Si no tienes nada instalado, no te pasa nada.</strong> Todo el temario de las
+        secciones 02 a 08 se puede practicar en el
+        <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a>, que corre en el
+        navegador y no necesita cuenta. La sección 9 (Android) sí necesita Android Studio, y es la única que te
+        pide instalar algo.</div>
 
       <h3 style="margin-top:1.8rem;">Entorno de desarrollo</h3>
       <div class="callout key"><strong>Requisitos:</strong> <strong style="color:#fff">Kotlin 2.x</strong> y
@@ -3750,6 +3857,11 @@ dependencies {
           <div class="activity-head"><span class="activity-num">1</span>
             <h4>Filtrado avanzado</h4>
           </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Encadenar <code>filter</code>, <code>map</code> y <code>sortedBy</code> en una sola expresión</span>
+            <span>⏱ <b>Tiempo:</b> 10 min</span>
+            <span>✅ <b>Logro:</b> El programa imprime <code>[CARLOS, DAVID]</code></span>
+          </div>
           <p>Dada una lista de nombres, filtra los que tienen más de 3 letras, conviértelos a mayúsculas y ordénalos
             alfabéticamente.</p>
           <div class="reveal-row">
@@ -3775,6 +3887,11 @@ dependencies {
         <div class="activity">
           <div class="activity-head"><span class="activity-num">2</span>
             <h4>Mapa de estudiantes</h4>
+          </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Recorrer un <code>Map</code> con <code>entries</code> y ordenar por valor</span>
+            <span>⏱ <b>Tiempo:</b> 10 min</span>
+            <span>✅ <b>Logro:</b> Imprime <code>[Ana, Eva, Juan]</code> en orden de nota descendente</span>
           </div>
           <p>Crea un mapa <code>Map&lt;String, Double&gt;</code> con nombres y notas. Filtra los aprobados (&gt;=5) y
             devuelve una lista de nombres ordenados por nota descendente.</p>
@@ -3802,6 +3919,11 @@ dependencies {
         <div class="activity">
           <div class="activity-head"><span class="activity-num">3</span>
             <h4>Función de orden superior con repetición</h4>
+          </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Escribir una función que <strong>recibe</strong> una lambda y la invoca</span>
+            <span>⏱ <b>Tiempo:</b> 20 min</span>
+            <span>✅ <b>Logro:</b> Imprime 5 líneas, de <code>Iteración: 5</code> a <code>Iteración: 1</code></span>
           </div>
           <p>Crea una función <code>repetirCondicional</code> que reciba un número <code>n</code> y una lambda, y
             ejecute la lambda mientras <code>n</code> sea mayor que 0, decrementando <code>n</code> en cada iteración.
@@ -3841,6 +3963,11 @@ dependencies {
           <div class="activity-head"><span class="activity-num">4</span>
             <h4>Data class y null safety</h4>
           </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Modelar con <code>data class</code> y filtrar nulos de una <code>List&lt;Producto?&gt;</code></span>
+            <span>⏱ <b>Tiempo:</b> 20 min</span>
+            <span>✅ <b>Logro:</b> Imprime <code>Total productos P: 5.0</code> (los 4 no nulos que empiezan por «P»)</span>
+          </div>
           <p>Define una <code>data class Producto(id: Int, nombre: String, precio: Double)</code>. Dada una lista
             nullable, calcula el precio total de los productos no nulos que empiezan por «P».</p>
           <div class="reveal-row">
@@ -3872,6 +3999,11 @@ dependencies {
           <div class="activity-head"><span class="activity-num">5</span>
             <h4>Extensión de String avanzada</h4>
           </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Declarar una <strong>función de extensión</strong> sobre <code>String</code></span>
+            <span>⏱ <b>Tiempo:</b> 15 min</span>
+            <span>✅ <b>Logro:</b> <code>"ana maría pérez".toInitials()</code> devuelve <code>A.M.P.</code></span>
+          </div>
           <p>Crea una función de extensión <code>toInitials()</code> para <code>String</code> que devuelva las iniciales
             de cada palabra en mayúscula (ej: «Ana María Pérez» → «A.M.P.»).</p>
           <div class="reveal-row">
@@ -3900,6 +4032,11 @@ dependencies {
         <div class="activity">
           <div class="activity-head"><span class="activity-num">6</span>
             <h4>Sealed class y when</h4>
+          </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Modelar estados con una jerarquía sellada y un <code>when</code> <strong>exhaustivo</strong></span>
+            <span>⏱ <b>Tiempo:</b> 25 min</span>
+            <span>✅ <b>Logro:</b> El <code>when</code> cubre los 4 estados y compila <strong>sin <code>else</code></strong></span>
           </div>
           <p>Modela el estado de una descarga con una sealed class que tenga estados: <code>Iniciada</code>,
             <code>Progreso(Int)</code> (porcentaje), <code>Completada(ByteArray)</code>, <code>Error(String)</code>.
@@ -3944,6 +4081,11 @@ dependencies {
           <div class="activity-head"><span class="activity-num">7</span>
             <h4>Scope functions y configuración</h4>
           </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Configurar un objeto con <code>apply</code> y leerlo con <code>let</code></span>
+            <span>⏱ <b>Tiempo:</b> 15 min</span>
+            <span>✅ <b>Logro:</b> La configuración tiene los 3 valores esperados y se imprimen</span>
+          </div>
           <p>Crea una clase <code>Configuracion</code> con propiedades <code>url</code>, <code>tiempoEspera</code> y
             <code>maxReintentos</code>. Usa <code>apply</code> para crear una instancia configurada y <code>let</code>
             para mostrar su contenido.</p>
@@ -3981,6 +4123,11 @@ dependencies {
         <div class="activity">
           <div class="activity-head"><span class="activity-num">8</span>
             <h4>Corrutinas con async</h4>
+          </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Lanzar dos corrutinas en paralelo y esperar a las dos con <code>awaitAll</code></span>
+            <span>⏱ <b>Tiempo:</b> 25 min</span>
+            <span>✅ <b>Logro:</b> Imprime ambos resultados, y el tiempo total es el del más lento, no la suma</span>
           </div>
           <p>Usa <code>async</code> para ejecutar dos tareas en paralelo (simuladas con <code>delay</code>) y combina
             sus resultados.</p>
@@ -4020,6 +4167,11 @@ dependencies {
           <div class="activity-head"><span class="activity-num">9</span>
             <h4>Operadores de colecciones</h4>
           </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Agrupar con <code>groupBy</code> usando un <code>when</code> sobre rangos</span>
+            <span>⏱ <b>Tiempo:</b> 20 min</span>
+            <span>✅ <b>Logro:</b> Imprime los 4 grupos: <code>0-9</code>, <code>10-19</code>, <code>20-29</code> y <code>Otros</code></span>
+          </div>
           <p>Dada una lista de enteros del 1 al 20, obtén una lista con los pares, multiplícalos por 2, y agrupa por
             decenas (0-9, 10-19, 20-29 y un grupo final para el resto).</p>
           <div class="reveal-row">
@@ -4054,6 +4206,11 @@ dependencies {
         <div class="activity">
           <div class="activity-head"><span class="activity-num">10</span>
             <h4>ViewModel simulado</h4>
+          </div>
+          <div class="activity-meta">
+            <span>🎯 <b>Objetivo:</b> Publicar el estado con <code>StateFlow</code> y leerlo <strong>una vez</strong> sin colgar el programa</span>
+            <span>⏱ <b>Tiempo:</b> 30 min</span>
+            <span>✅ <b>Logro:</b> Imprime el estado <code>Exito</code> con los productos, y el programa <strong>termina</strong></span>
           </div>
           <p>Simula un ViewModel con un <code>StateFlow</code> que maneje el estado de carga de datos. Crea una función
             <code>cargarDatos()</code> que emita estados de carga, éxito y error.</p>
@@ -4109,6 +4266,80 @@ dependencies {
         </div>
 
       </div>
+
+      <h3 style="margin-top:1.8rem;">Autoevaluación</h3>
+      <p>Antes de dar por cerrada la guía, contrasta lo que has hecho con esta lista. Cada línea es un
+        <strong>compromiso</strong>: si puedes marcarla con «sí» sin mirar la resolución, has asimilado el concepto. Si dudas,
+        vuelve a la sección correspondiente antes de continuar con el módulo.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Compromiso</th>
+              <th>Sección</th>
+              <th>✓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Explico por qué <code>val</code> congela la <strong>referencia</strong> y no el contenido</td>
+              <td><a href="#fundamentos">02</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Escribo un <code>when</code> exhaustivo sobre una jerarquía sellada <strong>sin</strong> <code>else</code></td>
+              <td><a href="#poo">03</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Distingo <code>sealed class</code> de <code>sealed interface</code> y sé cuándo usar cada una</td>
+              <td><a href="#poo">03</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Sé cuándo un <code>when</code> <strong>no</strong> puede hacer smart cast y por qué</td>
+              <td><a href="#poo">03</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Elijo la scope function correcta: <code>let</code> para transformar, <code>apply</code> para configurar,
+                <code>also</code> para registrar</td>
+              <td><a href="#scope">05</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Resuelvo un nullable <strong>sin</strong> usar <code>!!</code></td>
+              <td><a href="#fundamentos">02</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Marco las corrutinas con <code>launch</code> y <code>async</code> según si necesito retorno o no</td>
+              <td><a href="#corrutinas">07</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Entiendo que <code>collect</code> sobre un <code>StateFlow</code> no termina y sé cuándo usar
+                <code>first()</code></td>
+              <td><a href="#android">09</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>Relanzo la <code>CancellationException</code> en lugar de tragármela en un <code>catch</code></td>
+              <td><a href="#corrutinas">07</a></td>
+              <td>☐</td>
+            </tr>
+            <tr>
+              <td>He completado las 10 actividades <strong>sin</strong> mirar la resolución a la primera</td>
+              <td><a href="#actividades">10</a></td>
+              <td>☐</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout key"><strong>Cómo se usa esta tabla.</strong> No es un examen: es el <strong>mapa de tus
+        huecos</strong>. Las filas que dejes sin marcar te dicen exactamente qué sección releer, y por eso tiene una
+        columna con el enlace directo. Un alumno que llega al proyecto final con toda la tabla marcada habrá hecho la
+        guía; uno con tres huecos sabe que le quedan tres repasos, no «el idioma entero».</div>
     </section>
 
     <!-- ============ SECTION 11: PROYECTO INTEGRADOR ============ -->
@@ -4160,6 +4391,102 @@ dependencies {
     }
 }</code></pre>
       </div>
+
+      <h3 style="margin-top:1.6rem;">Qué hay que entregar</h3>
+      <p>El proyecto se entrega como <strong>código Kotlin ejecutable</strong>. No es un documento ni una maqueta: es un
+        programa que compila y que se puede lanzar desde la terminal.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Qué se espera</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#fff">Formato</strong></td>
+              <td>Un fichero <code>Main.kt</code> (o un proyecto Gradle si prefieres) con todo el código del proyecto
+                integrado</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Cómo se entrega</strong></td>
+              <td>Subido al repositorio del alumno (commit <code>feat: proyecto integrador Kotlin</code>) <strong>y</strong>
+                una captura o transcripción de la salida por consola</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Cómo se comprueba</strong></td>
+              <td>Con <code>kotlinc Main.kt -include-runtime -d main.jar &amp;&amp; java -jar main.jar</code> (o con
+                «Run» en el Playground) <strong>sin errores</strong> y sin Warnings si es posible</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Qué debe incluir</strong></td>
+              <td>Los 5 puntos del enunciado (modelo, repositorio, funcionalidades, estados y corrutinas) más una función
+                <code>main()</code> que lo recorra entero</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Duración estimada</strong></td>
+              <td>2 h 30 min</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:1.6rem;">Criterios de evaluación</h3>
+      <p>Cada criterio se puntúa de <strong>0 a 2</strong> (0 = no está, 1 = está pero con errores, 2 = correcto y
+        bien hecho). Con 5 criterios, la puntuación máxima es 10.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Criterio</th>
+              <th>2 puntos</th>
+              <th>1 punto</th>
+              <th>0 puntos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#fff">Compila y se ejecuta</strong></td>
+              <td>Compila sin errores y la salida es la esperada</td>
+              <td>Compila con algún aviso o la salida no coincide</td>
+              <td>No compila</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Modelo de datos</strong></td>
+              <td><code>data class Producto</code> con los 4 campos y <code>copy()</code> usado para el descuento</td>
+              <td>El modelo existe pero le falta algún campo o no se usa <code>copy()</code></td>
+              <td>No hay modelo</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Funcionalidades</strong></td>
+              <td>Las 4 operaciones funcionan, incluida la búsqueda sin distinguir mayúsculas</td>
+              <td>Funcionan 2 o 3</td>
+              <td>No funciona ninguna</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Estados y corrutinas</strong></td>
+              <td>La jerarquía sellada cubre carga / éxito / error y las operaciones van dentro de corrutinas con
+                <code>delay</code></td>
+              <td>Hay estados pero no corrutinas, o al revés</td>
+              <td>No hay ni estados ni corrutinas</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">Calidad del código</strong></td>
+              <td>Nombres claros, sin <code>!!</code>, sin <code>copy-paste</code> innecesario y con comentarios que
+                explican el porqué</td>
+              <td>Funciona pero con <code>!!</code>, nombres crípticos o duplicaciones</td>
+              <td>Código ilegible</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout tip"><strong>Antes de entregar, comprueba esto.</strong> Si el punto 3 dice «simula la BD»,
+        el objetivo <strong>no</strong> es que escribas SQL ni que añadas Room: es que el repositorio tenga la misma
+        <em>forma</em> que tendría con una base de datos real (funciones <code>suspend</code> que devuelven datos y
+        esconden de dónde vienen). En la <a href="PMDM%20-%20ACT%203.1.html">ACT 3.1</a> sustituye esa lista en memoria
+        por <strong>Room + KSP + DataStore</strong> y comprobarás que <strong>el resto del código no cambia</strong>: esa
+        es exactamente la idea que se quiere transmitir con la arquitectura.</div>
 
       <h3 style="margin-top:1.6rem;">Uso en un ViewModel simulado</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
