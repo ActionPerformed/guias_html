@@ -2226,6 +2226,30 @@ println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> 
                     (Kotlin 1.9+) es la forma moderna de escribir <code>object Cargando</code>: le da <code>toString()</code>
                     y <code>equals()</code> propios, como cualquier <code>data class</code>.</li>
                 </ul></div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// La MISMA jerarquía escrita como 'sealed interface' + 'data object'</span>
+<span class="cmt">// Es la forma que verás en las actividades del módulo (ACT 4.1)</span>
+<span class="kw">sealed interface</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;
+    <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;
+}
+
+<span class="cmt">// El 'when' sigue siendo exhaustivo: los dos 'is' son del mismo tipo</span>
+<span class="kw">fun</span> <span class="fn">mostrar</span>(estado: EstadoUI&lt;List&lt;String&gt;&gt;) {
+    <span class="kw">when</span> (estado) {
+        is EstadoUI.Cargando -&gt; println(<span class="str">"Cargando..."</span>)
+        is EstadoUI.Exito -&gt; println(estado.datos)
+        is EstadoUI.Error -&gt; println(estado.mensaje)
+    }
+}</code></pre>
+              </div>
+              <div class="callout tip"><strong><code>sealed class</code> y <code>sealed interface</code>: dos formas, un
+                mismo efecto.</strong> Con la <code>class</code>, los casos heredan de una clase; con la
+                <code>interface</code>, la implementan. En ambos casos la jerarquía es <strong>cerrada</strong>, el
+                <code>when</code> es <strong>exhaustivo</strong> y el compilador <strong>obliga a tratar todos los
+                casos</strong>. Cuando llegues a las actividades del módulo verás las dos formas; no son dos conceptos
+                distintos, es la misma idea con dos sintaxis.</div>
             </div>
           </div>
         </div>
@@ -3397,26 +3421,81 @@ println(saludo)   <span class="cmt">// Sin nombre</span>
     <!-- ============ SECTION 9: ANDROID ============ -->
     <section class="block" id="android">
       <div class="eyebrow-row"><span class="section-num">09</span></div>
-      <h2>Kotlin en Android <span style="color:var(--text-faint); font-weight:500; font-size:1rem;">— contexto
-          DAM</span></h2>
+      <h2>Kotlin en Android clásico <span style="color:var(--text-faint); font-weight:500; font-size:1rem;">— Views y
+          ViewBinding</span></h2>
       <p class="lede">Cómo aterrizan todos estos conceptos en un proyecto real: Gradle, View Binding y un ViewModel con
-        estado.</p>
+        estado. Esta es la vía <strong style="color:#fff">Views</strong> (XML + <code>ViewBinding</code>), la que verás
+        en el código heredado de muchas apps. Al final de la sección tienes el <strong style="color:#fff">puente a
+        Compose</strong>, que es la vía con la que trabajan el resto de actividades del módulo.</p>
+
+      <div class="callout key"><strong>ViewBinding frente a Compose: dos formas de hacer la misma pantalla.</strong> No
+        son detractores: son dos maneras de describir la interfaz, y conviene saber distinguirla antes de que te la
+        pidan.
+        <div class="tblwrap" style="margin-top:.6rem;">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Views + ViewBinding</th>
+                <th>Compose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:#fff">La interfaz es…</strong></td>
+                <td>un fichero <strong>XML</strong> (<code>activity_main.xml</code>)</td>
+                <td><strong>funciones de Kotlin</strong> que dibujan la pantalla</td>
+              </tr>
+              <tr>
+                <td><strong style="color:#fff">Acceso a un botón</strong></td>
+                <td><code>binding.btnSaludar</code> (objeto generado a partir del XML)</td>
+                <td>una variable que apunta a la lambda del botón</td>
+              </tr>
+              <tr>
+                <td><strong style="color:#fff">Estado de la pantalla</strong></td>
+                <td>se guarda en variables y se pinta a mano</td>
+                <td><code>remember</code> + <code>mutableStateOf</code>: el estado <strong>vive en la función</strong>
+                  que dibuja</td>
+              </tr>
+              <tr>
+                <td><strong style="color:#fff">En este módulo</strong></td>
+                <td>esta sección y el proyecto integrador</td>
+                <td>ACT 1.1, ACT 2.1, ACT 2.2, ACT 3.1 y ACT 4.1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:.6rem;">La <strong>estructura mental es la misma en las dos</strong>: un modelo de datos
+          (<code>data class</code>), un <code>ViewModel</code> que lo expone como <code>StateFlow</code> y una pantalla
+          que <strong>recoge</strong> ese estado y reacciona. Lo que cambia es <em>cómo se declara</em> la pantalla. Por
+          eso el puente está al final de la sección: si entiendes el flujo
+          «<code>ViewModel → StateFlow → la pantalla escucha y pinta</code>», ya sabes la mitad de Compose.</p>
+      </div>
 
       <h3 style="margin-top:1.6rem;">Estructura básica de build.gradle.kts</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
         <pre class="code"><code>plugins {
-    id(<span class="str">"com.android.application"</span>)
-    id(<span class="str">"org.jetbrains.kotlin.android"</span>)
+    id(<span class="str">"com.android.application"</span>) version <span class="str">"8.7.3"</span>
+    id(<span class="str">"org.jetbrains.kotlin.android"</span>) version <span class="str">"2.0.21"</span>
 }
 
 android {
     namespace = <span class="str">"com.example.app"</span>
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = <span class="str">"com.example.app"</span>
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
+    }
+
+    <span class="cmt">// AGP 8.x exige JDK 17: hay que declararlo, o el proyecto no compila</span>
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = <span class="str">"17"</span>
     }
 
     buildFeatures {
@@ -3425,11 +3504,20 @@ android {
 }
 
 dependencies {
-    implementation(<span class="str">"androidx.core:core-ktx:1.12.0"</span>)
-    implementation(<span class="str">"androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"</span>)
-    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"</span>)
+    implementation(<span class="str">"androidx.core:core-ktx:1.15.0"</span>)
+    implementation(<span class="str">"androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7"</span>)
+    implementation(<span class="str">"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"</span>)
 }</code></pre>
       </div>
+      <div class="callout key"><strong>Estas versiones son las mismas que usa el resto del módulo.</strong> El
+        <code>compileSdk = 35</code>, el <code>core-ktx:1.15.0</code>, el Lifecycle <code>2.8.7</code> y las corrutinas
+        <code>1.9.0</code> coinciden con la guía de Android y con las actividades, para que al copiar un proyecto de una
+        guía a otra no cambien los números. También se han añadido las <strong>versiones de los plugins</strong> y el
+        <code>jvmTarget = "17"</code>: sin ellos, un <code>build.gradle.kts</code> moderno <strong>no compila</strong>.</div>
+      <div class="callout tip"><strong>En proyectos grandes, las versiones viven en un catálogo.</strong> A partir de las
+        actividades del módulo las dependencias se declaran en un fichero <code>gradle/libs.versions.toml</code> y se
+        usan con <code>libs.xxx</code>, de modo que cambiar una versión es cambiar una línea. Aquí se escriben en línea
+        porque el ejemplo es más corto, pero es la misma idea.</div>
 
       <h3 style="margin-top:1.6rem;">ViewBinding en Activity</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -3499,6 +3587,57 @@ dependencies {
         <code>sealed class</code> que vimos en Programación Orientada a Objetos — así se cierra el círculo entre teoría
         y práctica en Android.</div>
 
+      <h3 style="margin-top:1.6rem;"><code>stateIn</code>: un solo flujo compartido entre varias pantallas</h3>
+      <p>Lo anterior <strong>escribe</strong> el estado a mano en un <code>MutableStateFlow</code>. Cuando la fuente de
+        los datos es un <code>Flow</code> (una base de datos, una API, un <code>Sensor</code>), hay una forma más
+        directa: <code>stateIn</code> convierte ese <code>Flow</code> «frío» en un <code>StateFlow</code> «caliente» y
+        <strong>compartido</strong>, de modo que dos pantallas que lo miran comparten la misma suscripción.</p>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.flow.*
+<span class="kw">import</span> androidx.lifecycle.ViewModel
+<span class="kw">import</span> androidx.lifecycle.viewModelScope
+
+<span class="cmt">// Un repositorio que EXPORTA un Flow, en vez de devolver el dato directamente</span>
+<span class="kw">class</span> <span class="fn">RepositorioProductos</span> {
+    <span class="kw">private val</span> productos = listOf(
+        Producto(1, <span class="str">"Laptop"</span>, 1200.0),
+        Producto(2, <span class="str">"Ratón"</span>, 25.0)
+    )
+    <span class="kw">fun</span> <span class="fn">observeProductos</span>(): Flow&lt;List&lt;Producto&gt;&gt; = flow { emit(productos) }
+}
+
+<span class="kw">class</span> <span class="fn">ProductosViewModel</span>(<span class="kw">private val</span> repositorio: RepositorioProductos) : ViewModel() {
+
+    <span class="cmt">// El tipo explícito del 'map' es obligatorio: sin él, el flujo</span>
+    <span class="cmt">// sería de tipo Exito&lt;...&gt; y el 'catch' no podría emitir un Error.</span>
+    <span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&lt;List&lt;Producto&gt;&gt;&gt; = repositorio.observeProductos()
+        .map&lt;List&lt;Producto&gt;, EstadoUI&lt;List&lt;Producto&gt;&gt;&gt; { lista -&gt; EstadoUI.Exito(lista) }
+        .catch { error -&gt; emit(EstadoUI.Error(error.message ?: <span class="str">"Error"</span>)) }
+        .stateIn(
+            scope = viewModelScope,
+            <span class="cmt">// Convierte el Flow en un StateFlow que se mantiene vivo</span>
+            <span class="cmt">// 5 segundos después de que nadie lo esté mirando</span>
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = EstadoUI.Cargando
+        )
+}</code></pre>
+      </div>
+      <div class="callout key"><strong>Qué significa <code>SharingStarted.WhileSubscribed(5000)</code>.</strong> Un
+        <code>StateFlow</code> compartido necesita <strong>decidir cuánto tiempo sigue vivo</strong>:
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><code>WhileSubscribed(5000)</code>: cuando nadie mira, el flujo <strong>se cancela a los 5
+            segundos</strong>. Si alguien vuelve a mirar antes, se reanuda con el <strong>último valor</strong>, sin
+            repetir la descarga. Es la opción por defecto en la mayoría de apps.</li>
+          <li><code>Eagerly</code>: el flujo <strong>se mantiene activo siempre</strong>, aunque nadie mire. Gastas
+            recursos (batería, red) a cambio de tener el dato listo.</li>
+          <li><code>WhileSubscribed()</code> sin número: se cancela <strong>en cuanto</strong> nadie lo mira.</li>
+        </ul>
+        <p style="margin-top:.5rem;">Y fíjate en el <code>catch</code>: va <strong>antes</strong> del
+          <code>stateIn</code>, no después. Si el error lo capturara el <code>StateFlow</code> ya construido, el flujo
+          <strong>murió</strong> y no volvería a emitir. Por eso el <code>catch</code> transforma el error <strong>dentro</strong>
+          del flujo, en un <code>EstadoUI.Error</code> que la pantalla sabe pintar.</p>
+      </div>
+
       <h3 style="margin-top:1.6rem;">La Activity consume el estado</h3>
       <p>El <code>StateFlow</code> del ViewModel es el <strong>estado de la pantalla</strong>: el Activity se limita a
         escucharlo y a pintar lo que llega. La conexión se hace con <code>collect</code>, dentro de una corrutina del
@@ -3535,6 +3674,68 @@ dependencies {
         ejecutas dentro de una corrutina. Y al vivir en el <code>lifecycleScope</code>, esa corrutina se cancela
         automáticamente cuando la Activity se destruye, de modo que <strong>nunca te queda un <code>collect</code>
         huérfano</strong> escribiendo en vistas que ya no existen.</div>
+
+      <h3 style="margin-top:2rem;">Puente a Compose: el mismo flujo, otro dialecto</h3>
+      <p>Lo que acabas de ver <strong>es</strong> Compose, solo que con otra sintaxis para pintar. En Compose la
+        pantalla es una función que <strong>se vuelve a ejecutar</strong> cada vez que cambia un dato; para conservar un
+        valor entre ejecuciones se usa <code>remember</code> + <code>mutableStateOf</code>, y para <strong>recolectar el
+        estado del ViewModel</strong> se usa <code>collectAsState</code>, que por dentro hace exactamente lo mismo que el
+        <code>collect</code> de arriba.</p>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="cmt">// La misma idea del collect, pero escrita al estilo Compose</span>
+<span class="kw">import</span> androidx.compose.material3.*
+<span class="kw">import</span> androidx.compose.runtime.*
+<span class="kw">import</span> androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+<span class="kw">@Composable</span>
+<span class="kw">fun</span> <span class="fn">PantallaProductos</span>(vm: ProductosViewModel) {
+    <span class="cmt">// 'collectAsState' = el estado actual del StateFlow, ya recogido</span>
+    <span class="kw">val</span> estado <span class="kw">by</span> vm.uiState.collectAsStateWithLifecycle()
+
+    <span class="cmt">// OJO: 'estado' es una propiedad delegada, y Kotlin no puede hacer</span>
+    <span class="cmt">// 'smart cast' sobre ella. La solucion es copiarla a una val local.</span>
+    <span class="kw">when</span> (<span class="kw">val</span> actual = estado) {
+        is EstadoUI.Cargando -&gt; CircularProgressIndicator()
+        is EstadoUI.Exito -&gt; Text(<span class="str">"Productos: ${actual.datos.size}"</span>)
+        is EstadoUI.Error -&gt; Text(actual.mensaje)
+    }
+}
+
+<span class="kw">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Contador</span>() {
+    <span class="cmt">// 'remember' guarda el valor entre redibujados de la pantalla</span>
+    <span class="kw">var</span> contador <span class="kw">by</span> remember { mutableStateOf(0) }
+    Button(onClick = { contador++ }) { Text(<span class="str">"Pulsado $contador veces"</span>) }
+}</code></pre>
+      </div>
+      <div class="callout warn"><strong>Un detalle que se paga caro en Compose: el <em>smart cast</em> no funciona sobre
+        una propiedad delegada.</strong> Cuando escribes <code>val estado by ...</code>, <code>estado</code> es una
+        <strong>propiedad delegada</strong>, y el compilador no puede garantizar que su valor no cambie entre dos
+        líneas: por eso se niega a hacer <code>is EstadoUI.Exito</code> sobre ella. La solución que verás en todas las
+        guías del módulo es copiar el valor a una variable local dentro del <code>when</code>:
+        <code>when (val actual = estado)</code>. Es la misma trampa que con los <em>platform types</em> de Java, y
+        tiene la misma solución: <strong>trabaja con una copia local</strong>.</div>
+      <div class="callout tip"><strong>El puente mental: <code>remember</code> ≈ una variable normal.</strong> En Views
+        guardas el valor en una propiedad de la Activity y lo pinto al actualizar; en Compose lo guardas con
+        <code>remember { mutableStateOf(...) }</code> y <strong>el redibujado lo hace el framework</strong> por ti. Es el
+        mismo dato con dos envoltorios distintos.</div>
+      <div class="callout key"><strong>Dos cosas que ya usas y aquí cambian de nombre.</strong>
+        <ul class="plain" style="margin-top:.4rem;">
+          <li><code>collect { }</code> (Views) → <code>collectAsState()</code> / <code>collectAsStateWithLifecycle()</code>
+            (Compose). No cambia el concepto: sigues escuchando un <code>StateFlow</code>.</li>
+          <li><code>sealed class EstadoUI</code> → en Compose es habitual escribirlo como
+            <code>sealed interface EstadoUI</code> con <code>data object</code> para los casos sin datos. Ambas formas
+            compilan igual y el <code>when</code> sigue siendo exhaustivo; la <code>sealed interface</code> es la que
+            verás en las actividades del módulo.</li>
+        </ul>
+      </div>
+      <div class="callout warn"><strong>Lo que <strong style="color:#fff">no</strong> hace esta guía y sí necesitarás
+        después.</strong> En las actividades del módulo aparecen dos piezas más que aquí solo se nombran:
+        <code>stateIn</code> (convierte un <code>Flow</code> en un <code>StateFlow</code> que se comparte entre
+        recolectores, con la política <code>SharingStarted</code> que decide cuánto tiempo se mantiene vivo) y
+        <code>ViewModelProvider.Factory</code> (crea el <code>ViewModel</code> con sus dependencias, cuando ya no basta
+        con el <code>viewModels()</code> sin argumentos). Llega con ellas; lo que sí necesitas de esta sección es el
+        <strong>flujo mental</strong> «el <code>ViewModel</code> publica el estado, la pantalla lo recoge y reacciona».</div>
     </section>
 
     <!-- ============ SECTION 10: ACTIVIDADES ============ -->
@@ -4011,6 +4212,113 @@ dependencies {
         <span class="pill"><a href="https://kotlinlang.org/docs/kotlin-koans.html" target="_blank" rel="noopener"
             style="color:inherit; text-decoration:none;">Kotlin Koans</a></span>
       </p>
+
+      <h3 style="margin-top:1.6rem;">Tu ruta dentro del módulo PMDM</h3>
+      <p>Esta guía es el <strong>punto de partida</strong>: el lenguaje, sin Android. A partir de aquí, el módulo avanza
+        siempre con <strong>Compose</strong>. Estas son las guías en el orden en el que conviene recorrerlas:</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Orden</th>
+              <th>Guía</th>
+              <th>Qué te aporta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#fff">1</strong></td>
+              <td><strong style="color:#fff">UT1 — Kotlin desde Cero</strong> <em>(esta)</em></td>
+              <td>El lenguaje: tipos, nulabilidad, POO, colecciones, corrutinas</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">2</strong></td>
+              <td><a href="PMDM%20-%20UT1%20-%20Android.html">UT1 — Fundamentos Android</a></td>
+              <td>Android Studio, el emulador, <code>Activity</code>, <code>Intent</code>, <code>Logcat</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">3</strong></td>
+              <td><a href="PMDM%20-%20ACT%201.1.html">ACT 1.1 — Android Studio</a></td>
+              <td>Tu primera app real, ya en Compose</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">4</strong></td>
+              <td><a href="PMDM%20-%20ACT%202.1.html">ACT 2.1</a> y
+                <a href="PMDM%20-%20ACT%202.2.html">ACT 2.2</a></td>
+              <td>Login, <code>NavHost</code>, diálogos, Material 3</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">5</strong></td>
+              <td><a href="PMDM%20-%20ACT%203.1.html">ACT 3.1</a></td>
+              <td>CRUD con Room, DataStore, <code>ViewModel</code> y <code>StateFlow</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fff">6</strong></td>
+              <td><a href="PMDM%20-%20ACT%204.1.html">ACT 4.1</a></td>
+              <td>Red, Bluetooth y SMS</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout tip"><strong>El puente está en dos puntos concretos.</strong> En la sección
+        <a href="#android">9 · Kotlin en Android clásico</a> tienes el flujo
+        «<code>ViewModel → StateFlow → la pantalla escucha y pinta</code>» (que es el mismo en Compose) y el
+        <code>when</code> sobre la jerarquía sellada, que es <strong>idéntico</strong> al de las actividades. Si dominas
+        esas dos piezas, en la ACT 1.1 solo tendrás que aprender a <em>pintar</em>: el dato y la lógica ya los sabes.</div>
+
+      <h3 style="margin-top:1.6rem;">Conceptos que llegarán después (mapa de avance)</h3>
+      <p>Estas son las piezas que <strong>no</strong> se explican aquí pero que usan las actividades del módulo. No te las
+        aprendas de memoria: úsala como mapa para saber <strong>qué leer y cuándo</strong>.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Para qué sirve</th>
+              <th>Dónde se explica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>remember</code> + <code>mutableStateOf</code></td>
+              <td>Guardar un valor <strong>dentro de la pantalla</strong> en Compose, de modo que sobreviva a los
+                redibujados</td>
+              <td>ACT 1.1 (sección 1) y el <a href="#android">puente a Compose</a> de la sección 9</td>
+            </tr>
+            <tr>
+              <td><code>collectAsState</code> /
+                <code>collectAsStateWithLifecycle</code></td>
+              <td>Recoger el <code>StateFlow</code> del ViewModel <strong>desde dentro de la pantalla</strong>, sin
+                escribir el <code>collect</code> a mano</td>
+              <td>El <a href="#android">puente a Compose</a> de la sección 9</td>
+            </tr>
+            <tr>
+              <td><code>stateIn</code> + <code>SharingStarted</code></td>
+              <td>Convertir un <code>Flow</code> «frío» en un <code>StateFlow</code> <strong>compartido</strong> entre
+                varias pantallas, y decidir cuánto tiempo se mantiene vivo</td>
+              <td>La sección <a href="#android">9</a> (con ejemplo completo) y ACT 3.1</td>
+            </tr>
+            <tr>
+              <td><code>ViewModelProvider.Factory</code></td>
+              <td>Crear el ViewModel <strong>con dependencias</strong> (un repositorio, por ejemplo), cuando
+                <code>viewModels()</code> a secas ya no basta</td>
+              <td>ACT 3.1</td>
+            </tr>
+            <tr>
+              <td><code>CancellationException</code></td>
+              <td>La excepción <strong>especial</strong> con la que se cancela una corrutina: no es un error, y hay que
+                dejar que se propague</td>
+              <td>Sección 7 (corrutinas) y ACT 4.1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn"><strong>No te saltes el <code>catch</code> ni el
+        <code>CancellationException</code>.</strong> Si en un <code>catch (e: Exception)</code> te tragas la
+        <code>CancellationException</code>, la corrutina <strong>no se cancela</strong>: sigue corriendo cuando debería
+        parar. Por eso lo correcto es <strong>relanzarla</strong>
+        (<code>catch (e: CancellationException) { throw e }</code>) antes del resto. La sección 7 lo explica con detalle.
+      </div>
 
       <h3 style="margin-top:1.6rem;">Librerías esenciales para Android</h3>
       <div class="tblwrap">
