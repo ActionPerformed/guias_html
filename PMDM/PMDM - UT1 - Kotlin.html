@@ -1696,6 +1696,118 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
           </div>
         </div>
 
+        <div class="acc-item">
+          <button class="acc-head"><span>2.7 · Comprobación y conversión de tipos <span class="tag">is · as · smart
+                cast</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <div class="acc-panel-inner">
+              <p>En Java, para comprobar el tipo de un objeto hay que escribir <code>instanceof</code> y, después,
+                hacer una <em>conversión explícita</em> (<code>(Exito) estado</code>) para poder acceder a los miembros
+                propios de ese tipo. Kotlin tiene herramientas para las dos cosas, y además el compilador <strong>se
+                charge de la conversión</strong> cuando puede.</p>
+              <div class="tblwrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Operador</th>
+                      <th>Qué hace</th>
+                      <th>Equivalente en Java</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>is</code></td>
+                      <td>Devuelve <code>true</code> si el objeto <strong>es</strong> de ese tipo (o de un subtipo)</td>
+                      <td><code>instanceof</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>as</code></td>
+                      <td><strong>Convierte</strong> el objeto. Si no es del tipo, lanza
+                        <code>ClassCastException</code></td>
+                      <td><code>(Exito) estado</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>as?</code></td>
+                      <td><strong>Convierte con seguridad</strong>: si no es del tipo, devuelve <code>null</code> en lugar
+                        de fallar</td>
+                      <td>No hay equivalente directo</td>
+                    </tr>
+                    <tr>
+                      <td><em>smart cast</em></td>
+                      <td>Tras comprobar con <code>is</code>, el compilador <strong>ya sabe</strong> el tipo y te deja
+                        acceder a sus miembros sin escribir nada</td>
+                      <td>No hay equivalente: en Java hay que castear a mano</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
+}
+
+<span class="kw">val</span> estado: EstadoUI&lt;List&lt;String&gt;&gt; = EstadoUI.Exito(listOf(<span class="str">"Ana"</span>))
+
+<span class="cmt">// 'is' comprueba el tipo y devuelve un Boolean</span>
+<span class="kw">if</span> (estado is EstadoUI.Exito) {
+    <span class="cmt">// SMART CAST: aquí el compilador ya sabe que 'estado' es Exito,</span>
+    <span class="cmt">// así que deja acceder a .datos sin escribir ningún cast.</span>
+    println(estado.datos)   <span class="cmt">// [Ana]</span>
+}
+
+<span class="cmt">// 'as' convierte; si el tipo no encaja, lanza ClassCastException</span>
+<span class="kw">val</span> exito = estado as EstadoUI.Exito&lt;List&lt;String&gt;&gt;
+println(exito.datos)       <span class="cmt">// [Ana]</span>
+
+<span class="cmt">// 'as?' convierte con seguridad: devuelve null si no encaja</span>
+<span class="kw">val</span> error = estado as? EstadoUI.Error
+println(error?.mensaje)    <span class="cmt">// null (no es un Error)</span>
+
+<span class="cmt">// En Java habría que escribir:</span>
+<span class="cmt">// if (estado instanceof Exito) { ((Exito) estado).getDatos(); }</span></code></pre>
+              </div>
+              <div class="callout key"><strong>Cuándo funciona el <em>smart cast</em> (y cuándo no).</strong> El
+                compilador solo lo aplica si puede <em>garantizar</em> que el tipo no va a cambiar entre la comprobación
+                y el uso. Funciona con: variables <code>val</code> locales, propiedades <code>val</code> de la misma
+                clase, y objetos que no se puedan mutar. <strong>No</strong> funciona con una <code>var</code> local
+                (porque podría cambiar), ni con una propiedad <code>var</code> de otra clase, ni con un
+                <code>var</code> abierto que otro código pueda modificar. En esos casos Kotlin te pide un cast
+                explícito, y por eso no debes fiarte de un <em>smart cast</em> que no compile: es que la garantía no se
+                cumple.</div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// Con 'val' el smart cast funciona</span>
+<span class="kw">val</span> texto: Any = <span class="str">"Hola"</span>
+<span class="kw">if</span> (texto is String) {
+    println(texto.length)   <span class="cmt">// 4  -> el compilador ya sabe que es String</span>
+}
+
+<span class="cmt">// Con 'var' NO se puede hacer smart cast: el tipo puede cambiar</span>
+<span class="kw">var</span> cualquiera: Any = <span class="str">"Hola"</span>
+<span class="kw">if</span> (cualquiera is String) {
+    <span class="cmt">// println(cualquiera.length)  -> error de compilación</span>
+    <span class="cmt">// hay que castear a mano:</span>
+    println((cualquiera as String).length)   <span class="cmt">// 4</span>
+}</code></pre>
+              </div>
+              <div class="callout key"><strong>Equivalencias con Java, de un vistazo:</strong>
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li><code>Unit</code> ≈ <code>void</code> (y <code>Void</code>): el valor de «nada». Kotlin, además,
+                    permite <code>Any</code> como tipo de retorno real.</li>
+                  <li><code>Nothing</code> ≈ <em>no existe equivalente</em> en Java: es el tipo de una función que
+                    <strong>nunca</strong> termina de forma normal (porque lanza). Como es el <em>tipo inferior</em>, el
+                    compilador acepta una función <code>Nothing</code> allí donde se espera cualquier otro tipo.</li>
+                  <li><code>Any</code> ≈ <code>Object</code>, pero <strong>solo para tipos no anulables</strong>; el
+                    equivalente real de <code>Object</code> es <code>Any?</code>.</li>
+                </ul></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1854,6 +1966,23 @@ println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> 
                 <code>EstadoUI&lt;List&lt;Producto&gt;&gt;</code> en otro. El <code>out</code> indica que ese tipo solo se
                 <em>entrega</em>, nunca se recibe: por eso <code>EstadoUI&lt;Nothing&gt;</code> —el estado «sin datos»— sirve
                 como valor inicial de cualquiera.</p>
+              <div class="callout key"><strong>Varianza: qué significa el <code>out</code> (y el <code>in</code>).</strong>
+                En Java, los genéricos son <strong>invariantes</strong>: <code>List&lt;String&gt;</code> <em>no</em> es un
+                <code>List&lt;Any&gt;</code>, aunque <code>String</code> sea un <code>Any</code>. Kotlin añade
+                <strong>varianza declarativa</strong>: se declara en la definición del tipo, con dos palabras reservadas.
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li><code>out T</code> («productor»): el tipo solo <strong>se entrega</strong>. Kotlin te deja usar
+                    <code>EstadoUI&lt;List&lt;String&gt;&gt;</code> donde se espera <code>EstadoUI&lt;List&lt;Any&gt;&gt;</code>,
+                    porque solo vas a leer. Equivale a <code>? extends T</code> en Java.</li>
+                  <li><code>in T</code> («consumidor»): el tipo solo <strong>se recibe</strong>. Equivale a
+                    <code>? super T</code> en Java.</li>
+                  <li>Sin declaración, el tipo es <strong>invariante</strong>, igual que en Java.</li>
+                </ul>
+                <p style="margin-top:.5rem;">Por eso <code>EstadoUI&lt;Nothing&gt;</code> funciona como estado «sin datos»
+                  de cualquier variante: <code>Nothing</code> es el <em>tipo inferior</em> (el único tipo que es subclase
+                  de todos), así que es asignable a cualquier <code>T</code>. Es el mismo truco que
+                  <code>List&lt;Nothing&gt;</code> como lista vacía.</p>
+              </div>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
                 <pre class="code"><code><span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
     <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;()
@@ -2218,6 +2347,148 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
           </div>
         </div>
 
+        <div class="acc-item">
+          <button class="acc-head"><span>4.7 · Funciones de extensión <span class="tag">añadir métodos a
+                cualquier tipo</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24"
+              fill="none">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <div class="acc-panel-inner">
+              <p>Una <strong>función de extensión</strong> te permite «añadir un método» a un tipo que <strong>no
+                controlas</strong>. En Java esto no existe: si quieres un método <code>toInitials()</code> en
+                <code>String</code>, solo puedes escribir una clase de utilidades con métodos estáticos
+                (<code>Utils.toInitials(cadena)</code>) o, si tienes el código, modificar la clase original. En Kotlin
+                escribes <code>"Ana María".toInitials()</code> y ya parece un método de <code>String</code>.</p>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// Internamente, el compilador lo traduce a esto:</span>
+<span class="cmt">// fun toInitials(this: String): String</span>
+<span class="cmt">// El receptor (this) es el primer parámetro.</span>
+<span class="kw">fun</span> String.<span class="fn">toInitials</span>(): String =
+    <span class="kw">this</span>.split(<span class="str">" "</span>)
+        .filter { it.isNotBlank() }
+        .map { it.first().uppercase() }
+        .joinToString(<span class="str">""</span>)
+
+println(<span class="str">"Ana Ruiz Pérez"</span>.toInitials())   <span class="cmt">// ARP</span></code></pre>
+              </div>
+              <div class="callout key"><strong>Tres reglas que hay que conocer:</strong>
+                <ul class="plain" style="margin-top:.4rem;">
+                  <li><strong>No añade miembros de verdad</strong>: el receptor es solo el primer parámetro, así que
+                    desde dentro de la extensión no se puede acceder a los miembros <code>private</code> del
+                    receptor.</li>
+                  <li><strong>Si el tipo ya tiene un miembro con ese nombre, gana el miembro</strong>. Una extensión
+                    nunca «sobrescribe» un método existente: solo añade nombres que no estaban en uso.</li>
+                  <li><strong>Se pueden definir sobre cualquier tipo</strong>, incluidos los de la librería estándar
+                    (<code>String</code>, <code>List</code>) y los tuyos propios.</li>
+                </ul></div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// Extensión sobre un tipo propio</span>
+<span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> nombre: String, <span class="kw">val</span> precio: Double)
+
+<span class="kw">fun</span> Producto.<span class="fn">precioConIva</span>(): Double = precio * 1.21
+<span class="kw">fun</span> Producto.<span class="fn">esBarato</span>(): Boolean = precio &lt; 50
+
+<span class="kw">val</span> raton = Producto(<span class="str">"Ratón"</span>, 25.0)
+println(raton.precioConIva())   <span class="cmt">// 30.25</span>
+println(raton.esBarato())        <span class="cmt">// true</span></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head"><span>4.8 · Operadores de la librería estándar <span class="tag">sumOf · fold ·
+                chunked · zip</span></span><svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24"
+              fill="none">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <div class="acc-panel-inner">
+              <p>La librería estándar de Kotlin trae operadores que en Java había que escribir a mano (o a base de
+                <code>Stream</code>). Estos son los que más aparecen en el material del módulo:</p>
+              <div class="tblwrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Operador</th>
+                      <th>Qué hace</th>
+                      <th>Ejemplo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>sumOf { }</code></td>
+                      <td>Suma el resultado de la lambda sobre todos los elementos</td>
+                      <td><code>precios.sumOf { it }</code> → total</td>
+                    </tr>
+                    <tr>
+                      <td><code>joinToString</code></td>
+                      <td>Une los elementos en un <code>String</code> con un separador</td>
+                      <td><code>nombres.joinToString(", ")</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>fold { }</code></td>
+                      <td>Acumula con un valor inicial; <code>reduce { }</code> es lo mismo sin valor inicial</td>
+                      <td><code>lista.fold(0) { acc, x -&gt; acc + x }</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>chunked(n)</code></td>
+                      <td>Parte la lista en trozos de <code>n</code> elementos</td>
+                      <td><code>lista.chunked(2)</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>zip { }</code></td>
+                      <td>Empareja los elementos de dos colecciones en pares</td>
+                      <td><code>lista.zip(precios)</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>distinct()</code></td>
+                      <td>Elimina duplicados</td>
+                      <td><code>lista.distinct()</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>maxOrNull()</code> / <code>minOrNull()</code></td>
+                      <td>Máximo o mínimo, o <code>null</code> si la lista está vacía (a diferencia de
+                        <code>max()</code>, que lanza excepción)</td>
+                      <td><code>lista.maxOrNull()</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">val</span> precios = listOf(10.0, 20.0, 30.0)
+<span class="kw">val</span> nombres = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>)
+
+<span class="cmt">// sumOf: suma el resultado de la lambda</span>
+<span class="kw">val</span> total = precios.sumOf { it }             <span class="cmt">// 60.0</span>
+<span class="kw">val</span> conIva = precios.sumOf { it * 1.21 }    <span class="cmt">// 72.6</span>
+
+<span class="cmt">// joinToString: une en un texto</span>
+println(nombres.joinToString(<span class="str">", "</span>))      <span class="cmt">// Ana, Bea, Carlos</span>
+println(nombres.joinToString(<span class="str">" | "</span>))      <span class="cmt">// Ana | Bea | Carlos</span>
+
+<span class="cmt">// fold y reduce: acumulan</span>
+<span class="kw">val</span> acumulado = precios.fold(0.0) { acc, p -&gt; acc + p }   <span class="cmt">// 60.0</span>
+<span class="kw">val</span> reduccion = precios.reduce { acc, p -&gt; acc + p }    <span class="cmt">// 60.0</span>
+
+<span class="cmt">// chunked: trocea la lista</span>
+<span class="kw">val</span> trozos = listOf(1, 2, 3, 4, 5).chunked(2)   <span class="cmt">// [[1, 2], [3, 4], [5]]</span>
+
+<span class="cmt">// zip: empareja dos colecciones</span>
+<span class="kw">val</span> pares = listOf(<span class="str">"A"</span>, <span class="str">"B"</span>).zip(listOf(1, 2))   <span class="cmt">// [(A, 1), (B, 2)]</span>
+
+<span class="cmt">// distinct y maxOrNull</span>
+println(listOf(1, 1, 2).distinct())      <span class="cmt">// [1, 2]</span>
+println(precios.maxOrNull())             <span class="cmt">// 30.0</span>
+println(emptyList&lt;Int&gt;().maxOrNull())  <span class="cmt">// null  (max() lanzaría excepción)</span></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -2556,6 +2827,11 @@ dependencies {
         <strong>bloquea el hilo</strong> en el que se ejecuta: solo tiene sentido en el <code>main</code> de una
         aplicación de consola o en una prueba unitaria. <strong>En Android nunca debes usarlo</strong>, porque bloquearías
         el hilo principal y la interfaz se congelaría.</div>
+      <div class="callout key"><strong><code>awaitAll()</code>: cuando hay varias corrutinas en paralelo.</strong> Si
+        lanzas varias corrutinas con <code>async</code> y quieres <strong>todas</strong> sus resultados, no esperas una
+        a una: <code>awaitAll()</code> espera a todas y devuelve la lista de resultados en el mismo orden en que las
+        creaste. Si alguna falla, <code>awaitAll()</code> relanza su excepción, igual que <code>await()</code>. Es el
+        equivalente a <code>CompletableFuture.allOf(...).join()</code> en Java.</div>
       <div class="callout key"><strong>Concurrencia estructurada:</strong> toda corrutina pertenece a un
         <code>CoroutineScope</code>, y cuando ese ámbito se cancela o termina, <strong>todas</strong> sus corrutinas
         hijas se cancelan también. No hay corrutinas «sueltas»: por eso Android ofrece <code>viewModelScope</code>
@@ -2697,6 +2973,101 @@ dependencies {
             <code>Exception</code>, así que ese <code>catch</code> se traga la cancelación de la corrutina y la deja en
             un estado raro. Captúrala y vuelve a lanzarla, como en el ejemplo de arriba.</li>
         </ul></div>
+      <div class="callout key"><strong>De dónde sale <code>viewModelScope</code> y hasta cuándo vive.</strong> Es una
+        <em>extensión</em> que la librería de AndroidX (<code>androidx.lifecycle:lifecycle-viewmodel-ktx</code>) define
+        sobre cualquier <code>ViewModel</code>. Crea un <code>CoroutineScope</code> <strong>ligado al ciclo de vida del
+        ViewModel</strong>: cuando la pantalla se destruye y el ViewModel se limpia, el scope se cancela y
+        <strong>todas</strong> las corrutinas que estaban dentro se cancelan solas. Por eso no hace falta
+        <code>cancel()</code> a mano ni guardar el <code>Job</code> en ninguna variable: el framework se encarga.
+        <p style="margin-top:.5rem;">La alternativa para el código de la Activity es
+          <code>lifecycleScope</code>, que funciona igual pero ligado al ciclo de vida de la <em>pantalla</em>: se
+          cancela cuando la Activity se destruye. La regla práctica: <strong>las corrutinas que piden datos van en el
+          ViewModel</strong> (sobreviven a los cambios de configuración, como girar la pantalla) y <strong>las que
+          pintan en pantalla van en la Activity</strong>.</p>
+      </div>
+
+      <h3 style="margin-top:1.6rem;">Flow y StateFlow: el estado de la pantalla</h3>
+      <p>Un <code>Flow</code> es una <strong>fuente de valores que se recolecta</strong>: algo que emite datos a lo largo
+        del tiempo y al que te «suscribes» con <code>collect { }</code>. Es el sustituto de los <em>callbacks</em> y de
+        los <code>LiveData</code> en el mundo moderno de Android.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Qué es</th>
+              <th>Se puede escribir desde fuera</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Flow&lt;T&gt;</code></td>
+              <td>Secuencia de valores. Es «frío»: el bloque que emite <strong>no se ejecuta</strong> hasta que alguien
+                lo recolecta, y se vuelve a ejecutar por cada recolector</td>
+              <td>No (solo se emite desde dentro del flujo)</td>
+            </tr>
+            <tr>
+              <td><code>StateFlow&lt;T&gt;</code></td>
+              <td>Como un <code>Flow</code>, pero <strong>siempre tiene un valor actual</strong>. Es «caliente»: existe
+                aunque nadie lo esté mirando, y cuando alguien lo recolecta recibe <strong>primero el valor actual</strong>
+                y después los nuevos</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td><code>MutableStateFlow&lt;T&gt;</code></td>
+              <td>La versión <strong>escribible</strong> del anterior. Es la que vive dentro del ViewModel</td>
+              <td>Sí, con <code>.value = ...</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.*
+<span class="kw">import</span> kotlinx.coroutines.flow.*
+
+<span class="cmt">// Un Flow 'frío': el código se ejecuta cada vez que alguien lo recolecta</span>
+<span class="kw">fun</span> <span class="fn">temperaturas</span>(): Flow&lt;Int&gt; = flow {
+    <span class="kw">for</span> (t <span class="kw">in</span> listOf(18, 21, 25)) {
+        emit(t)
+    }
+}
+
+<span class="kw">fun</span> <span class="fn">main</span>() = runBlocking {
+    <span class="cmt">// 'collect' recibe cada valor emitido</span>
+    temperaturas().collect { t -&gt; println(<span class="str">"$t grados"</span>) }
+}</code></pre>
+      </div>
+      <div class="callout key"><strong>Por qué el <code>StateFlow</code> se expone como <code>private val _uiState</code> +
+        <code>val uiState = _uiState.asStateFlow()</code>.</strong> Es una convención de Android que conviene aprender
+        ya: la <strong>propiedad con guion bajo es privada</strong> (solo el ViewModel puede escribir en ella) y la
+        <strong>pública es de solo lectura</strong>, porque <code>asStateFlow()</code> devuelve una vista de solo
+        lectura del <code>MutableStateFlow</code>. Así nadie de fuera puede hacer <code>vm.uiState.value = ...</code> y
+        romper el estado. La Activity solo puede <strong>escuchar</strong>.</div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> kotlinx.coroutines.flow.*
+
+<span class="cmt">// El estado de la pantalla (la misma sealed class de la sección 3.5)</span>
+<span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
+    <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
+}
+
+<span class="cmt">// Dentro del ViewModel: se escribe en privado...</span>
+<span class="kw">private val</span> _uiState = MutableStateFlow&lt;EstadoUI&lt;List&lt;String&gt;&gt;&gt;(EstadoUI.Cargando)
+
+<span class="cmt">// ...y se expone de solo lectura</span>
+<span class="kw">val</span> uiState: StateFlow&lt;EstadoUI&lt;List&lt;String&gt;&gt;&gt; = _uiState.asStateFlow()
+
+<span class="cmt">// 'asStateFlow' NO copia el valor: es una vista del mismo flujo.</span>
+<span class="cmt">// Por eso el valor inicial (Cargando) se ve al instante al recolectarlo.</span></code></pre>
+      </div>
+      <div class="callout warn"><strong><code>collect</code> nunca termina</strong> (es un bucle infinito esperando
+        valores), así que <strong>no puedes llamar a <code>collect</code> directamente en el <code>main</code></strong> de
+        una app de consola: el programa se quedaría colgado. Para probarlo en el Playground, o para leer <strong>un solo
+        valor</strong> y seguir, usa <code>first()</code> (devuelve el valor actual y termina) o
+        <code>first { condición }</code> (espera hasta que se cumpla). En una Activity, el <code>collect</code> va
+        dentro de una corrutina del <code>lifecycleScope</code>, y por eso no bloquea nada.</div>
     </section>
 
     <!-- ============ SECTION 8: INTEROP JAVA ============ -->
@@ -2852,6 +3223,17 @@ dependencies {
     }
 }</code></pre>
       </div>
+      <div class="callout key"><strong>Qué es <code>lateinit</code>.</strong> Es un modificador que permite
+        <strong>inicializar una propiedad más tarde</strong> (normalmente en <code>onCreate</code>) y que solo funciona
+        con tipos <strong>no anulables</strong>. Sin él, el compilador te obligaría a darle un valor inicial
+        (<code>var binding: ActivityMainBinding? = null</code>) y tendrías que comprobar en cada uso si es <code>null</code>
+        (<code>binding?.btnSaludar</code>). Con <code>lateinit</code> el código queda limpio: <code>binding</code> se usa
+        directamente.
+        <p style="margin-top:.5rem;">La contrapartida es que el compilador <strong>no te protege</strong>: si usaras
+          <code>binding</code> antes de asignarlo, saltaría un <code>UninitializedPropertyAccessException</code> en
+          tiempo de ejecución, no un error de compilación. Por eso <code>lateinit</code> se reserva para casos en los
+          que la inicialización es <strong>garantizada</strong> (como el <code>inflate</code> en <code>onCreate</code>).</p>
+      </div>
 
       <h3 style="margin-top:1.6rem;">ViewModel con StateFlow</h3>
       <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -2891,6 +3273,43 @@ dependencies {
       <div class="callout key"><strong>Conexión con la sección 3.5:</strong> este <code>EstadoUI</code> es la misma
         <code>sealed class</code> que vimos en Programación Orientada a Objetos — así se cierra el círculo entre teoría
         y práctica en Android.</div>
+
+      <h3 style="margin-top:1.6rem;">La Activity consume el estado</h3>
+      <p>El <code>StateFlow</code> del ViewModel es el <strong>estado de la pantalla</strong>: el Activity se limita a
+        escucharlo y a pintar lo que llega. La conexión se hace con <code>collect</code>, dentro de una corrutina del
+        <code>lifecycleScope</code>.</p>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">class</span> <span class="fn">MainActivity</span> : AppCompatActivity() {
+    <span class="kw">private val</span> viewModel: ProductosViewModel by viewModels()
+
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="kw">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        viewModel.cargarProductos()
+
+        lifecycleScope.launch {
+            <span class="cmt">// Recolecta el estado: se ejecuta cada vez que cambia</span>
+            viewModel.uiState.collect { estado -&gt;
+                <span class="kw">when</span> (estado) {
+                    is EstadoUI.Cargando -&gt; mostrarCargando()
+                    is EstadoUI.Exito -&gt; mostrarProductos(estado.datos)
+                    is EstadoUI.Error -&gt; mostrarError(estado.mensaje)
+                }
+            }
+        }
+    }
+
+    <span class="kw">private fun</span> <span class="fn">mostrarCargando</span>() { <span class="cmt">/* ... */</span> }
+    <span class="kw">private fun</span> <span class="fn">mostrarProductos</span>(lista: List&lt;Producto&gt;) { <span class="cmt">/* ... */</span> }
+    <span class="kw">private fun</span> <span class="fn">mostrarError</span>(mensaje: String) { <span class="cmt">/* ... */</span> }
+}</code></pre>
+      </div>
+      <div class="callout key"><strong>Por qué <code>collect</code> dentro de <code>lifecycleScope.launch</code>.</strong>
+        Un <code>collect</code> no termina nunca, así que no puede ejecutarse en el hilo principal de forma directa: lo
+        ejecutas dentro de una corrutina. Y al vivir en el <code>lifecycleScope</code>, esa corrutina se cancela
+        automáticamente cuando la Activity se destruye, de modo que <strong>nunca te queda un <code>collect</code>
+        huérfano</strong> escribiendo en vistas que ya no existen.</div>
     </section>
 
     <!-- ============ SECTION 10: ACTIVIDADES ============ -->
@@ -3317,7 +3736,7 @@ dependencies {
 
 <span class="cmt">// Estados de la operación (misma sealed class genérica de la sección 3.5)</span>
 <span class="kw">sealed class</span> <span class="fn">EstadoUI</span>&lt;<span class="kw">out</span> T&gt; {
-    <span class="kw">object</span> Cargando : EstadoUI&lt;Nothing&gt;()
+    <span class="kw">data object</span> Cargando : EstadoUI&lt;Nothing&gt;()
     <span class="kw">data class</span> <span class="fn">Exito</span>&lt;T&gt;(<span class="kw">val</span> datos: T) : EstadoUI&lt;T&gt;()
     <span class="kw">data class</span> <span class="fn">Error</span>(<span class="kw">val</span> mensaje: String) : EstadoUI&lt;Nothing&gt;()
 }
