@@ -31,6 +31,7 @@
       --grad: linear-gradient(120deg, var(--purple) 0%, #B15CFF 45%, var(--orange) 100%);
       --radius: 14px;
       --maxw: 880px;
+      --sbw: 250px;
     }
 
     * {
@@ -39,6 +40,12 @@
 
     html {
       scroll-behavior: smooth;
+    }
+
+    /* Los destinos de los anclas no deben quedar bajo la barra fija */
+    section[id],
+    .acc-item[id] {
+      scroll-margin-top: 12px;
     }
 
     body {
@@ -435,6 +442,96 @@
 
       .navtoggle {
         display: flex;
+      }
+
+      /* La barra superior fija ocupa ~56px: los anclas deben dejar margen */
+      section[id],
+      .acc-item[id] {
+        scroll-margin-top: 70px;
+      }
+    }
+
+    /* ===== MENÚ LATERAL (pantallas anchas) =====
+       Por encima de 900px el menú pasa a ser una columna fija a la izquierda;
+       por debajo se mantiene la barra horizontal con su botón desplegable. */
+    @media (min-width:901px) {
+
+      /* El contenido se aparta para que el menú no lo tape */
+      body {
+        padding-left: var(--sbw);
+      }
+
+      header.nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sbw);
+        border-bottom: none;
+        border-right: 1px solid var(--border-soft);
+        background: rgba(10, 12, 30, .92);
+        overscroll-behavior: contain;
+      }
+
+      .nav-inner {
+        max-width: none;
+        margin: 0;
+        min-height: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .9rem;
+        padding: 1.1rem .9rem 1.4rem;
+      }
+
+      .brand {
+        order: 0;
+        padding: .2rem .3rem .5rem;
+      }
+
+      .search {
+        order: 1;
+        margin-left: 0;
+      }
+
+      .search input {
+        width: 100%;
+      }
+
+      .search input:focus {
+        width: 100%;
+      }
+
+      .search-results {
+        left: 0;
+        right: auto;
+        width: 330px;
+      }
+
+      .navlinks {
+        order: 2;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .1rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+        padding: .3rem .2rem 0 0;
+      }
+
+      .navlinks a {
+        white-space: normal;
+        border-radius: 10px;
+        padding: .5rem .7rem;
+      }
+
+      .navtoggle {
+        order: 3;
+      }
+
+      /* La barra de progreso no debe pasar por encima del menú */
+      .progress-wrap {
+        left: var(--sbw);
       }
     }
 
@@ -1201,9 +1298,14 @@
       position: fixed;
       top: 0;
       left: 0;
+      right: 0;
       height: 3px;
-      background: var(--grad);
       z-index: 200;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--grad);
       width: 0%;
       transition: width .1s;
     }
@@ -1305,6 +1407,7 @@
         color: #16161c;
         font-size: 10.5pt;
         line-height: 1.45;
+        padding-left: 0;
       }
 
       /* Elementos que solo tienen sentido en pantalla */
@@ -1428,7 +1531,7 @@
 
 <body>
   <a href="#inicio" class="skip-link">Saltar al contenido</a>
-  <div class="progress-wrap" id="progressBar"></div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
 
   <header class="nav">
     <div class="nav-inner">
