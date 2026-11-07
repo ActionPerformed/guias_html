@@ -1250,6 +1250,35 @@
         </div>
       </div>
 
+      <div class="callout warn"><strong>Un punto ciego de la comparativa: Kotlin no elimina la encapsulación.</strong> Al
+        ver <code>class Persona(val nombre: String)</code> puede dar la impresión de que la propiedad es pública. Y lo
+        es: sin nada más, <code>var nombre: String</code> se puede <strong>leer y escribir desde fuera</strong>. Para
+        conservar el control, el <em>setter</em> se hace privado con <code>private set</code>. Es exactamente el
+        concepto que en Java resuelves con <code>getNombre()</code> y <code>setNombre()</code> privados: el getter y el
+        setter se escriben solos, pero siguen pudiendo tener distinta visibilidad.</div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="cmt">// Sin nada más: la propiedad es PÚBLICA en lectura y escritura</span>
+<span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">var</span> nombre: String)
+
+<span class="kw">val</span> p = Persona(<span class="str">"Ana"</span>)
+p.nombre = <span class="str">"Bea"</span>   <span class="cmt">// permitido: cualquiera puede cambiarla</span></code></pre>
+      </div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="cmt">// Encapsulada: se LEE desde fuera, pero solo se ESCRIBE dentro</span>
+<span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">var</span> nombre: String) {
+    <span class="kw">fun</span> <span class="fn">renombrar</span>(nuevoNombre: String) {
+        nombre = nuevoNombre
+    }
+}
+
+<span class="kw">val</span> p = Persona(<span class="str">"Ana"</span>)
+println(p.nombre)        <span class="cmt">// Ana   (lectura pública)</span>
+p.renombrar(<span class="str">"Bea"</span>)
+println(p.nombre)        <span class="cmt">// Bea</span>
+
+<span class="cmt">// p.nombre = "Luis"  -> error de compilación: la escritura es privada</span></code></pre>
+      </div>
+
       <h3 style="margin-top:1.8rem;">Entorno de desarrollo</h3>
       <div class="callout key"><strong>Requisitos:</strong> <strong style="color:#fff">Kotlin 2.x</strong> y
         <strong style="color:#fff">JDK 17</strong> (Kotlin 2.x no arranca con JDK 8 ni con JDK 11). En la práctica no
@@ -1692,6 +1721,42 @@ println(<span class="str">"Mi nombre es $nombre y tengo ${edad + 1} años"</span
     i++
 }</code></pre>
               </div>
+              <div class="callout tip"><strong>El <code>for</code> de Kotlin no usa índices… y no hay que implementar
+                ningún <code>Iterator</code>.</strong> En Java, el <code>for-each</code> funciona porque
+                <code>Iterable</code> declara un método <code>iterator()</code> que devuelve un
+                <code>Iterator</code> con <code>hasNext()</code> y <code>next()</code>, y tú implementas esa interfaz
+                cuando creas tu propia colección. En Kotlin el <code>for</code> recorre cualquier <em>iterable</em>
+                y el compilador genera el iterador por ti: tú no implementas nada. Cuando lo que necesitas es el
+                <strong>índice</strong>, usa <code>withIndex()</code> (como en el ejemplo de arriba), que te da ambos
+                valores a la vez.</div>
+              <div class="callout key"><strong>Del bucle clásico a la cadena de operadores.</strong> Los operadores
+                <code>filter</code>, <code>map</code> y compañía no son «magia»: son el resultado de <em>encadenar
+                transformaciones</em>, y su equivalente en Java es el bucle con <code>for</code> (o, si ya usabas
+                Java 8, una cadena de <code>Stream</code>). Las tres formulaciones hacen lo mismo:</div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">val</span> alumnos = listOf(<span class="str">"Ana"</span>, <span class="str">"Bea"</span>, <span class="str">"Carlos"</span>, <span class="str">"Ana"</span>, <span class="str">"David"</span>)
+
+<span class="cmt">// 1) Kotlin clásico: bucle con índice</span>
+<span class="kw">val</span> conA = mutableListOf&lt;String&gt;()
+<span class="kw">for</span> (i in alumnos.indices) {
+    <span class="kw">if</span> (alumnos[i].startsWith(<span class="str">"A"</span>)) conA.add(alumnos[i])
+}
+println(conA)   <span class="cmt">// [Ana, Ana]</span>
+
+<span class="cmt">// 2) Kotlin funcional: la misma operación, encadenada</span>
+<span class="kw">val</span> conA2 = alumnos.filter { it.startsWith(<span class="str">"A"</span>) }
+println(conA2)  <span class="cmt">// [Ana, Ana]</span>
+
+<span class="cmt">// 3) Java 8+: el equivalente con Streams</span>
+<span class="cmt">// List&lt;String&gt; conA3 = alumnos.stream()</span>
+<span class="cmt">//     .filter(a -&gt; a.startsWith("A"))</span>
+<span class="cmt">//     .collect(Collectors.toList());</span></code></pre>
+              </div>
+              <div class="callout tip"><strong>¿Cuándo usar cada uno?</strong> El bucle <code>for</code> cuando
+                necesitas <strong>modificar</strong> algo durante el recorrido, <strong>romper</strong> (<code>break</code>)
+                o <strong>continuar</strong> (<code>continue</code>), porque las cadenas de operadores se leen bien pero
+                no admiten esas dos cosas. La cadena de operadores cuando solo quieres <strong>transformar</strong> una
+                colección: se lee de izquierda a derecha y cada paso es un valor intermedio.</div>
             </div>
           </div>
         </div>
@@ -1808,6 +1873,108 @@ println(error?.mensaje)    <span class="cmt">// null (no es un Error)</span>
           </div>
         </div>
 
+        <div class="acc-item">
+          <button class="acc-head"><span>2.8 · Igualdad e identidad <span class="tag">== · === · equals()</span></span><svg
+              class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg></button>
+          <div class="acc-panel">
+            <div class="acc-panel-inner">
+              <p>Este es el cambio de semántica más silencioso que vas a notar, porque <strong>los símbolos son los
+                mismos pero significan lo contrario</strong>. En Java, para objetos, <code>==</code> compara
+                <em>referencias</em> y el contenido se compara con <code>equals()</code>. En Kotlin está al revés:
+                <code>==</code> compara <strong>valor</strong> (invoca <code>equals()</code> por debajo) y la identidad
+                de referencia se pide con <code>===</code>.</p>
+              <div class="tblwrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Expresión</th>
+                      <th>Qué compara</th>
+                      <th>Equivalente en Java</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>a == b</code></td>
+                      <td><strong>Valor</strong>: llama a <code>equals()</code>. Dos objetos con los mismos campos son
+                        iguales</td>
+                      <td><code>a.equals(b)</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>a === b</code></td>
+                      <td><strong>Identidad</strong>: ¿son <em>el mismo objeto</em> en memoria?</td>
+                      <td><code>a == b</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>a != b</code></td>
+                      <td>Negación de <code>==</code></td>
+                      <td><code>!a.equals(b)</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>a !== b</code></td>
+                      <td>Negación de <code>===</code></td>
+                      <td><code>a != b</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// Una 'data class' genera equals() por ti: compara los campos</span>
+<span class="kw">data class</span> <span class="fn">Producto</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String)
+
+<span class="kw">val</span> p1 = Producto(1, <span class="str">"Teclado"</span>)
+<span class="kw">val</span> p2 = Producto(1, <span class="str">"Teclado"</span>)
+
+println(p1 == p2)     <span class="cmt">// true  -> mismos campos: IGUALES por valor</span>
+println(p1 === p2)    <span class="cmt">// false -> son dos objetos distintos</span>
+
+<span class="cmt">// En Java, para que dos productos fueran iguales habrías escrito:</span>
+<span class="cmt">// p1.equals(p2)   // y además el hashCode()</span></code></pre>
+              </div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// Una clase NORMAL no tiene equals(): '==' compara identidad</span>
+<span class="kw">class</span> <span class="fn">Punto</span>(<span class="kw">val</span> x: Int, <span class="kw">val</span> y: Int)
+
+<span class="kw">val</span> a = Punto(1, 2)
+<span class="kw">val</span> b = Punto(1, 2)
+println(a == b)       <span class="cmt">// false -> sin un equals() propio solo se compara la identidad</span>
+
+<span class="cmt">// Si sobrescribes equals(), DEBES sobrescribir también hashCode()</span>
+<span class="kw">class</span> <span class="fn">Articulo</span>(<span class="kw">val</span> id: Int, <span class="kw">val</span> nombre: String) {
+    <span class="kw">override fun</span> <span class="fn">equals</span>(otro: Any?): Boolean =
+        otro <span class="kw">is</span> Articulo &amp;&amp; id == otro.id
+
+    <span class="kw">override fun</span> <span class="fn">hashCode</span>(): Int = id
+}
+
+println(Articulo(1, <span class="str">"Teclado"</span>) == Articulo(1, <span class="str">"Teclado"</span>))  <span class="cmt">// true</span></code></pre>
+              </div>
+              <div class="callout key"><strong>Por qué <code>equals()</code> y <code>hashCode()</code> van siempre
+                juntos.</strong> Son dos preguntas distintas: <code>equals()</code> dice «¿son el mismo valor?» y
+                <code>hashCode()</code> dice «¿en qué cubo los meto?». Las colecciones hash (<code>HashMap</code>,
+                <code>HashSet</code>) usan el <code>hashCode()</code> para encontrar el cubo y el
+                <code>equals()</code> para confirmar la coincidencia. Si dos objetos son iguales pero tienen distinto
+                <code>hashCode()</code>, buscarán en cubos distintos y <strong>nunca se encontrarán</strong>. Por eso,
+                si escribes <code>equals()</code>, escribe también <code>hashCode()</code>. Una <code>data
+                class</code> te da los dos ya hechos.</div>
+              <div class="callout warn"><strong>La trampa del <code>data class</code> con <code>ByteArray</code>.</strong>
+                El <code>equals()</code> generado compara sus propiedades con <code>==</code>, pero
+                <code>ByteArray</code> se compara por <em>referencia</em>, no por contenido. Dos
+                <code>Completada</code> con los mismos bytes <strong>no son iguales</strong>. Para comparar el
+                contenido, usa <code>contentEquals()</code>:</div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="cmt">// contentEquals() compara el CONTENIDO del array</span>
+<span class="kw">val</span> a = byteArrayOf(1, 2, 3)
+<span class="kw">val</span> b = byteArrayOf(1, 2, 3)
+println(a == b)                      <span class="cmt">// false -> compara referencias</span>
+println(a.contentEquals(b))          <span class="cmt">// true  -> compara el contenido</span></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1845,6 +2012,41 @@ println(error?.mensaje)    <span class="cmt">// null (no es un Error)</span>
     }
 }</code></pre>
               </div>
+              <div class="callout key"><strong><code>init</code> no es un constructor, y Kotlin sí tiene constructores
+                secundarios.</strong> En Java, el cuerpo del constructor va dentro del <code>new Persona(...)</code>. En
+                Kotlin el <strong>constructor primario es solo la lista de parámetros</strong> (no tiene cuerpo), y el
+                bloque <code>init { }</code> es un <strong>bloque de inicialización</strong> que se ejecuta al crear
+                el objeto: es el equivalente al cuerpo del constructor de Java. Si necesitas constructores
+                adicionales, existen los <strong>secundarios</strong>, y se escriben con la palabra
+                <code>constructor</code>:</div>
+              <div class="codewrap"><button class="copy-btn">Copiar</button>
+                <pre class="code"><code><span class="kw">class</span> <span class="fn">Persona</span>(<span class="kw">val</span> nombre: String, <span class="kw">val</span> anioNacimiento: Int) {
+    <span class="kw">val</span> edad: Int
+    <span class="kw">var</span> email: String? = <span class="str">"sin email"</span>
+        <span class="kw">private set</span>
+
+    init {
+        edad = 2026 - anioNacimiento
+        println(<span class="str">"Persona creada: $nombre ($edad años)"</span>)
+    }
+
+    <span class="cmt">// Constructor secundario: además del nombre y el año, se pasa el email.</span>
+    <span class="cmt">// Al tener OTRA firma, no choca con el constructor primario.</span>
+    <span class="kw">constructor</span>(nombre: String, anioNacimiento: Int, email: String) : <span class="kw">this</span>(nombre, anioNacimiento) {
+        <span class="kw">this</span>.email = email
+    }
+}
+
+<span class="kw">val</span> anonima = Persona(<span class="str">"Ana"</span>, 1995)
+<span class="kw">val</span> conEmail = Persona(<span class="str">"Bea"</span>, 1998, <span class="str">"bea@email.com"</span>)
+println(conEmail.email)   <span class="cmt">// bea@email.com</span></code></pre>
+              </div>
+              <div class="callout tip"><strong>El orden de inicialización importa.</strong> Las propiedades se
+                inicializan <strong>en el orden en que están declaradas</strong>, y los bloques <code>init</code> se
+                ejecutan en su sitio, intercalados. Por eso una propiedad declarada después no puede usarse desde un
+                <code>init</code> anterior: el compilador no la conoce todavía. Y el <code>this</code> en un
+                constructor secundario <strong>delega</strong> en el primario (debe ser la primera instrucción), de modo
+                que la inicialización no se duplica.</div>
             </div>
           </div>
         </div>
@@ -1863,6 +2065,9 @@ println(error?.mensaje)    <span class="cmt">// null (no es un Error)</span>
                 <li>Los <strong>miembros también son <code>final</code> por defecto</strong>: un método no se puede
                   sobrescribir salvo que esté marcado <code>open</code>. El modificador <code>override</code> no sustituye
                   al <code>open</code>: se necesitan <strong>los dos</strong>.</li>
+                <li>El <code>override</code> es <strong>obligatorio</strong> (en Java es opcional): si sobrescribes un
+                  método sin escribirlo, el compilador da un error. Kotlin te obliga a <em>declarar</em> la
+                  sobrescritura, para que quien lea el código la vea sin tener que subir a la clase padre.</li>
                 <li>Las propiedades <code>val</code> no se pueden sobrescribir nunca (no tienen setter).</li>
               </ul>
               <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -1948,6 +2153,12 @@ println(usuario1)  <span class="cmt">// Usuario(id=1, nombre=Ana, email=ana@emai
 println(px + py)                      <span class="cmt">// 7</span>
 println(Punto(3, 4))                   <span class="cmt">// Punto(x=3, y=4)  -> la etiqueta no aparece</span></code></pre>
               </div>
+              <div class="callout key"><strong>El <code>equals()</code> de una <code>data class</code> es <em>igualdad
+                estructural</em>, no referencial.</strong> Dos <code>Usuario</code> con los mismos datos son
+                <code>==</code> aunque sean objetos distintos en memoria. En Java, dos objetos con los mismos campos
+                NO eran iguales salvo que hablaras de un <code>record</code> o escribieras el <code>equals()</code> a
+                mano: es el mismo salto conceptual que el de los <code>data class</code> en sí. El detalle está en el
+                apartado 2.8 «Igualdad e identidad».</div>
             </div>
           </div>
         </div>
@@ -2369,9 +2580,9 @@ numeros.none { it > 10 } <span class="cmt">// true (ninguno >10)</span></code></
     <span class="kw">this</span>.split(<span class="str">" "</span>)
         .filter { it.isNotBlank() }
         .map { it.first().uppercase() }
-        .joinToString(<span class="str">""</span>)
+        .joinToString(<span class="str">"."</span>) + <span class="str">"."</span>
 
-println(<span class="str">"Ana Ruiz Pérez"</span>.toInitials())   <span class="cmt">// ARP</span></code></pre>
+println(<span class="str">"Ana María Pérez"</span>.toInitials())   <span class="cmt">// A.M.P.</span></code></pre>
               </div>
               <div class="callout key"><strong>Tres reglas que hay que conocer:</strong>
                 <ul class="plain" style="margin-top:.4rem;">
@@ -2742,6 +2953,20 @@ with(persona) {
         capturarlas. Solo se capturan las que tú decidas. Esto cambia la interoperabilidad: cuando llames a una API de
         <strong>Java</strong> que declare <code>throws IOException</code>, Kotlin te deja llamarla sin nada; el
         compilador no te avisa, así que la responsabilidad de comprobarla es tuya.</div>
+      <div class="callout tip"><strong>Si Java necesita saberlo, se lo dices con <code>@Throws</code>.</strong> Kotlin
+        puede <em>anotar</em> una función para que, en el bytecode generado, declare la excepción que Java espera.
+        Es el puente para escribir una función en Kotlin que llamen código Java:</div>
+      <div class="codewrap"><button class="copy-btn">Copiar</button>
+        <pre class="code"><code><span class="kw">import</span> java.io.IOException
+
+<span class="cmt">// En Kotlin NO se escribe 'throws'. Si quien llama es Java y</span>
+<span class="cmt">// espera una IOException, se declara con la anotación @Throws:</span>
+<span class="kw">@Throws</span>(IOException::class)
+<span class="kw">fun</span> <span class="fn">leerDeFichero</span>(ruta: String): String {
+    <span class="cmt">// Aquí dentro tú decides si capturarla o no</span>
+    <span class="kw">return</span> java.io.File(ruta).readText()
+}</code></pre>
+      </div>
     </section>
 
     <!-- ============ SECTION 7: CORRUTINAS ============ -->
@@ -3384,7 +3609,8 @@ dependencies {
             <button class="reveal-btn" data-target="hint-3">💡 Mostrar pista</button>
             <button class="reveal-btn" data-target="sol-3">✅ Ver resolución</button>
           </div>
-          <div class="reveal-panel hint-panel" id="hint-3">Usa un bucle <code>while</code> o <code>do-while</code>.
+          <div class="reveal-panel hint-panel" id="hint-3">Crea una <code>var contador = n</code> para poder decrementarla
+            (los parámetros son inmutables) y usa un bucle <code>while</code>.
           </div>
           <div class="reveal-panel" id="sol-3">
             <div class="codewrap"><button class="copy-btn">Copiar</button>
@@ -3400,6 +3626,13 @@ dependencies {
     repetirCondicional(5) { println(<span class="str">"Iteración: $it"</span>) }
 }</code></pre>
             </div>
+            <div class="callout tip"><strong>¿Por qué <code>var contador = n</code> y no <code>n--</code> directamente?</strong>
+              Porque <strong>los parámetros de una función son inmutables</strong>, igual que un <code>val</code>: Kotlin no
+              te deja reasignarlos. En Java, <code>n--</code> sobre el parámetro funcionaba sin problema (el parámetro
+              era una variable normal y modificable), así que el reflejo natural al ver Kotlin es pensar «aquí hay que
+              declarar <code>n</code> como <code>var</code>», y eso no es posible. La solución es <strong>copiar el
+              valor a una variable local</strong> y decrementar la copia. Es el mismo concepto que
+              <code>val</code> vs <code>var</code>, aplicado a un caso con el que te vas a topar.</div>
           </div>
         </div>
 
