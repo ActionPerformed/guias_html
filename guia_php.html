@@ -480,6 +480,127 @@ footer{
 .totop.show{opacity:1; pointer-events:auto;}
 .totop:hover{transform:translateY(-2px); border-color:var(--accent);}
 </style>
+
+<style>
+/* red-guias:estilo */
+/* Bloque "Sigue tu ruta": enlaces cruzados entre guías. */
+.red-guias{
+  /* Reset: hay guías que estilan el <nav> genérico (sticky, fijo, oculto). */
+  position:static;
+  top:auto;
+  right:auto;
+  bottom:auto;
+  left:auto;
+  z-index:auto;
+  float:none;
+  transform:none;
+  display:block;
+  width:auto;
+  height:auto;
+  max-width:none;
+  min-height:0;
+  max-height:none;
+  overflow:visible;
+  flex-direction:row;
+  flex-wrap:nowrap;
+  align-items:stretch;
+  gap:normal;
+  backdrop-filter:none;
+  border-right:none;
+  border-bottom:none;
+  border-top:none;
+  border-left:none;
+  margin:2.5rem 0 0;
+  padding:1.25rem 1.4rem;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  color:var(--text);
+}
+.red-guias h2{
+  display:block;
+  margin:0 0 .35rem;
+  font-size:1.05rem;
+  line-height:1.3;
+  letter-spacing:.02em;
+  color:var(--text);
+}
+.red-guias p.red-guias-lead{
+  margin:0 0 .9rem;
+  font-size:.95rem;
+  line-height:1.55;
+  color:var(--text-dim);
+}
+.red-guias ul.red-guias-lista{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:.55rem;
+}
+.red-guias li{
+  display:grid;
+  gap:.15rem;
+  max-width:none;
+  padding:.65rem .8rem;
+  border-left:3px solid var(--accent);
+}
+.red-guias li > span.red-guias-tipo{
+  font-size:.68rem;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+}
+.red-guias a{
+  font-weight:600;
+  color:var(--accent);
+  text-decoration:none;
+  padding:0;
+  border-radius:0;
+  background:none;
+  border-bottom:1px solid transparent;
+}
+.red-guias a::before{
+  content:none;
+}
+.red-guias a:hover,
+.red-guias a:focus-visible{
+  border-bottom-color:var(--accent);
+  background:none;
+  color:var(--accent);
+}
+.red-guias li > span.red-guias-motivo{
+  font-size:.85rem;
+  line-height:1.5;
+  color:var(--text-dim);
+}
+.red-guias p.red-guias-indice{
+  margin:1rem 0 0;
+  font-size:.9rem;
+}
+.red-guias p.red-guias-indice a{
+  color:var(--text-dim);
+  font-weight:500;
+  border-bottom:1px dotted var(--border);
+}
+@media print{
+  .red-guias{
+    display:block !important;
+    position:static !important;
+    background:#fff !important;
+    border-color:#bbb !important;
+    color:#111 !important;
+  }
+  .red-guias h2{color:#111 !important}
+  .red-guias p.red-guias-lead,
+  .red-guias li > span.red-guias-motivo,
+  .red-guias p.red-guias-indice a{color:#444 !important}
+  .red-guias li{background:#f6f6f6 !important;border-left-color:#888 !important}
+  .red-guias li > span.red-guias-tipo,
+  .red-guias a{color:#111 !important}
+}
+</style>
 </head>
 <body>
 
@@ -2008,6 +2129,19 @@ $total = count($usuarios);
       </div>
     </section>
 
+
+<!-- red-guias -->
+<nav class="red-guias" aria-labelledby="red-guias-t">
+  <h2 id="red-guias-t">Sigue tu ruta</h2>
+  <p class="red-guias-lead">PHP del lado del servidor: formularios y conexión a bases de datos. ASETE es donde este lenguaje se pone serio.</p>
+  <ul class="red-guias-lista">
+    <li><span class="red-guias-tipo">También te sirve</span><a href="ASETE/ASETE%20-%20UT0.html">UT0 · Lenguajes de guiones de servidor (PHP 8)</a><span class="red-guias-motivo">La teoría completa de PHP 8, comparada con Node, Python y Java.</span></li>
+    <li><span class="red-guias-tipo">También te sirve</span><a href="ASETE/ASETE%20-%20ACT%202.1.html">Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)</a><span class="red-guias-motivo">La POO en PHP, paso a paso y con proyecto.</span></li>
+    <li><span class="red-guias-tipo">También te sirve</span><a href="guia_valor_vs_referencia.html">Valor vs referencia (Java y PHP)</a><span class="red-guias-motivo">La comparación Java/PHP que aclara las diferencias de este lenguaje.</span></li>
+  </ul>
+  <p class="red-guias-indice"><a href="index.html">← Volver al catálogo de guías</a></p>
+</nav>
+<!-- /red-guias -->
     <footer>
       Guía de referencia rápida de PHP · 2º DAM / ASIR — documento único, autocontenido, sin dependencias externas más allá de las tipografías.
     </footer>

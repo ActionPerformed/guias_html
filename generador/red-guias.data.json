@@ -1,0 +1,473 @@
+{
+  "_comentario": "Fuente de verdad de la red de enlaces entre guías. Cada entrada declara: css (mapa de roles -> variable real del propio fichero), lead (una frase de orientacion) y enlaces (destino + motivo pedagogico). El inyector resuelve rutas relativas y genera el bloque HTML y el <style> de cada guia.",
+
+  "titulos": {
+    "guia-ia-bachillerato.html": "IA para estudiar (EBAU)",
+    "guia-ia-fp.html": "IA para estudiar (FP)",
+    "guia-que-ia-usar.html": "Qué IA usar para cada tarea",
+    "guia_prompts.html": "Escribe prompts que funcionan",
+    "guia_batch_windows.html": "Scripts Batch",
+    "guia_css_daw.html": "Dominando CSS",
+    "guia_git.html": "Git para FP",
+    "guia_latex.html": "LaTeX",
+    "guia_lean.html": "Introducción a Lean",
+    "guia_linux.html": "Introducción a Linux",
+    "guia_php.html": "PHP",
+    "guia_php_vulnerabilidad.html": "Parche urgente: PHP-FPM y WordPress en Docker",
+    "guia_proyecto_asir.html": "Proyecto de fin de ciclo ASIR",
+    "guia_react_encuesta.html": "Encuesta en React",
+    "guia_redes_daw.html": "Fundamentos de redes",
+    "guia_responsive_bootstrap.html": "De web fija a web responsive",
+    "guia_sql.html": "SQL",
+    "guia_valor_vs_referencia.html": "Valor vs referencia (Java y PHP)",
+    "ASETE/ASETE - UT0.html": "UT0 · Lenguajes de guiones de servidor (PHP 8)",
+    "ASETE/ASETE - UT1.html": "UT1 · Banco de pruebas PHP",
+    "ASETE/ASETE - ACT 1.1.html": "Actividad 1.1 · Mini-Biblioteca PHP",
+    "ASETE/ASETE - ACT 1.2.html": "Actividad 1.2 · Stack LAMP con Docker",
+    "ASETE/ASETE - ACT 1.3.html": "Actividad 1.3 · Login con PHP (sesiones y roles)",
+    "ASETE/ASETE - ACT 2.1.html": "Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)",
+    "ASETE/ASETE - ACT 2.2.html": "Actividad 2.2 · Composer y autoloading",
+    "ASETE/ASETE - ACT 3.1 - PUENTE.html": "Puente de la 3.1 · De la MiniApp a Laravel",
+    "ASETE/ASETE - ACT 3.1.html": "Actividad 3.1 · Taller Laravel con Docker",
+    "IAW/IAW - UT1.html": "UT1 · Implantación de aplicaciones web",
+    "IAW/IAW - UT4.html": "UT4 · Ofimática web",
+    "IAW/IAW - ACT 1.1.html": "Actividad 1.1 · Stack LEMP con Docker",
+    "IAW/IAW - ACT 2.1.html": "Actividad 2.1 · WordPress sobre LEMP",
+    "IAW/IAW - ACT 3.1.html": "Actividad 3.1 · Personalización integral de WordPress",
+    "IAW/IAW - ACT 4.1.html": "Actividad 4.1 · Nextcloud sobre LEMP",
+    "PMDM/PMDM - UT1 - Kotlin.html": "UT1 · Kotlin desde cero",
+    "PMDM/PMDM - UT1 - Android.html": "UT1 · Fundamentos de desarrollo Android",
+    "PMDM/PMDM - ACT 1.1.html": "Actividad 1.1 · Android Studio y Kotlin",
+    "PMDM/PMDM - ACT 2.1.html": "Actividad 2.1 · Login con Jetpack Compose",
+    "PMDM/PMDM - ACT 2.2.html": "Actividad 2.2 · NavHost, registro y diálogos",
+    "PMDM/PMDM - ACT 3.1.html": "Actividad 3.1 · CRUD con Room y DataStore",
+    "PMDM/PMDM - ACT 4.1.html": "Actividad 4.1 · Red, Bluetooth y SMS"
+  },
+
+  "guias": [
+    {
+      "fichero": "guia-ia-bachillerato.html",
+      "lead": "Aprendes a estudiar con IA para la EBAU. Los dos manuales que la sostienen —qué herramienta usar y cómo escribirle— están enlazados abajo.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--accent1", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia-que-ia-usar.html", "motivo": "Qué herramienta encaja en cada tipo de tarea antes de abrir el chat." },
+        { "tipo": "tema", "destino": "guia_prompts.html", "motivo": "El entrenamiento de prompts que hace que las respuestas rindan." },
+        { "tipo": "tema", "destino": "guia_lean.html", "motivo": "Las matemáticas de Selectividad, pero verificadas por máquina y no por confianza." }
+      ]
+    },
+    {
+      "fichero": "guia-ia-fp.html",
+      "lead": "La misma idea que la guía de EBAU, adaptada al aula de FP. Empieza por saber qué herramienta vas a usar.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--accent1", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia-que-ia-usar.html", "motivo": "Qué herramienta encaja en cada tipo de tarea antes de abrir el chat." },
+        { "tipo": "tema", "destino": "guia_prompts.html", "motivo": "El entrenamiento de prompts que hace que las respuestas rindan." },
+        { "tipo": "tema", "destino": "guia_proyecto_asir.html", "motivo": "Aplicado al proyecto de fin de ciclo: la documentación también se redacta con ayuda." }
+      ]
+    },
+    {
+      "fichero": "guia-que-ia-usar.html",
+      "lead": "Comparativa de herramientas por tarea. La técnica para hablarles está en la guía de prompts.",
+      "css": { "surface": "--card", "ink": "--text", "muted": "--dim", "line": "--border", "accent": "--math", "radius": "12px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_prompts.html", "motivo": "La técnica de prompt que hay detrás de cada respuesta buena." },
+        { "tipo": "tema", "destino": "guia-ia-fp.html", "motivo": "El mismo catálogo con el contexto del aula de FP." },
+        { "tipo": "tema", "destino": "guia-ia-bachillerato.html", "motivo": "La variante para preparar la EBAU." }
+      ]
+    },
+    {
+      "fichero": "guia_prompts.html",
+      "lead": "Cuatro semanas de entrenamiento en ingeniería de prompts. Cada ejercicio da más resultado si sabes qué herramienta vas a usar.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--accent1", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia-que-ia-usar.html", "motivo": "Antes de escribir el prompt: qué modelo vas a interrogar." },
+        { "tipo": "tema", "destino": "guia-ia-fp.html", "motivo": "La guía de IA para FP, con el contexto del aula." },
+        { "tipo": "tema", "destino": "guia-ia-bachillerato.html", "motivo": "La variante para preparar la EBAU." }
+      ]
+    },
+    {
+      "fichero": "guia_batch_windows.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /wrap -->" },
+      "lead": "Automatización con scripts .BAT y CMD en Windows. Si vienes de la terminal de Linux, esta es la otra puerta de entrada.",
+      "css": { "surface": "--surface", "ink": "--text", "muted": "--text2", "line": "--border", "accent": "--glow2", "radius": "6px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "La misma idea de terminal, en el sistema con el que trabaja el aula." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "Automatizar tareas y versionar el resultado: los dos scripts del día a día." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - ACT 1.1.html", "motivo": "El proyecto Android, que también se prepara con scripts." }
+      ]
+    },
+    {
+      "fichero": "guia_css_daw.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /wrap -->" },
+      "lead": "Selectores, box model, flexbox y animaciones. Este CSS es también el que hay debajo del tema de WordPress de IAW.",
+      "css": { "surface": "--ink2", "ink": "--text", "muted": "--text2", "line": "--border2", "accent": "--mag", "radius": "8px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_responsive_bootstrap.html", "motivo": "CSS da la base sobre la que se monta el diseño adaptable." },
+        { "tipo": "tema", "destino": "IAW/IAW - ACT 3.1.html", "motivo": "Personalizar el tema de WordPress es escribir CSS en producción." },
+        { "tipo": "tema", "destino": "guia_react_encuesta.html", "motivo": "El mismo CSS aplicado a una aplicación que funciona." }
+      ]
+    },
+    {
+      "fichero": "guia_git.html",
+      "lead": "Git con línea de metro para DAM, DAW y ASIR. Todo lo que evaluates en estos módulos —Android, Laravel, proyecto ASIR— empieza con un repositorio.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--mut", "line": "--ln", "accent": "--b", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Git se usa desde la terminal: aquí tienes los comandos que vas a necesitar." },
+        { "tipo": "tema", "destino": "guia_proyecto_asir.html", "motivo": "El proyecto de fin de ciclo es un repositorio de principio a fin." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - ACT 1.1.html", "motivo": "Android Studio pide repositorio desde el primer día." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 3.1.html", "motivo": "El taller de Laravel también se versiona con Git." }
+      ]
+    },
+    {
+      "fichero": "guia_latex.html",
+      "lead": "Composición tipográfica, fórmulas y documentos técnicos. Es la herramienta con la que se escribe la memoria del proyecto.",
+      "css": { "surface": "--paper-alt", "ink": "--ink", "muted": "--ink-soft", "line": "--border", "accent": "--accent", "radius": "2px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_lean.html", "motivo": "Las mismas matemáticas, pero verificadas por máquina y no por confianza." },
+        { "tipo": "tema", "destino": "guia_proyecto_asir.html", "motivo": "La memoria del proyecto, compuesta con esta herramienta." }
+      ]
+    },
+    {
+      "fichero": "guia_lean.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /wrap -->" },
+      "lead": "Demostraciones matemáticas que se escriben, se verifican y no mienten. Si lo que quieres es escribir y publicar, LaTeX es lo tuyo.",
+      "css": { "surface": "--paper2", "ink": "--ink", "muted": "--ink2", "line": "--line", "accent": "--indigo", "radius": "6px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_latex.html", "motivo": "La herramienta hermana para escribir, componer y publicar." },
+        { "tipo": "tema", "destino": "guia-ia-bachillerato.html", "motivo": "Las matemáticas de Selectividad, con verificación automática." }
+      ]
+    },
+    {
+      "fichero": "guia_linux.html",
+      "anclaje": { "tipo": "fin" },
+      "lead": "Sistema de archivos, permisos y terminal. Es el suelo de ASETE (Docker) y de IAW (servidores): sin esto, el resto no se sostiene.",
+      "css": { "surface": "--bg2", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--green", "radius": "8px", "dark": true, "ancho": "1100px" },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_batch_windows.html", "motivo": "La otra terminal: la de Windows, para cuando el equipo del aula no es Linux." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "Git se usa desde la terminal: los comandos que necesitas ya están aquí." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 1.2.html", "motivo": "La primera actividad de ASETE usa Docker y terminal desde el primer día." }
+      ]
+    },
+    {
+      "fichero": "guia_php.html",
+      "lead": "PHP del lado del servidor: formularios y conexión a bases de datos. ASETE es donde este lenguaje se pone serio.",
+      "css": { "surface": "--surface", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--accent", "radius": "12px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "ASETE/ASETE - UT0.html", "motivo": "La teoría completa de PHP 8, comparada con Node, Python y Java." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 2.1.html", "motivo": "La POO en PHP, paso a paso y con proyecto." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "La comparación Java/PHP que aclara las diferencias de este lenguaje." }
+      ]
+    },
+    {
+      "fichero": "guia_php_vulnerabilidad.html",
+      "lead": "Actualizar PHP-FPM y WordPress en Docker sin romper el despliegue. Se lee con el despliegue delante, no como teoría suelta.",
+      "css": { "surface": "--paper", "ink": "--ink", "muted": "--mut", "line": "--line", "accent": "--term", "radius": "8px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "IAW/IAW - ACT 2.1.html", "motivo": "El despliegue de WordPress en Docker que hay que proteger." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 1.2.html", "motivo": "Las mismas imágenes Docker, vistas desde ASETE." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 3.1.html", "motivo": "Un despliegue de Laravel en Docker que también hay que mantener al día." }
+      ]
+    },
+    {
+      "fichero": "guia_proyecto_asir.html",
+      "lead": "Guía orientativa del proyecto de fin de ciclo. Versionar, documentar y escribir: las tres herramientas están enlazadas abajo.",
+      "css": { "surface": "--paper", "ink": "--ink", "muted": "--mute", "line": "--rule", "accent": "--comp", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "Versionar el proyecto desde el primer día: el histórico es la nota más fácil de recuperar." },
+        { "tipo": "tema", "destino": "guia_latex.html", "motivo": "La memoria del proyecto, bien compuesta." },
+        { "tipo": "tema", "destino": "guia-ia-fp.html", "motivo": "IA para redactar la documentación sin perder de vista el trabajo propio." }
+      ]
+    },
+    {
+      "fichero": "guia_react_encuesta.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /wrap -->" },
+      "lead": "Hooks, componentes y una aplicación de votaciones en tiempo real.",
+      "css": { "surface": "--s2", "ink": "--text", "muted": "--muted", "line": "--border", "accent": "--accent", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_css_daw.html", "motivo": "Los estilos de la interfaz que construyes, con las bases bien puestas." },
+        { "tipo": "tema", "destino": "guia_responsive_bootstrap.html", "motivo": "Hacer que la encuesta se vea bien en cualquier pantalla." },
+        { "tipo": "tema", "destino": "guia-ia-fp.html", "motivo": "La guía de IA para FP, útil cuando te atasques en el código." }
+      ]
+    },
+    {
+      "fichero": "guia_redes_daw.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /wrap -->" },
+      "lead": "OSI, TCP/IP, IPv4, subredes y VLSM. Los puertos son justo lo que hace que un despliegue funcione o no.",
+      "css": { "surface": "--s1", "ink": "--text", "muted": "--text2", "line": "--border", "accent": "--blue", "radius": "8px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Configurar y diagnosticar la red desde la terminal." },
+        { "tipo": "tema", "destino": "IAW/IAW - ACT 1.1.html", "motivo": "Un despliegue real donde cada puerto y cada DNS importan." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - ACT 4.1.html", "motivo": "Conectividad en Android: la misma red, vista desde el móvil." }
+      ]
+    },
+    {
+      "fichero": "guia_responsive_bootstrap.html",
+      "anclaje": { "tipo": "marca", "marca": "<!-- /content -->" },
+      "lead": "De web fija a adaptable con Bootstrap. Necesitas DOM y CSS con solidez antes de que el framework te ahorre trabajo.",
+      "css": { "surface": "--surface", "ink": "--text", "muted": "--muted", "line": "--border", "accent": "--accent", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_css_daw.html", "motivo": "El CSS que Bootstrap asume y amplifica." },
+        { "tipo": "tema", "destino": "guia_react_encuesta.html", "motivo": "Otra manera de hacer adaptable, con JavaScript en lugar de clases." }
+      ]
+    },
+    {
+      "fichero": "guia_sql.html",
+      "lead": "Consultas, joins, subconsultas y diseño relacional. Debajo de WordPress, de PHP y de Android hay siempre una base de datos.",
+      "css": { "surface": "--panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--cyan", "radius": "3px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "La misma SQL aplicada desde PHP." },
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 1.1.html", "motivo": "La base de datos de la Mini-Biblioteca, en uso real." },
+        { "tipo": "tema", "destino": "IAW/IAW - ACT 1.1.html", "motivo": "MariaDB en contenedores: la misma SQL, otro despliegue." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - ACT 3.1.html", "motivo": "Room: SQL dentro de Android." }
+      ]
+    },
+    {
+      "fichero": "guia_valor_vs_referencia.html",
+      "lead": "Java y PHP comparados con simuladores interactivos. Es el puente entre lo que ya sabes y los dos módulos de servidor.",
+      "css": { "surface": "--pn", "ink": "--tx", "muted": "--mu", "line": "--ln", "accent": "--p", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "tema", "destino": "ASETE/ASETE - ACT 2.1.html", "motivo": "El salto de Java a PHP aplicado a una POO de verdad." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "PHP con los mismos simuladores, para el otro lado de la comparación." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "El mismo salto de Java a Kotlin, que es el tercero." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - UT0.html",
+      "lead": "La teoría del módulo: PHP 8 con referencias comparadas a Node.js, Python y Java. En la UT1 deja de ser teoría.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--ink-soft", "line": "--line", "accent": "--accent", "radius": "8px", "dark": false },
+      "enlaces": [
+        { "tipo": "continua", "destino": "ASETE/ASETE - UT1.html", "motivo": "La UT1 es el banco de pruebas donde ejecutas lo que aquí lees." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Resumen rápido de PHP: úsalo para repasar sintaxis sin salir de la guía." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "El puente Java → PHP con simuladores: qué cambia con los objetos y las referencias." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - UT1.html",
+      "lead": "El banco de pruebas PHP del módulo: un entorno ejecutable donde todo lo de la UT0 se puede probar.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--teal", "radius": "4px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - UT0.html", "motivo": "La UT0 es la teoría que este banco de pruebas ejecuta." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 1.1.html", "motivo": "La actividad 1.1 monta la Mini-Biblioteca sobre este entorno." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "El banco de pruebas incluye la base de datos: aquí la SQL se ve en contexto." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Referencia rápida de PHP mientras trabajas en el banco." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 1.1.html",
+      "anclaje": { "tipo": "envoltura", "selector": "div.wrap" },
+      "lead": "La primera actividad evaluable del módulo: una Mini-Biblioteca en PHP dentro del banco de pruebas.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--olive", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - UT1.html", "motivo": "Antes de empezar necesitas el banco de pruebas PHP de la UT1." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 1.2.html", "motivo": "La 1.2 saca esa misma aplicación de tu máquina y la mete en contenedores." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Sintaxis de PHP y formularios: la referencia que usarás a diario." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "De Java a PHP: el paso a objetos y clases que se repite en cada actividad." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 1.2.html",
+      "lead": "El salto de «funciona en mi portátil» a «funciona en un servidor»: el stack LAMP completo sobre Docker.",
+      "css": { "surface": "--bg-panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--docker", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 1.1.html", "motivo": "La MiniApp de la 1.1 es la aplicación que despliegas aquí." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 1.3.html", "motivo": "Con el stack en marcha, la 1.3 añade login, sesiones y roles." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "La terminal es donde se escriben los comandos de Docker que vas a usar." },
+        { "tipo": "tema", "destino": "guia_php_vulnerabilidad.html", "motivo": "El mismo problema de actualizar imágenes, aplicado a un despliegue real." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 1.3.html",
+      "lead": "Login con PHP: sesiones, cookies y roles sobre el stack que ya tienes desplegado.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--olive", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 1.2.html", "motivo": "El login se monta sobre el stack LAMP de la 1.2." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 2.1.html", "motivo": "La 2.1 reescribe la biblioteca como POO: la misma app, mejor estructurada." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "El esquema de usuarios y roles es SQL, y hay que saber escribirlo." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "Cómo se conserva el estado entre peticiones: el tema central de esta actividad." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 2.1.html",
+      "lead": "La misma Mini-Biblioteca, ahora con clases, herencia y autoload. El momento en que el código deja de ser un fichero gigante.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--olive", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 1.3.html", "motivo": "Las sesiones y el login de la 1.3 son la base funcional que aquí se reescribe." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 2.2.html", "motivo": "Con el proyecto ordenado en clases, la 2.2 añade Composer y PSR-4." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "El puente Java → PHP: objetos, constructores y valor frente a referencia." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Sintaxis de PHP con más detalle del que da la actividad." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 2.2.html",
+      "lead": "Composer, autoloading, namespaces y PSR-4: las reglas que permiten que un proyecto crezca sin romperse.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--olive", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 2.1.html", "motivo": "La MiniApp en POO de la 2.1 es lo que Composer va a organizar." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 3.1 - PUENTE.html", "motivo": "El puente de la 3.1 explica, con el código delante, cómo se pasa de esto a Laravel." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "Versiona el proyecto antes de que Composer añada dependencias: los conflictos se resuelven con diff." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Autoload y namespaces encajan aquí con la referencia de PHP." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 3.1 - PUENTE.html",
+      "lead": "La lectura que va antes del taller: cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": "--muted", "line": "--line", "accent": "--teal", "radius": "10px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 2.2.html", "motivo": "La 2.2 deja el proyecto con Composer: la estructura que Laravel va a sustituir." },
+        { "tipo": "continua", "destino": "ASETE/ASETE - ACT 3.1.html", "motivo": "El taller de la 3.1 aplica lo que acabas de leer, ya en Laravel y Docker." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "La misma lógica en PHP sin framework, para poder comparar." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Los comandos de terminal que usaremos en el despliegue." }
+      ]
+    },
+    {
+      "fichero": "ASETE/ASETE - ACT 3.1.html",
+      "lead": "El taller final del módulo: Laravel, Apache, PHP y MariaDB en contenedores, funcionando.",
+      "css": { "surface": "--card", "ink": "--ink", "muted": null, "line": "--line", "accent": "--teal", "radius": "10px", "dark": false, "mutedOpacidad": 0.72 },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "ASETE/ASETE - ACT 3.1 - PUENTE.html", "motivo": "El puente de la 3.1 es la lectura previa que da sentido a este taller." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "El taller se opera desde la terminal: comandos, volúmenes y permisos." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "El proyecto de Laravel también se versiona: el taller se entrega en un repositorio." },
+        { "tipo": "tema", "destino": "guia_php_vulnerabilidad.html", "motivo": "Mantener al día las imágenes del taller es exactamente el problema que se trata allí." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - UT1.html",
+      "lead": "La teoría del módulo: qué es una aplicación web y cómo se implanta. En la actividad 1.1 todo esto coge forma.",
+      "css": { "surface": "--paper-raised", "ink": "--ink", "muted": "--ink-dim", "line": "--rule", "accent": "--accent", "radius": "8px", "dark": false },
+      "enlaces": [
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 1.1.html", "motivo": "La teoría se aplica en la actividad 1.1, con un stack LEMP real." },
+        { "tipo": "tema", "destino": "guia_redes_daw.html", "motivo": "Puertos, DNS y subredes: lo que hay detrás de cada despliegue." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Terminal y permisos: la base para administrar el servidor." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - UT4.html",
+      "lead": "Ofimática web: qué es, cómo se clasifica y cómo elegir suite. En la actividad 4.1 la usarás de verdad.",
+      "css": { "surface": "--bl", "ink": "--ink", "muted": "--mu", "line": "--bd", "accent": "--b", "radius": "14px", "dark": false },
+      "enlaces": [
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 4.1.html", "motivo": "La ofimática web en la práctica: Nextcloud lleva una suite ofimática dentro." },
+        { "tipo": "tema", "destino": "guia_proyecto_asir.html", "motivo": "Documentos y memoria del proyecto: el otro uso de la ofimática." },
+        { "tipo": "tema", "destino": "guia_latex.html", "motivo": "Cuando el documento técnico pide más que un procesador de textos." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - ACT 1.1.html",
+      "lead": "El despliegue del módulo: Nginx, MariaDB y PHP en contenedores, con todo accesible desde el navegador.",
+      "css": { "surface": "--bg-panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--docker", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "IAW/IAW - UT1.html", "motivo": "La UT1 es la teoría que esta actividad pone en un servidor." },
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 2.1.html", "motivo": "La 2.1 instala y securiza WordPress sobre este LEMP." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Los comandos de contenedor que aparecen aquí, explicados." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "MariaDB por dentro: la base de datos que va a guardar el contenido." },
+        { "tipo": "tema", "destino": "guia_redes_daw.html", "motivo": "Por qué el puerto importa y cómo se expone el servidor." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - ACT 2.1.html",
+      "lead": "WordPress sobre el LEMP que ya tienes: instalación, configuración, roles y los primeros ajustes de seguridad.",
+      "css": { "surface": "--bg-panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--wp", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "IAW/IAW - ACT 1.1.html", "motivo": "WordPress se instala sobre el LEMP de la 1.1." },
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 3.1.html", "motivo": "La 3.1 convierte la instalación en un proyecto de personalización completo." },
+        { "tipo": "tema", "destino": "guia_php_vulnerabilidad.html", "motivo": "Este mismo WordPress en Docker, pero parcheado: léelo antes de publicar." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "Usuarios, opciones y contenido: todo acaba en tablas." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "WordPress es PHP: buena parte de sus fallos lo son." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - ACT 3.1.html",
+      "lead": "De «WordPress instalado» a «proyecto de personalización»: temas, plugins, contenido y copias de seguridad.",
+      "css": { "surface": "--bg-panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--wp", "radius": "10px", "dark": true },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "IAW/IAW - ACT 2.1.html", "motivo": "La 2.1 deja WordPress instalado y securizado." },
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 4.1.html", "motivo": "La 4.1 aplica lo aprendido a una intranet completa con Nextcloud." },
+        { "tipo": "tema", "destino": "guia_css_daw.html", "motivo": "Personalizar el tema es escribir CSS." },
+        { "tipo": "tema", "destino": "guia_responsive_bootstrap.html", "motivo": "Hacer que el tema se vea bien en móvil." },
+        { "tipo": "tema", "destino": "guia_php_vulnerabilidad.html", "motivo": "Plugins y actualizaciones: el mantenimiento real de esta pila." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - ACT 4.1.html",
+      "lead": "La intranet del módulo: Nextcloud sobre LEMP, con usuarios, archivos compartidos y su parte de seguridad.",
+      "css": { "surface": "--bl", "ink": "--ink", "muted": "--mu", "line": "--bd", "accent": "--b", "radius": "14px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "IAW/IAW - ACT 3.1.html", "motivo": "La personalización de WordPress de la 3.1 es el antecedente directo." },
+        { "tipo": "anterior", "destino": "IAW/IAW - UT4.html", "motivo": "La ofimática web de la UT4 es lo que aparece dentro de la intranet." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Copias de seguridad, permisos y procesos: todo se administra en la terminal." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "La base de datos detrás de usuarios y archivos compartidos." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - UT1 - Kotlin.html",
+      "lead": "El lenguaje del módulo, desde cero. La guía hermana de Android es su complemento natural.",
+      "css": { "surface": "--surface", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--purple", "radius": "14px", "dark": true },
+      "enlaces": [
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 1.1.html", "motivo": "La actividad 1.1 monta el IDE y aplica este Kotlin en Android." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Android.html", "motivo": "La guía hermana: el framework que da sentido al lenguaje." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "De Java a Kotlin sin rehacer la teoría: referencias, nullability e inmutabilidad." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - UT1 - Android.html",
+      "lead": "El framework del módulo, con su IDE y su ciclo de vida. La guía hermana de Kotlin es su complemento natural.",
+      "css": { "surface": "--panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--green", "radius": "12px", "dark": true },
+      "enlaces": [
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 1.1.html", "motivo": "La actividad 1.1 es la práctica guiada sobre este marco." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "La otra mitad de la UT1: el lenguaje en el que se escribe." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "El proyecto Android también se versiona, y desde el primer commit." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - ACT 1.1.html",
+      "lead": "La práctica guiada: Android Studio, el primer proyecto, el emulador y la lectura del Logcat.",
+      "css": { "surface": "--panel", "ink": "--text", "muted": "--text-dim", "line": "--border", "accent": "--terracotta", "radius": "14px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "El Kotlin de la UT1 es lo que escribes en el IDE." },
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 2.1.html", "motivo": "La 2.1 construye con Compose la pantalla de login de verdad." },
+        { "tipo": "tema", "destino": "guia_git.html", "motivo": "Antes de tocar código: repositorio, ramas y primer commit." },
+        { "tipo": "tema", "destino": "guia_valor_vs_referencia.html", "motivo": "Repaso de valor y referencia: la base de la lógica de ViewModel." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - ACT 2.1.html",
+      "lead": "Tu primera app de verdad en Jetpack Compose: pantalla de login, estado y validación.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--primary", "radius": "16px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "PMDM/PMDM - ACT 1.1.html", "motivo": "El proyecto y el IDE de la 1.1 son el punto de partida." },
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 2.2.html", "motivo": "La 2.2 amplía la app con navegación, registro y diálogos." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "Nullability, funciones de orden superior y data classes, tal como se usan aquí." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - ACT 2.2.html",
+      "lead": "La app de la 2.1, ampliada: NavHost, pantalla de registro, Scaffold y diálogos.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--primary", "radius": "16px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "PMDM/PMDM - ACT 2.1.html", "motivo": "La pantalla de login de la 2.1 es la que aquí se amplía." },
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 3.1.html", "motivo": "La 3.1 añade persistencia y arquitectura MVVM." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "La misma UT1, aplicada a la navegación y al estado de la app." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - ACT 3.1.html",
+      "lead": "La app completa: CRUD con Room, DataStore para las preferencias, ViewModel, notificaciones y despliegue.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--primary", "radius": "16px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "PMDM/PMDM - ACT 2.2.html", "motivo": "La 2.2 deja la app con navegación; aquí se le añade persistencia." },
+        { "tipo": "continua", "destino": "PMDM/PMDM - ACT 4.1.html", "motivo": "La 4.1 añade red, Bluetooth y SMS." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "Room es SQL: lo que aprendiste en bases de datos relacionales, aquí con azúcar." },
+        { "tipo": "tema", "destino": "PMDM/PMDM - UT1 - Kotlin.html", "motivo": "StateFlow y corrutinas, la base del ViewModel." }
+      ]
+    },
+    {
+      "fichero": "PMDM/PMDM - ACT 4.1.html",
+      "lead": "La última actividad: conectividad real con la app. Red, Bluetooth y SMS.",
+      "css": { "surface": "--surface", "ink": "--ink", "muted": "--muted", "line": "--border", "accent": "--primary", "radius": "16px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "PMDM/PMDM - ACT 3.1.html", "motivo": "La 3.1 deja la app con datos, notificaciones y estructura MVVM." },
+        { "tipo": "tema", "destino": "guia_redes_daw.html", "motivo": "TCP/IP y subredes: lo que pasa por el cable antes de llegar al móvil." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "El servidor contra el que habla el móvil también se administra en la terminal." }
+      ]
+    }
+  ]
+}

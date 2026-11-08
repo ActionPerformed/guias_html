@@ -99,6 +99,44 @@ Herramientas de apoyo para el alumnado, también en HTML único:
 | [cv-form.html](https://actionperformed.github.io/guias_html/utilidades/cv-form.html) | Formulario FEOE — rellena tus datos y genera tu CV profesional en Markdown |
 | [cv-pdf.html](https://actionperformed.github.io/guias_html/utilidades/cv-pdf.html) | Generador de CV en PDF — pega el Markdown del formulario, previsualiza e imprime o guarda como PDF |
 
+## Mapa de rutas
+
+Cada guía termina con un bloque **«Sigue tu ruta»**: los enlaces a la actividad siguiente y a la anterior del módulo, más las guías transversales que conviene tener abiertas al lado. Cada enlace lleva el motivo por el que sirve, no solo el nombre.
+
+### Secuencias de módulo
+
+**ASETE** — PHP y Laravel:
+
+[UT0 · Lenguajes de guiones de servidor (PHP 8)](ASETE/ASETE%20-%20UT0.html) → [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html) → [Actividad 1.1 · Mini-Biblioteca PHP](ASETE/ASETE%20-%20ACT%201.1.html) → [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html) → [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html) → [Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)](ASETE/ASETE%20-%20ACT%202.1.html) → [Actividad 2.2 · Composer y autoloading](ASETE/ASETE%20-%20ACT%202.2.html) → [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html) → [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html)
+
+**IAW** — Implantación de aplicaciones web:
+
+[UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html) → [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html) → [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html) → [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) → [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html) → [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html)
+
+**PMDM** — Android y Kotlin:
+
+[UT1 · Kotlin desde cero](PMDM/PMDM%20-%20UT1%20-%20Kotlin.html) → [UT1 · Fundamentos de desarrollo Android](PMDM/PMDM%20-%20UT1%20-%20Android.html) → [Actividad 1.1 · Android Studio y Kotlin](PMDM/PMDM%20-%20ACT%201.1.html) → [Actividad 2.1 · Login con Jetpack Compose](PMDM/PMDM%20-%20ACT%202.1.html) → [Actividad 2.2 · NavHost, registro y diálogos](PMDM/PMDM%20-%20ACT%202.2.html) → [Actividad 3.1 · CRUD con Room y DataStore](PMDM/PMDM%20-%20ACT%203.1.html) → [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html)
+
+### Guías transversales
+
+Estas guías son el pegamento entre módulos: cada una se enlaza desde las actividades que la necesitan.
+
+| Guía | Desde qué actividades se llega |
+|------|------------------------------|
+| [Dominando CSS](guia_css_daw.html) | [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
+| [Git para FP](guia_git.html) | [Actividad 2.2 · Composer y autoloading](ASETE/ASETE%20-%20ACT%202.2.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [UT1 · Fundamentos de desarrollo Android](PMDM/PMDM%20-%20UT1%20-%20Android.html), [Actividad 1.1 · Android Studio y Kotlin](PMDM/PMDM%20-%20ACT%201.1.html) |
+| [LaTeX](guia_latex.html) | [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html) |
+| [Introducción a Linux](guia_linux.html) | [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html), [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html) |
+| [PHP](guia_php.html) | [UT0 · Lenguajes de guiones de servidor (PHP 8)](ASETE/ASETE%20-%20UT0.html), [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html), [Actividad 1.1 · Mini-Biblioteca PHP](ASETE/ASETE%20-%20ACT%201.1.html), [Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)](ASETE/ASETE%20-%20ACT%202.1.html), [Actividad 2.2 · Composer y autoloading](ASETE/ASETE%20-%20ACT%202.2.html), [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html) |
+| [Parche urgente: PHP-FPM y WordPress en Docker](guia_php_vulnerabilidad.html) | [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html), [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
+| [Proyecto de fin de ciclo ASIR](guia_proyecto_asir.html) | [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html) |
+| [Fundamentos de redes](guia_redes_daw.html) | [UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html) |
+| [De web fija a web responsive](guia_responsive_bootstrap.html) | [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
+| [SQL](guia_sql.html) | [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html), [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html), [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 3.1 · CRUD con Room y DataStore](PMDM/PMDM%20-%20ACT%203.1.html) |
+| [Valor vs referencia (Java y PHP)](guia_valor_vs_referencia.html) | [UT0 · Lenguajes de guiones de servidor (PHP 8)](ASETE/ASETE%20-%20UT0.html), [Actividad 1.1 · Mini-Biblioteca PHP](ASETE/ASETE%20-%20ACT%201.1.html), [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html), [Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)](ASETE/ASETE%20-%20ACT%202.1.html), [UT1 · Kotlin desde cero](PMDM/PMDM%20-%20UT1%20-%20Kotlin.html), [Actividad 1.1 · Android Studio y Kotlin](PMDM/PMDM%20-%20ACT%201.1.html) |
+
+Las guías generales también se enlazan entre sí: en el bloque «Sigue tu ruta» de cada una aparecen las que le sirven de referencia directa (terminal, Git, SQL, CSS…).
+
 ---
 
 *Todas las guías son archivos HTML únicos, sin dependencias externas más allá de Google Fonts.*

@@ -683,6 +683,127 @@ pre .st{color:var(--blue2);}
 .callout.tip{border-left-color:var(--gold);background:rgba(244,196,48,.04);}
 .callout.tip strong{color:var(--gold);}
 </style>
+
+<style>
+/* red-guias:estilo */
+/* Bloque "Sigue tu ruta": enlaces cruzados entre guías. */
+.red-guias{
+  /* Reset: hay guías que estilan el <nav> genérico (sticky, fijo, oculto). */
+  position:static;
+  top:auto;
+  right:auto;
+  bottom:auto;
+  left:auto;
+  z-index:auto;
+  float:none;
+  transform:none;
+  display:block;
+  width:auto;
+  height:auto;
+  max-width:none;
+  min-height:0;
+  max-height:none;
+  overflow:visible;
+  flex-direction:row;
+  flex-wrap:nowrap;
+  align-items:stretch;
+  gap:normal;
+  backdrop-filter:none;
+  border-right:none;
+  border-bottom:none;
+  border-top:none;
+  border-left:none;
+  margin:2.5rem 0 0;
+  padding:1.25rem 1.4rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--s1);
+  color:var(--text);
+}
+.red-guias h2{
+  display:block;
+  margin:0 0 .35rem;
+  font-size:1.05rem;
+  line-height:1.3;
+  letter-spacing:.02em;
+  color:var(--text);
+}
+.red-guias p.red-guias-lead{
+  margin:0 0 .9rem;
+  font-size:.95rem;
+  line-height:1.55;
+  color:var(--text2);
+}
+.red-guias ul.red-guias-lista{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:.55rem;
+}
+.red-guias li{
+  display:grid;
+  gap:.15rem;
+  max-width:none;
+  padding:.65rem .8rem;
+  border-left:3px solid var(--blue);
+}
+.red-guias li > span.red-guias-tipo{
+  font-size:.68rem;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--blue);
+  font-weight:700;
+}
+.red-guias a{
+  font-weight:600;
+  color:var(--blue);
+  text-decoration:none;
+  padding:0;
+  border-radius:0;
+  background:none;
+  border-bottom:1px solid transparent;
+}
+.red-guias a::before{
+  content:none;
+}
+.red-guias a:hover,
+.red-guias a:focus-visible{
+  border-bottom-color:var(--blue);
+  background:none;
+  color:var(--blue);
+}
+.red-guias li > span.red-guias-motivo{
+  font-size:.85rem;
+  line-height:1.5;
+  color:var(--text2);
+}
+.red-guias p.red-guias-indice{
+  margin:1rem 0 0;
+  font-size:.9rem;
+}
+.red-guias p.red-guias-indice a{
+  color:var(--text2);
+  font-weight:500;
+  border-bottom:1px dotted var(--border);
+}
+@media print{
+  .red-guias{
+    display:block !important;
+    position:static !important;
+    background:#fff !important;
+    border-color:#bbb !important;
+    color:#111 !important;
+  }
+  .red-guias h2{color:#111 !important}
+  .red-guias p.red-guias-lead,
+  .red-guias li > span.red-guias-motivo,
+  .red-guias p.red-guias-indice a{color:#444 !important}
+  .red-guias li{background:#f6f6f6 !important;border-left-color:#888 !important}
+  .red-guias li > span.red-guias-tipo,
+  .red-guias a{color:#111 !important}
+}
+</style>
 </head>
 <body>
 
@@ -1354,6 +1475,19 @@ pre .st{color:var(--blue2);}
   </div>
 </div>
 
+
+<!-- red-guias -->
+<nav class="red-guias" aria-labelledby="red-guias-t">
+  <h2 id="red-guias-t">Sigue tu ruta</h2>
+  <p class="red-guias-lead">OSI, TCP/IP, IPv4, subredes y VLSM. Los puertos son justo lo que hace que un despliegue funcione o no.</p>
+  <ul class="red-guias-lista">
+    <li><span class="red-guias-tipo">También te sirve</span><a href="guia_linux.html">Introducción a Linux</a><span class="red-guias-motivo">Configurar y diagnosticar la red desde la terminal.</span></li>
+    <li><span class="red-guias-tipo">También te sirve</span><a href="IAW/IAW%20-%20ACT%201.1.html">Actividad 1.1 · Stack LEMP con Docker</a><span class="red-guias-motivo">Un despliegue real donde cada puerto y cada DNS importan.</span></li>
+    <li><span class="red-guias-tipo">También te sirve</span><a href="PMDM/PMDM%20-%20ACT%204.1.html">Actividad 4.1 · Red, Bluetooth y SMS</a><span class="red-guias-motivo">Conectividad en Android: la misma red, vista desde el móvil.</span></li>
+  </ul>
+  <p class="red-guias-indice"><a href="index.html">← Volver al catálogo de guías</a></p>
+</nav>
+<!-- /red-guias -->
 </div><!-- /wrap -->
 
 <div class="footer">
