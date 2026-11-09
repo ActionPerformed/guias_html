@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guías Didácticas Interactivas</title>
-  <meta name="description" content="Cápsulas informativas portable para aprender haciendo. Guías HTML autocontenidas sobre CSS, Redes, PHP, Git, SQL, y más.">
+  <meta name="description" content="Cápsulas informativas portable para aprender haciendo. 40 guías HTML autocontenidas: CSS, Redes, PHP, Git, SQL, Docker, WordPress, Android y más.">
+  <meta name="theme-color" content="#0A1826">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -80,6 +81,36 @@
       outline: 3px solid var(--amber);
       outline-offset: 2px;
       border-radius: 2px;
+    }
+
+    /* ── Accesibilidad ── */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: 0;
+      left: -9999px;
+      z-index: 100;
+      background: var(--cyan);
+      color: #061018;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 0 0 8px 0;
+    }
+
+    .skip-link:focus {
+      left: 0;
     }
 
     code, pre, kbd {
@@ -218,13 +249,6 @@
       line-height: 1.55;
     }
 
-    .hero-card-text cite {
-      font-family: 'Work Sans', sans-serif;
-      font-size: 12.5px;
-      font-style: normal;
-      color: var(--muted);
-    }
-
     .hero-card-mission {
       margin: 8px 0 0;
       font-size: 13px;
@@ -233,19 +257,6 @@
     }
 
     .hero-card-mission strong {
-      color: var(--ink);
-      font-weight: 600;
-    }
-
-    .hero-mission {
-      font-size: 15px;
-      color: var(--muted);
-      max-width: 60ch;
-      margin: 0 auto;
-      line-height: 1.75;
-    }
-
-    .hero-mission strong {
       color: var(--ink);
       font-weight: 600;
     }
@@ -327,6 +338,26 @@
     .chip[data-cat="asete"].active { background: var(--cat-asete); border-color: var(--cat-asete); }
     .chip[data-cat="iaw"].active { background: var(--cat-iaw); border-color: var(--cat-iaw); }
     .chip[data-cat="pmdm"].active { background: var(--cat-pmdm); border-color: var(--cat-pmdm); }
+
+    .result-count {
+      text-align: center;
+      margin: 18px 0 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .noscript-note {
+      border: 1px solid var(--amber);
+      background: rgba(232,163,61,.08);
+      border-radius: 8px;
+      padding: 16px 18px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .noscript-note strong { color: var(--ink); }
 
     /* ── Main content ── */
     .container {
@@ -519,17 +550,23 @@
 
     .footer-links a:hover { color: var(--cyan); }
 
-    /* ── Animaciones de entrada ── */
-    .tarjeta {
+    /* ── Animaciones de entrada ──
+       El estado «oculta» solo se aplica si hay JavaScript (clase .js en <html>):
+       sin JS, o si el script falla, las tarjetas se ven igualmente. */
+    .js .tarjeta {
       opacity: 0;
-      transform: translateY(16px);
     }
 
-    .tarjeta.visible {
-      animation: fadeUp .35s ease forwards;
+    .js .tarjeta.visible {
+      opacity: 1;
+      animation: fadeUp .35s ease;
     }
 
     @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
       to {
         opacity: 1;
         transform: translateY(0);
@@ -551,13 +588,91 @@
       .hero-card-img img { object-fit: contain; object-position: center top; max-width: 100%; max-height: 100%; }
       .hero-card-text { padding: 20px 16px; }
     }
+
+    /* ── Movimiento reducido ── */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .js .tarjeta.visible { animation: none; }
+      .tarjeta,
+      .hero-card,
+      .hero-card-img img,
+      .chip,
+      .tarjeta::before,
+      .tarjeta .arrow { transition: none !important; }
+    }
+
+    /* ── Impresión ──
+       Sin esta hoja, el catálogo impreso sale en blanco sobre blanco: el fondo
+       oscuro no se imprime y el texto claro se pierde. */
+    @media print {
+      html { scroll-behavior: auto; }
+
+      body {
+        background: #fff !important;
+        background-image: none !important;
+        color: #111 !important;
+        font-size: 12px;
+      }
+
+      .skip-link,
+      .buscador-wrap,
+      .filtros,
+      .result-count,
+      .no-results,
+      .hero-badge,
+      .hero-card-img,
+      .tarjeta .arrow { display: none !important; }
+
+      .hero { padding: 0 0 16px; text-align: left; }
+      .hero h1 { color: #111 !important; font-size: 30px; margin-bottom: 8px; }
+      .hero h1 em { color: #0F766E !important; }
+      .hero-tagline { color: #333 !important; margin: 0 0 12px; }
+      .hero-stats { justify-content: flex-start; gap: 24px; }
+      .stat-num { color: #0F766E !important; font-size: 20px; }
+      .stat-label { color: #555 !important; }
+      .hero-divider { display: none; }
+      .hero-card { border: 1px solid #ccc; box-shadow: none; background: #fff; margin: 0; }
+      .hero-card-text { background: #fff; border-left: 0; padding: 14px 16px; }
+      .hero-card-text blockquote { color: #111 !important; }
+      .hero-card-mission { color: #333 !important; }
+      .hero-card-mission strong { color: #111 !important; }
+
+      .container { padding: 0 0 12px; }
+      .categoria { margin-bottom: 18px; break-inside: avoid; }
+      .cat-header { border-bottom: 1px solid #999; }
+      .cat-header h2 { color: #111 !important; font-size: 18px; }
+      .cat-count { color: #444 !important; background: #f2f2f2; border-color: #ccc; }
+
+      .guias-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .tarjeta {
+        opacity: 1 !important;
+        transform: none !important;
+        background: #fff !important;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        padding: 10px 12px;
+        break-inside: avoid;
+      }
+      .tarjeta::before { opacity: 1 !important; }
+      .tarjeta .badge { background: #f2f2f2 !important; color: #333 !important; border-color: #999 !important; }
+      .tarjeta h3 { color: #111 !important; font-size: 13px; }
+      .tarjeta p { color: #333 !important; font-size: 11px; }
+
+      footer { border-top: 1px solid #ccc; color: #444 !important; padding: 16px 0 0; text-align: left; }
+      .footer-license { color: #111 !important; }
+      .footer-credit { color: #444 !important; }
+      .footer-links a { color: #333 !important; }
+    }
   </style>
 </head>
 <body>
 
+  <a class="skip-link" href="#main">Ir al catálogo de guías</a>
+
   <!-- ── Hero ── -->
   <header class="hero">
-    <h1>Guías Didácticas <span>Interactivas</span></h1>
+    <h1>Guías Didácticas <em>Interactivas</em></h1>
+
     <div class="hero-stats">
       <div class="stat">
         <span class="stat-num" id="stat-guias">40</span>
@@ -586,11 +701,12 @@
   </header>
 
   <!-- ── Buscador + Filtros ── -->
-  <section class="buscador-section">
+  <section class="buscador-section" aria-label="Buscar y filtrar guías">
     <div class="buscador-wrap">
-      <span class="buscador-icon">&#128269;</span>
+      <label class="visually-hidden" for="buscador">Buscar una guía por título, tema o módulo</label>
+      <span class="buscador-icon" aria-hidden="true">&#128269;</span>
       <input
-        type="text"
+        type="search"
         id="buscador"
         placeholder="Busca una guía... (ej: git, css, wordpress)"
         autocomplete="off"
@@ -598,17 +714,27 @@
       >
     </div>
 
-    <div class="filtros" role="group" aria-label="Filtrar por categoría">
-      <button class="chip active" data-cat="todas">Todas</button>
-      <button class="chip" data-cat="generales">Generales</button>
-      <button class="chip" data-cat="asete">ASETE</button>
-      <button class="chip" data-cat="iaw">IAW</button>
-      <button class="chip" data-cat="pmdm">PMDM</button>
+    <div class="filtros" role="group" aria-label="Filtrar por bloque">
+      <button type="button" class="chip active" data-cat="todas" aria-pressed="true">Todas</button>
+      <button type="button" class="chip" data-cat="generales" aria-pressed="false">Generales</button>
+      <button type="button" class="chip" data-cat="asete" aria-pressed="false">ASETE</button>
+      <button type="button" class="chip" data-cat="iaw" aria-pressed="false">IAW</button>
+      <button type="button" class="chip" data-cat="pmdm" aria-pressed="false">PMDM</button>
     </div>
+
+    <p class="result-count" id="result-count" role="status">Mostrando 40 de 40 guías</p>
   </section>
 
   <!-- ── Guías ── -->
-  <main class="container">
+  <main class="container" id="main">
+
+    <noscript>
+      <div class="noscript-note">
+        <strong>El catálogo necesita JavaScript</strong> para pintar y filtrar las 40 guías.
+        Si lo tienes desactivado, míralas todas en el
+        <a href="https://github.com/actionperformed/guias_html/blob/master/readme.md" target="_blank" rel="noopener">índice del repositorio</a>.
+      </div>
+    </noscript>
 
     <div class="no-results" id="no-results">
       <h3>No hay resultados</h3>
@@ -619,7 +745,7 @@
     <section class="categoria" data-cat="generales">
       <div class="cat-header">
         <div class="cat-dot" style="background:var(--cat-generales)"></div>
-        <h2>Guías Generales</h2>
+        <h2>Guías generales</h2>
         <span class="cat-count" id="count-generales">0</span>
       </div>
       <div class="guias-grid" id="grid-generales"></div>
@@ -662,9 +788,6 @@
     <p class="footer-license">
       <span>&#9670;</span> Libre y gratuito. <span>Comparte, crea, adapta.</span>
     </p>
-    <p class="footer-credit">
-      Contenido generado con IA + revisión humana &mdash; Archivo HTML único, sin dependencias
-    </p>
     <div class="footer-links">
       <a href="https://github.com/actionperformed/guias_html" target="_blank" rel="noopener">Repositorio</a>
       <a href="readme.md">Índice completo</a>
@@ -674,64 +797,74 @@
   </footer>
 
   <script>
+  (function () {
+    'use strict';
+
+    // El CSS usa `.js .tarjeta` para la animación de entrada: sin esta
+    // clase, las tarjetas se ven aunque el script no llegue a ejecutarse.
+    document.documentElement.classList.add('js');
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     // ── Datos de guías ──
-    const GUIAS = {
+const GUIAS = {
       generales: [
-        { archivo: "guia_css_daw.html", titulo: "Dominando CSS", descripcion: "Selectores, box model, flexbox y animaciones para 2º DAW" },
-        { archivo: "guia_redes_daw.html", titulo: "Fundamentos de Redes", descripcion: "OSI, TCP/IP, IPv4, subredes y VLSM para 1º DAW" },
-        { archivo: "guia_react_encuesta.html", titulo: "Encuesta en React", descripcion: "Hooks, componentes y app de votaciones en tiempo real" },
-        { archivo: "guia_responsive_bootstrap.html", titulo: "Web Responsive", descripcion: "De web fija a responsive con Bootstrap y diseño adaptable" },
-        { archivo: "guia_batch_windows.html", titulo: "Scripts Batch", descripcion: "Automatización en Windows con .BAT y CMD" },
-        { archivo: "guia_prompts.html", titulo: "Prompts que Funcionan", descripcion: "Entrenamiento de 4 semanas en ingeniería de prompts" },
-        { archivo: "guia-ia-bachillerato.html", titulo: "IA para el Bachillerato", descripcion: "La IA como herramienta de estudio — EBAU y técnicas de estudio" },
-        { archivo: "guia-ia-fp.html", titulo: "IA para la FP", descripcion: "La IA como herramienta de estudio para Formación Profesional" },
-        { archivo: "guia-que-ia-usar.html", titulo: "Qué IA Usar", descripcion: "Comparativa visual de herramientas de IA por tarea" },
-        { archivo: "guia_linux.html", titulo: "Introducción a Linux", descripcion: "Sistema de archivos, permisos y terminal para 1º DAW" },
-        { archivo: "guia_git.html", titulo: "Git para FP", descripcion: "Línea de metro DAM/DAW/ASIR — control de versiones" },
-        { archivo: "guia_lean.html", titulo: "Introducción a Lean", descripcion: "Lenguaje donde las demostraciones matemáticas se verifican y nunca mienten" },
-        { archivo: "guia_sql.html", titulo: "SQL", descripcion: "Consultas, joins, subconsultas y diseño de bases de datos relacionales" },
-        { archivo: "guia_valor_vs_referencia.html", titulo: "Valor vs Referencia", descripcion: "Java y PHP comparados con simuladores interactivos" },
-        { archivo: "guia_php_vulnerabilidad.html", titulo: "Parche urgente: PHP-FPM y WordPress en Docker", descripcion: "Cómo actualizar imágenes y proteger el despliegue frente a vulnerabilidades" },
-        { archivo: "guia_latex.html", titulo: "LaTeX", descripcion: "Composición tipográfica, fórmulas matemáticas y documentos técnicos" },
-        { archivo: "guia_php.html", titulo: "PHP", descripcion: "Programación del lado del servidor, formularios y conexión a BD" },
-        { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo" },
+        { archivo: "guia_css_daw.html", titulo: "Dominando CSS", descripcion: "Selectores, box model, flexbox y animaciones para 2º DAW", claves: ["css", "flexbox", "box model", "animaciones", "maquetacion"] },
+        { archivo: "guia_redes_daw.html", titulo: "Fundamentos de Redes", descripcion: "OSI, TCP/IP, IPv4, subredes y VLSM para 1º DAW", claves: ["redes", "osi", "tcp", "ip", "subredes", "dns", "enrutamiento"] },
+        { archivo: "guia_react_encuesta.html", titulo: "Encuesta en React", descripcion: "Hooks, componentes y app de votaciones en tiempo real", claves: ["react", "hooks", "javascript", "jsx", "componentes", "frontend"] },
+        { archivo: "guia_responsive_bootstrap.html", titulo: "Web Responsive", descripcion: "De web fija a responsive con Bootstrap y diseño adaptable", claves: ["responsive", "bootstrap", "mobile", "media queries", "css", "adaptable"] },
+        { archivo: "guia_batch_windows.html", titulo: "Scripts Batch", descripcion: "Automatización en Windows con .BAT y CMD", claves: ["batch", "cmd", "windows", "automatizacion", "script", "powershell"] },
+        { archivo: "guia_prompts.html", titulo: "Prompts que Funcionan", descripcion: "Entrenamiento de 4 semanas en ingeniería de prompts", claves: ["prompt", "prompting", "ia", "claude", "chatgpt", "instrucciones"] },
+        { archivo: "guia-ia-bachillerato.html", titulo: "IA para el Bachillerato", descripcion: "La IA como herramienta de estudio — EBAU y técnicas de estudio", claves: ["ia", "inteligencia artificial", "ebau", "selectividad", "estudio", "prompts"] },
+        { archivo: "guia-ia-fp.html", titulo: "IA para la FP", descripcion: "La IA como herramienta de estudio para Formación Profesional", claves: ["ia", "inteligencia artificial", "prompts", "smr", "asir", "dam", "daw"] },
+        { archivo: "guia-que-ia-usar.html", titulo: "Qué IA Usar", descripcion: "Comparativa visual de herramientas de IA por tarea", claves: ["ia", "herramientas", "comparativa", "privacidad", "gemini", "chatgpt", "claude", "copilot"] },
+        { archivo: "guia_linux.html", titulo: "Introducción a Linux", descripcion: "Sistema de archivos, permisos y terminal para 1º DAW", claves: ["linux", "terminal", "bash", "permisos", "sistema de archivos", "ubuntu", "wsl", "docker"] },
+        { archivo: "guia_git.html", titulo: "Git para FP", descripcion: "Línea de metro DAM/DAW/ASIR — control de versiones", claves: ["git", "versionado", "repositorio", "commit", "merge", "terminal", "github"] },
+        { archivo: "guia_lean.html", titulo: "Introducción a Lean", descripcion: "Lenguaje donde las demostraciones matemáticas se verifican y nunca mienten", claves: ["lean", "mathlib", "teoremas", "coq", "formalizacion", "matematicas"] },
+        { archivo: "guia_sql.html", titulo: "SQL", descripcion: "Consultas, joins, subconsultas y diseño de bases de datos relacionales", claves: ["sql", "base de datos", "joins", "subconsultas", "mysql", "mariadb", "postgres"] },
+        { archivo: "guia_valor_vs_referencia.html", titulo: "Valor vs Referencia", descripcion: "Java y PHP comparados con simuladores interactivos", claves: ["java", "php", "punteros", "memoria", "referencias", "poo", "simulador"] },
+        { archivo: "guia_php_vulnerabilidad.html", titulo: "Parche urgente: PHP-FPM y WordPress en Docker", descripcion: "Cómo actualizar imágenes y proteger el despliegue frente a vulnerabilidades", claves: ["seguridad", "docker", "wordpress", "php-fpm", "vulnerabilidades", "cve", "parche", "actualizar"] },
+        { archivo: "guia_latex.html", titulo: "LaTeX", descripcion: "Composición tipográfica, fórmulas matemáticas y documentos técnicos", claves: ["latex", "tex", "pdf", "formulas", "tipografia", "documento"] },
+        { archivo: "guia_php.html", titulo: "PHP", descripcion: "Programación del lado del servidor, formularios y conexión a BD", claves: ["php", "pdo", "formularios", "mysql", "mariadb", "servidor", "backend"] },
+        { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo", claves: ["proyecto", "fcf", "actas", "roles", "planificacion", "memoria"] },
       ],
       asete: [
-        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Lenguajes de guiones de servidor", descripcion: "PHP 8.x con referencias comparativas a Node.js, Python y Java" },
-        { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Entorno PHP para 2º ASIR/DAM" },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP para 2º DAM" },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker" },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.3.html", titulo: "ACT 1.3 — Login con PHP", descripcion: "Login con sesiones y roles en PHP" },
-        { archivo: "ASETE/ASETE%20-%20ACT%202.1.html", titulo: "ACT 2.1 — MiniApp Biblioteca", descripcion: "MiniApp de Biblioteca con POO en PHP" },
-        { archivo: "ASETE/ASETE%20-%20ACT%202.2.html", titulo: "ACT 2.2 — Composer y autoloading", descripcion: "Organiza el código con Composer, namespaces y autoloading" },
-        { archivo: "ASETE/ASETE%20-%20ACT%203.1.html", titulo: "ACT 3.1 — Taller Laravel", descripcion: "Laravel, Apache, PHP y MariaDB en contenedores con Docker" },
-        { archivo: "ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html", titulo: "ACT 3.1 · Puente — De la MiniApp a Laravel", descripcion: "Cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade" },
+        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Lenguajes de guiones de servidor", descripcion: "PHP 8.x con referencias comparativas a Node.js, Python y Java", claves: ["php", "servidor", "scripting", "seguridad", "node", "python", "java"] },
+        { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Entorno PHP para 2º ASIR/DAM", claves: ["php", "interprete", "playground", "banco de pruebas", "javascript"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP para 2º DAM", claves: ["php", "biblioteca", "playground", "login", "pdo", "crud"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker", claves: ["docker", "lamp", "apache", "php", "mysql", "compose", "despliegue"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.3.html", titulo: "ACT 1.3 — Login con PHP", descripcion: "Login con sesiones y roles en PHP", claves: ["php", "sesiones", "cookies", "roles", "login", "seguridad", "docker"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%202.1.html", titulo: "ACT 2.1 — MiniApp Biblioteca", descripcion: "MiniApp de Biblioteca con POO en PHP", claves: ["php", "poo", "clases", "herencia", "interfaces", "traits", "java"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%202.2.html", titulo: "ACT 2.2 — Composer y autoloading", descripcion: "Organiza el código con Composer, namespaces y autoloading", claves: ["composer", "namespaces", "psr-4", "autoload", "php", "psr-12"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%203.1.html", titulo: "ACT 3.1 — Taller Laravel", descripcion: "Laravel, Apache, PHP y MariaDB en contenedores con Docker", claves: ["laravel", "docker", "apache", "php", "mariadb", "composer", "taller"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html", titulo: "ACT 3.1 · Puente — De la MiniApp a Laravel", descripcion: "Cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade", claves: ["laravel", "blade", "eloquent", "rutas", "controladores", "migraciones"] },
       ],
       iaw: [
-        { archivo: "IAW/IAW%20-%20UT1.html", titulo: "UT1 — Implantación", descripcion: "Implantación de aplicaciones web" },
-        { archivo: "IAW/IAW%20-%20UT4.html", titulo: "UT4 — Ofimática web", descripcion: "Qué es la ofimática web, cómo se clasifica y cómo elegir suite" },
-        { archivo: "IAW/IAW%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Stack LEMP", descripcion: "Despliegue de un stack LEMP (Nginx + MariaDB) con Docker" },
-        { archivo: "IAW/IAW%20-%20ACT%202.1.html", titulo: "ACT 2.1 — WordPress", descripcion: "Instalación y securización de WordPress sobre LEMP" },
-        { archivo: "IAW/IAW%20-%20ACT%203.1.html", titulo: "ACT 3.1 — WordPress Integral", descripcion: "Proyecto de personalización integral de WordPress" },
-        { archivo: "IAW/IAW%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Nextcloud", descripcion: "Despliegue de Nextcloud sobre LEMP con Docker: intranet, usuarios y seguridad" },
+        { archivo: "IAW/IAW%20-%20UT1.html", titulo: "UT1 — Implantación", descripcion: "Implantación de aplicaciones web", claves: ["servidores web", "lemp", "nginx", "apache", "implantacion", "arquitectura"] },
+        { archivo: "IAW/IAW%20-%20UT4.html", titulo: "UT4 — Ofimática web", descripcion: "Qué es la ofimática web, cómo se clasifica y cómo elegir suite", claves: ["ofimatica", "odf", "ooxml", "office", "libreoffice", "suite"] },
+        { archivo: "IAW/IAW%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Stack LEMP", descripcion: "Despliegue de un stack LEMP (Nginx + MariaDB) con Docker", claves: ["lemp", "nginx", "mariadb", "docker", "phpmyadmin", "despliegue"] },
+        { archivo: "IAW/IAW%20-%20ACT%202.1.html", titulo: "ACT 2.1 — WordPress", descripcion: "Instalación y securización de WordPress sobre LEMP", claves: ["wordpress", "lemp", "seguridad", "instalacion", "docker"] },
+        { archivo: "IAW/IAW%20-%20ACT%203.1.html", titulo: "ACT 3.1 — WordPress Integral", descripcion: "Proyecto de personalización integral de WordPress", claves: ["wordpress", "personalizacion", "temas", "plugins", "proyecto", "php"] },
+        { archivo: "IAW/IAW%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Nextcloud", descripcion: "Despliegue de Nextcloud sobre LEMP con Docker: intranet, usuarios y seguridad", claves: ["nextcloud", "lemp", "docker", "intranet", "usuarios", "copias de seguridad"] },
       ],
       pmdm: [
-        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Kotlin.html", titulo: "UT1 — Kotlin desde Cero", descripcion: "Kotlin desde cero para desarrollo Android" },
-        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Android.html", titulo: "UT1 — Fundamentos Android", descripcion: "Fundamentos de desarrollo Android" },
-        { archivo: "PMDM/PMDM%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Android Studio", descripcion: "Introducción a Android Studio y Kotlin" },
-        { archivo: "PMDM/PMDM%20-%20ACT%202.1.html", titulo: "ACT 2.1 — Login con Compose", descripcion: "Pantalla de Login con Jetpack Compose — simulación interactiva" },
-        { archivo: "PMDM/PMDM%20-%20ACT%202.2.html", titulo: "ACT 2.2 — NavHost y Diálogos", descripcion: "NavHost, Registro, Scaffold y Diálogos — amplía login" },
-        { archivo: "PMDM/PMDM%20-%20ACT%203.1.html", titulo: "ACT 3.1 — CRUD, Room y Despliegue", descripcion: "CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue" },
-        { archivo: "PMDM/PMDM%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Red, Bluetooth y SMS", descripcion: "Conectividad avanzada: Red, Bluetooth y SMS" },
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Kotlin.html", titulo: "UT1 — Kotlin desde Cero", descripcion: "Kotlin desde cero para desarrollo Android", claves: ["kotlin", "android", "jetpack", "coroutines", "java"] },
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Android.html", titulo: "UT1 — Fundamentos Android", descripcion: "Fundamentos de desarrollo Android", claves: ["android", "android studio", "emulador", "logcat", "sdk"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Android Studio", descripcion: "Introducción a Android Studio y Kotlin", claves: ["android studio", "kotlin", "ide", "depuracion"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.1.html", titulo: "ACT 2.1 — Login con Compose", descripcion: "Pantalla de Login con Jetpack Compose — simulación interactiva", claves: ["compose", "jetpack", "login", "kotlin", "ui"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.2.html", titulo: "ACT 2.2 — NavHost y Diálogos", descripcion: "NavHost, Registro, Scaffold y Diálogos — amplía login", claves: ["compose", "navhost", "scaffold", "dialogos", "registro", "kotlin"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%203.1.html", titulo: "ACT 3.1 — CRUD, Room y Despliegue", descripcion: "CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue", claves: ["room", "datastore", "viewmodel", "notificaciones", "apk", "crud", "mvvm"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Red, Bluetooth y SMS", descripcion: "Conectividad avanzada: Red, Bluetooth y SMS", claves: ["bluetooth", "sms", "api rest", "wifi direct", "red", "conectividad"] },
       ],
     };
 
-    // Mapeo de categoría → color CSS
-    const CAT_COLORS = {
-      generales: '#E8A33D',
-      asete: '#FC8181',
-      iaw: '#68D391',
-      pmdm: '#60A5FA',
+
+    // ── Bloques: color y nombre ──
+    const CAT_INFO = {
+      generales: { color: '#E8A33D', nombre: 'generales' },
+      asete: { color: '#FC8181', nombre: 'ASETE' },
+      iaw: { color: '#68D391', nombre: 'IAW' },
+      pmdm: { color: '#60A5FA', nombre: 'PMDM' }
     };
 
     // Las rutas de las guías son relativas al propio index.html, así que el
@@ -739,21 +872,38 @@
     // GitHub Pages, sin duplicar la URL base en dos sitios.
     const BASE_URL = '';
 
+    // Quita acentos y pasa a minúsculas: «programacion» encuentra
+    // «Programación» sin obligar al alumno a escribir la tilde.
+    function norm(texto) {
+      return texto.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    }
+
     // ── Renderizar tarjetas ──
     function crearTarjeta(guia, cat) {
+      const info = CAT_INFO[cat];
+      const etiqueta = cat === 'generales' ? 'General' : cat.toUpperCase();
+
       const a = document.createElement('a');
       a.className = 'tarjeta';
       a.href = BASE_URL + guia.archivo;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.style.setProperty('--cat-color', CAT_COLORS[cat]);
+      a.style.setProperty('--cat-color', info.color);
 
       a.innerHTML = `
-        <span class="badge">${cat === 'generales' ? 'General' : cat.toUpperCase()}</span>
+        <span class="badge">${etiqueta}</span>
         <h3>${guia.titulo}</h3>
         <p>${guia.descripcion}</p>
-        <span class="arrow">&#8594;</span>
+        <span class="arrow" aria-hidden="true">&#8594;</span>
       `;
+
+      // Texto que indexa el buscador: título, descripción, bloque y
+      // palabras clave. Todo sin acentos y en minúsculas.
+      a.dataset.buscar = norm([
+        guia.titulo,
+        guia.descripcion,
+        etiqueta,
+        info.nombre,
+        (guia.claves || []).join(' ')
+      ].join(' '));
 
       return a;
     }
@@ -761,17 +911,19 @@
     // Renderizar todas las guías en sus grids
     Object.keys(GUIAS).forEach(cat => {
       const grid = document.getElementById(`grid-${cat}`);
-      const countEl = document.getElementById(`count-${cat}`);
-      countEl.textContent = GUIAS[cat].length;
 
       GUIAS[cat].forEach((guia, i) => {
         const tarjeta = crearTarjeta(guia, cat);
         grid.appendChild(tarjeta);
 
-        // Animación staggered
-        setTimeout(() => {
+        // Animación escalonada (omitida si el usuario pide menos movimiento)
+        if (reduceMotion.matches) {
           tarjeta.classList.add('visible');
-        }, 80 * i + Math.random() * 40);
+        } else {
+          setTimeout(() => {
+            tarjeta.classList.add('visible');
+          }, 80 * i + Math.random() * 40);
+        }
       });
     });
 
@@ -780,10 +932,12 @@
     document.getElementById('stat-guias').textContent = total;
 
     // ── Filtrado ──
-    let filtroActivo = 'todas';
+    let filtroCat = 'todas';
     let terminoBusqueda = '';
 
     function aplicarFiltro() {
+      // Todos los términos deben aparecer (búsqueda «docker wordpress»).
+      const terminos = norm(terminoBusqueda).split(/\s+/).filter(Boolean);
       let totalVisible = 0;
 
       Object.keys(GUIAS).forEach(cat => {
@@ -792,15 +946,8 @@
         let visiblesEnCat = 0;
 
         tarjetas.forEach(tarjeta => {
-          // Texto de la tarjeta
-          const texto = (
-            tarjeta.querySelector('h3').textContent + ' ' +
-            tarjeta.querySelector('p').textContent
-          ).toLowerCase();
-
-          const coincideCat = filtroActivo === 'todas' || filtroActivo === cat;
-          const coincideBusqueda = terminoBusqueda === '' ||
-            texto.includes(terminoBusqueda.toLowerCase());
+          const coincideCat = filtroCat === 'todas' || filtroCat === cat;
+          const coincideBusqueda = terminos.every(t => tarjeta.dataset.buscar.indexOf(t) !== -1);
 
           if (coincideCat && coincideBusqueda) {
             tarjeta.style.display = '';
@@ -810,16 +957,20 @@
           }
         });
 
-        if (visiblesEnCat === 0) {
-          seccion.hidden = true;
-        } else {
-          seccion.hidden = false;
-          // Actualizar contador visible
-          document.getElementById(`count-${cat}`).textContent = visiblesEnCat;
-        }
-
+        seccion.hidden = visiblesEnCat === 0;
+        document.getElementById(`count-${cat}`).textContent = visiblesEnCat;
         totalVisible += visiblesEnCat;
       });
+
+      // Contador de resultados: es la región viva que anuncia el filtrado.
+      const contador = document.getElementById('result-count');
+      if (totalVisible === 0) {
+        contador.textContent = terminoBusqueda
+          ? `Sin resultados para «${terminoBusqueda}»`
+          : 'Sin resultados con estos filtros';
+      } else {
+        contador.textContent = `Mostrando ${totalVisible} de ${total} guías`;
+      }
 
       // Mostrar / ocultar mensaje sin resultados
       const noResults = document.getElementById('no-results');
@@ -830,17 +981,26 @@
       }
     }
 
-    // Filtro por categoría (chips)
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        filtroActivo = chip.dataset.cat;
-        aplicarFiltro();
-        // Scroll al buscador
-        document.querySelector('.buscador-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // ── Chips de filtro ──
+    function conectarChips(selector, atributo, alCambiar) {
+      document.querySelectorAll(selector).forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll(selector).forEach(c => {
+            c.classList.remove('active');
+            c.setAttribute('aria-pressed', 'false');
+          });
+          chip.classList.add('active');
+          chip.setAttribute('aria-pressed', 'true');
+          alCambiar(chip.dataset[atributo]);
+          aplicarFiltro();
+          // Baja al catálogo para ver el resultado, no al buscador.
+          document.getElementById('main').scrollIntoView({
+            behavior: reduceMotion.matches ? 'auto' : 'smooth',
+            block: 'start'
+          });
+        });
       });
-    });
+    }
 
     // Búsqueda en tiempo real
     const buscadorInput = document.getElementById('buscador');
@@ -862,6 +1022,13 @@
         aplicarFiltro();
       }
     });
+
+    // ── Arranque ──
+    conectarChips('.filtros [data-cat]', 'cat', valor => { filtroCat = valor; });
+
+    aplicarFiltro();
+  })();
   </script>
+
 </body>
 </html>
