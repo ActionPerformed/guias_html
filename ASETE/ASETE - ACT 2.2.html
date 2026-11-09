@@ -3407,10 +3407,11 @@ class PrestamoService
     {
         $material = $this-&gt;repo-&gt;findById($materialId);
 
-        if (!$material-&gt;prestar()) {
+        if (!$material-&gt;isDisponible()) {
             throw new MaterialNoDisponibleException($material-&gt;getTitulo());
         }
 
+        $material-&gt;prestar();
         $this-&gt;repo-&gt;setDisponible($materialId, false);
         $this-&gt;repo-&gt;registrarPrestamo($materialId, $usuarioId);
 
