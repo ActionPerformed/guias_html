@@ -6,6 +6,12 @@
   <title>Guías Didácticas Interactivas</title>
   <meta name="description" content="Cápsulas informativas portable para aprender haciendo. 40 guías HTML autocontenidas: CSS, Redes, PHP, Git, SQL, Docker, WordPress, Android y más.">
   <meta name="theme-color" content="#0A1826">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Guías Didácticas Interactivas">
+  <meta property="og:description" content="40 guías HTML autocontenidas para aprender haciendo: 3 módulos de FP y 18 transversales, con buscador, niveles y rutas de aprendizaje.">
+  <meta property="og:url" content="https://actionperformed.github.io/guias_html/">
+  <meta property="og:locale" content="es_ES">
+  <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -339,6 +345,16 @@
     .chip[data-cat="iaw"].active { background: var(--cat-iaw); border-color: var(--cat-iaw); }
     .chip[data-cat="pmdm"].active { background: var(--cat-pmdm); border-color: var(--cat-pmdm); }
 
+    .filtros-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-align: center;
+      margin: 18px 0 8px;
+    }
+
     .result-count {
       text-align: center;
       margin: 18px 0 0;
@@ -406,6 +422,25 @@
 
     .cat-header h2 {
       font-size: 22px;
+    }
+
+    .cat-sigla {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: var(--cat-color, var(--cyan));
+      margin-right: 10px;
+    }
+
+    .cat-curso {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      padding: 2px 10px;
+      white-space: nowrap;
     }
 
     .cat-count {
@@ -493,6 +528,18 @@
       line-height: 1.55;
     }
 
+    .tarjeta .meta {
+      display: block;
+      margin-top: 10px;
+      padding-top: 10px;
+      padding-right: 28px;
+      border-top: 1px solid var(--line-soft);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .01em;
+      color: var(--muted);
+    }
+
     .tarjeta .arrow {
       position: absolute;
       bottom: 16px;
@@ -508,6 +555,135 @@
       opacity: 1;
       transform: translateX(0);
       color: var(--cyan);
+    }
+
+    /* ── Orientación: qué es cada cosa y por dónde empezar ── */
+    .orientacion {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 8px 20px 28px;
+    }
+
+    .orientacion-titulo {
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .orientacion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .orientacion-col {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .orientacion-sub {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--cyan);
+      margin-bottom: 14px;
+    }
+
+    .leyenda { margin: 0; }
+
+    .leyenda > div {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .leyenda dt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2px 8px;
+      flex: none;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .leyenda dd {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .leyenda dd strong { color: var(--ink); font-weight: 600; }
+
+    .orientacion-nota {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 14px 0 0;
+    }
+
+    .modulos, .inicios {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .modulos li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--muted);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line-soft);
+      line-height: 1.5;
+    }
+
+    .modulos li:last-child { border-bottom: 0; }
+
+    .modulo-sigla {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--c, var(--cyan));
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      padding: 2px 7px;
+      flex: none;
+    }
+
+    .modulo-curso {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .inicios li {
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .inicios li:last-child { border-bottom: 0; }
+
+    .inicios a {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .inicios p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
     /* ── Footer ── */
@@ -617,6 +793,7 @@
       .skip-link,
       .buscador-wrap,
       .filtros,
+      .filtros-label,
       .result-count,
       .no-results,
       .hero-badge,
@@ -637,10 +814,26 @@
       .hero-card-mission { color: #333 !important; }
       .hero-card-mission strong { color: #111 !important; }
 
+      .orientacion { padding: 0 0 16px; }
+      .orientacion-titulo { color: #111 !important; font-size: 20px; text-align: left; }
+      .orientacion-col { background: #fff; border: 1px solid #ccc; break-inside: avoid; }
+      .orientacion-sub { color: #0F766E !important; }
+      .leyenda dt { color: #111 !important; border-color: #999; }
+      .leyenda dd,
+      .orientacion-nota,
+      .modulos li,
+      .inicios p { color: #333 !important; }
+      .leyenda dd strong { color: #111 !important; }
+      .modulo-sigla { color: #333 !important; border-color: #999; }
+      .modulo-curso { color: #111 !important; }
+      .inicios a { color: #0F766E !important; }
+
       .container { padding: 0 0 12px; }
       .categoria { margin-bottom: 18px; break-inside: avoid; }
       .cat-header { border-bottom: 1px solid #999; }
       .cat-header h2 { color: #111 !important; font-size: 18px; }
+      .cat-sigla { color: #333 !important; }
+      .cat-curso { color: #444 !important; border-color: #bbb; }
       .cat-count { color: #444 !important; background: #f2f2f2; border-color: #ccc; }
 
       .guias-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -657,6 +850,7 @@
       .tarjeta .badge { background: #f2f2f2 !important; color: #333 !important; border-color: #999 !important; }
       .tarjeta h3 { color: #111 !important; font-size: 13px; }
       .tarjeta p { color: #333 !important; font-size: 11px; }
+      .tarjeta .meta { color: #555 !important; border-top-color: #ddd; }
 
       footer { border-top: 1px solid #ccc; color: #444 !important; padding: 16px 0 0; text-align: left; }
       .footer-license { color: #111 !important; }
@@ -671,16 +865,25 @@
 
   <!-- ── Hero ── -->
   <header class="hero">
+    <span class="hero-badge">Catálogo completo · 40 guías</span>
     <h1>Guías Didácticas <em>Interactivas</em></h1>
-
+    <p class="hero-tagline">
+      Cápsulas informativas portable para aprender haciendo: cada guía es un único archivo HTML
+      que funciona en cualquier navegador, sin servidores, sin instalaciones y sin dependencias.
+      Elige tu etapa, entra por el bloque que te toca y sigue la secuencia.
+    </p>
     <div class="hero-stats">
       <div class="stat">
         <span class="stat-num" id="stat-guias">40</span>
         <span class="stat-label">Guías</span>
       </div>
       <div class="stat">
-        <span class="stat-num">4</span>
-        <span class="stat-label">Categorías</span>
+        <span class="stat-num">3</span>
+        <span class="stat-label">Módulos</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">18</span>
+        <span class="stat-label">Transversales</span>
       </div>
     </div>
 
@@ -700,6 +903,62 @@
     </div>
   </header>
 
+  <!-- ── Orientación ── -->
+  <section class="orientacion" aria-labelledby="orientacion-titulo">
+    <h2 class="orientacion-titulo" id="orientacion-titulo">Por dónde empezar</h2>
+
+    <div class="orientacion-grid">
+      <div class="orientacion-col">
+        <h3 class="orientacion-sub">Qué significa cada etiqueta</h3>
+        <dl class="leyenda">
+          <div>
+            <dt>UT</dt>
+            <dd>Unidad de Trabajo: la parte <strong>teórica</strong> del módulo.</dd>
+          </div>
+          <div>
+            <dt>ACT</dt>
+            <dd>Actividad: la parte <strong>práctica y evaluable</strong>.</dd>
+          </div>
+        </dl>
+        <p class="orientacion-nota">
+          Las guías de módulo van en orden: cada una enlaza con la anterior y con la siguiente,
+          y al final de cada una tienes el bloque «Sigue tu ruta».
+        </p>
+      </div>
+
+      <div class="orientacion-col">
+        <h3 class="orientacion-sub">Qué módulo es el tuyo</h3>
+        <ul class="modulos">
+          <li>
+            <span class="modulo-sigla" style="--c: var(--cat-asete)">ASETE</span>
+            <span class="modulo-curso">2º DAM / 2º ASIR</span>
+            <span>PHP, Docker, Composer y Laravel</span>
+          </li>
+          <li>
+            <span class="modulo-sigla" style="--c: var(--cat-iaw)">IAW</span>
+            <span class="modulo-curso">2º ASIR</span>
+            <span>LEMP, WordPress y Nextcloud</span>
+          </li>
+          <li>
+            <span class="modulo-sigla" style="--c: var(--cat-pmdm)">PMDM</span>
+            <span class="modulo-curso">2º DAM</span>
+            <span>Android, Kotlin y Jetpack Compose</span>
+          </li>
+          <li>
+            <span class="modulo-sigla" style="--c: var(--cat-generales)">Generales</span>
+            <span class="modulo-curso">1º/2º DAW, 2º ASIR, Bachillerato</span>
+            <span>Temas transversales de cualquier curso</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="orientacion-col">
+        <h3 class="orientacion-sub">Empieza por aquí</h3>
+        <ul class="inicios" id="inicios"></ul>
+      </div>
+    </div>
+  </section>
+
   <!-- ── Buscador + Filtros ── -->
   <section class="buscador-section" aria-label="Buscar y filtrar guías">
     <div class="buscador-wrap">
@@ -714,12 +973,23 @@
       >
     </div>
 
-    <div class="filtros" role="group" aria-label="Filtrar por bloque">
+    <p class="filtros-label" id="filtros-cat-label">Por bloque</p>
+    <div class="filtros" role="group" aria-labelledby="filtros-cat-label">
       <button type="button" class="chip active" data-cat="todas" aria-pressed="true">Todas</button>
       <button type="button" class="chip" data-cat="generales" aria-pressed="false">Generales</button>
       <button type="button" class="chip" data-cat="asete" aria-pressed="false">ASETE</button>
       <button type="button" class="chip" data-cat="iaw" aria-pressed="false">IAW</button>
       <button type="button" class="chip" data-cat="pmdm" aria-pressed="false">PMDM</button>
+    </div>
+
+    <p class="filtros-label" id="filtros-curso-label">Por etapa</p>
+    <div class="filtros" role="group" aria-labelledby="filtros-curso-label">
+      <button type="button" class="chip active" data-curso="todas" aria-pressed="true">Todas</button>
+      <button type="button" class="chip" data-curso="1º de FP" aria-pressed="false">1º de FP</button>
+      <button type="button" class="chip" data-curso="2º de FP" aria-pressed="false">2º de FP</button>
+      <button type="button" class="chip" data-curso="Bachillerato" aria-pressed="false">Bachillerato</button>
+      <button type="button" class="chip" data-curso="Transversal" aria-pressed="false">Transversal</button>
+      <button type="button" class="chip" data-curso="Público general" aria-pressed="false">Público general</button>
     </div>
 
     <p class="result-count" id="result-count" role="status">Mostrando 40 de 40 guías</p>
@@ -743,9 +1013,10 @@
 
     <!-- Guías Generales -->
     <section class="categoria" data-cat="generales">
-      <div class="cat-header">
+      <div class="cat-header" style="--cat-color: var(--cat-generales)">
         <div class="cat-dot" style="background:var(--cat-generales)"></div>
         <h2>Guías generales</h2>
+        <span class="cat-curso">1º/2º DAW · 2º ASIR · Bachillerato</span>
         <span class="cat-count" id="count-generales">0</span>
       </div>
       <div class="guias-grid" id="grid-generales"></div>
@@ -753,9 +1024,10 @@
 
     <!-- ASETE -->
     <section class="categoria" data-cat="asete">
-      <div class="cat-header">
+      <div class="cat-header" style="--cat-color: var(--cat-asete)">
         <div class="cat-dot" style="background:var(--cat-asete)"></div>
-        <h2>Arquitectura de Servidor en Entornos de Trabajo Estructurados</h2>
+        <h2><span class="cat-sigla">ASETE</span>Arquitectura de Servidor en Entornos de Trabajo Estructurados</h2>
+        <span class="cat-curso">2º DAM / 2º ASIR</span>
         <span class="cat-count" id="count-asete">0</span>
       </div>
       <div class="guias-grid" id="grid-asete"></div>
@@ -763,9 +1035,10 @@
 
     <!-- IAW -->
     <section class="categoria" data-cat="iaw">
-      <div class="cat-header">
+      <div class="cat-header" style="--cat-color: var(--cat-iaw)">
         <div class="cat-dot" style="background:var(--cat-iaw)"></div>
-        <h2>Implantación de Aplicaciones Web</h2>
+        <h2><span class="cat-sigla">IAW</span>Implantación de Aplicaciones Web</h2>
+        <span class="cat-curso">2º ASIR</span>
         <span class="cat-count" id="count-iaw">0</span>
       </div>
       <div class="guias-grid" id="grid-iaw"></div>
@@ -773,9 +1046,10 @@
 
     <!-- PMDM -->
     <section class="categoria" data-cat="pmdm">
-      <div class="cat-header">
+      <div class="cat-header" style="--cat-color: var(--cat-pmdm)">
         <div class="cat-dot" style="background:var(--cat-pmdm)"></div>
-        <h2>Programación Multimedia y Dispositivos Móviles</h2>
+        <h2><span class="cat-sigla">PMDM</span>Programación Multimedia y Dispositivos Móviles</h2>
+        <span class="cat-curso">2º DAM</span>
         <span class="cat-count" id="count-pmdm">0</span>
       </div>
       <div class="guias-grid" id="grid-pmdm"></div>
@@ -788,9 +1062,14 @@
     <p class="footer-license">
       <span>&#9670;</span> Libre y gratuito. <span>Comparte, crea, adapta.</span>
     </p>
+    <p class="footer-credit">
+      Contenido generado con IA + revisión humana. Cada <em>guía</em> es un archivo HTML único sin
+      dependencias; este <em>catálogo</em> usa Google Fonts y una imagen.
+    </p>
+    <p class="footer-credit">Última revisión del catálogo: noviembre de 2026</p>
     <div class="footer-links">
       <a href="https://github.com/actionperformed/guias_html" target="_blank" rel="noopener">Repositorio</a>
-      <a href="readme.md">Índice completo</a>
+      <a href="https://github.com/actionperformed/guias_html/blob/master/readme.md" target="_blank" rel="noopener">Índice completo</a>
       <a href="utilidades/cv-form.html">Formulario FEOE</a>
       <a href="utilidades/cv-pdf.html">Generar CV en PDF</a>
     </div>
@@ -807,65 +1086,73 @@
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     // ── Datos de guías ──
-const GUIAS = {
+    const GUIAS = {
       generales: [
-        { archivo: "guia_css_daw.html", titulo: "Dominando CSS", descripcion: "Selectores, box model, flexbox y animaciones para 2º DAW", claves: ["css", "flexbox", "box model", "animaciones", "maquetacion"] },
-        { archivo: "guia_redes_daw.html", titulo: "Fundamentos de Redes", descripcion: "OSI, TCP/IP, IPv4, subredes y VLSM para 1º DAW", claves: ["redes", "osi", "tcp", "ip", "subredes", "dns", "enrutamiento"] },
-        { archivo: "guia_react_encuesta.html", titulo: "Encuesta en React", descripcion: "Hooks, componentes y app de votaciones en tiempo real", claves: ["react", "hooks", "javascript", "jsx", "componentes", "frontend"] },
-        { archivo: "guia_responsive_bootstrap.html", titulo: "Web Responsive", descripcion: "De web fija a responsive con Bootstrap y diseño adaptable", claves: ["responsive", "bootstrap", "mobile", "media queries", "css", "adaptable"] },
-        { archivo: "guia_batch_windows.html", titulo: "Scripts Batch", descripcion: "Automatización en Windows con .BAT y CMD", claves: ["batch", "cmd", "windows", "automatizacion", "script", "powershell"] },
-        { archivo: "guia_prompts.html", titulo: "Prompts que Funcionan", descripcion: "Entrenamiento de 4 semanas en ingeniería de prompts", claves: ["prompt", "prompting", "ia", "claude", "chatgpt", "instrucciones"] },
-        { archivo: "guia-ia-bachillerato.html", titulo: "IA para el Bachillerato", descripcion: "La IA como herramienta de estudio — EBAU y técnicas de estudio", claves: ["ia", "inteligencia artificial", "ebau", "selectividad", "estudio", "prompts"] },
-        { archivo: "guia-ia-fp.html", titulo: "IA para la FP", descripcion: "La IA como herramienta de estudio para Formación Profesional", claves: ["ia", "inteligencia artificial", "prompts", "smr", "asir", "dam", "daw"] },
-        { archivo: "guia-que-ia-usar.html", titulo: "Qué IA Usar", descripcion: "Comparativa visual de herramientas de IA por tarea", claves: ["ia", "herramientas", "comparativa", "privacidad", "gemini", "chatgpt", "claude", "copilot"] },
-        { archivo: "guia_linux.html", titulo: "Introducción a Linux", descripcion: "Sistema de archivos, permisos y terminal para 1º DAW", claves: ["linux", "terminal", "bash", "permisos", "sistema de archivos", "ubuntu", "wsl", "docker"] },
-        { archivo: "guia_git.html", titulo: "Git para FP", descripcion: "Línea de metro DAM/DAW/ASIR — control de versiones", claves: ["git", "versionado", "repositorio", "commit", "merge", "terminal", "github"] },
-        { archivo: "guia_lean.html", titulo: "Introducción a Lean", descripcion: "Lenguaje donde las demostraciones matemáticas se verifican y nunca mienten", claves: ["lean", "mathlib", "teoremas", "coq", "formalizacion", "matematicas"] },
-        { archivo: "guia_sql.html", titulo: "SQL", descripcion: "Consultas, joins, subconsultas y diseño de bases de datos relacionales", claves: ["sql", "base de datos", "joins", "subconsultas", "mysql", "mariadb", "postgres"] },
-        { archivo: "guia_valor_vs_referencia.html", titulo: "Valor vs Referencia", descripcion: "Java y PHP comparados con simuladores interactivos", claves: ["java", "php", "punteros", "memoria", "referencias", "poo", "simulador"] },
-        { archivo: "guia_php_vulnerabilidad.html", titulo: "Parche urgente: PHP-FPM y WordPress en Docker", descripcion: "Cómo actualizar imágenes y proteger el despliegue frente a vulnerabilidades", claves: ["seguridad", "docker", "wordpress", "php-fpm", "vulnerabilidades", "cve", "parche", "actualizar"] },
-        { archivo: "guia_latex.html", titulo: "LaTeX", descripcion: "Composición tipográfica, fórmulas matemáticas y documentos técnicos", claves: ["latex", "tex", "pdf", "formulas", "tipografia", "documento"] },
-        { archivo: "guia_php.html", titulo: "PHP", descripcion: "Programación del lado del servidor, formularios y conexión a BD", claves: ["php", "pdo", "formularios", "mysql", "mariadb", "servidor", "backend"] },
-        { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo", claves: ["proyecto", "fcf", "actas", "roles", "planificacion", "memoria"] },
+        { archivo: "guia_css_daw.html", titulo: "Dominando CSS", descripcion: "Selectores, box model, flexbox y animaciones", publico: "2º DAW", nivel: "medio", cursos: ["2º de FP"], claves: ["css", "flexbox", "box model", "animaciones", "maquetacion"] },
+        { archivo: "guia_redes_daw.html", titulo: "Fundamentos de Redes", descripcion: "OSI, TCP/IP, IPv4, subredes y VLSM", publico: "1º DAW", nivel: "medio", cursos: ["1º de FP"], claves: ["redes", "osi", "tcp", "ip", "subredes", "dns", "enrutamiento"] },
+        { archivo: "guia_react_encuesta.html", titulo: "Encuesta en React", descripcion: "Hooks, componentes y app de votaciones en tiempo real", publico: "DAW", nivel: "medio", cursos: ["2º de FP"], claves: ["react", "hooks", "javascript", "jsx", "componentes", "frontend"] },
+        { archivo: "guia_responsive_bootstrap.html", titulo: "Web Responsive", descripcion: "De web fija a responsive con Bootstrap y diseño adaptable", publico: "DAW", nivel: "básico-medio", cursos: ["2º de FP"], claves: ["responsive", "bootstrap", "mobile", "media queries", "css", "adaptable"] },
+        { archivo: "guia_batch_windows.html", titulo: "Scripts Batch", descripcion: "Automatización en Windows con .BAT y CMD", publico: "1º DAW", nivel: "básico", cursos: ["1º de FP"], claves: ["batch", "cmd", "windows", "automatizacion", "script", "powershell"] },
+        { archivo: "guia_prompts.html", titulo: "Prompts que Funcionan", descripcion: "Entrenamiento de 4 semanas en ingeniería de prompts", publico: "Cualquier FP", nivel: "transversal", cursos: ["Transversal"], claves: ["prompt", "prompting", "ia", "claude", "chatgpt", "instrucciones"] },
+        { archivo: "guia-ia-bachillerato.html", titulo: "IA para el Bachillerato", descripcion: "La IA como herramienta de estudio — EBAU y técnicas de estudio", publico: "2º Bachillerato", nivel: "básico", cursos: ["Bachillerato"], claves: ["ia", "inteligencia artificial", "ebau", "selectividad", "estudio", "prompts"] },
+        { archivo: "guia-ia-fp.html", titulo: "IA para la FP", descripcion: "La IA como herramienta de estudio para Formación Profesional", publico: "2º FP", nivel: "básico", cursos: ["2º de FP"], claves: ["ia", "inteligencia artificial", "prompts", "smr", "asir", "dam", "daw"] },
+        { archivo: "guia-que-ia-usar.html", titulo: "Qué IA Usar", descripcion: "Comparativa visual de herramientas de IA por tarea", publico: "Docentes y estudiantes", nivel: "transversal", cursos: ["Transversal"], claves: ["ia", "herramientas", "comparativa", "privacidad", "gemini", "chatgpt", "claude", "copilot"] },
+        { archivo: "guia_linux.html", titulo: "Introducción a Linux", descripcion: "Sistema de archivos, permisos y terminal", publico: "1º DAW", nivel: "básico", cursos: ["1º de FP"], claves: ["linux", "terminal", "bash", "permisos", "sistema de archivos", "ubuntu", "wsl", "docker"] },
+        { archivo: "guia_git.html", titulo: "Git para FP", descripcion: "Control de versiones línea a línea, con simulador de terminal y grafo de commits", publico: "DAM / DAW / ASIR", nivel: "básico", cursos: ["1º de FP", "2º de FP"], claves: ["git", "versionado", "repositorio", "commit", "merge", "terminal", "github"] },
+        { archivo: "guia_lean.html", titulo: "Introducción a Lean", descripcion: "Lenguaje donde las demostraciones matemáticas se verifican y nunca mienten", publico: "Matemáticas / CS", nivel: "avanzado", cursos: ["Público general"], claves: ["lean", "mathlib", "teoremas", "coq", "formalizacion", "matematicas"] },
+        { archivo: "guia_sql.html", titulo: "SQL", descripcion: "Consultas, joins, subconsultas y diseño de bases de datos relacionales", publico: "1º ASIR / DAM / DAW", nivel: "medio-avanzado", cursos: ["1º de FP", "2º de FP"], claves: ["sql", "base de datos", "joins", "subconsultas", "mysql", "mariadb", "postgres"] },
+        { archivo: "guia_valor_vs_referencia.html", titulo: "Valor vs Referencia", descripcion: "Java y PHP comparados con simuladores interactivos", publico: "DAM / ASIR", nivel: "medio", cursos: ["2º de FP"], claves: ["java", "php", "punteros", "memoria", "referencias", "poo", "simulador"] },
+        { archivo: "guia_php_vulnerabilidad.html", titulo: "Parche urgente: PHP-FPM y WordPress en Docker", descripcion: "Cómo actualizar imágenes y proteger el despliegue frente a vulnerabilidades", publico: "Perfil admin", nivel: "avanzado", cursos: ["Público general"], claves: ["seguridad", "docker", "wordpress", "php-fpm", "vulnerabilidades", "cve", "parche", "actualizar"] },
+        { archivo: "guia_latex.html", titulo: "LaTeX", descripcion: "Composición tipográfica, fórmulas matemáticas y documentos técnicos", publico: "Público general", nivel: "iniciación", cursos: ["Público general"], claves: ["latex", "tex", "pdf", "formulas", "tipografia", "documento"] },
+        { archivo: "guia_php.html", titulo: "PHP", descripcion: "Programación del lado del servidor, formularios y conexión a BD", publico: "2º DAM / 2º ASIR", nivel: "medio-avanzado", cursos: ["2º de FP"], claves: ["php", "pdo", "formularios", "mysql", "mariadb", "servidor", "backend"] },
+        { archivo: "guia_proyecto_asir.html", titulo: "Proyecto Fin de Ciclo ASIR", descripcion: "Guía orientativa para desarrollar el proyecto de fin de ciclo", publico: "2º ASIR", nivel: "organizativo", cursos: ["2º de FP"], claves: ["proyecto", "fcf", "actas", "roles", "planificacion", "memoria"] },
       ],
       asete: [
-        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Lenguajes de guiones de servidor", descripcion: "PHP 8.x con referencias comparativas a Node.js, Python y Java", claves: ["php", "servidor", "scripting", "seguridad", "node", "python", "java"] },
-        { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Entorno PHP para 2º ASIR/DAM", claves: ["php", "interprete", "playground", "banco de pruebas", "javascript"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP para 2º DAM", claves: ["php", "biblioteca", "playground", "login", "pdo", "crud"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker", claves: ["docker", "lamp", "apache", "php", "mysql", "compose", "despliegue"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%201.3.html", titulo: "ACT 1.3 — Login con PHP", descripcion: "Login con sesiones y roles en PHP", claves: ["php", "sesiones", "cookies", "roles", "login", "seguridad", "docker"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%202.1.html", titulo: "ACT 2.1 — MiniApp Biblioteca", descripcion: "MiniApp de Biblioteca con POO en PHP", claves: ["php", "poo", "clases", "herencia", "interfaces", "traits", "java"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%202.2.html", titulo: "ACT 2.2 — Composer y autoloading", descripcion: "Organiza el código con Composer, namespaces y autoloading", claves: ["composer", "namespaces", "psr-4", "autoload", "php", "psr-12"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%203.1.html", titulo: "ACT 3.1 — Taller Laravel", descripcion: "Laravel, Apache, PHP y MariaDB en contenedores con Docker", claves: ["laravel", "docker", "apache", "php", "mariadb", "composer", "taller"] },
-        { archivo: "ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html", titulo: "ACT 3.1 · Puente — De la MiniApp a Laravel", descripcion: "Cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade", claves: ["laravel", "blade", "eloquent", "rutas", "controladores", "migraciones"] },
+        { archivo: "ASETE/ASETE%20-%20UT0.html", titulo: "UT0 — Lenguajes de guiones de servidor", descripcion: "PHP 8.x con referencias comparativas a Node.js, Python y Java", nivel: "teoría", tiempo: "40 h", claves: ["php", "servidor", "scripting", "seguridad", "node", "python", "java"] },
+        { archivo: "ASETE/ASETE%20-%20UT1.html", titulo: "UT1 — Banco de Pruebas PHP", descripcion: "Intérprete PHP ejecutable en el navegador y 6 actividades", nivel: "teoría", claves: ["php", "interprete", "playground", "banco de pruebas", "javascript"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Mini-Biblioteca", descripcion: "Mini-biblioteca en PHP con login simulado", nivel: "práctica", tiempo: "4 h", claves: ["php", "biblioteca", "playground", "login", "pdo", "crud"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.2.html", titulo: "ACT 1.2 — Despliegue LAMP", descripcion: "Despliegue de un stack LAMP con Docker Compose", nivel: "práctica", tiempo: "1 h", claves: ["docker", "lamp", "apache", "php", "mysql", "compose", "despliegue"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%201.3.html", titulo: "ACT 1.3 — Login con PHP", descripcion: "Login con sesiones, cookies y roles sobre el stack de la 1.2", nivel: "práctica", tiempo: "4 h", claves: ["php", "sesiones", "cookies", "roles", "login", "seguridad", "docker"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%202.1.html", titulo: "ACT 2.1 — MiniApp Biblioteca", descripcion: "La misma app reescrita con POO: clases, herencia, interfaces y traits", nivel: "desde Java", tiempo: "6 h", claves: ["php", "poo", "clases", "herencia", "interfaces", "traits", "java"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%202.2.html", titulo: "ACT 2.2 — Composer y autoloading", descripcion: "Organiza el código con Composer, namespaces y PSR-4", nivel: "desde Java", tiempo: "4 h", claves: ["composer", "namespaces", "psr-4", "autoload", "php", "psr-12"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html", titulo: "ACT 3.1 · Puente — De la MiniApp a Laravel", descripcion: "Cómo se escribe la misma aplicación con rutas, controladores, Eloquent y Blade", tipo: "Lectura", nivel: "lectura", claves: ["laravel", "blade", "eloquent", "rutas", "controladores", "migraciones"] },
+        { archivo: "ASETE/ASETE%20-%20ACT%203.1.html", titulo: "ACT 3.1 — Taller Laravel", descripcion: "Laravel, Apache, PHP y MariaDB en contenedores con Docker", nivel: "práctica", tiempo: "4 h", claves: ["laravel", "docker", "apache", "php", "mariadb", "composer", "taller"] },
       ],
       iaw: [
-        { archivo: "IAW/IAW%20-%20UT1.html", titulo: "UT1 — Implantación", descripcion: "Implantación de aplicaciones web", claves: ["servidores web", "lemp", "nginx", "apache", "implantacion", "arquitectura"] },
-        { archivo: "IAW/IAW%20-%20UT4.html", titulo: "UT4 — Ofimática web", descripcion: "Qué es la ofimática web, cómo se clasifica y cómo elegir suite", claves: ["ofimatica", "odf", "ooxml", "office", "libreoffice", "suite"] },
-        { archivo: "IAW/IAW%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Stack LEMP", descripcion: "Despliegue de un stack LEMP (Nginx + MariaDB) con Docker", claves: ["lemp", "nginx", "mariadb", "docker", "phpmyadmin", "despliegue"] },
-        { archivo: "IAW/IAW%20-%20ACT%202.1.html", titulo: "ACT 2.1 — WordPress", descripcion: "Instalación y securización de WordPress sobre LEMP", claves: ["wordpress", "lemp", "seguridad", "instalacion", "docker"] },
-        { archivo: "IAW/IAW%20-%20ACT%203.1.html", titulo: "ACT 3.1 — WordPress Integral", descripcion: "Proyecto de personalización integral de WordPress", claves: ["wordpress", "personalizacion", "temas", "plugins", "proyecto", "php"] },
-        { archivo: "IAW/IAW%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Nextcloud", descripcion: "Despliegue de Nextcloud sobre LEMP con Docker: intranet, usuarios y seguridad", claves: ["nextcloud", "lemp", "docker", "intranet", "usuarios", "copias de seguridad"] },
+        { archivo: "IAW/IAW%20-%20UT1.html", titulo: "UT1 — Implantación", descripcion: "Servidores de aplicaciones web y arquitectura LEMP", nivel: "teoría", tiempo: "4-6 h", claves: ["servidores web", "lemp", "nginx", "apache", "implantacion", "arquitectura"] },
+        { archivo: "IAW/IAW%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Stack LEMP", descripcion: "Despliegue de un stack LEMP (Nginx + MariaDB) con Docker", nivel: "práctica", tiempo: "6-8 h", claves: ["lemp", "nginx", "mariadb", "docker", "phpmyadmin", "despliegue"] },
+        { archivo: "IAW/IAW%20-%20ACT%202.1.html", titulo: "ACT 2.1 — WordPress", descripcion: "Instalación y securización de WordPress sobre LEMP", nivel: "práctica", tiempo: "5-6 h", claves: ["wordpress", "lemp", "seguridad", "instalacion", "docker"] },
+        { archivo: "IAW/IAW%20-%20ACT%203.1.html", titulo: "ACT 3.1 — WordPress Integral", descripcion: "Proyecto de personalización integral de WordPress", nivel: "autonomía", tiempo: "8 h", claves: ["wordpress", "personalizacion", "temas", "plugins", "proyecto", "php"] },
+        { archivo: "IAW/IAW%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Nextcloud", descripcion: "Despliegue de Nextcloud sobre LEMP con Docker: intranet, usuarios y seguridad", nivel: "práctica", tiempo: "8 h", claves: ["nextcloud", "lemp", "docker", "intranet", "usuarios", "copias de seguridad"] },
+        { archivo: "IAW/IAW%20-%20UT4.html", titulo: "UT4 — Ofimática web", descripcion: "Qué es la ofimática web, cómo se clasifica y cómo elegir suite", nivel: "teoría", tiempo: "2 h", claves: ["ofimatica", "odf", "ooxml", "office", "libreoffice", "suite"] },
       ],
       pmdm: [
-        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Kotlin.html", titulo: "UT1 — Kotlin desde Cero", descripcion: "Kotlin desde cero para desarrollo Android", claves: ["kotlin", "android", "jetpack", "coroutines", "java"] },
-        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Android.html", titulo: "UT1 — Fundamentos Android", descripcion: "Fundamentos de desarrollo Android", claves: ["android", "android studio", "emulador", "logcat", "sdk"] },
-        { archivo: "PMDM/PMDM%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Android Studio", descripcion: "Introducción a Android Studio y Kotlin", claves: ["android studio", "kotlin", "ide", "depuracion"] },
-        { archivo: "PMDM/PMDM%20-%20ACT%202.1.html", titulo: "ACT 2.1 — Login con Compose", descripcion: "Pantalla de Login con Jetpack Compose — simulación interactiva", claves: ["compose", "jetpack", "login", "kotlin", "ui"] },
-        { archivo: "PMDM/PMDM%20-%20ACT%202.2.html", titulo: "ACT 2.2 — NavHost y Diálogos", descripcion: "NavHost, Registro, Scaffold y Diálogos — amplía login", claves: ["compose", "navhost", "scaffold", "dialogos", "registro", "kotlin"] },
-        { archivo: "PMDM/PMDM%20-%20ACT%203.1.html", titulo: "ACT 3.1 — CRUD, Room y Despliegue", descripcion: "CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue", claves: ["room", "datastore", "viewmodel", "notificaciones", "apk", "crud", "mvvm"] },
-        { archivo: "PMDM/PMDM%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Red, Bluetooth y SMS", descripcion: "Conectividad avanzada: Red, Bluetooth y SMS", claves: ["bluetooth", "sms", "api rest", "wifi direct", "red", "conectividad"] },
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Kotlin.html", titulo: "UT1 — Kotlin desde Cero", descripcion: "Kotlin desde cero para desarrollo Android, con el puente desde Java", nivel: "desde Java", tiempo: "≈ 11 h", claves: ["kotlin", "android", "jetpack", "coroutines", "java"] },
+        { archivo: "PMDM/PMDM%20-%20UT1%20-%20Android.html", titulo: "UT1 — Fundamentos Android", descripcion: "Android Studio panel a panel: emulador, Logcat y estructura del proyecto", nivel: "iniciación", claves: ["android", "android studio", "emulador", "logcat", "sdk"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%201.1.html", titulo: "ACT 1.1 — Android Studio", descripcion: "Explorar el IDE, personalizarlo, depurar y documentar", nivel: "iniciación", tiempo: "4 h", claves: ["android studio", "kotlin", "ide", "depuracion"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.1.html", titulo: "ACT 2.1 — Login con Compose", descripcion: "Pantalla de Login con Jetpack Compose — simulación interactiva", nivel: "práctica", claves: ["compose", "jetpack", "login", "kotlin", "ui"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%202.2.html", titulo: "ACT 2.2 — NavHost y Diálogos", descripcion: "NavHost, Registro, Scaffold y Diálogos — amplía el login", nivel: "práctica", claves: ["compose", "navhost", "scaffold", "dialogos", "registro", "kotlin"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%203.1.html", titulo: "ACT 3.1 — CRUD, Room y Despliegue", descripcion: "CRUD con Room, DataStore, ViewModel, Notificaciones y Despliegue", nivel: "práctica", claves: ["room", "datastore", "viewmodel", "notificaciones", "apk", "crud", "mvvm"] },
+        { archivo: "PMDM/PMDM%20-%20ACT%204.1.html", titulo: "ACT 4.1 — Red, Bluetooth y SMS", descripcion: "Conectividad avanzada: API REST con errores, Bluetooth y SMS", nivel: "práctica", tiempo: "≈ 6 h", claves: ["bluetooth", "sms", "api rest", "wifi direct", "red", "conectividad"] },
       ],
     };
 
-
-    // ── Bloques: color y nombre ──
+    // ── Bloques: color, nombre y a quién va dirigida cada sección ──
     const CAT_INFO = {
-      generales: { color: '#E8A33D', nombre: 'generales' },
-      asete: { color: '#FC8181', nombre: 'ASETE' },
-      iaw: { color: '#68D391', nombre: 'IAW' },
-      pmdm: { color: '#60A5FA', nombre: 'PMDM' }
+      generales: { color: '#E8A33D', nombre: 'generales', publico: '1º/2º DAW · 2º ASIR · Bachillerato', cursos: [] },
+      asete: { color: '#FC8181', nombre: 'ASETE', publico: '2º DAM / 2º ASIR', cursos: ['2º de FP'] },
+      iaw: { color: '#68D391', nombre: 'IAW', publico: '2º ASIR', cursos: ['2º de FP'] },
+      pmdm: { color: '#60A5FA', nombre: 'PMDM', publico: '2º DAM', cursos: ['2º de FP'] }
     };
+
+    // ── Puntos de entrada recomendados ──
+    const INICIOS = [
+      { titulo: 'ASETE · 2º DAM / 2º ASIR', archivo: 'ASETE/ASETE%20-%20UT0.html', texto: 'La UT0 es la teoría del módulo (40 h); el banco de pruebas de la UT1 la ejecuta.' },
+      { titulo: 'IAW · 2º ASIR', archivo: 'IAW/IAW%20-%20UT1.html', texto: 'La UT1 explica los servidores de aplicaciones web y la arquitectura LEMP (4-6 h).' },
+      { titulo: 'PMDM · 2º DAM', archivo: 'PMDM/PMDM%20-%20UT1%20-%20Kotlin.html', texto: 'Kotlin desde cero, con el puente desde Java ya hecho (≈ 11 h).' },
+      { titulo: 'Terminal · cualquier etapa', archivo: 'guia_linux.html', texto: 'Permisos y terminal: lo que vas a necesitar para mover Docker.' },
+      { titulo: 'Control de versiones · cualquier etapa', archivo: 'guia_git.html', texto: 'Git línea a línea, con simulador de terminal y grafo de commits.' }
+    ];
 
     // Las rutas de las guías son relativas al propio index.html, así que el
     // catálogo funciona igual abierto en local (file://) o publicado en
@@ -878,37 +1165,77 @@ const GUIAS = {
       return texto.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
     }
 
+    // La etiqueta de la tarjeta dice el tipo de guía (Unidad / Actividad),
+    // no la categoría: la categoría ya la dan el color y la sección.
+    function tipoDe(guia) {
+      if (guia.tipo) return guia.tipo;
+      if (guia.titulo.indexOf('ACT') === 0) return 'Actividad';
+      if (guia.titulo.indexOf('UT') === 0) return 'Unidad';
+      return 'General';
+    }
+
+    // Espacio duro: evita que «6 h» se parta entre dos líneas en la tarjeta.
+    const NBSP = String.fromCharCode(160);
+
     // ── Renderizar tarjetas ──
     function crearTarjeta(guia, cat) {
       const info = CAT_INFO[cat];
-      const etiqueta = cat === 'generales' ? 'General' : cat.toUpperCase();
+      const tipo = tipoDe(guia);
+      const meta = [guia.publico || info.publico, guia.nivel, guia.tiempo]
+        .filter(Boolean)
+        .join(' · ')
+        .replace(/(\d)\s(h|min)\b/g, (m, cifra, unidad) => cifra + NBSP + unidad);
 
       const a = document.createElement('a');
       a.className = 'tarjeta';
       a.href = BASE_URL + guia.archivo;
       a.style.setProperty('--cat-color', info.color);
+      a.dataset.cursos = (guia.cursos || info.cursos).join('|');
 
       a.innerHTML = `
-        <span class="badge">${etiqueta}</span>
+        <span class="badge">${tipo}</span>
         <h3>${guia.titulo}</h3>
         <p>${guia.descripcion}</p>
+        <span class="meta">${meta}</span>
         <span class="arrow" aria-hidden="true">&#8594;</span>
       `;
 
-      // Texto que indexa el buscador: título, descripción, bloque y
-      // palabras clave. Todo sin acentos y en minúsculas.
+      // Texto que indexa el buscador: título, descripción, bloque, módulo,
+      // público, nivel y palabras clave. Todo sin acentos y en minúsculas.
       a.dataset.buscar = norm([
         guia.titulo,
         guia.descripcion,
-        etiqueta,
+        tipo,
         info.nombre,
+        info.publico,
+        meta,
         (guia.claves || []).join(' ')
       ].join(' '));
 
       return a;
     }
 
+    // ── Puntos de entrada ──
+    function renderInicios() {
+      const lista = document.getElementById('inicios');
+      INICIOS.forEach(item => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = BASE_URL + item.archivo;
+        a.textContent = item.titulo;
+        const p = document.createElement('p');
+        p.textContent = item.texto;
+        li.appendChild(a);
+        li.appendChild(p);
+        lista.appendChild(li);
+      });
+    }
+
     // Renderizar todas las guías en sus grids
+    // Las generales se ordenan alfabéticamente; los módulos mantienen el
+    // orden de aprendizaje.
+    GUIAS.generales.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+
     Object.keys(GUIAS).forEach(cat => {
       const grid = document.getElementById(`grid-${cat}`);
 
@@ -916,7 +1243,7 @@ const GUIAS = {
         const tarjeta = crearTarjeta(guia, cat);
         grid.appendChild(tarjeta);
 
-        // Animación escalonada (omitida si el usuario pide menos movimiento)
+        // Animación staggered
         if (reduceMotion.matches) {
           tarjeta.classList.add('visible');
         } else {
@@ -933,6 +1260,7 @@ const GUIAS = {
 
     // ── Filtrado ──
     let filtroCat = 'todas';
+    let filtroCurso = 'todas';
     let terminoBusqueda = '';
 
     function aplicarFiltro() {
@@ -947,9 +1275,11 @@ const GUIAS = {
 
         tarjetas.forEach(tarjeta => {
           const coincideCat = filtroCat === 'todas' || filtroCat === cat;
+          const coincideCurso = filtroCurso === 'todas' ||
+            tarjeta.dataset.cursos.split('|').indexOf(filtroCurso) !== -1;
           const coincideBusqueda = terminos.every(t => tarjeta.dataset.buscar.indexOf(t) !== -1);
 
-          if (coincideCat && coincideBusqueda) {
+          if (coincideCat && coincideCurso && coincideBusqueda) {
             tarjeta.style.display = '';
             visiblesEnCat++;
           } else {
@@ -1024,11 +1354,13 @@ const GUIAS = {
     });
 
     // ── Arranque ──
+    renderInicios();
+
     conectarChips('.filtros [data-cat]', 'cat', valor => { filtroCat = valor; });
+    conectarChips('.filtros [data-curso]', 'curso', valor => { filtroCurso = valor; });
 
     aplicarFiltro();
   })();
   </script>
-
 </body>
 </html>
