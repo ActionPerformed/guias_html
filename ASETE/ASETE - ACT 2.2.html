@@ -3429,7 +3429,35 @@ class PrestamoService
                 es responsabilidad del controlador.</b></li>
             <li>Es <b>una</b> operación de negocio. El controlador solo llama y traduce excepciones a respuestas HTTP.
             </li>
+            <li><b>Consultar y actuar van separados.</b> <span class="inline">isDisponible()</span> <b>pregunta</b>
+              (no cambia nada); <span class="inline">prestar()</span> <b>manda</b> (presta y cambia el estado). Por eso
+              el <span class="inline">if</span> solo mira el resultado de la consulta, y el préstamo se concede en su
+              propia línea, fuera de la condición. Si hicieras
+              <span class="inline">if (!$material-&gt;prestar())</span>, el efecto (prestar) quedaría <b>escondido
+              dentro de la condición</b>: para leer el <span class="inline">if</span> habría que saber qué hace
+              <span class="inline">prestar()</span> por dentro.</li>
           </ul>
+        </div>
+        <div class="tip">
+          <p>💡 <b>Una pregunta que queda abierta (y está muy bien que quede):</b> en ACT 2.1 escribiste
+            <span class="inline">prestar(): bool</span> justo para que la <b>entidad</b> protegiera la invariante
+            «no se puede prestar algo ya prestado». Si aquí el servicio ya ha comprobado con
+            <span class="inline">isDisponible()</span>, <b>¿no se está duplicando la comprobación</b>? ¿Y qué pasa con
+            el <span class="inline">bool</span> que devuelve <span class="inline">prestar()</span>, que aquí ya no se
+            mira?</p>
+          <p>Las dos versiones —<span class="inline">if (!$material-&gt;prestar())</span> o
+            <span class="inline">if (!$material-&gt;isDisponible())</span> + <span class="inline">prestar()</span>—
+            <b>compilan y funcionan igual</b>. La diferencia es de criterio, no de resultado:</p>
+          <ul>
+            <li>La <b>anterior</b> deja la regla en un único sitio (dentro de la entidad) y no abre ventana entre
+              comprobar y actuar. A cambio, esconde un efecto dentro de la condición.</li>
+            <li>La <b>actual</b> se lee mejor y separa consulta de orden. A cambio, la comprobación queda duplicada y
+              el valor de retorno de <span class="inline">prestar()</span> se descarta.</li>
+          </ul>
+          <p>Si el sistema tuviera <b>concurrencia real</b> (dos peticiones simultáneas sobre el mismo material), la
+            versión anterior sería la más segura: la comprobación y el cambio ocurren dentro de la misma llamada. Aquí
+            no hay concurrencia, así que la actual se lee mejor sin perder nada. <b>Decide tú cuál te parece más
+            correcta y sé capaz de justificarlo.</b></p>
         </div>
         <h3>📄 Paso 4: <span class="inline">finally</span> — un caso real</h3>
         <p><span class="inline">finally</span> se ejecuta <b>siempre</b>, haya o no excepción. Útil para limpiar
@@ -3440,10 +3468,11 @@ class PrestamoService
     $material = $this-&gt;repo-&gt;findById($materialId);
 
     try {
-        if (!$material-&gt;prestar()) {
+        if (!$material-&gt;isDisponible()) {
             throw new MaterialNoDisponibleException($material-&gt;getTitulo());
         }
 
+        $material-&gt;prestar();
         $this-&gt;repo-&gt;setDisponible($materialId, false);
         $this-&gt;repo-&gt;registrarPrestamo($materialId, $usuarioId);
     } finally {
@@ -3457,6 +3486,14 @@ class PrestamoService
           <p>📌 <b><span class="inline">finally</span> no captura: solo limpia.</b> Si hay excepción, se propaga
             <b>después</b> del <span class="inline">finally</span>. Eso permite "hacer algo siempre" sin tragarte el
             error.</p>
+          <ul>
+            <li><b>El <span class="inline">try</span> empieza <b>después</b> de
+              <span class="inline">findById()</span>.</b> Si el id no existe, la excepción salta <b>antes</b> de
+              entrar en el <span class="inline">try</span>… y el <span class="inline">finally</span> <b>no se
+              ejecuta</b>: no hay <span class="inline">$material</span> que registrar. Si el material existe pero ya
+              está prestado, la excepción sí nace <b>dentro</b> del <span class="inline">try</span> y el
+              <span class="inline">finally</span> sí registra el intento fallido.</li>
+          </ul>
         </div>
         <h3>📄 Paso 5: capturar en los puntos de entrada</h3>
         <p><span class="inline">public/material.php</span>:</p>
@@ -4741,7 +4778,7 @@ public function prestar(int $id, PrestamoService $service)
           var s = SC[+$("#w3s").value], cf = CF[+$("#w3c").value], fin = $("#w3f").checked, glob = $("#w3g").checked, ex = s.ex;
           var clause = null; if (ex) cf.c.forEach(function (c) { if (!clause && isa(ex, c[0])) clause = c; });
           var L = ["POST /prestar.php   material_id=" + (ex === "MaterialNoEncontradoException" ? 9999 : 2), "requireLogin() ✓", "$service->prestar($id, 2)", "   $repo->findById($id)  " + (ex && !s.after ? "↯ lanza " + ex : "✓ devuelve el objeto")];
-          if (!ex || s.after) { L.push("   try {"); L.push("      $material->prestar()  → " + (ex ? "false  → throw new " + ex + "  ↯" : "true  → UPDATE + INSERT ✓")); L.push("   }" + (fin ? " finally { log('Intento de préstamo…') }" : "")); }
+          if (!ex || s.after) { L.push("   try {"); if (ex) { L.push("      $material->isDisponible()  → false  → throw new " + ex + "  ↯"); } else { L.push("      $material->isDisponible()  → true"); L.push("      $material->prestar()  → UPDATE + INSERT ✓"); } L.push("   }" + (fin ? " finally { log('Intento de préstamo…') }" : "")); }
           var st, page, logs = [], warn = "";
           if (!ex) { st = "302 → /material.php?id=2"; page = "El usuario ve la ficha: «Prestado»."; if (!fin) logs.push("Préstamo de 'Dune' al usuario 2"); }
           else if (clause) { st = clause[1]; page = "«No se pudo completar el préstamo»  +  " + s.msg; if (ex === "TypeError" || ex === "PDOException") warn = "\n<span class=\"err\">⚠ El mensaje técnico llega al usuario: fuga de información (rutas, SQL…). Un catch demasiado amplio no debería mostrar getMessage().</span>"; }

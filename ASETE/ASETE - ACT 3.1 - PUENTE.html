@@ -1172,9 +1172,10 @@ Route::get(<span class="s">'/admin'</span>,               [AdminController::clas
     <span class="k">public function</span> prestar(<span class="n">int</span> $materialId, <span class="n">int</span> $usuarioId): <span class="k">void</span>
     {
         $material = $this->repo->findById($materialId);
-        <span class="k">if</span> (!$material->prestar()) {
+        <span class="k">if</span> (!$material->isDisponible()) {
             <span class="k">throw new</span> MaterialNoDisponibleException($material->getTitulo());
         }
+        $material->prestar();
         $this->repo->setDisponible($materialId, <span class="k">false</span>);
         $this->repo->registrarPrestamo($materialId, $usuarioId);
     }
@@ -1193,9 +1194,10 @@ Route::get(<span class="s">'/admin'</span>,               [AdminController::clas
     {
         DB::transaction(<span class="k">function</span> () <span class="k">use</span> ($materialId, $usuarioId) {
             $material = $this->repo->findById($materialId);
-            <span class="k">if</span> (!$material->prestar()) {
+            <span class="k">if</span> (!$material->isDisponible()) {
                 <span class="k">throw new</span> MaterialNoDisponibleException($material->getTitulo());
             }
+            $material->prestar();
             $this->repo->setDisponible($materialId, <span class="k">false</span>);
             $this->repo->registrarPrestamo($materialId, $usuarioId);
         });
