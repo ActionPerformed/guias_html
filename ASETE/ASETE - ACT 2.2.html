@@ -2704,7 +2704,8 @@
         <p>Los archivos movidos ahora tienen rutas relativas distintas. Todavía no hay namespaces ni Composer. Arregla las rutas para que la app siga funcionando igual que antes:</p>
         <ul>
           <li>En <span class="inline">public/index.php</span>: <span class="inline">require_once __DIR__ . '/../includes/auth.php'</span> → <span class="inline">require_once __DIR__ . '/../app/Includes/auth.php'</span>.</li>
-          <li>En <span class="inline">app/Repos/MaterialRepo.php</span>: <span class="inline">require_once __DIR__ . '/../config/db.php'</span> → <span class="inline">require_once __DIR__ . '/../app/Config/db.php'</span>.</li>
+          <li>En <span class="inline">app/Repos/MaterialRepo.php</span>: <span class="inline">require_once __DIR__ . '/../config/db.php'</span> → <span class="inline">require_once __DIR__ . '/../Config/db.php'</span>.</li>
+          <li>En <span class="inline">app/Includes/auth.php</span>: <span class="inline">require_once __DIR__ . '/../config/db.php'</span> → <span class="inline">require_once __DIR__ . '/../Config/db.php'</span>.</li>
           <li>Etc.</li>
         </ul>
 
@@ -2921,6 +2922,15 @@ function db(): PDO
     }
     return $pdo;
 }</pre>
+        <div class="note">
+          <p>📌 <b>Fíjate:</b> <span class="inline">db()</span> es una <b>función global</b>: <span
+              class="inline">app/Config/db.php</span> no declara <span class="inline">namespace</span> y por eso no
+            necesita ningún <span class="inline">use</span>. Se carga con <span class="inline">require_once</span> desde
+            quien la use —igual que <span class="inline">auth.php</span>— y se llama directamente como <span
+              class="inline">db()</span>. Si algún día quieres meterla en un namespace, el <span
+              class="inline">use</span> correcto sería <span class="inline">use function App\Config\db;</span>
+            (el <span class="inline">use</span> sin <span class="inline">function</span> solo sirve para clases).</p>
+        </div>
         <h3>📄 Paso 3: puntos de entrada</h3>
 <p>Los <strong>puntos de entrada</strong> son los archivos de <span class="inline">public/</span> que el navegador puede pedir directamente. Son seis:</p>
 <div class="tw"><table><thead><tr><th>Archivo</th><th>Qué hace</th></tr></thead><tbody><tr><td><span class="inline">public/login.php</span></td><td>Formulario de login</td></tr><tr><td><span class="inline">public/logout.php</span></td><td>Cierra sesión</td></tr><tr><td><span class="inline">public/index.php</span></td><td>Catálogo</td></tr><tr><td><span class="inline">public/material.php</span></td><td>Ficha individual</td></tr><tr><td><span class="inline">public/prestar.php</span></td><td>Acción de préstamo</td></tr><tr><td><span class="inline">public/admin.php</span></td><td>Panel de administración</td></tr></tbody></table></div>
@@ -3245,14 +3255,15 @@ class MaterialRepo
 ├── app/
 │   ├── Classes/       ← namespace App\Classes
 │   ├── Repos/         ← namespace App\Repos
-│   ├── Config/        ← namespace App\Config
+│   ├── Config/        ← db() sin namespace (función global)
 │   └── Includes/
 ├── public/            ← puntos de entrada, solo require de vendor/autoload.php
 ├── vendor/            ← generado por Composer
 ├── composer.json
 └── composer.lock</pre>
         <p>La app funciona igual, pero <b>sin <span class="inline">require_once</span> de clases</b>. Composer se
-          encarga. Tienes namespaces en todo el código de aplicación.</p>
+          encarga. Tienes namespaces en todo el código de aplicación, salvo en <span class="inline">app/Config/db.php</span>:
+          <span class="inline">db()</span> es una <b>función global</b> y se carga con <span class="inline">require_once</span>.</p>
       </section>
 
       <section id="bloque-2" data-b="2">
@@ -4132,11 +4143,12 @@ public function prestar(int $id, PrestamoService $service)
         </div>
         <div class="amp" data-amp="A4">
           <div class="amp-head"><span class="amp-n">A4</span><b>Autoload de funciones</b></div>
-          <p>Composer también puede autoloadear funciones (<span class="inline">autoload.files</span>). Mueve <span
-              class="inline">db()</span> a <span class="inline">app/Config/db.php</span> y añade <span
-              class="inline">"files": ["app/Config/db.php"]</span> en <span class="inline">composer.json</span>. ¿Qué
-            diferencia hay entre <span class="inline">autoload.psr-4</span> (clases) y <span
-              class="inline">autoload.files</span> (funciones)?</p><button class="amp-done" type="button">Marcar como
+          <p>Composer también puede autoloadear funciones (<span class="inline">autoload.files</span>). Vuelve a
+            poner <span class="inline">namespace App\Config;</span> en <span class="inline">app/Config/db.php</span>,
+            añádelo a <span class="inline">"files": ["app/Config/db.php"]</span> en <span
+              class="inline">composer.json</span> y llámalo con <span class="inline">use function
+              App\Config\db;</span>. ¿Qué diferencia hay entre <span class="inline">autoload.psr-4</span> (clases) y
+            <span class="inline">autoload.files</span> (funciones)?</p><button class="amp-done" type="button">Marcar como
             resuelta</button>
         </div>
         <div class="amp" data-amp="A5">
@@ -4614,7 +4626,7 @@ public function prestar(int $id, PrestamoService $service)
           { b: "classes/traits/TieneFechas.php", a: "app/Classes/Traits/TieneFechas.php", ns: "App\\Classes\\Traits", c: "TieneFechas", ren: true },
           { b: "classes/traits/Loggable.php", a: "app/Classes/Traits/Loggable.php", ns: "App\\Classes\\Traits", c: "Loggable", ren: true },
           { b: "repos/MaterialRepo.php", a: "app/Repos/MaterialRepo.php", ns: "App\\Repos", c: "MaterialRepo" },
-          { b: "config/db.php", a: "app/Config/db.php", ns: "App\\Config", fn: true },
+          { b: "config/db.php", a: "app/Config/db.php", fn: true },
           { b: "includes/auth.php", a: "app/Includes/auth.php", ns: "App\\Includes", fn: true },
           { b: "includes/header.php", a: "app/Includes/header.php", ns: "App\\Includes", inc: true },
           { b: "includes/footer.php", a: "app/Includes/footer.php", ns: "App\\Includes", inc: true },
@@ -4676,7 +4688,7 @@ public function prestar(int $id, PrestamoService $service)
       /* ================= LAB 2 · Resolución de nombres + autoloader PSR-4 ================= */
       (function () {
         var host = $("#w-autoload"); if (!host) return;
-        var FILES = [["public/index.php", ""], ["app/Repos/MaterialRepo.php", "App\\Repos"], ["app/Classes/Libro.php", "App\\Classes"], ["app/Config/db.php", "App\\Config"], ["app/Services/PrestamoService.php", "App\\Services"]];
+        var FILES = [["public/index.php", ""], ["app/Repos/MaterialRepo.php", "App\\Repos"], ["app/Classes/Libro.php", "App\\Classes"], ["app/Config/db.php", ""], ["app/Services/PrestamoService.php", "App\\Services"]];
         var IMPS = ["App\\Repos\\MaterialRepo", "App\\Classes\\MaterialBiblioteca", "App\\Classes\\Traits\\TieneFechas", "App\\Classes\\Mapa", "PDO"];
         var CODES = ["MaterialRepo", "MaterialBiblioteca", "TieneFechas", "Libro", "PDO", "\\App\\Classes\\Libro", "Mapa", "RuntimeException"];
         var BUILTIN = ["PDO", "RuntimeException", "Exception", "Throwable", "TypeError", "Error"];
