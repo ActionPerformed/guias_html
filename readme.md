@@ -57,7 +57,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | Guía | Descripción |
 |------|-------------|
 | [ASETE - UT0.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT0.html) | UT0 — Lenguajes de guiones de servidor: PHP 8.x con referencias comparativas a Node.js, Python y Java |
-| [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Banco de pruebas PHP para 2º ASIR/DAM |
+| [ASETE - UT1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20UT1.html) | UT1 — Banco de pruebas PHP para 2º DAM |
 | [ASETE - ACT 1.1.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.1.html) | Actividad 1.1 — Mini-Biblioteca PHP para 2º DAM |
 | [ASETE - ACT 1.2.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.2.html) | Actividad 1.2 — Despliegue de un stack LAMP con Docker |
 | [ASETE - ACT 1.3.html](https://actionperformed.github.io/guias_html/ASETE/ASETE%20-%20ACT%201.3.html) | Actividad 1.3 — Login con PHP (sesiones y roles) |
@@ -75,7 +75,7 @@ Porque la formación no debería tener barreras de entrada. Y porque el progreso
 | [IAW - ACT 1.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%201.1.html) | Actividad 1.1 — Despliegue de un stack LEMP (Nginx + MariaDB) con Docker |
 | [IAW - ACT 2.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%202.1.html) | Actividad 2.1 — Instalación y securización de WordPress sobre LEMP |
 | [IAW - ACT 3.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%203.1.html) | Actividad 3.1 — Proyecto de personalización integral de WordPress |
-| [IAW - ACT 4.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%204.1.html) | Actividad 4.1 — Nextcloud sobre LEMP en Docker: intranet, usuarios y seguridad |
+| [IAW - ACT 4.1.html](https://actionperformed.github.io/guias_html/IAW/IAW%20-%20ACT%204.1.html) | Actividad 4.1 — Nextcloud sobre LAMP en Docker: intranet, usuarios y seguridad |
 
 
 ### PMDM (Programación Multimedia y Dispositivos Móviles)
@@ -111,7 +111,7 @@ Cada guía termina con un bloque **«Sigue tu ruta»**: los enlaces a la activid
 
 **IAW** — Implantación de aplicaciones web:
 
-[UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html) → [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html) → [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html) → [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) → [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html) → [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html)
+[UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html) → [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html) → [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html) → [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) → [Actividad 4.1 · Nextcloud sobre LAMP](IAW/IAW%20-%20ACT%204.1.html) → [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html)
 
 **PMDM** — Android y Kotlin:
 
@@ -126,13 +126,13 @@ Estas guías son el pegamento entre módulos: cada una se enlaza desde las activ
 | [Dominando CSS](guia_css_daw.html) | [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
 | [Git para FP](guia_git.html) | [Actividad 2.2 · Composer y autoloading](ASETE/ASETE%20-%20ACT%202.2.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [UT1 · Fundamentos de desarrollo Android](PMDM/PMDM%20-%20UT1%20-%20Android.html), [Actividad 1.1 · Android Studio y Kotlin](PMDM/PMDM%20-%20ACT%201.1.html) |
 | [LaTeX](guia_latex.html) | [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html) |
-| [Introducción a Linux](guia_linux.html) | [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html), [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html) |
+| [Introducción a Linux](guia_linux.html) | [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html), [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 4.1 · Nextcloud sobre LAMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html) |
 | [PHP](guia_php.html) | [UT0 · Lenguajes de guiones de servidor (PHP 8)](ASETE/ASETE%20-%20UT0.html), [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html), [Actividad 1.1 · Mini-Biblioteca PHP](ASETE/ASETE%20-%20ACT%201.1.html), [Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)](ASETE/ASETE%20-%20ACT%202.1.html), [Actividad 2.2 · Composer y autoloading](ASETE/ASETE%20-%20ACT%202.2.html), [Puente de la 3.1 · De la MiniApp a Laravel](ASETE/ASETE%20-%20ACT%203.1%20-%20PUENTE.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html) |
 | [Parche urgente: PHP-FPM y WordPress en Docker](guia_php_vulnerabilidad.html) | [Actividad 1.2 · Stack LAMP con Docker](ASETE/ASETE%20-%20ACT%201.2.html), [Actividad 3.1 · Taller Laravel con Docker](ASETE/ASETE%20-%20ACT%203.1.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html), [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
 | [Proyecto de fin de ciclo ASIR](guia_proyecto_asir.html) | [UT4 · Ofimática web](IAW/IAW%20-%20UT4.html) |
 | [Fundamentos de redes](guia_redes_daw.html) | [UT1 · Implantación de aplicaciones web](IAW/IAW%20-%20UT1.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 4.1 · Red, Bluetooth y SMS](PMDM/PMDM%20-%20ACT%204.1.html) |
 | [De web fija a web responsive](guia_responsive_bootstrap.html) | [Actividad 3.1 · Personalización integral de WordPress](IAW/IAW%20-%20ACT%203.1.html) |
-| [SQL](guia_sql.html) | [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html), [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html), [Actividad 4.1 · Nextcloud sobre LEMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 3.1 · CRUD con Room y DataStore](PMDM/PMDM%20-%20ACT%203.1.html) |
+| [SQL](guia_sql.html) | [UT1 · Banco de pruebas PHP](ASETE/ASETE%20-%20UT1.html), [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html), [Actividad 1.1 · Stack LEMP con Docker](IAW/IAW%20-%20ACT%201.1.html), [Actividad 2.1 · WordPress sobre LEMP](IAW/IAW%20-%20ACT%202.1.html), [Actividad 4.1 · Nextcloud sobre LAMP](IAW/IAW%20-%20ACT%204.1.html), [Actividad 3.1 · CRUD con Room y DataStore](PMDM/PMDM%20-%20ACT%203.1.html) |
 | [Valor vs referencia (Java y PHP)](guia_valor_vs_referencia.html) | [UT0 · Lenguajes de guiones de servidor (PHP 8)](ASETE/ASETE%20-%20UT0.html), [Actividad 1.1 · Mini-Biblioteca PHP](ASETE/ASETE%20-%20ACT%201.1.html), [Actividad 1.3 · Login con PHP (sesiones y roles)](ASETE/ASETE%20-%20ACT%201.3.html), [Actividad 2.1 · MiniApp de Biblioteca (POO en PHP)](ASETE/ASETE%20-%20ACT%202.1.html), [UT1 · Kotlin desde cero](PMDM/PMDM%20-%20UT1%20-%20Kotlin.html), [Actividad 1.1 · Android Studio y Kotlin](PMDM/PMDM%20-%20ACT%201.1.html) |
 
 Las guías generales también se enlazan entre sí: en el bloque «Sigue tu ruta» de cada una aparecen las que le sirven de referencia directa (terminal, Git, SQL, CSS…).
