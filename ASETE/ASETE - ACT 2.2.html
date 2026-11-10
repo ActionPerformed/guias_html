@@ -2904,30 +2904,15 @@ use App\Classes\DVD;
 use App\Classes\Libro;
 use App\Classes\MaterialBiblioteca;
 use App\Classes\Revista;
-use App\Config\db;
+
+require_once __DIR__ . '/../Config/db.php';
 
 class MaterialRepo
 {
     // ... resto igual, SIN require_once ...
 }</pre>
-        <div class="banner">
-          <p>⚠️ <b>Ojo con <span class="inline">db()</span>.</b> Es una <b>función</b>, no una clase. Los namespaces
-            también afectan a las funciones:</p>
-          <ul>
-            <li><span class="inline">use App\Config\db;</span> → importa la <b>función</b> (correcto).</li>
-            <li>O llamar <span class="inline">\App\Config\db()</span> (FQN, más feo).</li>
-          </ul>
-          <p><b>Recomendación:</b> <span class="inline">use function App\Config\db;</span> explícito. Es más legible y
-            evita ambigüedades con clases que se llamen igual.</p>
-        </div>
         <p><span class="inline">app/Config/db.php</span>:</p>
         <pre class="code-src" data-lang="php" data-title="app/Config/db.php" hidden>&lt;?php
-declare(strict_types=1);
-
-namespace App\Config;
-
-use PDO;
-
 function db(): PDO
 {
     static $pdo = null;
@@ -2936,12 +2921,6 @@ function db(): PDO
     }
     return $pdo;
 }</pre>
-        <div class="note">
-          <p>📌 <b><span class="inline">use PDO;</span></b> es necesario porque <span class="inline">PDO</span> vive en
-            el namespace global (<span class="inline">\PDO</span>). Dentro de <span class="inline">namespace
-              App\Config;</span>, escribir <span class="inline">PDO</span> sin <span class="inline">use</span> haría que
-            PHP buscara <span class="inline">App\Config\PDO</span>, que no existe.</p>
-        </div>
         <h3>📄 Paso 3: puntos de entrada</h3>
 <p>Los <strong>puntos de entrada</strong> son los archivos de <span class="inline">public/</span> que el navegador puede pedir directamente. Son seis:</p>
 <div class="tw"><table><thead><tr><th>Archivo</th><th>Qué hace</th></tr></thead><tbody><tr><td><span class="inline">public/login.php</span></td><td>Formulario de login</td></tr><tr><td><span class="inline">public/logout.php</span></td><td>Cierra sesión</td></tr><tr><td><span class="inline">public/index.php</span></td><td>Catálogo</td></tr><tr><td><span class="inline">public/material.php</span></td><td>Ficha individual</td></tr><tr><td><span class="inline">public/prestar.php</span></td><td>Acción de préstamo</td></tr><tr><td><span class="inline">public/admin.php</span></td><td>Panel de administración</td></tr></tbody></table></div>
@@ -3076,7 +3055,6 @@ requireAdmin();
 
 // ... resto igual (consultas con db() o MaterialRepo, según tengas) ...
 </pre>
-<div class="note"><p><strong>Fíjate:</strong> <span class="inline">requireAdmin()</span> se llama directamente. Si <span class="inline">admin.php</span> usa <span class="inline">MaterialRepo</span> o excepciones, añade sus <span class="inline">use</span> correspondientes. Si usa <span class="inline">db()</span> directamente, añade <span class="inline">use function App\Config\db;</span>.</p></div>
 <h3>🧪 Comprobación</h3>
 <p>Después de tocar los seis archivos, abre cada uno en el navegador:</p>
 <ul><li>http://localhost:8080/login.php → formulario.</li>
