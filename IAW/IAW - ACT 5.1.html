@@ -3707,10 +3707,18 @@ $media = calcularMedia($alumno["modulos"]);
                 var V = $('#labView'); V.hidden = false; $('#labSrc').hidden = true; $('#labEdit').hidden = false;
                 V.innerHTML = prog.lines.map(function (l, i) { return '<div id="ln' + i + '"><i>' + (i + 1) + '</i>' + hl(l, 'php') + '</div>' }).join(''); show()
             }
+            /* Muestra la línea actual dentro del panel, sin mover la página: si se usara
+               scrollIntoView(), la página entera saltaría al laboratorio al abrirla. */
+            function verLinea(d) {
+                var box = $('#labView'); if (!box) return;
+                var dr = d.getBoundingClientRect(), br = box.getBoundingClientRect();
+                if (dr.top < br.top) box.scrollTop -= (br.top - dr.top);
+                else if (dr.bottom > br.bottom) box.scrollTop += (dr.bottom - br.bottom)
+            }
             function show() {
                 var s = steps[cur], p = cur ? steps[cur - 1].v : {};
                 $$('#labView .cur').forEach(function (d) { d.classList.remove('cur') });
-                if (s.l >= 0) { var d = $('#ln' + s.l); if (d) { d.classList.add('cur'); d.scrollIntoView({ block: 'nearest' }) } }
+                if (s.l >= 0) { var d = $('#ln' + s.l); if (d) { d.classList.add('cur'); verLinea(d) } }
                 $('#stepInfo').textContent = 'paso ' + (cur + 1) + ' / ' + steps.length;
                 $('#stepNote').innerHTML = s.end ? '🏁 Fin del programa.' : 'Estás a punto de ejecutar la <strong>línea ' + (s.l + 1) + '</strong>. Las variables valen lo que ves abajo <em>antes</em> de ejecutarla.';
                 var h = ''; Object.keys(s.v).forEach(function (k) {
