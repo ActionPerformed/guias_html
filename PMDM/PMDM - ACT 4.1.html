@@ -38,7 +38,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 90px;
+            scroll-padding-top: 16px;
         }
 
         body {
@@ -83,7 +83,7 @@
         #progressBar {
             position: fixed;
             top: 0;
-            left: 0;
+            left: 236px;
             height: 4px;
             background: linear-gradient(90deg, var(--primary), var(--accent));
             width: 0%;
@@ -219,47 +219,52 @@
             margin-top: 6px;
         }
 
-        /* NAV */
+        /* NAV — barra lateral vertical fija a la izquierda */
         .navbar {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            bottom: 0;
+            width: 236px;
             z-index: 100;
-            background: rgba(255, 255, 255, .92);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
         .navbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
+            position: relative;
             display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            overflow-x: auto;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 2px;
+            padding: 18px 14px 28px;
+            min-height: 100%;
         }
 
         .navbar-inner::-webkit-scrollbar {
-            height: 5px;
+            width: 6px;
         }
 
         .navbar-inner::-webkit-scrollbar-thumb {
             background: var(--border);
-            border-radius: 5px;
+            border-radius: 6px;
         }
 
         .nav-brand {
             font-family: 'Sora';
             font-weight: 700;
             color: var(--primary);
-            white-space: nowrap;
-            margin-right: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
             font-size: .95rem;
         }
 
         .nav-link {
-            white-space: nowrap;
+            display: block;
             padding: 7px 12px;
             border-radius: 8px;
             font-size: .82rem;
@@ -279,10 +284,85 @@
             color: #fff;
         }
 
+        /* el contenido deja sitio a la barra lateral */
+        body {
+            padding-left: 236px;
+        }
+
         main {
             max-width: 980px;
             margin: 0 auto;
             padding: 40px 20px 90px;
+        }
+
+        /* en pantallas estrechas la barra vuelve arriba, pero SIN cortarse:
+           los enlaces se reparten en varias filas en lugar de hacer scroll horizontal */
+        @media(max-width: 880px) {
+            html {
+                scroll-padding-top: 90px;
+            }
+
+            body {
+                padding-left: 0;
+            }
+
+            #progressBar {
+                left: 0;
+            }
+
+            .navbar {
+                position: sticky;
+                top: 0;
+                left: auto;
+                bottom: auto;
+                width: auto;
+                overflow: visible;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .navbar-inner {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 6px;
+                padding: 10px 16px;
+                min-height: 0;
+            }
+
+            .nav-brand {
+                width: 100%;
+                margin: 0 0 2px;
+                padding-bottom: 6px;
+            }
+        }
+
+        @media print {
+            body {
+                padding-left: 0;
+            }
+
+            .navbar {
+                position: static;
+                width: auto;
+                overflow: visible;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                box-shadow: none;
+            }
+
+            .navbar-inner {
+                flex-direction: row;
+                flex-wrap: wrap;
+                min-height: 0;
+            }
+
+            .nav-brand {
+                width: auto;
+                margin: 0 10px 0 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
         }
 
         /* section cards */
@@ -5792,6 +5872,7 @@ fun SmsScreen() {
 
         /* ---------- SCROLLSPY + PROGRESS BAR ---------- */
         const navLinks = document.querySelectorAll('.nav-link');
+        const navBar = document.querySelector('.navbar');
         const sections = document.querySelectorAll('main .section, .demo-section');
         function onScroll() {
             const doc = document.documentElement;
@@ -5806,6 +5887,14 @@ fun SmsScreen() {
             navLinks.forEach(l => {
                 l.classList.toggle('active', l.getAttribute('href') === '#' + current);
             });
+            // la barra es una columna: si el enlace activo queda fuera, se desplaza hasta verlo
+            const act = document.querySelector('.nav-link.active');
+            if (act && navBar && navBar.scrollHeight > navBar.clientHeight + 4) {
+                const nr = navBar.getBoundingClientRect();
+                const ar = act.getBoundingClientRect();
+                if (ar.top < nr.top + 10) navBar.scrollTop -= (nr.top + 10 - ar.top);
+                else if (ar.bottom > nr.bottom - 10) navBar.scrollTop += (ar.bottom - (nr.bottom - 10));
+            }
         }
         document.addEventListener('scroll', onScroll);
         onScroll();
