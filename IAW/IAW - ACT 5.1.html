@@ -1,0 +1,3678 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Introducción a PHP · 2º ASIR · De HTML estático a páginas dinámicas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Albert+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --steel: #e4e9ee;
+            --paper: #fff;
+            --ink: #1a2330;
+            --dim: #586677;
+            --line: #cdd6de;
+            --night: #16202c;
+            --night2: #1f2c3b;
+            --tomato: #e4572e;
+            --basil: #2a8a57;
+            --mustard: #e9a416;
+            --plum: #7a4fd0;
+            --r: 12px;
+            --fd: 'Unbounded', sans-serif;
+            --fb: 'Albert Sans', sans-serif;
+            --fm: 'JetBrains Mono', monospace
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            html {
+                scroll-behavior: auto
+            }
+
+            * {
+                transition: none !important;
+                animation: none !important
+            }
+        }
+
+        body {
+            margin: 0;
+            background: var(--steel);
+            background-image: radial-gradient(#cfd8e0 1px, transparent 1px);
+            background-size: 22px 22px;
+            color: var(--ink);
+            font: 16px/1.65 var(--fb)
+        }
+
+        code,
+        pre {
+            font-family: var(--fm)
+        }
+
+        a {
+            color: #1c63c8
+        }
+
+        #bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            width: 0;
+            background: linear-gradient(90deg, var(--tomato), var(--mustard), var(--basil));
+            z-index: 99
+        }
+
+        header.top {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--night);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .7rem 1.2rem;
+            border-bottom: 3px solid var(--tomato)
+        }
+
+        header.top b {
+            font: 700 .9rem var(--fd);
+            letter-spacing: .02em
+        }
+
+        header.top .prog {
+            margin-left: auto;
+            font: 500 .78rem var(--fm);
+            color: #c9d4df;
+            display: flex;
+            align-items: center;
+            gap: .6rem
+        }
+
+        .pt {
+            width: 130px;
+            height: 8px;
+            background: #33455a;
+            border-radius: 9px;
+            overflow: hidden
+        }
+
+        .pf {
+            height: 100%;
+            width: 0;
+            background: var(--basil);
+            transition: width .3s
+        }
+
+        #burger {
+            display: none;
+            background: none;
+            border: 1px solid #4a5d73;
+            color: #fff;
+            border-radius: 8px;
+            padding: .3rem .6rem;
+            font-size: 1.1rem
+        }
+
+        .shell {
+            display: grid;
+            grid-template-columns: 250px minmax(0, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.2rem
+        }
+
+        aside {
+            position: sticky;
+            top: 62px;
+            align-self: start;
+            max-height: calc(100vh - 70px);
+            overflow: auto;
+            padding: 1.2rem 0
+        }
+
+        aside a {
+            display: flex;
+            gap: .6rem;
+            padding: .4rem .7rem;
+            color: var(--dim);
+            text-decoration: none;
+            font-size: .88rem;
+            border-left: 3px solid transparent;
+            border-radius: 0 8px 8px 0
+        }
+
+        aside a b {
+            font: 500 .75rem var(--fm);
+            min-width: 1.6em;
+            color: var(--tomato)
+        }
+
+        aside a:hover {
+            background: #fff
+        }
+
+        aside a.on {
+            background: #fff;
+            color: var(--ink);
+            border-left-color: var(--tomato);
+            font-weight: 600
+        }
+
+        main {
+            padding-bottom: 5rem;
+            min-width: 0;
+            max-width: 820px
+        }
+
+        .hero {
+            padding: 2.5rem 0 1rem
+        }
+
+        .hero h1 {
+            font: 700 clamp(1.7rem, 4.2vw, 2.7rem)/1.15 var(--fd);
+            margin: .2rem 0 .6rem
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: var(--tomato)
+        }
+
+        .hero .lede {
+            font-size: 1.08rem;
+            color: var(--dim);
+            max-width: 55ch
+        }
+
+        .ticket {
+            background: #fffdf7;
+            border: 1px solid #e6dfcc;
+            border-radius: 6px;
+            padding: 1.1rem 1.3rem 1.3rem;
+            margin: 1.6rem 0;
+            position: relative;
+            box-shadow: 0 10px 25px -12px rgba(0, 0, 0, .35);
+            font-family: var(--fm);
+            font-size: .82rem;
+            max-width: 520px
+        }
+
+        .ticket::before,
+        .ticket::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: radial-gradient(circle at 8px 0, var(--steel) 6px, transparent 7px) 0 0/16px 10px
+        }
+
+        .ticket::before {
+            top: -5px
+        }
+
+        .ticket::after {
+            bottom: -5px;
+            transform: scaleY(-1)
+        }
+
+        .ticket h3 {
+            margin: 0 0 .5rem;
+            font: 700 .85rem var(--fd);
+            text-align: center;
+            letter-spacing: .06em
+        }
+
+        .ticket .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            border-bottom: 1px dashed #cfc7b0;
+            padding: .32rem 0
+        }
+
+        .ticket .row span:last-child {
+            color: var(--tomato);
+            white-space: nowrap
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin: 1rem 0
+        }
+
+        .legend span,
+        .tag {
+            font: 600 .72rem var(--fb);
+            padding: .2rem .6rem;
+            border-radius: 99px;
+            color: #fff
+        }
+
+        .legend .ok,
+        .ok .tag {
+            background: var(--basil)
+        }
+
+        .legend .act,
+        .act .tag {
+            background: var(--mustard);
+            color: #2b2100
+        }
+
+        .legend .amp,
+        .amp .tag {
+            background: var(--tomato)
+        }
+
+        .legend .think,
+        .think .tag {
+            background: var(--plum)
+        }
+
+        .blk {
+            padding: 2.2rem 0 .5rem;
+            scroll-margin-top: 70px
+        }
+
+        .blk h2 {
+            font: 700 1.45rem/1.2 var(--fd);
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin: 0 0 1rem
+        }
+
+        .num {
+            background: var(--night);
+            color: #fff;
+            font: 500 .95rem var(--fm);
+            padding: .3rem .6rem;
+            border-radius: 8px;
+            min-width: 2.3rem;
+            text-align: center
+        }
+
+        .blk h3,
+        .blk h4 {
+            font-family: var(--fb)
+        }
+
+        p {
+            margin: .2rem 0 .9rem
+        }
+
+        .item {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-left: 6px solid var(--line);
+            border-radius: var(--r);
+            margin: .9rem 0;
+            box-shadow: 0 3px 10px -6px rgba(0, 0, 0, .25)
+        }
+
+        .item.ok {
+            border-left-color: var(--basil)
+        }
+
+        .item.act {
+            border-left-color: var(--mustard)
+        }
+
+        .item.amp {
+            border-left-color: var(--tomato)
+        }
+
+        .item.think {
+            border-left-color: var(--plum)
+        }
+
+        .item>summary {
+            cursor: pointer;
+            list-style: none;
+            padding: .8rem 1rem;
+            display: flex;
+            gap: .7rem;
+            align-items: center;
+            font-weight: 700
+        }
+
+        .item>summary::-webkit-details-marker {
+            display: none
+        }
+
+        .item>summary::after {
+            content: "▾";
+            margin-left: auto;
+            color: var(--dim);
+            transition: transform .2s
+        }
+
+        .item:not([open])>summary::after {
+            transform: rotate(-90deg)
+        }
+
+        .ib {
+            padding: 0 1.1rem 1rem
+        }
+
+        .item.done-ok {
+            box-shadow: 0 0 0 2px var(--basil) inset
+        }
+
+        .callout {
+            background: #eef6ff;
+            border-left: 4px solid #3b82d6;
+            border-radius: 8px;
+            padding: .6rem 1rem;
+            margin: .9rem 0
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0
+        }
+
+        .tw {
+            overflow-x: auto;
+            margin: .9rem 0;
+            border: 1px solid var(--line);
+            border-radius: 10px
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: .88rem
+        }
+
+        th {
+            background: var(--night);
+            color: #fff;
+            text-align: left;
+            font: 600 .8rem var(--fb)
+        }
+
+        th,
+        td {
+            padding: .5rem .8rem;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top
+        }
+
+        tr:nth-child(even) td {
+            background: #f6f8fa
+        }
+
+
+        code {
+            background: #eef1f5;
+            padding: .1em .35em;
+            border-radius: 5px;
+            font-size: .88em
+        }
+
+        .code {
+            background: var(--night);
+            border-radius: 10px;
+            margin: .9rem 0;
+            overflow: hidden
+        }
+
+        .ch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .35rem .7rem;
+            background: var(--night2);
+            color: #8fa3b8;
+            font: 500 .72rem var(--fm)
+        }
+
+        .cb {
+            display: flex;
+            gap: .4rem
+        }
+
+        .cb button {
+            background: #2c3d52;
+            color: #d8e2ec;
+            border: 1px solid #435a74;
+            border-radius: 6px;
+            font: 500 .72rem var(--fb);
+            padding: .25rem .6rem;
+            cursor: pointer
+        }
+
+        .cb button:hover {
+            border-color: var(--mustard)
+        }
+
+        .cb .trace {
+            color: #8ef0b8
+        }
+
+        .code pre {
+            margin: 0;
+            padding: .9rem 1rem;
+            overflow-x: auto;
+            color: #dbe6f1;
+            font-size: .82rem;
+            line-height: 1.6
+        }
+
+        .code code {
+            background: none;
+            padding: 0;
+            font-size: inherit
+        }
+
+        pre.diagram {
+            background: #fffdf7;
+            border: 1px solid #e6dfcc;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: .78rem;
+            line-height: 1.45;
+            border-radius: 8px
+        }
+
+        .k {
+            color: #c3a6ff;
+            font-weight: 500
+        }
+
+        .s {
+            color: #9be3b0
+        }
+
+        .v {
+            color: #7cc7f4
+        }
+
+        .f {
+            color: #f5d479
+        }
+
+        .n {
+            color: #f2a56b
+        }
+
+        .c {
+            color: #6f849a;
+            font-style: italic
+        }
+
+        .t {
+            color: #f5806a
+        }
+
+        .p {
+            color: #e9a416;
+            font-weight: 600
+        }
+
+        .done {
+            display: inline-flex;
+            gap: .45rem;
+            align-items: center;
+            margin: .4rem 1rem .2rem 0;
+            font-weight: 600;
+            font-size: .86rem;
+            cursor: pointer
+        }
+
+        .chk {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--basil)
+        }
+
+        .sol {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: .4rem
+        }
+
+        .sol>summary {
+            cursor: pointer;
+            font-weight: 700;
+            font-size: .86rem;
+            color: #fff;
+            background: var(--plum);
+            padding: .3rem .9rem;
+            border-radius: 99px;
+            list-style: none
+        }
+
+        .sol>div {
+            margin-top: .6rem;
+            border: 1px dashed var(--plum);
+            border-radius: 10px;
+            padding: .5rem 1rem;
+            background: #faf7ff;
+            min-width: min(100%, 640px)
+        }
+
+        /* lab */
+        .lab {
+            background: var(--night);
+            color: #e4ecf4;
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, .6)
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-bottom: .8rem
+        }
+
+        .presets button {
+            background: #2c3d52;
+            color: #e4ecf4;
+            border: 1px solid #435a74;
+            border-radius: 99px;
+            padding: .3rem .8rem;
+            font: 600 .78rem var(--fb);
+            cursor: pointer
+        }
+
+        .presets button.on {
+            background: var(--tomato);
+            border-color: var(--tomato)
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: 1rem
+        }
+
+        @media(max-width:820px) {
+            .lab-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        #labSrc {
+            width: 100%;
+            height: 250px;
+            background: #0f1822;
+            color: #dbe6f1;
+            border: 1px solid #33455a;
+            border-radius: 10px;
+            padding: .7rem;
+            font: .82rem/1.6 var(--fm);
+            resize: vertical
+        }
+
+        .lines {
+            background: #0f1822;
+            border: 1px solid #33455a;
+            border-radius: 10px;
+            padding: .4rem 0;
+            font: .82rem/1.6 var(--fm);
+            max-height: 300px;
+            overflow: auto
+        }
+
+        .lines div {
+            padding: 0 .7rem;
+            white-space: pre;
+            display: flex;
+            gap: .8rem
+        }
+
+        .lines i {
+            color: #587089;
+            font-style: normal;
+            min-width: 1.6em;
+            text-align: right
+        }
+
+        .lines div.cur {
+            background: rgba(233, 164, 22, .25);
+            box-shadow: inset 3px 0 var(--mustard)
+        }
+
+        .lab-btns {
+            margin-top: .6rem;
+            display: flex;
+            gap: .5rem
+        }
+
+        .lab button.pri {
+            background: var(--basil);
+            border-color: var(--basil)
+        }
+
+        .lab-btns button,
+        .lab-ctl button {
+            background: #2c3d52;
+            color: #fff;
+            border: 1px solid #435a74;
+            border-radius: 8px;
+            padding: .4rem .9rem;
+            font: 600 .85rem var(--fb);
+            cursor: pointer
+        }
+
+        .lab-ctl {
+            display: flex;
+            gap: .3rem;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .stepinfo {
+            margin-left: .5rem;
+            font: 500 .78rem var(--fm);
+            color: #9db0c4
+        }
+
+        .stepnote {
+            margin: .6rem 0;
+            font-size: .88rem;
+            background: #1f2c3b;
+            border-radius: 8px;
+            padding: .5rem .7rem;
+            min-height: 2.6em
+        }
+
+        .lab h4 {
+            margin: .7rem 0 .4rem;
+            font: 600 .72rem var(--fb);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #8fa3b8
+        }
+
+        .vars {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            min-height: 56px
+        }
+
+        .box {
+            border: 2px solid #4a5d73;
+            border-radius: 8px;
+            min-width: 76px;
+            text-align: center;
+            background: #16202c;
+            transition: .25s
+        }
+
+        .box small {
+            display: block;
+            background: #2c3d52;
+            font: 500 .72rem var(--fm);
+            padding: .1rem .4rem;
+            color: #c9d4df
+        }
+
+        .box span {
+            display: block;
+            font: 500 1rem var(--fm);
+            padding: .3rem .5rem
+        }
+
+        .box.chg {
+            border-color: var(--mustard);
+            box-shadow: 0 0 0 3px rgba(233, 164, 22, .35);
+            transform: translateY(-2px)
+        }
+
+        .labout {
+            background: #0f1822;
+            border: 1px solid #33455a;
+            border-radius: 8px;
+            padding: .6rem;
+            margin: 0;
+            min-height: 60px;
+            max-height: 160px;
+            overflow: auto;
+            color: #9be3b0;
+            font-size: .82rem;
+            white-space: pre-wrap
+        }
+
+        .laberr {
+            margin-top: .7rem;
+            background: rgba(228, 87, 46, .18);
+            border: 1px solid var(--tomato);
+            border-radius: 8px;
+            padding: .5rem .8rem;
+            font-size: .86rem
+        }
+
+        footer {
+            padding: 2rem 0;
+            color: var(--dim);
+            font-size: .85rem
+        }
+
+        #top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: var(--night);
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: .2s
+        }
+
+        #top.show {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        @media(max-width:960px) {
+            .shell {
+                grid-template-columns: 1fr
+            }
+
+            #burger {
+                display: block
+            }
+
+            aside {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 270px;
+                background: var(--steel);
+                z-index: 60;
+                transform: translateX(-100%);
+                transition: .25s;
+                padding: 4.5rem .5rem 1rem;
+                max-height: none
+            }
+
+            aside.open {
+                transform: none
+            }
+
+            .pt {
+                display: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bar"></div>
+    <header class="top"><button id="burger" aria-label="Menú">☰</button><b>&lt;?php Introducción a PHP</b>
+        <div class="prog"><span id="plabel">0 / 39 tareas</span>
+            <div class="pt">
+                <div class="pf" id="pf"></div>
+            </div>
+        </div>
+    </header>
+    <div class="shell">
+        <aside id="side">
+            <nav><a href="#s0" data-t="s0"><b>0</b> Antes de empezar: el mapa mental</a>
+                <a href="#s1" data-t="s1"><b>1</b> ¿Qué es un lenguaje de guiones de servidor?</a>
+                <a href="#s2" data-t="s2"><b>2</b> Tu primer script, explicado línea a línea</a>
+                <a href="#sA" data-t="sA"><b>A</b> Pensar como un programador (antes de teclear)</a>
+                <a href="#lab" data-t="lab"><b>▶</b> Laboratorio de trazas</a>
+                <a href="#s3" data-t="s3"><b>3</b> Sintaxis básica: variables y salida</a>
+                <a href="#s4" data-t="s4"><b>4</b> Leer errores desde el minuto 1 ⚠️</a>
+                <a href="#s5" data-t="s5"><b>5</b> Condicionales: `if`, `else`, `switch`</a>
+                <a href="#s6" data-t="s6"><b>6</b> Bucles: `while`, `for`, `foreach`</a>
+                <a href="#s7" data-t="s7"><b>7</b> Arrays (concepto explícito, nuevo)</a>
+                <a href="#s8" data-t="s8"><b>8</b> Funciones</a>
+                <a href="#s9" data-t="s9"><b>9</b> Gestión de errores y validación</a>
+                <a href="#s10" data-t="s10"><b>10</b> Proyecto final — &quot;Ficha de alumno dinámica&quot;</a>
+                <a href="#s11" data-t="s11"><b>11</b> Autoevaluación y evaluación entre iguales</a>
+                <a href="#s12" data-t="s12"><b>12</b> Recursos y siguientes pasos</a>
+            </nav>
+        </aside>
+        <main>
+            <section class="hero" id="inicio">
+                <div class="legend"><span class="ok">🟢 Reto resuelto: léelo y pruébalo</span><span class="act">🟡
+                        Actividad: complétalo</span><span class="amp">🔴 Ampliación: créalo tú</span><span
+                        class="think">🧠 Para pensar: predice</span></div>
+                <h1>De HTML estático a <em>páginas dinámicas</em> con PHP</h1>
+                <p class="lede">2º ASIR · Programación desde cero, sobre tu LEMP en Docker. No hace falta saber
+                    programar: empezamos pensando como un programador y terminamos con una ficha de alumno generada por
+                    código.</p>
+                <div class="ticket">
+                    <h3>COMANDA · 8 HORAS</h3>
+                    <div class="row"><span>Sesión 1 · Mapa, primer script y algoritmos</span><span>2 h</span></div>
+                    <div class="row"><span>Sesión 2 · Variables, errores y condicionales</span><span>2 h</span></div>
+                    <div class="row"><span>Sesión 3 · Bucles, arrays y funciones</span><span>2 h</span></div>
+                    <div class="row"><span>Sesión 4 · Validación y proyecto final</span><span>2 h</span></div>
+                    <div class="row"><span>Autoevaluación y evaluación entre iguales (cierre)</span><span>en casa</span></div>
+                </div>
+                <p>Las ampliaciones 🔴 son para quien vaya adelantado. Marca cada tarea al terminarla: la barra de
+                    arriba avanza contigo.</p>
+            </section>
+            <section class="blk" id="s0">
+                <h2><span class="num">0</span>Antes de empezar: el mapa mental</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">0.1 El flujo completo, con nombres</span></summary>
+                    <div class="ib">
+                        <pre class="diagram">   TÚ (programador)              SERVIDOR (Apache+PHP)               NAVEGADOR
+       │                                  │                            │
+       │ 1. Escribes .php en VS Code      │                            │
+       │    y lo guardas en               │                            │
+       │    /var/www/html/...         │                            │
+       │                                  │                            │
+       │ 2. Abres el navegador y          │                            │
+       │    escribes la URL               │                            │
+       │                                  │                            │
+       │ ──── http://localhost/... ──────────────────────────────────▶ │
+       │                                  │                            │
+       │                                  │ 3. Apache recibe la URL    │
+       │                                  │ 4. Ve que acaba en .php    │
+       │                                  │ 5. Pasa el archivo a PHP   │
+       │                                  │ 6. PHP LEE y EJECUTA       │
+       │                                  │    el código               │
+       │                                  │ 7. PHP produce HTML puro   │
+       │                                  │                            │
+       │ ◀──────────────── HTML resultante ────────────────────────── │
+       │                                  │                            │
+       │                                  │ 8. El navegador muestra    │
+       │                                  │    el HTML (sin PHP)       │</pre>
+                        <p><strong>Regla mental nº 1:</strong> <em>El navegador nunca ve PHP. Solo ve el HTML que PHP ha
+                                producido.</em></p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">0.2 Analogía completa</span></summary>
+                    <div class="ib">
+                        <p>Piensa en un <strong>restaurante</strong>:</p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Elemento</th>
+                                        <th>Restaurante</th>
+                                        <th>PHP/Web</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Menú impreso</td>
+                                        <td>Carta física</td>
+                                        <td>HTML estático</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cliente que pide</td>
+                                        <td>Navegador</td>
+                                        <td>Petición HTTP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cocinero</td>
+                                        <td>Apache + PHP</td>
+                                        <td>Servidor</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cocina</td>
+                                        <td>Backend</td>
+                                        <td>Lógica PHP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Plato servido</td>
+                                        <td>HTML dinámico</td>
+                                        <td>Respuesta HTTP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Comensal no ve la cocina</td>
+                                        <td>El navegador no ve PHP</td>
+                                        <td>✔️</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>Cuando pides "lo que sea", el cocinero <strong>decide</strong> cómo prepararlo según lo que
+                            tengas (alergias = parámetros, hora = fecha del sistema). Con HTML estático, el plato es
+                            siempre el mismo.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">0.3 Comprobación del entorno (tu LEMP en Docker)</span></summary>
+                    <div class="ib">
+                        <div class="callout">
+                            <p>Damos por hecho que ya sabes levantar tu stack LEMP con <code>docker compose</code> y que
+                                una carpeta de tu equipo está montada como raíz web (dentro del contenedor suele ser
+                                <code>/var/www/html</code>). Los nombres de servicio (<code>web</code>,
+                                <code>php</code>…) dependen de tu <code>docker-compose.yml</code>: míralos con
+                                <code>docker compose ps</code>.
+                            </p>
+                        </div>
+                        <p><strong>Paso 1.</strong> En la carpeta de tu proyecto ejecuta
+                            <code>docker compose up -d</code>. Después <code>docker compose ps</code>: el servicio web
+                            debe aparecer como <em>running / Up</em>.
+                        </p>
+                        <p><strong>Paso 2.</strong> Abre VS Code sobre la carpeta <strong>montada</strong> (la que se ve
+                            como raíz web dentro del contenedor). Crea la subcarpeta <code>php-intro/</code>.</p>
+                        <p><strong>Paso 3.</strong> Dentro, crea <code>hola.php</code> con este contenido
+                            <strong>exacto</strong>:
+                        </p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+echo "¡Hola, mundo!";</code></pre>
+                        </div>
+                        <p><strong>Paso 4.</strong> Guarda (Ctrl+S). Comprueba que se llama <code>hola.php</code>,
+                            <strong>no</strong> <code>hola.php.txt</code>. En VS Code, abajo a la derecha, debe poner
+                            <em>PHP</em>.
+                        </p>
+                        <p><strong>Paso 5.</strong> Abre <code>http://localhost:PUERTO/php-intro/hola.php</code>, donde
+                            <code>PUERTO</code> es el que publicaste en el compose (por ejemplo <code>8080</code>; si es
+                            el 80, se omite).
+                        </p>
+                        <p><strong>Paso 6.</strong> Debes ver <code>¡Hola, mundo!</code> en pantalla, sin más.</p>
+                        <p><strong>Paso 7 (bonus).</strong> Ejecuta PHP directamente en el contenedor, sin navegador:
+                        </p>
+                        <div class="code">
+                            <div class="ch"><span>bash</span><span class="cb"><button
+                                        class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="bash">docker compose exec web php -v
+docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
+                        </div>
+                        <p><strong>Si algo falla:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Síntoma</th>
+                                        <th>Causa probable</th>
+                                        <th>Qué hacer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>"No se puede conectar"</td>
+                                        <td>Contenedor parado o puerto equivocado</td>
+                                        <td><code>docker compose ps</code> y revisa el puerto</td>
+                                    </tr>
+                                    <tr>
+                                        <td>404 / "Not Found"</td>
+                                        <td>Ruta o nombre de archivo mal</td>
+                                        <td>Compara la URL con la carpeta montada</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Se ve el código PHP o se descarga el archivo</td>
+                                        <td>No acaba en <code>.php</code>, o abres con <code>file:///</code></td>
+                                        <td>Abre siempre por <code>http://localhost...</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Parse error"</td>
+                                        <td>Falta <code>;</code>, comilla o paréntesis</td>
+                                        <td>Lee el mensaje (sección 4)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Página en blanco</td>
+                                        <td>Error oculto (<code>display_errors</code> desactivado)</td>
+                                        <td>Sección 4.1 y <code>docker compose logs -f web</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Guardas pero no cambia nada</td>
+                                        <td>La carpeta que editas no es la montada</td>
+                                        <td>Revisa <code>volumes:</code> del compose</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p><strong>Alternativa sin entorno:</strong> un sandbox online como <code>3v4l.org</code>
+                                sirve para probar fragmentos pequeños.</p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">0.4 Configuración de VS Code recomendada</span></summary>
+                    <div class="ib">
+                        <ul>
+                            <li>Instala la extensión <strong>PHP Intelephense</strong> (autocompletado).</li>
+                            <li>Activa el <strong>formateo al guardar</strong> (<code>editor.formatOnSave: true</code>).
+                            </li>
+                            <li>Instala <strong>PHP Debug</strong> si quieres aprender a depurar con breakpoints
+                                (opcional, avanzado).</li>
+                        </ul>
+                        <p>Esto cubre el contenido del RA <em>"herramientas de edición de código"</em>.</p>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s1">
+                <h2><span class="num">1</span>¿Qué es un lenguaje de guiones de servidor?</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">1.1 Comparativa rápida</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Estático (HTML/CSS)</th>
+                                        <th>Dinámico (PHP)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Siempre igual</td>
+                                        <td>Cambia según datos</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lo escribe el diseñador</td>
+                                        <td>Lo genera el servidor</td>
+                                    </tr>
+                                    <tr>
+                                        <td>No toma decisiones</td>
+                                        <td>Toma decisiones (if, bucles)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>No recuerda nada</td>
+                                        <td>Puede recordar (sesiones, BD)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>El navegador lo entiende</td>
+                                        <td>El navegador solo entiende su HTML resultante</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">1.2 Lenguajes de servidor relevantes</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Lenguaje</th>
+                                        <th>Framework típico</th>
+                                        <th>Usado por</th>
+                                        <th>Curva de aprendizaje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>PHP</strong></td>
+                                        <td>Laravel, Symfony</td>
+                                        <td>WordPress, Wikipedia, Moodle</td>
+                                        <td>Baja ⭐</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Node.js (JavaScript)</strong></td>
+                                        <td>Express, Nest</td>
+                                        <td>Netflix, PayPal, LinkedIn</td>
+                                        <td>Media ⭐⭐</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Python</strong></td>
+                                        <td>Django, Flask</td>
+                                        <td>Instagram, Pinterest, Spotify</td>
+                                        <td>Baja ⭐</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Java</strong></td>
+                                        <td>Spring</td>
+                                        <td>Bancos, grandes empresas</td>
+                                        <td>Alta ⭐⭐⭐</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>C#</strong></td>
+                                        <td>ASP.NET</td>
+                                        <td>Stack Overflow, Microsoft</td>
+                                        <td>Media ⭐⭐</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p><strong>¿Por qué aprendemos PHP y no otro?</strong> Porque es el más implantado en pymes
+                                y administraciones, es fácil de desplegar (Apache+PHP en casi cualquier hosting), y su
+                                sintaxis es permisiva. Una vez que sabes uno, los demás son variaciones.</p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">1.1 — Comparar estático y
+                            dinámico</span></summary>
+                    <div class="ib">
+                        <p><strong><code>estatico.html</code></strong></p>
+                        <div class="code">
+                            <div class="ch"><span>html</span><span class="cb"><button
+                                        class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Estático&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Página estática&lt;/h1&gt;
+    &lt;p&gt;La hora actual es la que yo escribí a mano.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+                        <p><strong><code>dinamico.php</code></strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Dinámico&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Página dinámica&lt;/h1&gt;
+    &lt;p&gt;La hora actual en el servidor es: &lt;?php echo date('H:i:s'); ?&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+                        <p><strong>Explicación línea a línea:</strong></p>
+                        <ul>
+                            <li><code>&lt;?php ... ?&gt;</code> delimita el código que el servidor ejecutará.</li>
+                            <li><code>date('H:i:s')</code> es una función integrada que devuelve la hora actual del
+                                <strong>servidor</strong> (no del navegador) formateada como <code>HH:MM:SS</code>.
+                            </li>
+                            <li><code>echo</code> imprime ese resultado <em>en el mismo sitio</em> donde estaba el
+                                <code>&lt;?php</code> en el archivo original. El HTML resultante sale con la hora ya
+                                "pegada".
+                            </li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">1.1 — Reflexión guiada</span></summary>
+                    <div class="ib">
+                        <ol>
+                            <li>¿Por qué el <code>.html</code> no cambia y el <code>.php</code> sí?</li>
+                            <li>Haz <em>Ver código fuente</em> en el navegador sobre <code>dinamico.php</code>. ¿Ves
+                                <code>&lt;?php</code>? ¿Por qué no?
+                            </li>
+                            <li>Menciona dos tareas que <strong>no se pueden</strong> hacer con HTML+CSS pero
+                                <strong>sí</strong> con PHP.
+                            </li>
+                            <li>Si abres <code>dinamico.php</code> con doble clic (sin Apache), ¿qué pasa? ¿Por qué?
+                            </li>
+                        </ol><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Ideas clave: <br>(1) el <code>.html</code> lo sirve Apache tal cual; el
+                                    <code>.php</code>
+                                    pasa por el intérprete antes de enviarse. <br>(2) No: el navegador solo recibe el
+                                    resultado. <br>(3) Guardar datos, leer una base de datos, reaccionar a la
+                                    hora/usuario,
+                                    enviar correos… <br>(4) Sin servidor nadie ejecuta el PHP: el navegador muestra el
+                                    código o descarga el archivo.</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s2">
+                <h2><span class="num">2</span>Tu primer script, explicado línea a línea</h2>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">2.1 — El "hola mundo"
+                            completo</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+    // Esto es un comentario: PHP lo ignora.
+    echo "¡Hola, mundo!";
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Explicación:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Línea</th>
+                                        <th>Qué hace</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>&lt;?php</code></td>
+                                        <td>Abre el modo PHP. A partir de aquí, PHP interpreta.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>// ...</code></td>
+                                        <td>Comentario de una línea.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>echo "¡Hola, mundo!";</code></td>
+                                        <td>Imprime el string. <strong>El <code>;</code> es obligatorio.</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>?&gt;</code></td>
+                                        <td>Cierra el modo PHP. Si el archivo acaba aquí, es opcional, pero recomendado
+                                            para claridad.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><strong>Errores frecuentes del principiante:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Error</th>
+                                        <th>Mensaje PHP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Olvidar <code>;</code></td>
+                                        <td><code>Parse error: syntax error, unexpected token ...</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Olvidar <code>$</code> en variable</td>
+                                        <td><code>Fatal error: Uncaught Error: Undefined constant "nombre"</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mezclar comillas</td>
+                                        <td><code>Parse error: syntax error, unexpected identifier ...</code> (o
+                                            <code>unexpected end of file</code>)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Usar <code>echo</code> sin valor</td>
+                                        <td><code>Parse error: syntax error, unexpected token ";"</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">2.1 — "Rompe el código a
+                            propósito"</span></summary>
+                    <div class="ib">
+                        <p>Copia el "hola mundo" y <strong>provoca cada error de la tabla anterior</strong> (uno a uno).
+                            Anota el mensaje exacto que aparece en cada caso y en qué línea apunta. Después corrige.</p>
+                        <div class="callout">
+                            <p><strong>Objetivo:</strong> que pierdas el miedo a los mensajes de error. En programación,
+                                el error no es fracaso: es información.</p>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="sA">
+                <h2><span class="num">A</span>Pensar como un programador (antes de teclear)</h2>
+                <div class="callout">
+                    <p>Programar es <strong>resolver un problema con instrucciones tan simples que una máquina las pueda
+                            seguir</strong>. Escribir PHP es la parte fácil; lo difícil (y lo importante) es saber qué
+                        instrucciones dar y en qué orden.</p>
+                </div>
+                <details class="item plain" open>
+                    <summary><span class="ttl">A.1 ¿Qué es un algoritmo?</span></summary>
+                    <div class="ib">
+                        <p>Una <strong>receta</strong>: una lista ordenada y sin ambigüedades de pasos que lleva de unos
+                            datos de entrada a un resultado.</p>
+                        <pre class="diagram">ALGORITMO hacer_te
+  1. Llenar el cazo de agua
+  2. Calentar el agua hasta que hierva
+  3. Echar la bolsita en la taza
+  4. Verter el agua
+  5. Esperar 3 minutos
+  6. Retirar la bolsita</pre>
+                        <p>Un ordenador es un cocinero <strong>muy obediente y nada listo</strong>: hace exactamente lo
+                            que dices, en el orden que dices. Si el paso 2 dice "hasta que hierva" sin más, no sabe
+                            cuándo parar. Por eso los algoritmos se escriben primero en <strong>pseudocódigo</strong>
+                            (español estructurado) y luego se traducen a PHP.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">A.2 Las tres estructuras con las que se construye todo</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Estructura</th>
+                                        <th>Pregunta que responde</th>
+                                        <th>En la receta</th>
+                                        <th>En PHP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Secuencia</strong></td>
+                                        <td>¿En qué orden?</td>
+                                        <td>Paso 1, paso 2, paso 3…</td>
+                                        <td>Una línea tras otra</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Selección</strong></td>
+                                        <td>¿Y si…?</td>
+                                        <td><em>Si</em> hay leche, añádela</td>
+                                        <td><code>if / else / switch</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Iteración</strong></td>
+                                        <td>¿Cuántas veces?</td>
+                                        <td><em>Mientras</em> no hierva, espera</td>
+                                        <td><code>while / for / foreach</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p>Todo programa que verás en tu vida (un banco, un videojuego, WordPress) está hecho con
+                                estas tres piezas combinadas.</p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">A.3 De pseudocódigo a PHP</span></summary>
+                    <div class="ib">
+                        <pre class="diagram">ALGORITMO decidir_descuento
+  LEER importe
+  SI importe &gt; 100 ENTONCES
+      descuento ← importe × 10 %
+  SI NO
+      descuento ← 0
+  FIN SI
+  ESCRIBIR importe − descuento</pre>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$importe = 120;
+if ($importe &gt; 100) {
+    $descuento = $importe * 0.10;
+} else {
+    $descuento = 0;
+}
+echo $importe - $descuento;   // 108</code></pre>
+                        </div>
+                        <p>Observa la correspondencia: <code>←</code> es <code>=</code> · <code>SI … ENTONCES</code> es
+                            <code>if (…) {</code> · <code>SI NO</code> es <code>} else {</code> · <code>ESCRIBIR</code>
+                            es <code>echo</code>.
+                        </p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">A.4 La traza: ejecutar el programa en tu cabeza</span></summary>
+                    <div class="ib">
+                        <p><strong>Trazar</strong> es seguir el programa línea a línea apuntando qué valen las variables
+                            en cada momento. Es la técnica nº 1 para encontrar fallos lógicos.</p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Paso</th>
+                                        <th>Línea ejecutada</th>
+                                        <th><code>$importe</code></th>
+                                        <th><code>$descuento</code></th>
+                                        <th>Salida</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><code>$importe = 120;</code></td>
+                                        <td>120</td>
+                                        <td>—</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td><code>if ($importe &gt; 100)</code> → <strong>cierto</strong></td>
+                                        <td>120</td>
+                                        <td>—</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td><code>$descuento = $importe * 0.10;</code></td>
+                                        <td>120</td>
+                                        <td>12</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td><code>echo $importe - $descuento;</code></td>
+                                        <td>120</td>
+                                        <td>12</td>
+                                        <td>108</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p><strong>Método de 4 pasos para cualquier problema:</strong><br>① entiende qué entra y qué
+                                debe salir<br>② escribe los pasos en pseudocódigo<br>③ pruébalos a mano con un ejemplo
+                                (traza)<br>④ solo entonces, traduce a PHP.<br>En el <strong>laboratorio de trazas</strong>
+                                de abajo puedes ver cómo lo hace PHP paso a paso.</p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item think" open>
+                    <summary><span class="tag">Para pensar</span><span class="ttl">A.1 — Mayor de dos</span></summary>
+                    <div class="ib">
+                        <p>Traza este algoritmo con <code>a = 8</code> y <code>b = 5</code>, y luego con
+                            <code>a = 2</code> y <code>b = 9</code>. ¿Qué hace?
+                        </p>
+                        <pre class="diagram">LEER a, b
+SI a &gt; b ENTONCES  mayor ← a
+SI NO              mayor ← b
+ESCRIBIR mayor</pre><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Con <code>a=8, b=5</code> → <code>8</code>; con <code>a=2, b=9</code> →
+                                    <code>9</code>. Devuelve <strong>el mayor</strong> de los dos números.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">A.1 — Tu primer algoritmo</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Escribe en pseudocódigo (sin PHP todavía) un algoritmo que
+                            reciba una <strong>temperatura</strong> y escriba "Hace frío" si es menor de 15, "Templado"
+                            si está entre 15 y 25 (ambos incluidos) y "Calor" si es mayor de 25. Prueba tu algoritmo con
+                            10, 15, 25 y 30. <strong>Después</strong> tradúcelo a PHP.</p><label class="done"><input
+                                type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Pseudocódigo:</p>
+                                <pre class="diagram">LEER temp
+SI temp &lt; 15 ENTONCES ESCRIBIR "Hace frío"
+SI NO, SI temp &lt;= 25 ENTONCES ESCRIBIR "Templado"
+SI NO ESCRIBIR "Calor"</pre>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$temp = 15;
+if ($temp &lt; 15) {
+    echo "Hace frío";
+} elseif ($temp &lt;= 25) {
+    echo "Templado";
+} else {
+    echo "Calor";
+}</code></pre>
+                                </div>
+                                <p>Con 10 → Hace frío · 15 → Templado · 25 → Templado · 30 → Calor. Los valores
+                                    <strong>frontera</strong> (15 y 25) son los que delatan un <code>&lt;</code> mal
+                                    puesto por un <code>&lt;=</code>.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="lab">
+                <h2><span class="num">▶</span>Laboratorio de trazas</h2>
+                <p>Elige un ejemplo (o escribe el tuyo) y pulsa <strong>Trazar</strong>. Verás, paso a paso, qué línea
+                    se ejecuta, cómo cambian las <em>cajas</em> de las variables y qué sale por pantalla. Es la traza de
+                    la sección A.4, hecha por la máquina. Admite un subconjunto de PHP: variables, operadores,
+                    <code>echo</code>, <code>if/elseif/else</code>, <code>while</code>, <code>for</code> y
+                    <code>foreach</code> sobre listas.
+                </p>
+                <div class="lab">
+                    <div class="lab-top">
+                        <div class="presets" id="presets"></div>
+                    </div>
+                    <div class="lab-grid">
+                        <div class="lab-code">
+                            <textarea id="labSrc" spellcheck="false"></textarea>
+                            <div id="labView" class="lines" hidden></div>
+                            <div class="lab-btns">
+                                <button id="labRun" class="pri">▶ Trazar</button>
+                                <button id="labEdit" hidden>✎ Editar</button>
+                            </div>
+                        </div>
+                        <div class="lab-state">
+                            <div class="lab-ctl">
+                                <button id="bFirst" title="Inicio">⏮</button><button id="bPrev"
+                                    title="Paso anterior">◀</button>
+                                <button id="bPlay" title="Reproducir">⏵</button>
+                                <button id="bNext" title="Paso siguiente">▶</button><button id="bLast"
+                                    title="Final">⏭</button>
+                                <span id="stepInfo" class="stepinfo">paso 0 / 0</span>
+                            </div>
+                            <div id="stepNote" class="stepnote">Pulsa <strong>Trazar</strong> para empezar.</div>
+                            <h4>Variables (las cajas)</h4>
+                            <div id="vars" class="vars"></div>
+                            <h4>Salida</h4>
+                            <pre id="labOut" class="labout"></pre>
+                        </div>
+                    </div>
+                    <div id="labErr" class="laberr" hidden></div>
+                </div>
+            </section>
+
+            <section class="blk" id="s3">
+                <h2><span class="num">3</span>Sintaxis básica: variables y salida</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">3.1 ¿Qué es una variable? (analogía)</span></summary>
+                    <div class="ib">
+                        <p>Una variable es una <strong>caja etiquetada</strong> donde guardas un valor que puede
+                            cambiar. La etiqueta es el nombre (<code>$edad</code>); el contenido es el valor
+                            (<code>25</code>).</p>
+                        <pre class="diagram">   ┌──────────────┐
+   │  $edad       │  ← etiqueta (nombre)
+   ├──────────────┤
+   │     25       │  ← contenido (valor)
+   └──────────────┘</pre>
+                        <p>Puedes <em>abrir la caja</em> (leer), <em>meter otra cosa</em> (asignar), <em>tirar la caja a
+                                la basura</em> (<code>unset</code>).</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">3.2 Declaración y tipos</span></summary>
+                    <div class="ib">
+                        <p>En PHP <strong>no se declara el tipo</strong>: se asigna directamente y PHP lo deduce.</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$nombre = "Ana";        // string (texto)
+$edad   = 25;           // int (entero)
+$nota   = 7.5;          // float (decimal)
+$activo = true;         // bool (verdadero/falso)
+$nada   = null;         // null (sin valor)
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Para ver el tipo</strong> en tiempo de ejecución: <code>var_dump($nombre);</code> →
+                            imprime <code>string(3) "Ana"</code>. Muy útil para depurar.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">3.3 Interpolación de variables</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$nombre = "Ana";
+
+echo "Hola, $nombre";    // Hola, Ana   ← dobles comillas INTERPOLAN
+echo 'Hola, $nombre';    // Hola, $nombre ← simples NO
+echo "Hola, " . $nombre; // Hola, Ana   ← concatenación con punto
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Regla práctica:</strong></p>
+                        <ul>
+                            <li>Dobles comillas → cuando quieres interpolar.</li>
+                            <li>Simples comillas → cuando el texto no tiene variables (más rápido).</li>
+                            <li>Concatenación con <code>.</code> → cuando construyes strings complejos.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">3.4 Operadores básicos</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Operadores</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Aritméticos</td>
+                                        <td><code>+ - * / % **</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Asignación</td>
+                                        <td><code>= += -= *= /=</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Comparación</td>
+                                        <td><code>== === != !== &lt; &gt; &lt;= &gt;=</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lógicos</td>
+                                        <td><code>&amp;&amp; || !</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Concatenación</td>
+                                        <td><code>.</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p><strong><code>==</code> vs <code>===</code>:</strong> <code>==</code> compara valor (con
+                                conversión de tipos); <code>===</code> compara valor <strong>y tipo</strong>.
+                                <code>"5" == 5</code> es <code>true</code>; <code>"5" === 5</code> es
+                                <code>false</code>. <strong>Usa siempre <code>===</code> salvo que tengas
+                                    motivo.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">3.1 — Mi primera página
+                            dinámica</span></summary>
+                    <div class="ib">
+                        <p>Guárdalo como <code>saludo.php</code>.</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+    $nombre = "Alumno de ASIR";
+    $curso  = "2º";
+    $modulo = "Despliegue de aplicaciones web";
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Mi primer PHP&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; }
+        .tarjeta { background: white; padding: 1.5rem; border-radius: 8px;
+                   box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-width: 500px; }
+        h1 { color: #2c3e50; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="tarjeta"&gt;
+        &lt;h1&gt;¡Hola, &lt;?php echo $nombre; ?&gt;!&lt;/h1&gt;
+        &lt;p&gt;Estás en &lt;strong&gt;&lt;?php echo $curso; ?&gt;&lt;/strong&gt; del módulo
+           &lt;em&gt;&lt;?php echo $modulo; ?&gt;&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Hoy es &lt;?php echo date('d/m/Y'); ?&gt;.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+                        <p><strong>Explicación del flujo:</strong></p>
+                        <ol>
+                            <li>PHP empieza a ejecutar en la línea 1.</li>
+                            <li>Asigna 3 variables. No se imprime nada todavía.</li>
+                            <li>Cierra <code>?&gt;</code> → a partir de aquí envía texto literal (el HTML).</li>
+                            <li>Cuando encuentra <code>&lt;?php echo $nombre; ?&gt;</code> → sustituye por el valor.
+                            </li>
+                            <li>Al final, el navegador recibe HTML <strong>puro, sin <code>&lt;?php</code></strong>.
+                            </li>
+                        </ol><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item think" open>
+                    <summary><span class="tag">Para pensar</span><span class="ttl">3.1 — Traza</span></summary>
+                    <div class="ib">
+                        <p>Sin ejecutar, ¿qué imprime este código? Anota la respuesta y luego compruébala.</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$a = 3;
+$b = 4;
+$a = $b;
+$b = 10;
+echo "a=$a, b=$b";
+?&gt;</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Imprime <code>a=4, b=10</code>. <code>$a = $b</code> <strong>copia</strong> el valor
+                                    4 en la caja <code>a</code>; después <code>$b = 10</code> solo cambia la caja
+                                    <code>b</code>. Compruébalo paso a paso en el laboratorio de trazas (ejemplo
+                                    <em>Intercambio</em>).
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">3.1 — Personalización</span></summary>
+                    <div class="ib">
+                        <p>Copia <code>saludo.php</code> como <code>saludo2.php</code> y:</p>
+                        <ol>
+                            <li>Añade <code>$ciudad</code> y muéstrala en un párrafo nuevo.</li>
+                            <li>Añade <code>$edad</code> y muestra <em>"Tengo X años"</em>.</li>
+                            <li>Cambia el CSS a tu gusto.</li>
+                            <li>Comenta cada variable con <code>//</code>.</li>
+                        </ol><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">3.2 — Detectar el error</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Este código tiene <strong>3 errores</strong>. Ejecútalo, lee los mensajes, corrígelos.</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+    nombre = "Luis";
+    $Edad = 30
+    echo "Me llamo $nombre y tengo $edad años";
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Pistas:</strong></p>
+                        <ul>
+                            <li>Falta <code>$</code> en <code>nombre</code>.</li>
+                            <li>Falta <code>;</code> al final de <code>$Edad = 30</code>.</li>
+                            <li><strong>PHP distingue mayúsculas</strong> en variables: <code>$Edad</code> ≠
+                                <code>$edad</code>.
+                            </li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+    $nombre = "Luis";
+    $edad = 30;
+    echo "Me llamo $nombre y tengo $edad años";
+?&gt;</code></pre>
+                                </div>
+                                <p>Errores: faltaba <code>$</code> en <code>nombre</code>, faltaba <code>;</code> tras
+                                    <code>30</code>, y <code>$Edad</code> ≠ <code>$edad</code> (mayúsculas).
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">3.3 — Calculadora simple</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Crea <code>calculadora.php</code> con <code>$num1 = 8</code> y <code>$num2 = 2</code>.
+                            Muestra las 5 operaciones (suma, resta, multiplicación, división, módulo) en formato
+                            <code>8 + 2 = 10</code>.
+                        </p>
+                        <p><strong>Extra:</strong> cambia los valores. ¿Qué pasa si <code>$num2 = 0</code>? (En PHP 8 la
+                            división por cero es un error fatal, no un aviso.)</p><label class="done"><input
+                                type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$num1 = 8;
+$num2 = 2;
+echo "$num1 + $num2 = " . ($num1 + $num2) . "&lt;br&gt;";
+echo "$num1 - $num2 = " . ($num1 - $num2) . "&lt;br&gt;";
+echo "$num1 * $num2 = " . ($num1 * $num2) . "&lt;br&gt;";
+echo "$num1 / $num2 = " . ($num1 / $num2) . "&lt;br&gt;";
+echo "$num1 % $num2 = " . ($num1 % $num2) . "&lt;br&gt;";</code></pre>
+                                </div>
+                                <p>Los paréntesis son obligatorios: sin ellos, <code>.</code> y <code>+</code> se
+                                    mezclan y el resultado es incorrecto.</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s4">
+                <h2><span class="num">4</span>Leer errores desde el minuto 1 ⚠️</h2>
+                <div class="callout">
+                    <p><strong>Esta sección se adelanta a propósito.</strong> Un programador no escribe código perfecto:
+                        escribe código, lee el error, corrige. Aprender a <em>leer</em> errores vale más que memorizar
+                        sintaxis.</p>
+                </div>
+                <details class="item plain" open>
+                    <summary><span class="ttl">4.1 Configurar la visibilidad de errores</span></summary>
+                    <div class="ib">
+                        <p>Según la imagen de PHP que uses, los errores pueden salir ya por pantalla o no. Compruébalo y
+                            fuerza el modo "desarrollo" con <strong>la forma rápida</strong>, al principio de tu script:
+                        </p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+ini_set('display_errors', '1');
+error_reporting(E_ALL);</code></pre>
+                        </div>
+                        <p><strong>La forma de servidor</strong> (para todos los scripts): un fichero <code>.ini</code>
+                            con estas líneas, montado en el contenedor en el directorio de configuración adicional de
+                            PHP (<code>conf.d</code>), y reiniciar con <code>docker compose restart</code>.</p>
+                        <div class="code">
+                            <div class="ch"><span>ini</span><span class="cb"><button class="copy">Copiar</button></span>
+                            </div>
+                            <pre><code data-lang="ini">display_errors = On
+error_reporting = E_ALL</code></pre>
+                        </div>
+                        <p>En desarrollo se ven en pantalla; en producción se ocultan y se guardan en el log. Para
+                            leerlo: <code>docker compose logs -f web</code>.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">4.2 Anatomía de un mensaje de error</span></summary>
+                    <div class="ib">
+                        <pre
+                            class="diagram">Parse error: syntax error, unexpected token "echo", expecting "," or ";" in /var/www/html/php-intro/hola.php on line 3</pre>
+                        <ul>
+                            <li><strong>Tipo:</strong> <code>Parse error</code> (error de sintaxis, el más común).</li>
+                            <li><strong>Descripción:</strong> <code>unexpected token "echo"</code> (encontró un
+                                <code>echo</code> donde esperaba otra cosa).
+                            </li>
+                            <li><strong>Archivo:</strong> la ruta <em>dentro del contenedor</em>.</li>
+                            <li><strong>Línea:</strong> <code>3</code>. <strong>Ojo:</strong> a veces el error real está
+                                en la línea <strong>anterior</strong> (falta <code>;</code> en la línea 2 → PHP se queja
+                                al llegar a la 3).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">4.3 Los 6 errores más comunes y su traducción (PHP 8)</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mensaje</th>
+                                        <th>Causa</th>
+                                        <th>Solución</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>Parse error: syntax error, unexpected token ...</code></td>
+                                        <td>Falta <code>;</code>, comilla o paréntesis</td>
+                                        <td>Revisa la línea indicada <strong>y la anterior</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Warning: Undefined variable $x</code></td>
+                                        <td>Usas una variable sin asignar</td>
+                                        <td>Asígnala antes (o comprueba el nombre y las mayúsculas)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Fatal error: Uncaught Error: Undefined constant "x"</code></td>
+                                        <td>Olvidaste el <code>$</code> de una variable</td>
+                                        <td>Añade <code>$</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Fatal error: Call to undefined function x()</code></td>
+                                        <td>Función mal escrita o inexistente</td>
+                                        <td>Revisa el nombre</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Fatal error: Uncaught DivisionByZeroError: Division by zero</code>
+                                        </td>
+                                        <td>División entre 0</td>
+                                        <td>Comprueba <code>if ($divisor != 0)</code> antes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Warning: Array to string conversion</code></td>
+                                        <td>Imprimes un array con <code>echo</code> (sale la palabra <code>Array</code>)
+                                        </td>
+                                        <td>Usa <code>print_r</code> o <code>var_dump</code>, o recórrelo con
+                                            <code>foreach</code>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><strong>Tres familias de error:</strong> de <strong>sintaxis</strong> (PHP ni empieza), de
+                            <strong>ejecución</strong> (empieza y se rompe) y <strong>lógicos</strong> (todo "funciona"
+                            pero el resultado es incorrecto: de estos PHP no avisa nunca).
+                        </p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">4.4 Herramientas de depuración</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$datos = ["nombre" =&gt; "Ana", "edad" =&gt; 25];
+
+echo "&lt;pre&gt;";      // Para que se vea bien en HTML
+print_r($datos);   // Imprime el array legible
+var_dump($datos);  // Imprime array con tipos y longitudes
+
+?&gt;</code></pre>
+                        </div>
+                        <div class="callout">
+                            <p><strong>Truco:</strong> cuando algo no funciona, pon <code>var_dump($variable);</code>
+                                antes de la línea sospechosa. Es como una linterna en una habitación oscura.</p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">4.1 — "Caza del error"</span></summary>
+                    <div class="ib">
+                        <p>Cada fragmento tiene <strong>exactamente un error</strong>. Encuéntralo, anota el mensaje de
+                            PHP y corrígelo.</p>
+                        <p><strong>a)</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$nombre = "Ana"
+echo $nombre;
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>b)</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$total = 0;
+echo "Total: " . $total
+echo "&lt;br&gt;Fin";
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>c)</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$lista = ["a", "b", "c"];
+echo $lista;
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>d)</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$x = 10;
+$y = 0;
+echo $x / $y;
+?&gt;</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p><strong>a)</strong> Falta <code>;</code> tras <code>"Ana"</code>. Mensaje:
+                                    <code>unexpected token "echo"</code> en la línea <strong>3</strong> (la siguiente).
+                                </p>
+                                <p><strong>b)</strong> Falta <code>;</code> tras <code>$total</code>:
+                                    <code>unexpected token "echo"</code>.
+                                </p>
+                                <p><strong>c)</strong> <code>echo</code> de un array:
+                                    <code>Warning: Array to string conversion</code> y sale <code>Array</code>. Usa
+                                    <code>print_r($lista);</code>.
+                                </p>
+                                <p><strong>d)</strong>
+                                    <code>Fatal error: Uncaught DivisionByZeroError: Division by zero</code>. Comprueba
+                                    antes <code>if ($y != 0)</code>.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">4.2 — Activar/desactivar errores</span>
+                    </summary>
+                    <div class="ib">
+                        <ol>
+                            <li>Pon <code>display_errors = Off</code>, reinicia el contenedor
+                                (<code>docker compose restart</code>), prueba el fragmento (a). ¿Qué ves?</li>
+                            <li>Vuelve a poner <code>On</code>. ¿Por qué en producción se pone <code>Off</code>? (Pista:
+                                seguridad, no revelar rutas del servidor).</li>
+                        </ol><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s5">
+                <h2><span class="num">5</span>Condicionales: <code>if</code>, <code>else</code>, <code>switch</code>
+                </h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">5.1 ¿Qué es una condición? (analogía)</span></summary>
+                    <div class="ib">
+                        <p>Es una <strong>decisión cotidiana</strong>: <em>si llueve, cojo paraguas; si no, no</em>. PHP
+                            traduce eso a:</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">if (llueve) { cojo paraguas; }
+else        { no cojo nada; }</code></pre>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">5.2 <code>if / elseif / else</code></span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$nota = 7;
+
+if ($nota &gt;= 9) {
+    echo "Sobresaliente";
+} elseif ($nota &gt;= 7) {
+    echo "Notable";
+} elseif ($nota &gt;= 5) {
+    echo "Aprobado";
+} else {
+    echo "Suspenso";
+}
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Importante:</strong> PHP evalúa <strong>de arriba a abajo</strong> y se queda con la
+                            <strong>primera condición que se cumpla</strong>. Por eso se ordena de más exigente a menos.
+                        </p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">5.3 Sintaxis alternativa (para mezclar con HTML)</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php if ($nota &gt;= 5): ?&gt;
+    &lt;p style="color: green;"&gt;Aprobado&lt;/p&gt;
+&lt;?php else: ?&gt;
+    &lt;p style="color: red;"&gt;Suspenso&lt;/p&gt;
+&lt;?php endif; ?&gt;</code></pre>
+                        </div>
+                        <p>Es equivalente a las llaves <code>{}</code>, pero <strong>mucho más legible</strong> cuando
+                            hay mucho HTML entre medias. Muy usada en plantillas.</p>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">5.1 — Clasificador de notas con
+                            HTML</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php $nota = 6.5; ?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Notas&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Resultado académico&lt;/h1&gt;
+    &lt;?php if ($nota &gt;= 9): ?&gt;
+        &lt;p style="color: green;"&gt;🏆 Sobresaliente (&lt;?php echo $nota; ?&gt;)&lt;/p&gt;
+    &lt;?php elseif ($nota &gt;= 7): ?&gt;
+        &lt;p style="color: #2c7;"&gt;✅ Notable (&lt;?php echo $nota; ?&gt;)&lt;/p&gt;
+    &lt;?php elseif ($nota &gt;= 5): ?&gt;
+        &lt;p style="color: orange;"&gt;✔️ Aprobado (&lt;?php echo $nota; ?&gt;)&lt;/p&gt;
+    &lt;?php else: ?&gt;
+        &lt;p style="color: red;"&gt;❌ Suspenso (&lt;?php echo $nota; ?&gt;)&lt;/p&gt;
+    &lt;?php endif; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item think" open>
+                    <summary><span class="tag">Para pensar</span><span class="ttl">5.1 — Traza</span></summary>
+                    <div class="ib">
+                        <p>¿Qué imprime?</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$edad = 16;
+if ($edad &gt;= 18) {
+    echo "Mayor";
+} elseif ($edad &gt;= 14) {
+    echo "Adolescente";
+} else {
+    echo "Niño";
+}
+?&gt;</code></pre>
+                        </div>
+                        <p>¿Y si cambias <code>$edad = 16</code> por <code>$edad = 30</code>? ¿Y por
+                            <code>$edad = 5</code>?
+                        </p><label class="done"><input type="checkbox" class="chk">
+                            Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p><code>16</code> → <strong>Adolescente</strong> · <code>30</code> →
+                                    <strong>Mayor</strong> · <code>5</code> → <strong>Niño</strong>. Se queda con la
+                                    primera condición cierta, de arriba abajo.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">5.1 — Semáforo</span></summary>
+                    <div class="ib">
+                        <p>Crea <code>semaforo.php</code> con <code>$color</code> que pueda valer <code>"rojo"</code>,
+                            <code>"amarillo"</code>, <code>"verde"</code> u otro. Muestra:
+                        </p>
+                        <ul>
+                            <li>Rojo → "¡Alto!" fondo rojo</li>
+                            <li>Amarillo → "Precaución" fondo amarillo</li>
+                            <li>Verde → "Adelante" fondo verde</li>
+                            <li>Otro → "Color desconocido"</li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$color = "rojo";
+switch ($color) {
+    case "rojo":     $texto = "¡Alto!";      $fondo = "red";    break;
+    case "amarillo": $texto = "Precaución";  $fondo = "gold";   break;
+    case "verde":    $texto = "Adelante";    $fondo = "green";  break;
+    default:         $texto = "Color desconocido"; $fondo = "#ccc";
+}
+?&gt;
+&lt;div style="background: &lt;?php echo $fondo; ?&gt;; padding: 1rem;"&gt;&lt;?php echo $texto; ?&gt;&lt;/div&gt;</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">5.4 <code>switch</code></span></summary>
+                    <div class="ib">
+                        <p>Cuando comparas <strong>una variable contra valores concretos</strong>, <code>switch</code>
+                            es más limpio:</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$dia = "miércoles";
+
+switch ($dia) {
+    case "lunes":
+    case "martes":
+    case "miércoles":
+    case "jueves":
+    case "viernes":
+        echo "Laborable";
+        break;
+    case "sábado":
+    case "domingo":
+        echo "Fin de semana";
+        break;
+    default:
+        echo "Día no válido";
+}
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Claves:</strong></p>
+                        <ul>
+                            <li>Los <code>case</code> vacíos caen al siguiente (por eso lunes-viernes comparten bloque).
+                            </li>
+                            <li><code>break</code> <strong>obligatorio</strong> al final de cada bloque; si no, PHP
+                                sigue ejecutando los siguientes.</li>
+                            <li><code>default</code> es el "si no coincide ninguno".</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">5.2 — Estación del año</span></summary>
+                    <div class="ib">
+                        <p>Con <code>$mes</code> (1–12) y <code>switch</code>, muestra la estación:</p>
+                        <ul>
+                            <li>12, 1, 2 → Invierno</li>
+                            <li>3, 4, 5 → Primavera</li>
+                            <li>6, 7, 8 → Verano</li>
+                            <li>9, 10, 11 → Otoño</li>
+                            <li>Otro → "Mes inválido"</li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$mes = 4;
+switch ($mes) {
+    case 12: case 1: case 2: echo "Invierno";  break;
+    case 3: case 4: case 5:  echo "Primavera"; break;
+    case 6: case 7: case 8:  echo "Verano";    break;
+    case 9: case 10: case 11: echo "Otoño";    break;
+    default: echo "Mes inválido";
+}</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s6">
+                <h2><span class="num">6</span>Bucles: <code>while</code>, <code>for</code>, <code>foreach</code></h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">6.1 ¿Qué es un bucle? (analogía)</span></summary>
+                    <div class="ib">
+                        <p>Un bucle es <strong>repetir algo hasta que se cumpla una condición</strong>, como
+                            <em>"mientras queden platos, lávame uno"</em>.
+                        </p>
+                        <p><strong>Tres bucles, tres propósitos:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Bucle</th>
+                                        <th>Cuándo usarlo</th>
+                                        <th>Analogía</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>while</code></td>
+                                        <td>No sé cuántas veces repetir</td>
+                                        <td>"Mientras haya ropa, plancha una"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>for</code></td>
+                                        <td>Sé cuántas veces exactamente</td>
+                                        <td>"Plancha las 5 camisas"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>foreach</code></td>
+                                        <td>Recorro una lista</td>
+                                        <td>"Plancha cada camisa de la cesta"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">6.2 <code>while</code></span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$i = 1;
+while ($i &lt;= 5) {
+    echo "Vuelta $i&lt;br&gt;";
+    $i++;   // ¡IMPRESCINDIBLE! o bucle infinito
+}
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>⚠️ El error nº1 de los principiantes:</strong> olvidar <code>$i++</code>. El bucle no
+                            termina nunca y el navegador se queda cargando. Si te pasa: cierra la pestaña, corrige,
+                            recarga.</p>
+                    </div>
+                </details>
+                <details class="item think" open>
+                    <summary><span class="tag">Para pensar</span><span class="ttl">6.1 — Bucle infinito</span></summary>
+                    <div class="ib">
+                        <p>¿Qué pasa con este código? ¿Por qué?</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$i = 1;
+while ($i &lt;= 5) {
+    echo "Vuelta $i&lt;br&gt;";
+}
+?&gt;</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Imprime <code>Vuelta 1</code> <strong>sin parar</strong>: nada modifica
+                                    <code>$i</code>, así que <code>$i &lt;= 5</code> es siempre cierto. Solución: añadir
+                                    <code>$i++;</code> dentro del bucle. Pruébalo en el laboratorio: la traza se corta
+                                    sola a los 300 pasos.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">6.3 <code>for</code></span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+for ($i = 1; $i &lt;= 5; $i++) {
+    echo "Vuelta $i&lt;br&gt;";
+}
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Anatomía del <code>for</code>:</strong></p>
+                        <pre class="diagram">for (inicio ; condición ; incremento)
+     $i=1    $i&lt;=5        $i++</pre>
+                        <ol>
+                            <li><strong>Inicio</strong> (una vez): <code>$i = 1</code>.</li>
+                            <li><strong>Condición</strong> (antes de cada vuelta): ¿<code>$i &lt;= 5</code>?</li>
+                            <li><strong>Cuerpo</strong>: lo que hay entre llaves.</li>
+                            <li><strong>Incremento</strong> (después de cada vuelta): <code>$i++</code>.</li>
+                            <li>Volver al paso 2.</li>
+                        </ol>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">6.1 — Tabla de multiplicar</span>
+                    </summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$numero = 7;
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Tabla del &lt;?php echo $numero; ?&gt;&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Tabla del &lt;?php echo $numero; ?&gt;&lt;/h1&gt;
+    &lt;table border="1" cellpadding="8"&gt;
+        &lt;?php for ($i = 1; $i &lt;= 10; $i++): ?&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;?php echo $numero; ?&gt; × &lt;?php echo $i; ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;strong&gt;&lt;?php echo $numero * $i; ?&gt;&lt;/strong&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;?php endfor; ?&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+                        <p><strong>Lo importante:</strong> 10 filas HTML generadas con <strong>una sola línea</strong>
+                            de PHP.</p><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">6.1 — Números pares</span></summary>
+                    <div class="ib">
+                        <p>Muestra en un <code>&lt;ul&gt;</code> los números pares del 1 al 20.</p>
+                        <ul>
+                            <li><strong>Primera versión:</strong> con <code>for</code> y un
+                                <code>if ($i % 2 == 0)</code>.
+                            </li>
+                            <li><strong>Segunda versión:</strong> con <code>for</code> e incremento de 2
+                                (<code>$i += 2</code>).</li>
+                            <li>¿Cuál es más clara? ¿Cuál es más eficiente?</li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+// Versión 1
+echo "&lt;ul&gt;";
+for ($i = 1; $i &lt;= 20; $i++) {
+    if ($i % 2 == 0) { echo "&lt;li&gt;$i&lt;/li&gt;"; }
+}
+echo "&lt;/ul&gt;";
+
+// Versión 2
+echo "&lt;ul&gt;";
+for ($i = 2; $i &lt;= 20; $i += 2) {
+    echo "&lt;li&gt;$i&lt;/li&gt;";
+}
+echo "&lt;/ul&gt;";</code></pre>
+                                </div>
+                                <p>La segunda es más clara y hace 10 vueltas en lugar de 20.</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">6.2 — Galería de imágenes</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Genera 5 imágenes con un <code>for</code>:</p>
+                        <div class="code">
+                            <div class="ch"><span>html</span><span class="cb"><button
+                                        class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="html">&lt;img src="https://picsum.photos/200?random=1" alt="Foto 1"&gt;
+&lt;img src="https://picsum.photos/200?random=2" alt="Foto 2"&gt;
+...</code></pre>
+                        </div>
+                        <p>Aplica CSS para que se vean en fila.</p><label class="done"><input type="checkbox"
+                                class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;div style="display:flex; gap:8px;"&gt;
+&lt;?php for ($i = 1; $i &lt;= 5; $i++): ?&gt;
+    &lt;img src="https://picsum.photos/200?random=&lt;?php echo $i; ?&gt;" alt="Foto &lt;?php echo $i; ?&gt;"&gt;
+&lt;?php endfor; ?&gt;
+&lt;/div&gt;</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">6.1 — FizzBuzz</span></summary>
+                    <div class="ib">
+                        <p>Muestra los números del 1 al 30, pero:</p>
+                        <ul>
+                            <li>Múltiplo de 3 → <strong>Fizz</strong></li>
+                            <li>Múltiplo de 5 → <strong>Buzz</strong></li>
+                            <li>Múltiplo de 3 y 5 → <strong>FizzBuzz</strong></li>
+                            <li>Resto → el número</li>
+                        </ul>
+                        <p>Pista: <code>$i % 3 == 0 &amp;&amp; $i % 5 == 0</code>. <strong>Ordena los <code>if</code>
+                                con cuidado.</strong></p><label class="done"><input type="checkbox" class="chk">
+                            Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+for ($i = 1; $i &lt;= 30; $i++) {
+    if ($i % 3 == 0 &amp;&amp; $i % 5 == 0) { echo "FizzBuzz"; }
+    elseif ($i % 3 == 0)            { echo "Fizz"; }
+    elseif ($i % 5 == 0)            { echo "Buzz"; }
+    else                            { echo $i; }
+    echo "&lt;br&gt;";
+}</code></pre>
+                                </div>
+                                <p>El caso "3 y 5" va <strong>primero</strong>: si no, el 15 se quedaría en Fizz.</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">6.2 — Pirámide</span></summary>
+                    <div class="ib">
+                        <p>Altura configurable (<code>$altura = 5</code>):</p>
+                        <pre class="diagram">*
+**
+***
+****
+*****</pre>
+                        <p>Usa dos bucles anidados (uno para filas, otro para asteriscos).</p><label class="done"><input
+                                type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$altura = 5;
+for ($fila = 1; $fila &lt;= $altura; $fila++) {
+    for ($col = 1; $col &lt;= $fila; $col++) {
+        echo "*";
+    }
+    echo "&lt;br&gt;";
+}</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">6.3 — Tabla de multiplicar
+                            completa</span></summary>
+                    <div class="ib">
+                        <p>Tabla HTML 10×10 con las tablas del 1 al 10. Usa dos <code>for</code> anidados. Pinta las
+                            cabeceras de fila y columna.</p><label class="done"><input type="checkbox" class="chk">
+                            Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;table border="1" cellpadding="6"&gt;
+&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;?php for ($c = 1; $c &lt;= 10; $c++): ?&gt;&lt;th&gt;&lt;?php echo $c; ?&gt;&lt;/th&gt;&lt;?php endfor; ?&gt;&lt;/tr&gt;
+&lt;?php for ($f = 1; $f &lt;= 10; $f++): ?&gt;
+&lt;tr&gt;&lt;th&gt;&lt;?php echo $f; ?&gt;&lt;/th&gt;
+    &lt;?php for ($c = 1; $c &lt;= 10; $c++): ?&gt;&lt;td&gt;&lt;?php echo $f * $c; ?&gt;&lt;/td&gt;&lt;?php endfor; ?&gt;
+&lt;/tr&gt;
+&lt;?php endfor; ?&gt;
+&lt;/table&gt;</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s7">
+                <h2><span class="num">7</span>Arrays (concepto explícito, nuevo)</h2>
+                <div class="callout">
+                    <p><strong>En la v1 usábamos arrays sin haberlos explicado.</strong> Aquí van como bloque propio,
+                        porque sin ellos no se entiende <code>foreach</code> ni el proyecto final.</p>
+                </div>
+                <details class="item plain" open>
+                    <summary><span class="ttl">7.1 ¿Qué es un array? (analogía)</span></summary>
+                    <div class="ib">
+                        <p>Un array es una <strong>estantería con cajones numerados o etiquetados</strong>. Cada cajón
+                            guarda un valor.</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$frutas = ["manzana", "pera", "plátano"];
+//           [0]         [1]      [2]
+
+echo $frutas[0];  // manzana
+echo $frutas[2];  // plátano
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Los índices empiezan en 0.</strong> Es fuente clásica de confusión.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">7.2 Arrays asociativos</span></summary>
+                    <div class="ib">
+                        <p>En vez de índices numéricos, usas <strong>etiquetas (claves)</strong>:</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$alumno = [
+    "nombre" =&gt; "María",
+    "edad"   =&gt; 21,
+    "ciclo"  =&gt; "ASIR"
+];
+
+echo $alumno["nombre"];  // María
+echo $alumno["edad"];    // 21
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Analogía:</strong> un diccionario. Buscas por palabra (clave), no por posición.</p>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">7.3 Operaciones básicas</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$nums = [10, 20, 30];
+
+echo count($nums);       // 3 (número de elementos)
+$nums[] = 40;            // añadir al final
+print_r($nums);          // ver todo el array
+
+// Recorrer
+foreach ($nums as $n) {
+    echo "$n ";
+}
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">7.1 — Lista de la compra</span>
+                    </summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$compra = [
+    ["producto" =&gt; "Pan",     "cantidad" =&gt; 2, "precio" =&gt; 1.20],
+    ["producto" =&gt; "Leche",   "cantidad" =&gt; 1, "precio" =&gt; 0.95],
+    ["producto" =&gt; "Huevos",  "cantidad" =&gt; 12,"precio" =&gt; 2.50],
+];
+
+$total = 0;
+foreach ($compra as $item) {
+    $subtotal = $item["cantidad"] * $item["precio"];
+    $total += $subtotal;
+    echo "{$item['producto']}: {$item['cantidad']} × {$item['precio']} € = $subtotal €&lt;br&gt;";
+}
+echo "&lt;strong&gt;Total: $total €&lt;/strong&gt;";
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Observa:</strong> <code>{$item['producto']}</code> con llaves se usa cuando quieres
+                            interpolar un array dentro de comillas dobles (PHP necesita saber dónde acaba el nombre de
+                            la variable).</p><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">7.1 — Tu array</span></summary>
+                    <div class="ib">
+                        <p>Crea un array con 5 de tus series/películas favoritas (solo títulos). Muéstralas en una lista
+                            <code>&lt;ol&gt;</code> con <code>foreach</code>.
+                        </p><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$series = ["Dark", "Severance", "The Office", "Black Mirror", "Fargo"];
+?&gt;
+&lt;ol&gt;
+&lt;?php foreach ($series as $s): ?&gt;
+    &lt;li&gt;&lt;?php echo $s; ?&gt;&lt;/li&gt;
+&lt;?php endforeach; ?&gt;
+&lt;/ol&gt;</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">7.2 — Notas de clase</span></summary>
+                    <div class="ib">
+                        <p>Array asociativo con 5 alumnos y sus notas. Recórrelo y muestra cada alumno y si está
+                            aprobado o suspenso.</p><label class="done"><input type="checkbox" class="chk">
+                            Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$notas = ["Ana" =&gt; 8.5, "Luis" =&gt; 4.2, "Marta" =&gt; 6, "Pablo" =&gt; 9.1, "Eva" =&gt; 5];
+foreach ($notas as $nombre =&gt; $nota) {
+    $estado = ($nota &gt;= 5) ? "aprobado" : "suspenso";
+    echo "$nombre: $nota ($estado)&lt;br&gt;";
+}</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s8">
+                <h2><span class="num">8</span>Funciones</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">8.1 ¿Por qué funciones? (analogía)</span></summary>
+                    <div class="ib">
+                        <p>Si tienes que calcular el IVA en 20 sitios distintos, ¿copias la fórmula 20 veces? No: la
+                            defines <strong>una vez</strong> y la <strong>reutilizas</strong>. Como una
+                            <strong>receta</strong> que puedes invocar siempre que la necesites.
+                        </p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+function calcularIva($precio, $tipo = 21) {
+    $iva = $precio * $tipo / 100;
+    return $precio + $iva;
+}
+
+echo calcularIva(100);       // 121 (IVA por defecto 21)
+echo calcularIva(100, 10);   // 110 (IVA reducido)
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Partes:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Parte</th>
+                                        <th>Ejemplo</th>
+                                        <th>Significado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Palabra clave</td>
+                                        <td><code>function</code></td>
+                                        <td>Declara la función</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nombre</td>
+                                        <td><code>calcularIva</code></td>
+                                        <td>Verbo, sin tildes ni espacios</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Parámetros</td>
+                                        <td><code>($precio, $tipo = 21)</code></td>
+                                        <td>Datos de entrada. <code>$tipo</code> tiene valor por defecto</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cuerpo</td>
+                                        <td><code>{ ... }</code></td>
+                                        <td>Lo que hace</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>return</code></td>
+                                        <td><code>return $precio + $iva;</code></td>
+                                        <td>Devuelve el resultado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="callout">
+                            <p><strong><code>return</code> vs <code>echo</code>:</strong> <code>echo</code>
+                                <strong>muestra</strong> por pantalla. <code>return</code> <strong>devuelve</strong> el
+                                valor para que el código que llamó decida qué hacer. Una función puede
+                                <code>return</code> y luego tú haces <code>echo</code> del resultado.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">8.2 Funciones integradas útiles</span></summary>
+                    <div class="ib">
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Función</th>
+                                        <th>Qué hace</th>
+                                        <th>Ejemplo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>strlen($s)</code></td>
+                                        <td>Longitud</td>
+                                        <td><code>strlen("hola")</code> → 4</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>strtoupper($s)</code></td>
+                                        <td>Mayúsculas</td>
+                                        <td><code>strtoupper("hola")</code> → "HOLA"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>strtolower($s)</code></td>
+                                        <td>Minúsculas</td>
+                                        <td><code>strtolower("HOLA")</code> → "hola"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>ucfirst($s)</code></td>
+                                        <td>Primera mayúscula</td>
+                                        <td><code>ucfirst("hola")</code> → "Hola"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>trim($s)</code></td>
+                                        <td>Quita espacios extremos</td>
+                                        <td><code>trim("  hola  ")</code> → "hola"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>str_replace($a,$b,$s)</code></td>
+                                        <td>Reemplaza</td>
+                                        <td><code>str_replace("a","@","casa")</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>strpos($s,$b)</code></td>
+                                        <td>Posición de subcadena</td>
+                                        <td><code>strpos("hola","o")</code> → 1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>round($n,$d)</code></td>
+                                        <td>Redondea</td>
+                                        <td><code>round(3.1416,2)</code> → 3.14</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>rand($min,$max)</code></td>
+                                        <td>Aleatorio entero</td>
+                                        <td><code>rand(1,6)</code> (dado)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>date($f)</code></td>
+                                        <td>Fecha formateada</td>
+                                        <td><code>date("d/m/Y")</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>count($arr)</code></td>
+                                        <td>Nº elementos</td>
+                                        <td><code>count([1,2,3])</code> → 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>number_format($n,$d,$sep_dec,$sep_mil)</code></td>
+                                        <td>Formato numérico</td>
+                                        <td><code>number_format(1234.5, 2, ',', '.')</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">8.1 — Saludo personalizado</span>
+                    </summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+function saludar($nombre) {
+    return "Hola, " . ucfirst(strtolower(trim($nombre))) . "!";
+}
+
+echo saludar("  aNA  ");   // Hola, Ana!
+echo saludar("LUIS");       // Hola, Luis!
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Observa:</strong> combinamos 3 funciones anidadas. Se evalúan <strong>de dentro hacia
+                                fuera</strong>:</p>
+                        <ol>
+                            <li><code>trim("  aNA  ")</code> → <code>"aNA"</code>.</li>
+                            <li><code>strtolower("aNA")</code> → <code>"ana"</code>.</li>
+                            <li><code>ucfirst("ana")</code> → <code>"Ana"</code>.</li>
+                        </ol><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item think" open>
+                    <summary><span class="tag">Para pensar</span><span class="ttl">8.1 — Traza</span></summary>
+                    <div class="ib">
+                        <p>¿Qué devuelve <code>saludar("  PEDRO  ")</code>? ¿Y <code>saludar("")</code>? Pruébalo.</p>
+                        <label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p><code>saludar("  PEDRO  ")</code> → <code>Hola, Pedro!</code> ·
+                                    <code>saludar("")</code> → <code>Hola, !</code> (la función no valida que haya
+                                    nombre: ¡buen candidato a mejorar con <code>empty</code>!).
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">8.2 — Función que devuelve
+                            HTML</span></summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+function tarjetaProducto($nombre, $precio) {
+    $precioFmt = number_format($precio, 2, ',', '.');
+    return "
+        &lt;div style='border:1px solid #ccc; padding:1rem; margin:0.5rem;
+                    border-radius:6px; display:inline-block; width:180px;'&gt;
+            &lt;h3&gt;$nombre&lt;/h3&gt;
+            &lt;p&gt;&lt;strong&gt;$precioFmt €&lt;/strong&gt;&lt;/p&gt;
+        &lt;/div&gt;
+    ";
+}
+
+$productos = [
+    ["Nombre" =&gt; "Teclado", "Precio" =&gt; 25.50],
+    ["Nombre" =&gt; "Ratón",   "Precio" =&gt; 15.00],
+    ["Nombre" =&gt; "Monitor", "Precio" =&gt; 189.99],
+];
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Productos&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Catálogo&lt;/h1&gt;
+    &lt;?php foreach ($productos as $p): ?&gt;
+        &lt;?php echo tarjetaProducto($p["Nombre"], $p["Precio"]); ?&gt;
+    &lt;?php endforeach; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">8.1 — Mini-calculadora funcional</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Crea 4 funciones: <code>sumar</code>, <code>restar</code>, <code>multiplicar</code>,
+                            <code>dividir</code>.
+                        </p>
+                        <ul>
+                            <li><code>dividir</code> debe devolver <code>"Error: división por cero"</code> si el divisor
+                                es 0.</li>
+                            <li>Muéstralas en una página HTML con estilo.</li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+function sumar($a, $b)       { return $a + $b; }
+function restar($a, $b)      { return $a - $b; }
+function multiplicar($a, $b) { return $a * $b; }
+function dividir($a, $b) {
+    if ($b == 0) { return "Error: división por cero"; }
+    return $a / $b;
+}
+echo sumar(8, 2), "&lt;br&gt;", dividir(8, 0);</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">8.2 — Función de clasificación</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Escribe <code>clasificar($nota)</code> que devuelva <code>"Sobresaliente"</code>,
+                            <code>"Notable"</code>, <code>"Aprobado"</code> o <code>"Suspenso"</code>. Úsala con un
+                            array:
+                        </p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">$notas = [9.5, 7.2, 4.8, 5.9, 8.1];
+foreach ($notas as $nota) {
+    echo "Nota $nota: " . clasificar($nota) . "&lt;br&gt;";
+}</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+function clasificar($nota) {
+    if ($nota &gt;= 9)      { return "Sobresaliente"; }
+    elseif ($nota &gt;= 7)  { return "Notable"; }
+    elseif ($nota &gt;= 5)  { return "Aprobado"; }
+    return "Suspenso";
+}</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">8.1 — <code>esPrimo($n)</code></span>
+                    </summary>
+                    <div class="ib">
+                        <p>Función que devuelva <code>true</code> si el número es primo. Úsala para mostrar todos los
+                            primos del 1 al 50.</p>
+                        <p><strong>Pista:</strong> un número &gt; 1 es primo si solo es divisible entre 1 y él mismo.
+                            Bucle <code>for ($i = 2; $i &lt; $n; $i++)</code> comprobando <code>$n % $i == 0</code>.</p>
+                        <label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+function esPrimo($n) {
+    if ($n &lt; 2) { return false; }
+    for ($i = 2; $i &lt; $n; $i++) {
+        if ($n % $i == 0) { return false; }
+    }
+    return true;
+}
+for ($n = 1; $n &lt;= 50; $n++) {
+    if (esPrimo($n)) { echo "$n "; }
+}</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">8.2 —
+                            <code>contarVocales($texto)</code></span></summary>
+                    <div class="ib">
+                        <p>Función que cuente cuántas vocales tiene un string (mayúsculas y minúsculas). Pista:
+                            <code>str_split($texto)</code> convierte el string en array de caracteres; recórrelo con
+                            <code>foreach</code> y <code>in_array</code>.
+                        </p><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+function contarVocales($texto) {
+    $vocales = ["a","e","i","o","u","A","E","I","O","U"];
+    $total = 0;
+    foreach (str_split($texto) as $letra) {
+        if (in_array($letra, $vocales)) { $total++; }
+    }
+    return $total;
+}
+echo contarVocales("Programación");   // 5</code></pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s9">
+                <h2><span class="num">9</span>Gestión de errores y validación</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">9.1 <code>isset</code> y <code>empty</code></span></summary>
+                    <div class="ib">
+                        <p>Antes de usar una variable, conviene saber si existe (<code>isset</code>) o está vacía
+                            (<code>empty</code>).</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+if (isset($nombre)) {
+    echo "Existe";
+} else {
+    echo "NO existe";
+}
+
+$apellido = "";
+if (empty($apellido)) {
+    echo "Está vacío";
+}
+?&gt;</code></pre>
+                        </div>
+                        <p><strong>Diferencia:</strong></p>
+                        <ul>
+                            <li><code>isset($x)</code> → <code>true</code> si <code>$x</code> existe y <strong>no es
+                                    null</strong>.</li>
+                            <li><code>empty($x)</code> → <code>true</code> si <code>$x</code> es <code>""</code>,
+                                <code>0</code>, <code>"0"</code>, <code>null</code>, <code>false</code> o no existe.
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">9.2 Validación de datos (introducción a seguridad)</span></summary>
+                    <div class="ib">
+                        <div class="callout">
+                            <p><strong>Regla de oro:</strong> <strong>nunca confíes en datos del usuario.</strong> Todo
+                                lo que venga de un formulario, URL o fichero debe validarse antes de usarse.</p>
+                        </div>
+                        <p>Esto importa aunque ahora solo trabajemos con variables: en cuanto pasemos a formularios
+                            (próxima unidad), todo lo que entre por <code>$_GET</code>/<code>$_POST</code> es
+                            <em>peligroso</em>.
+                        </p>
+                    </div>
+                </details>
+                <details class="item ok" open>
+                    <summary><span class="tag">Reto resuelto</span><span class="ttl">9.1 — Validación de edad</span>
+                    </summary>
+                    <div class="ib">
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">&lt;?php
+$edad = 15;
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Validación&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Acceso al recinto&lt;/h1&gt;
+    &lt;?php if (!isset($edad)): ?&gt;
+        &lt;p style="color: orange;"&gt;⚠️ Falta la edad&lt;/p&gt;
+    &lt;?php elseif (!is_numeric($edad)): ?&gt;
+        &lt;p style="color: red;"&gt;❌ La edad no es un número&lt;/p&gt;
+    &lt;?php elseif ($edad &lt; 0 || $edad &gt; 120): ?&gt;
+        &lt;p style="color: red;"&gt;❌ Edad fuera de rango&lt;/p&gt;
+    &lt;?php elseif ($edad &gt;= 18): ?&gt;
+        &lt;p style="color: green;"&gt;✅ Puedes pasar&lt;/p&gt;
+    &lt;?php else: ?&gt;
+        &lt;p style="color: orange;"&gt;🔞 No puedes pasar (te faltan &lt;?php echo 18 - $edad; ?&gt; años)&lt;/p&gt;
+    &lt;?php endif; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                        </div>
+                        <p><strong>Observa:</strong> los <code>if/elseif</code> se leen como <strong>un embudo</strong>:
+                            primero comprobamos que existe, luego que es número, luego rango, etc. Cada condición
+                            descarta un caso inválido.</p><label class="done"><input type="checkbox" class="chk">
+                            Probado</label>
+                    </div>
+                </details>
+                <details class="item act" open>
+                    <summary><span class="tag">Actividad</span><span class="ttl">9.1 — Validador de email
+                            (simplificado)</span></summary>
+                    <div class="ib">
+                        <p>Función <code>validarEmail($email)</code> que devuelva <code>true</code> si:</p>
+                        <ul>
+                            <li>contiene <code>@</code>,</li>
+                            <li>tiene al menos un punto después de la <code>@</code>, con algún carácter entre ambos
+                                (<code>luis@.es</code> no vale),</li>
+                            <li>no está vacío,</li>
+                            <li>no tiene espacios.</li>
+                        </ul>
+                        <p><strong>Pista:</strong> <code>strpos($s, "@")</code> devuelve la posición o
+                            <code>false</code>. <strong>Ojo:</strong> si <code>@</code> está en la posición 0, devuelve
+                            <code>0</code> (que en <code>if</code> es <em>falso</em>). Usa <code>!== false</code>.
+                        </p>
+                        <p>Prueba con:</p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">$emails = ["ana@ies.es", "luis@.es", "sin arroba.es", "", "  pepe@dominio.org  "];</code></pre>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+function validarEmail($email) {
+    $email = trim($email);
+    if ($email === "" || strpos($email, " ") !== false) { return false; }
+    $arroba = strpos($email, "@");
+    if ($arroba === false || $arroba === 0) { return false; }
+    $punto = strpos($email, ".", $arroba);
+    return $punto !== false &amp;&amp; $punto &gt; $arroba + 1;
+}
+$emails = ["ana@ies.es", "luis@.es", "sin arroba.es", "", "  pepe@dominio.org  "];
+foreach ($emails as $e) {
+    echo "[$e] → " . (validarEmail($e) ? "válido" : "NO válido") . "&lt;br&gt;";
+}</code></pre>
+                                </div>
+                                <p>Resultado: válido, NO, NO, NO, válido (tras <code>trim</code>).</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">9.1 — Sanitización con
+                            <code>htmlspecialchars</code></span></summary>
+                    <div class="ib">
+                        <p>Prueba a mostrar <code>&lt;script&gt;alert('hackeado')&lt;/script&gt;</code> con
+                            <code>echo</code> directo y luego con <code>htmlspecialchars()</code>. ¿Qué diferencia hay?
+                            ¿Por qué esto es importante en seguridad web?
+                        </p><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <p>Con <code>echo</code> directo el navegador <strong>ejecuta</strong> el script
+                                    (aparece el <code>alert</code>). Con <code>htmlspecialchars()</code> los caracteres
+                                    <code>&lt;</code> <code>&gt;</code> <code>'</code> se convierten en entidades y el
+                                    texto se <strong>muestra</strong> sin ejecutarse. Es la defensa básica contra XSS:
+                                    <em>nunca</em> imprimas datos del usuario sin escapar.
+                                </p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s10">
+                <h2><span class="num">10</span>Proyecto final — "Ficha de alumno dinámica"</h2>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">🔴 Proyecto integrador</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Crea <code>alumno.php</code> que genere una ficha HTML a partir de un <strong>array
+                                asociativo</strong>. Debe incluir:</p>
+                        <ol>
+                            <li><strong>Datos:</strong> nombre, edad, ciclo, módulos (array de arrays con nombre y
+                                nota).</li>
+                            <li><strong>Función</strong> <code>calcularMedia($notas)</code> → media.</li>
+                            <li><strong>Función</strong> <code>clasificar($nota)</code> → etiqueta cualitativa.</li>
+                            <li><strong>Bucle</strong> para pintar los módulos en una tabla.</li>
+                            <li><strong>Condicionales</strong> para colorear aprobados/suspensos.</li>
+                            <li><strong>CSS</strong> decente.</li>
+                        </ol>
+                        <p><strong>Estructura de datos sugerida:</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
+                                        class="trace">▶ Trazar</button></span></div>
+                            <pre><code data-lang="php">$alumno = [
+    "nombre"  =&gt; "María López",
+    "edad"    =&gt; 21,
+    "ciclo"   =&gt; "ASIR",
+    "modulos" =&gt; [
+        ["nombre" =&gt; "Despliegue",   "nota" =&gt; 8.5],
+        ["nombre" =&gt; "Implantación", "nota" =&gt; 6.0],
+        ["nombre" =&gt; "Seguridad",    "nota" =&gt; 4.5],
+        ["nombre" =&gt; "Bases de datos","nota" =&gt; 7.2],
+    ],
+];</code></pre>
+                        </div>
+                        <p><strong>Salida esperada:</strong></p>
+                        <pre class="diagram">Ficha de María López (21 años) — ASIR
+
+| Módulo             | Nota | Clasificación |
+|--------------------|------|---------------|
+| Despliegue         | 8.5  | Notable ✅    |
+| Implantación       | 6.0  | Aprobado ✅   |
+| Seguridad          | 4.5  | Suspenso ❌   |
+| Bases de datos     | 7.2  | Notable ✅    |
+
+Media: 6.55 — Aprobado</pre>
+                        <p><strong>Criterios de evaluación del proyecto:</strong></p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspecto</th>
+                                        <th>Puntos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Sintaxis PHP correcta (c)</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Condicionales y bucles (d)</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Funciones propias (e)</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Validación mínima</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>HTML/CSS limpio</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Comentarios y claridad</td>
+                                        <td>1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                        <details class="sol">
+                            <summary>Ver solución</summary>
+                            <div>
+                                <div class="code">
+                                    <div class="ch"><span>php</span><span class="cb"><button
+                                                class="copy">Copiar</button><button class="trace">▶
+                                                Trazar</button></span></div>
+                                    <pre><code data-lang="php">&lt;?php
+$alumno = [
+    "nombre" =&gt; "María López", "edad" =&gt; 21, "ciclo" =&gt; "ASIR",
+    "modulos" =&gt; [
+        ["nombre" =&gt; "Despliegue",    "nota" =&gt; 8.5],
+        ["nombre" =&gt; "Implantación",  "nota" =&gt; 6.0],
+        ["nombre" =&gt; "Seguridad",     "nota" =&gt; 4.5],
+        ["nombre" =&gt; "Bases de datos","nota" =&gt; 7.2],
+    ],
+];
+function clasificar($nota) {
+    if ($nota &gt;= 9) return "Sobresaliente";
+    if ($nota &gt;= 7) return "Notable";
+    if ($nota &gt;= 5) return "Aprobado";
+    return "Suspenso";
+}
+function calcularMedia($modulos) {
+    if (count($modulos) == 0) return 0;
+    $suma = 0;
+    foreach ($modulos as $m) { $suma += $m["nota"]; }
+    return $suma / count($modulos);
+}
+$media = calcularMedia($alumno["modulos"]);
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Ficha&lt;/title&gt;
+&lt;style&gt;td.ok{color:green} td.ko{color:red} table{border-collapse:collapse} td,th{padding:6px 12px;border:1px solid #ccc}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Ficha de &lt;?php echo htmlspecialchars($alumno["nombre"]); ?&gt; (&lt;?php echo $alumno["edad"]; ?&gt; años) — &lt;?php echo $alumno["ciclo"]; ?&gt;&lt;/h1&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;Módulo&lt;/th&gt;&lt;th&gt;Nota&lt;/th&gt;&lt;th&gt;Clasificación&lt;/th&gt;&lt;/tr&gt;
+&lt;?php foreach ($alumno["modulos"] as $m): ?&gt;
+&lt;tr&gt;
+  &lt;td&gt;&lt;?php echo $m["nombre"]; ?&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;?php echo number_format($m["nota"], 1); ?&gt;&lt;/td&gt;
+  &lt;td class="&lt;?php echo $m["nota"] &gt;= 5 ? "ok" : "ko"; ?&gt;"&gt;&lt;?php echo clasificar($m["nota"]); ?&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;?php endforeach; ?&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Media: &lt;?php echo number_format($media, 2); ?&gt; — &lt;?php echo clasificar($media); ?&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+                                </div>
+                                <p>La media es 6,55 → Aprobado.</p>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+                <details class="item amp" open>
+                    <summary><span class="tag">Ampliación</span><span class="ttl">del proyecto (opcional)</span>
+                    </summary>
+                    <div class="ib">
+                        <ul>
+                            <li>Añadir un <strong>array de varios alumnos</strong> y pintar una ficha por cada uno.</li>
+                            <li>Añadir un <strong>buscador</strong> (aunque sea filtrando por nombre con
+                                <code>strpos</code>).
+                            </li>
+                            <li>Añadir un <strong>botón</strong> que recargue con un alumno aleatorio
+                                (<code>rand</code>).</li>
+                        </ul><label class="done"><input type="checkbox" class="chk"> Hecho</label>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s11">
+                <h2><span class="num">11</span>Autoevaluación y evaluación entre iguales</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">11.1 Autoevaluación con niveles (no binaria)</span></summary>
+                    <div class="ib">
+                        <p>Marca tu nivel real: 🟥 = no / 🟨 = a medias / 🟩 = sí.</p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Afirmación</th>
+                                        <th>🟥</th>
+                                        <th>🟨</th>
+                                        <th>🟩</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Explico la diferencia HTML vs PHP</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Escribo un <code>.php</code> sin errores de sintaxis</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Uso variables de varios tipos y <code>echo</code></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Escribo <code>if / elseif / else</code> correctamente</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Escribo <code>for</code> y <code>while</code> sin bucles infinitos</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Recorro arrays con <code>foreach</code></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Defino funciones con parámetros y <code>return</code></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Uso 5+ funciones integradas</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Leo y corrijo errores típicos</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>He terminado el proyecto y funciona</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><strong>Interpretación:</strong></p>
+                        <ul>
+                            <li>🟩 en las 8 primeras → <strong>criterios mínimos superados (c, d, e)</strong>.</li>
+                            <li>🟨 en alguna → <strong>repasa ese bloque</strong> con las actividades de refuerzo.</li>
+                            <li>🟥 en alguna → <strong>pide ayuda</strong> y vuelve al reto resuelto correspondiente.
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">11.2 Evaluación entre iguales (opcional pero recomendada)</span>
+                    </summary>
+                    <div class="ib">
+                        <p>Intercambia tu proyecto con un compañero. Rellena esta mini-rúbrica sobre <strong>su</strong>
+                            proyecto (sé constructivo):</p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspecto</th>
+                                        <th>Comentario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>¿Se entiende el código sin explicación?</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Usa funciones donde debería?</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Hay algún error no controlado?</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Una cosa que me ha gustado</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Una cosa que mejoraría</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </section>
+            <section class="blk" id="s12">
+                <h2><span class="num">12</span>Recursos y siguientes pasos</h2>
+                <details class="item plain" open>
+                    <summary><span class="ttl">12.1 Documentación y práctica</span></summary>
+                    <div class="ib">
+                        <ul>
+                            <li><strong>Manual oficial PHP (es):</strong> <a href="https://www.php.net/manual/es/"
+                                    target="_blank" rel="noopener">https://www.php.net/manual/es/</a></li>
+                            <li><strong>W3Schools PHP:</strong> <a href="https://www.w3schools.com/php/" target="_blank"
+                                    rel="noopener">https://www.w3schools.com/php/</a></li>
+                            <li><strong>PHP The Right Way:</strong> <a href="https://phptherightway.com/"
+                                    target="_blank" rel="noopener">https://phptherightway.com/</a></li>
+                            <li><strong>Sandbox online:</strong> <a href="https://3v4l.org/" target="_blank"
+                                    rel="noopener">https://3v4l.org/</a></li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">12.2 ¿Y ahora qué?</span></summary>
+                    <div class="ib">
+                        <p>Este bloque cubre los <strong>mínimos</strong>. Los siguientes pasos naturales son:</p>
+                        <ol>
+                            <li><strong>Formularios</strong> (<code>$_GET</code>, <code>$_POST</code>) — recibir datos
+                                del usuario.</li>
+                            <li><strong>Sesiones</strong> (<code>session_start</code>) — recordar al usuario entre
+                                páginas.</li>
+                            <li><strong>Bases de datos</strong> (PDO, MySQL) — persistir información.</li>
+                            <li><strong>Separar lógica de presentación</strong> (plantillas, MVC).</li>
+                            <li><strong>Seguridad</strong> (validación, <code>htmlspecialchars</code>, contraseñas con
+                                <code>password_hash</code>).
+                            </li>
+                        </ol>
+                    </div>
+                </details>
+                <details class="item plain" open>
+                    <summary><span class="ttl">12.3 Contexto profesional</span></summary>
+                    <div class="ib">
+                        <p>PHP no vive solo: en producción se despliega con <strong>Apache/Nginx + PHP-FPM</strong>, se
+                            versiona con <strong>Git</strong>, se testea con <strong>PHPUnit</strong>, y se empaqueta
+                            con <strong>Composer</strong>. Todo eso son los siguientes módulos del ciclo. Esta guía es
+                            la puerta de entrada.</p>
+                    </div>
+                </details>
+            </section>
+            <footer>Guía de introducción a PHP · 2º ASIR. Archivo único y portable (solo carga las tipografías de Google
+                Fonts).</footer>
+        </main>
+    </div>
+    <button id="top" aria-label="Subir">↑</button>
+    <script>
+        (function () {
+            "use strict";
+            var $ = function (s, r) { return (r || document).querySelector(s) }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
+            /* ---- resaltado ---- */
+            function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }
+            var KW = 'function|return|if|else|elseif|foreach|for|while|do|switch|case|break|continue|as|echo|print|true|false|null|and|or|isset|empty|new|class|endif|endfor|endforeach|endwhile|default|array|exit|die';
+            var RX = new RegExp('(?<c>//[^\\n]*|/\\*[\\s\\S]*?\\*/|&lt;!--[\\s\\S]*?--&gt;)|(?<s>"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|(?<p>&lt;\\?php|&lt;\\?=|\\?&gt;)|(?<v>\\$[A-Za-z_]\\w*)|(?<k>\\b(?:' + KW + ')\\b)|(?<f>\\b[a-z_]\\w*(?=\\())|(?<n>\\b\\d+(?:\\.\\d+)?\\b)', 'g');
+            var RXH = new RegExp('(?<c>&lt;!--[\\s\\S]*?--&gt;)|(?<p>&lt;\\?php|&lt;\\?=|\\?&gt;)|(?<t>&lt;/?[a-zA-Z][\\w-]*|/?&gt;)|(?<v>\\$[A-Za-z_]\\w*)', 'g');
+            function hl(raw, lang) {
+                var e = esc(raw);
+                if (lang === 'ini') return e.replace(/^(;.*)$/gm, '<span class="c">$1</span>').replace(/^(\w+)(\s*=)/gm, '<span class="v">$1</span>$2');
+                if (lang === 'bash') return e.replace(/\b(docker|compose|exec|php|up|ps|logs|restart)\b/g, '<span class="k">$1</span>');
+                var rx = (lang === 'html' && !/&lt;\?php/.test(e)) ? RXH : RX;
+                if (lang === 'html' && rx === RXH && /&lt;\?/.test(e)) rx = RX;
+                return e.replace(rx, function (m) { var g = arguments[arguments.length - 1]; for (var k in g) { if (g[k] !== undefined) return '<span class="' + k + '">' + m + '</span>' } return m })
+            }
+            $$('code[data-lang]').forEach(function (c) { c.innerHTML = hl(c.textContent, c.dataset.lang) });
+            /* ---- copiar ---- */
+            $$('.copy').forEach(function (b) {
+                b.onclick = function () {
+                    var t = $('code', b.closest('.code')).textContent, d = function () { b.textContent = '✔ Copiado'; setTimeout(function () { b.textContent = 'Copiar' }, 1400) };
+                    if (navigator.clipboard) navigator.clipboard.writeText(t).then(d, function () { fb(t, d) }); else fb(t, d)
+                }
+            });
+            function fb(t, d) { var a = document.createElement('textarea'); a.value = t; a.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(a); a.select(); try { document.execCommand('copy') } catch (e) { } a.remove(); d() }
+            /* ---- progreso de tareas ---- */
+            var chks = $$('.chk'); function upd() {
+                var n = 0; chks.forEach(function (c) { var on = c.checked; if (on) n++; c.closest('.item').classList.toggle('done-ok', on) });
+                $('#plabel').textContent = n + ' / ' + chks.length + ' tareas'; $('#pf').style.width = (n / chks.length * 100) + '%'
+            }
+            chks.forEach(function (c) { c.onchange = upd }); upd();
+            /* ---- navegación ---- */
+            var secs = $$('.blk'), links = $$('aside a'), side = $('#side');
+            $('#burger').onclick = function () { side.classList.toggle('open') }; links.forEach(function (a) { a.onclick = function () { side.classList.remove('open') } });
+            function sc() {
+                var h = document.documentElement, y = window.scrollY; $('#bar').style.width = (y / (h.scrollHeight - innerHeight) * 100) + '%'; $('#top').classList.toggle('show', y > 600);
+                var cur = secs[0]; secs.forEach(function (s) { if (s.getBoundingClientRect().top < 120) cur = s }); links.forEach(function (a) { a.classList.toggle('on', a.dataset.t === cur.id) })
+            }
+            addEventListener('scroll', sc, { passive: true }); sc(); $('#top').onclick = function () { scrollTo({ top: 0, behavior: 'smooth' }) };
+            /* ================= LABORATORIO DE TRAZAS ================= */
+            var PRE = {
+                'Intercambio': '$a = 3;\n$b = 4;\n$a = $b;\n$b = 10;\necho "a=$a, b=$b";',
+                'Nota (if)': '$nota = 7;\nif ($nota >= 9) {\n    echo "Sobresaliente";\n} elseif ($nota >= 7) {\n    echo "Notable";\n} elseif ($nota >= 5) {\n    echo "Aprobado";\n} else {\n    echo "Suspenso";\n}',
+                'while': '$i = 1;\nwhile ($i <= 5) {\n    echo "Vuelta $i\\n";\n    $i++;\n}',
+                'for + suma': '$suma = 0;\nfor ($i = 1; $i <= 5; $i++) {\n    $suma += $i;\n    echo "i=$i suma=$suma\\n";\n}',
+                'foreach': '$precios = [1.2, 0.95, 2.5];\n$total = 0;\nforeach ($precios as $p) {\n    $total += $p;\n}\necho "Total: $total";',
+                'FizzBuzz': 'for ($i = 1; $i <= 15; $i++) {\n    if ($i % 3 == 0 && $i % 5 == 0) {\n        echo "FizzBuzz ";\n    } elseif ($i % 3 == 0) {\n        echo "Fizz ";\n    } elseif ($i % 5 == 0) {\n        echo "Buzz ";\n    } else {\n        echo "$i ";\n    }\n}',
+                'Bucle infinito': '$i = 1;\nwhile ($i <= 5) {\n    echo "Vuelta $i\\n";\n}'
+            };
+            var H = { count: function (a) { return a.length }, strlen: function (s) { return String(s).length }, strtoupper: function (s) { return String(s).toUpperCase() }, strtolower: function (s) { return String(s).toLowerCase() }, ucfirst: function (s) { s = String(s); return s.charAt(0).toUpperCase() + s.slice(1) }, trim: function (s) { return String(s).trim() }, round: function (n, d) { d = d || 0; var f = Math.pow(10, d); return Math.round(n * f) / f }, abs: Math.abs, max: Math.max, min: Math.min, intdiv: function (a, b) { return Math.trunc(a / b) } };
+            function fmt(v) { if (v === true) return '1'; if (v === false || v === null || v === undefined) return ''; if (Array.isArray(v)) return 'Array'; if (typeof v === 'number') return String(parseFloat(v.toPrecision(14))); return String(v) }
+            function strT(q) { // cadena PHP -> literal JS
+                var body = q.slice(1, -1);
+                if (q[0] === "'") return '"' + body.replace(/\\'/g, "'").replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+                body = body.replace(/`/g, '\\`').replace(/\\\$/g, '\u0001');
+                body = body.replace(/\{(\$[A-Za-z_]\w*(?:\[[^\]]+\])*)\}/g, function (m, x) { return '${F(' + x + ')}' }).replace(/\$([A-Za-z_]\w*)(\[[^\]]+\])?/g, function (m, n, i) { return '${F($' + n + (i || '') + ')}' });
+                return '`' + body.replace(/\u0001/g, '$') + '`'
+            }
+            function transpile(src) {
+                if (/function\s|\?>|<\?=|=>|\bclass\b|\$_|<[a-z]/i.test(src.replace(/"[^"]*"|'[^']*'/g, '""'))) throw new Error('Este fragmento usa algo fuera del subconjunto del laboratorio (funciones propias, HTML mezclado, arrays asociativos…).');
+                var lines = src.replace(/<\?php/g, '').split('\n'), names = {}, out = [];
+                lines.forEach(function (raw, i) {
+                    var t = raw.trim();
+                    if (!t || /^\/\//.test(t)) { out.push(''); return }
+                    var parts = t.split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/), code = '';
+                    parts.forEach(function (p, j) {
+                        if (j % 2) { code += strT(p); return }
+                        p = p.replace(/\/\/.*$/, '').replace(/\$([A-Za-z_]\w*)/g, function (m, n) { names[n] = 1; return m }).replace(/\s\.=\s/g, ' += ').replace(/\s\.\s/g, ' + ').replace(/\belseif\b/g, 'else if').replace(/\bTRUE\b/g, 'true').replace(/\bFALSE\b/g, 'false').replace(/\bNULL\b/g, 'null'); code += p
+                    });
+                    var m = code.match(/^foreach\s*\((.+?)\s+as\s+(\$\w+)\s*\)/); if (m) code = code.replace(m[0], 'for (' + m[2] + ' of ' + m[1] + ')');
+                    code = code.replace(/^echo\s+(.+);$/, 'echo($1);');
+                    var simple = /;\s*$/.test(code) && !/^(\}|else)/.test(code), head = /^(if|while|for)\b/.test(code);
+                    if (simple || head) code = 'T(' + i + ');' + code;
+                    out.push(code)
+                });
+                var vn = Object.keys(names).map(function (n) { return '$' + n });
+                var snap = 'function S(){return {' + vn.map(function (n) { return JSON.stringify(n) + ':' + n }).join(',') + '}}';
+                var body = (vn.length ? 'var ' + vn.join(',') + ';' : '') + snap + ';' + out.join('\n').replace(/T\((\d+)\);/g, 'T($1,S);');
+                return { fn: new Function('T', 'echo', 'F', 'count', 'strlen', 'strtoupper', 'strtolower', 'ucfirst', 'trim', 'round', 'abs', 'max', 'min', 'intdiv', body), lines: src.replace(/<\?php\n?/, '').split('\n'), raw: lines }
+            }
+            var steps = [], cur = 0, tm = null, prog = null;
+            function run() {
+                var src = $('#labSrc').value, err = $('#labErr'); err.hidden = true; stop();
+                try {
+                    var P = transpile(src); steps = []; var out = '', n = 0;
+                    var T = function (l, S) { if (++n > 300) { var e = new Error('LIMIT'); throw e } steps.push({ l: l, v: JSON.parse(JSON.stringify(S())), o: out }) };
+                    var E = function (v) { out += fmt(v) };
+                    try { P.fn(T, E, fmt, H.count, H.strlen, H.strtoupper, H.strtolower, H.ucfirst, H.trim, H.round, H.abs, H.max, H.min, H.intdiv) }
+                    catch (e) { if (e.message === 'LIMIT') { err.hidden = false; err.textContent = '⛔ Se ha cortado a los 300 pasos: tu programa no termina (bucle infinito). Fíjate en qué variable debería cambiar dentro del bucle.' } else throw e }
+                    steps.push({ l: -1, v: steps.length ? steps[steps.length - 1].v : {}, o: out, end: 1 });
+                    prog = P; cur = 0; view();
+                } catch (e) { err.hidden = false; err.textContent = '⚠️ ' + e.message }
+            }
+            function view() {
+                var V = $('#labView'); V.hidden = false; $('#labSrc').hidden = true; $('#labEdit').hidden = false;
+                V.innerHTML = prog.lines.map(function (l, i) { return '<div id="ln' + i + '"><i>' + (i + 1) + '</i>' + hl(l, 'php') + '</div>' }).join(''); show()
+            }
+            function show() {
+                var s = steps[cur], p = cur ? steps[cur - 1].v : {};
+                $$('#labView .cur').forEach(function (d) { d.classList.remove('cur') });
+                if (s.l >= 0) { var d = $('#ln' + s.l); if (d) { d.classList.add('cur'); d.scrollIntoView({ block: 'nearest' }) } }
+                $('#stepInfo').textContent = 'paso ' + (cur + 1) + ' / ' + steps.length;
+                $('#stepNote').innerHTML = s.end ? '🏁 Fin del programa.' : 'Estás a punto de ejecutar la <strong>línea ' + (s.l + 1) + '</strong>. Las variables valen lo que ves abajo <em>antes</em> de ejecutarla.';
+                var h = ''; Object.keys(s.v).forEach(function (k) {
+                    if (s.v[k] === undefined) return; var ch = JSON.stringify(p[k]) !== JSON.stringify(s.v[k]) && cur > 0;
+                    h += '<div class="box' + (ch ? ' chg' : '') + '"><small>' + k + '</small><span>' + esc(JSON.stringify(s.v[k])) + '</span></div>'
+                });
+                $('#vars').innerHTML = h || '<span style="color:#8fa3b8">(aún no hay variables)</span>'; $('#labOut').textContent = s.o
+            }
+            function go(i) { if (!steps.length) return; cur = Math.max(0, Math.min(steps.length - 1, i)); show() }
+            function stop() { if (tm) { clearInterval(tm); tm = null; $('#bPlay').textContent = '⏵' } }
+            $('#labRun').onclick = run;
+            $('#labEdit').onclick = function () { stop(); $('#labView').hidden = true; $('#labSrc').hidden = false; $('#labEdit').hidden = true };
+            $('#bFirst').onclick = function () { stop(); go(0) }; $('#bLast').onclick = function () { stop(); go(steps.length - 1) };
+            $('#bPrev').onclick = function () { stop(); go(cur - 1) }; $('#bNext').onclick = function () { stop(); go(cur + 1) };
+            $('#bPlay').onclick = function () { if (tm) { stop(); return } if (!steps.length) run(); if (cur >= steps.length - 1) go(0); $('#bPlay').textContent = '⏸'; tm = setInterval(function () { if (cur >= steps.length - 1) { stop(); return } go(cur + 1) }, 800) };
+            var pb = $('#presets'); Object.keys(PRE).forEach(function (k, i) { var b = document.createElement('button'); b.textContent = k; b.onclick = function () { $$('button', pb).forEach(function (x) { x.classList.remove('on') }); b.classList.add('on'); $('#labEdit').onclick(); $('#labSrc').value = PRE[k]; $('#labErr').hidden = true; run() }; pb.appendChild(b); if (!i) b.click() });
+            /* botón "Trazar" de los bloques de código */
+            $$('.trace').forEach(function (b) {
+                var raw = $('code', b.closest('.code')).textContent; try { transpile(raw) } catch (e) { b.remove(); return }
+                b.onclick = function () { $$('button', pb).forEach(function (x) { x.classList.remove('on') }); $('#labEdit').onclick(); $('#labSrc').value = raw.replace(/<\?php\n?/, '').replace(/\n?\?>\s*$/, ''); run(); $('#lab').scrollIntoView() }
+            });
+        })();
+    </script>
+</body>
+
+</html>
