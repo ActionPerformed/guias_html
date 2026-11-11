@@ -3744,6 +3744,26 @@ class MainActivity : ComponentActivity() {
                     (<code>https://jsonplaceholder.typicode.com/users</code>), una API pública sin autenticación. El
                     foco no está solo en «que funcione», sino en <strong>modelar todos los tipos de fallo
                         posibles</strong>.</p>
+                <div class="callout">
+                    <p><strong>Los usuarios son ficticios, y eso es lo que queremos.</strong> JSONPlaceholder es una API
+                        de pruebas: devuelve <strong>datos de ejemplo inventados</strong> (nombres como «Leanne Graham» y
+                        correos como <code>Sincere@april.biz</code>). No hay ningún usuario real detrás, no se pide
+                        contraseña y no hay nada que proteger.</p>
+                    <p><strong>De dónde salen los datos, exactamente:</strong> no están escritos en tu código. La lista
+                        la devuelve el servidor. El recorrido completo es
+                        <code>NetworkScreen</code> → <code>UserViewModel.fetchUsers()</code> →
+                        <code>safeApiCall { RetrofitClient.api.getUsers() }</code> → <code>GET
+                            https://jsonplaceholder.typicode.com/users</code> → el servidor responde con 10 usuarios →
+                        <code>kotlinx.serialization</code> los convierte a <code>List&lt;User&gt;</code> →
+                        <code>UiState.Success(users)</code> → <code>items(s.users)</code> los pinta en pantalla.</p>
+                    <p>La gracia de usar una API real (aunque sus datos sean inventados) es que te toca el código
+                        completo: <strong>HTTPS, cabeceras, deserialización, códigos de error y timeouts de verdad</strong>.
+                        Si los datos estuvieran en tu propio código, todo eso no existiría. Y por eso el
+                        <em>mismo</em> JSONPlaceholder te sirve más adelante: cuando hagas el <strong>Reto 3</strong> y
+                        guardes la lista en <code>DataStore</code>, o cuando la <strong>Actividad 3.1</strong> añada tu
+                        base de datos local con <code>Room</code>, cambiarás <code>getUsers()</code> por una consulta a
+                        tu propia base de datos y la interfaz <strong>no cambiará ni una línea</strong>.</p>
+                </div>
                 <h3>4.1. Modelo de datos y servicio</h3>
                 <p><strong>Archivo nuevo:</strong> <code>ApiService.kt</code></p>
                 <div class="code-wrap">
