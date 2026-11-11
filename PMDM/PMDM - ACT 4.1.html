@@ -3697,6 +3697,8 @@ class MainActivity : ComponentActivity() {
 
     &lt;!-- ==================== SMS (Criterio d) ==================== --&gt;
     &lt;uses-permission android:name="android.permission.SEND_SMS" /&gt;
+    &lt;!-- Recepción de SMS entrantes (apartado 6.5). Es peligroso: hay que concederlo en ejecución --&gt;
+    &lt;uses-permission android:name="android.permission.RECEIVE_SMS" /&gt;
 
     &lt;!-- Hardware opcional: la app se instala aunque no exista --&gt;
     &lt;uses-feature android:name="android.hardware.bluetooth" android:required="false" /&gt;
@@ -3704,6 +3706,17 @@ class MainActivity : ComponentActivity() {
 
     &lt;application
         ... &gt;
+        &lt;!-- Receptor de SMS entrantes (apartado 6.5).
+             exported="true" es obligatorio: el sistema es quien le manda el Intent,
+             y desde Android 12 (API 31) un receptor con intent-filter debe declararlo --&gt;
+        &lt;receiver
+            android:name=".SmsReceiver"
+            android:exported="true"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.provider.Telephony.SMS_RECEIVED" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/receiver&gt;
+
         &lt;!-- Aquí va tu MainActivity, tal como la generó el asistente --&gt;
     &lt;/application&gt;
 &lt;/manifest&gt;</pre>
@@ -3727,10 +3740,13 @@ class MainActivity : ComponentActivity() {
                     <strong>declara en el Manifest</strong> y además <strong>se pide al usuario en ejecución</strong>.
                     Sin lo segundo, la API lanza <code>SecurityException</code>. Eso lo resolveremos con una «puerta de
                     permisos» en Compose.</div>
-                <div class="callout warn"><strong>Sobre <code>SEND_SMS</code>:</strong> Google Play restringe su uso a
+                <div class="callout warn"><strong>Sobre <code>SEND_SMS</code> y
+                    <code>RECEIVE_SMS</code>:</strong> Google Play restringe su uso a
                     apps que sean gestor de SMS por defecto (u otras excepciones muy concretas). Para una app publicada,
                     la alternativa del <code>Intent</code> (sección 6.2) es la vía habitual; <code>SmsManager</code>
-                    queda para uso académico o apps no distribuidas en Play.</div>
+                    queda para uso académico o apps no distribuidas en Play. Lo mismo vale para
+                    <code>RECEIVE_SMS</code>: recibir SMS sin ser una app de mensajería es
+                    precisamente lo que Play no permite en general.</div>
             </div>
         </div>
         <div class="section card" id="s4">
@@ -4754,7 +4770,8 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                         ese SMS entre las apps que lo gestionan, como un SMS entrante más.</li>
                     <li>Con varios emuladores, el <code>-s</code> es <strong>obligatorio</strong>: sin
                         él, <code>adb emu</code> no sabe a cuál conectarse.</li>
-                    <li>Lo verás en la app de Mensajes del emulador <code>5554</code>.</li>
+                    <li>Lo verás en la app de Mensajes del emulador <code>5554</code>… y, si tienes el
+                        receptor del apartado 6.5, <strong>también en tu app</strong>.</li>
                     <li>Comandos hermanos: <code>phonenumber 600123456</code> cambia el número del
                         dispositivo y <code>gsm call 600123456</code> simula una llamada entrante.</li>
                 </ul>
@@ -4770,10 +4787,235 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                     <li>El <code>PendingIntent</code> <code>SMS_SENT_ACTION</code> se dispara, pero
                         <strong>nadie lo escucha</strong> todavía: eso es el Reto 2.</li>
                 </ul>
-                <h3>6.5. Comprueba la Fase 3</h3>
+                <h3>6.5. Recibir SMS</h3>
+                <p>Hasta ahora solo has <strong>enviado</strong> SMS. La otra mitad del criterio es
+                    <strong>recibirlos</strong>: cuando entra un SMS, el sistema difunde un
+                    <em>broadcast</em> con la acción
+                    <code>android.provider.Telephony.SMS_RECEIVED</code> y <strong>toda app que
+                    declare el permiso <code>RECEIVE_SMS</code> lo recibe</strong>, no solo la app de
+                    mensajería del sistema.</p>
+                <p><strong>Archivo nuevo:</strong> <code>SmsReceiver.kt</code></p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>SmsReceiver.kt</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="kt">package com.example.conectividad
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.provider.Telephony
+
+/**
+ * Receptor de SMS entrantes.
+ *
+ * Ojo: este objeto lo crea el SISTEMA (por eso lo declaramos en el Manifest),
+ * no tu app. Por tanto no puede tocar la UI: solo publica el mensaje en el SmsBus.
+ */
+class SmsReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
+
+        // Devuelve un array: un SMS largo llega partido en varios trozos
+        val parts = Telephony.Sms.Intents.getMessagesFromIntent(intent) ?: return
+        if (parts.isEmpty()) return
+
+        // Hay que concatenar el cuerpo: si no, solo se ve la primera parte
+        val body = parts.joinToString("") { it.messageBody }
+        val sender = parts.firstOrNull()?.originatingAddress ?: "(número desconocido)"
+
+        SmsBus.publish(sender, body)
+    }
+}</pre>
+                </div>
+                <p><strong>Archivo nuevo:</strong> <code>SmsBus.kt</code>. Es el <strong>puente</strong>
+                    entre el receptor (que vive en el framework) y la interfaz (Compose):</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>SmsBus.kt</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="kt">package com.example.conectividad
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+/** Un SMS que acaba de entrar en el dispositivo. */
+data class SmsReceived(val sender: String, val body: String, val id: Long)
+
+/**
+ * Puente entre el receptor y la UI.
+ *
+ * El id no es un detalle: un StateFlow NO vuelve a emitir si el valor nuevo es
+ * igual al anterior, así que dos SMS idénticos seguidos (el mismo texto del
+ * mismo emisor) se comerían el segundo. Con un id incremental cada aviso es único.
+ */
+object SmsBus {
+    private var nextId = 0L
+    private val _received = MutableStateFlow&lt;SmsReceived?&gt;(null)
+    val received = _received.asStateFlow()
+
+    fun publish(sender: String, body: String) {
+        _received.value = SmsReceived(sender, body, nextId++)
+    }
+}</pre>
+                </div>
+                <div class="callout "><strong>¿Por qué un <code>SmsBus</code> y no pintar directamente
+                        en el receptor?</strong> Porque un receptor declarado en el Manifest
+                    <strong>lo instancia el sistema</strong>, fuera de tu app: no tiene ninguna
+                    <code>Activity</code> delante y no puede tocar la UI. La solución estándar es un
+                    <strong>bus</strong>: el receptor publica el dato y la pantalla se suscribe a él.</div>
+                <p><strong>Archivo modificado:</strong> <code>SmsScreen.kt</code>. Sustituye el de 6.3 por
+                    este: es el mismo con tres novedades (el <code>Scaffold</code> con el
+                    <code>Snackbar</code>, el permiso <code>RECEIVE_SMS</code> y la suscripción al
+                    bus):</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>SmsScreen.kt</span><span><button class="copy-btn"
+                                style="margin-right:6px" onclick="expandCode(this)">Expandir</button><button
+                                class="copy-btn" onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre class="tall" data-lang="kt">package com.example.conectividad
+
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun SmsScreen() {
+    val context = LocalContext.current
+    val smsPermission = rememberPermissionState(Manifest.permission.SEND_SMS)
+    val receivePermission = rememberPermissionState(Manifest.permission.RECEIVE_SMS)
+    val hasTelephony = context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+
+    var phone by remember { mutableStateOf("5554") } // 5554 = puerto de consola del primer emulador (= su número por defecto)
+    var message by remember { mutableStateOf("Hola desde Android") }
+    var status by remember { mutableStateOf("") }
+
+    // --- SMS entrantes --------------------------------------------------
+    // El receptor publica en SmsBus; aquí nos suscribimos y lo mostramos.
+    val incoming by SmsBus.received.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(incoming) {
+        val sms = incoming ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar("SMS de ${sms.sender}: ${sms.body}")
+    }
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding -&gt;
+        Column(
+            Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedTextField(
+                value = phone, onValueChange = { phone = it },
+                label = { Text("Teléfono") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = message, onValueChange = { message = it },
+                label = { Text("Mensaje") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Opción A: Intent → la app de mensajería, sin permiso
+            OutlinedButton(
+                onClick = {
+                    status = if (sendSmsViaIntent(context, phone, message)) "Abierta la app de mensajería"
+                    else "No hay ninguna app de SMS instalada"
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Enviar con Intent (sin permiso)") }
+
+            // Opción B: SmsManager → envío directo, con permiso
+            if (smsPermission.status.isGranted) {
+                Button(
+                    onClick = {
+                        sendSms(context, phone, message)
+                        status = "SMS enviado a la cola (sin confirmación todavía: Reto 2)"
+                    },
+                    enabled = hasTelephony,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Enviar con SmsManager") }
+            } else {
+                Button(
+                    onClick = { smsPermission.launchPermissionRequest() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Conceder permiso SEND_SMS") }
+            }
+            if (!hasTelephony) Text("Este dispositivo no tiene telefonía.")
+
+            // Opción C: recibir los SMS que entran
+            if (receivePermission.status.isGranted) {
+                Text("Permiso RECEIVE_SMS concedido: tu app ya recibe los SMS entrantes.")
+            } else {
+                Button(
+                    onClick = { receivePermission.launchPermissionRequest() },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Conceder permiso RECEIVE_SMS") }
+            }
+
+            Text(status)
+        }
+    }
+}</pre>
+                </div>
+                <ul>
+                    <li><code>RECEIVE_SMS</code> es un permiso <strong>peligroso</strong> (hay que
+                        concederlo en ejecución) desde Android 4.4 (API 19). Declararlo no basta: sin
+                        el <code>launchPermissionRequest()</code> el sistema ni siquiera te enviará el
+                        broadcast.</li>
+                    <li><code>SMS_RECEIVED</code> lo reciben <strong>todas</strong> las apps con el
+                        permiso. <code>SMS_DELIVER</code> es otro broadcast distinto, y ese solo lo
+                        recibe la app de SMS que el usuario tenga por defecto.</li>
+                    <li><code>android:exported="true"</code> es obligatorio desde Android 12: un
+                        receptor con <code>intent-filter</code> que no lo declare, no arranca.</li>
+                    <li>Un SMS largo llega <strong>partido en varias partes</strong>: por eso
+                        concatenamos los cuerpos. Si solo ves la primera parte, ahí está tu bug.</li>
+                </ul>
+                <p><strong>Para probarlo:</strong> con la app instalada y el permiso concedido,
+                    ejecuta en la terminal:</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>bash</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="sh">$ adb -s emulator-5554 emu sms send 5556 "Hola desde el otro emulador"</pre>
+                </div>
+                <p>El SMS entra en el emulador <code>5554</code> como si lo hubiera enviado el
+                    <code>5556</code>: lo verás en la app de Mensajes <strong>y</strong> en el
+                    <code>Snackbar</code> de tu app.</p>
+                <div class="callout "><strong>Truco para probar el caso multiparte:</strong> envía desde
+                    tu propia app al número del propio emulador (<code>5554</code>). El mensaje
+                    <strong>vuelve al mismo dispositivo</strong> (por eso lo veías en la app de
+                    Mensajes), así que tu receptor lo recibirá: con un texto de más de 160 caracteres
+                    comprobarás que las partes se concatenan y que llega entero.</div>
+                <h3>6.6. Comprueba la Fase 3</h3>
                 <ul>
                     <li>«Enviar con Intent» abre la app de mensajería con el texto ya escrito.</li>
                     <li>«Enviar con SmsManager» pide el permiso la primera vez.</li>
+                    <li>Un SMS entrante simulado (<code>adb -s emulator-5554 emu sms send 5554
+                        "Prueba"</code>) aparece en tu app, en el <code>Snackbar</code>.</li>
                     <li>Con un mensaje largo, el SMS llega entero (varias partes).</li>
                 </ul>
             </div>
@@ -4955,8 +5197,8 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                     <li><input type="checkbox"><span>«Enviar con Intent» abre la app de mensajería con el texto.</span>
                     </li>
                     <li><input type="checkbox"><span>«Enviar con SmsManager» pide SEND_SMS la primera vez.</span></li>
-                    <li><input type="checkbox"><span>Con <code>adb emu sms send</code> llega un SMS entrante a tu
-                            emulador.</span></li>
+                    <li><input type="checkbox"><span>Con <code>adb emu sms send</code> llega un SMS entrante y la app
+                            lo muestra en el <code>Snackbar</code>.</span></li>
                     <li><input type="checkbox"><span>Un mensaje largo llega completo.</span></li>
                 </ul>
                 <div class="progress-track">
@@ -5248,21 +5490,40 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                 <div class="reto-card">
                     <div class="reto-head" onclick="this.parentElement.classList.toggle('open')"><span
                             class="reto-stars">⭐⭐⭐⭐ Experto</span>
-                        <h4>Reto 6: Receptor de SMS</h4>
+                        <h4>Reto 6: Buzón de SMS recibidos</h4>
                         <div class="chev">▾</div>
                     </div>
                     <div class="reto-body">
-                        <p>Añade un <code>BroadcastReceiver</code> para <code>SMS_RECEIVED</code> (requiere permiso
-                            <code>RECEIVE_SMS</code>) y muestra el mensaje entrante en un <code>Snackbar</code>.</p>
+                        <p>El receptor ya está resuelto en el apartado 6.5: llega el SMS y se muestra en
+                            un <code>Snackbar</code>. Ahora <strong>conviértelo en un buzón de verdad</strong>:
+                            que los SMS recibidos se guarden y se puedan ver.</p>
+                        <ul>
+                            <li>Guarda cada SMS recibido (emisor, cuerpo y fecha) para que no se pierda al
+                                cerrar la app: <strong>DataStore</strong> (como en el Reto 3) o
+                                <strong>Room</strong>, que es lo natural aquí.</li>
+                            <li>Muestra una <strong>lista</strong> con los SMS recibidos, del más reciente al
+                                más antiguo, con emisor, fecha y cuerpo.</li>
+                            <li>Permite <strong>filtrar por número</strong> (un campo de texto o un
+                                <code>FilterChip</code>).</li>
+                            <li>Opcional: publica una <strong>notificación</strong> en la barra de estado
+                                cuando entra un SMS.</li>
+                        </ul>
                         <button class="reveal-btn" onclick="toggleHint(this)">💡 Ver pistas</button>
                         <div class="hint-box">
                             <ul>
-                                <li><code>RECEIVE_SMS</code> es un permiso peligroso: decláralo y pídelo en ejecución.
-                                </li>
-                                <li><code>Telephony.Sms.Intents.getMessagesFromIntent(intent)</code> te devuelve los
-                                    mensajes.</li>
-                                <li>Para el <code>Snackbar</code> necesitas un <code>SnackbarHostState</code> en el
-                                    <code>Scaffold</code>.</li>
+                                <li>El punto de enganche es <code>SmsBus.publish()</code>: ahí (o en el
+                                    receptor) es donde insertas en la base de datos.</li>
+                                <li>Una <code>data class</code> con emisor, cuerpo y fecha te vale como
+                                    fila de la tabla.</li>
+                                <li>Para la fecha: <code>SimpleDateFormat</code> o
+                                    <code>java.time.LocalDateTime</code>.</li>
+                                <li>Para la lista: <code>LazyColumn</code> dentro de un
+                                    <code>Scaffold</code> (ya tienes uno en el 6.5).</li>
+                                <li>Para la notificación: <code>NotificationManager</code> +
+                                    <code>NotificationChannel</code> (obligatorio desde API 26).</li>
+                                <li>No te olvides del caso multiparte: el <code>Snackbar</code> del 6.5
+                                    concatena las partes, pero la fila de la lista también debe
+                                    guardarlas unidas.</li>
                                 <li>Recuerda las restricciones de Google Play sobre los permisos de SMS.</li>
                             </ul>
                         </div>
@@ -5661,7 +5922,7 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
         const BONDS = {};
         let CS, clogN = 0, netTimer = null, cToastT = null;
         function clg(t, m) { clogN++; const d = document.createElement('div'); d.className = 'log-' + t; d.textContent = m; $('cLog').appendChild(d); $('cLog').scrollTop = 1e6; $('cLogN').textContent = clogN + ' eventos'; }
-        function cInit() { CS = { tab: 0, net: { st: 'idle' }, bt: { perm: false, scan: false, found: [], status: '', tm: null }, smsp: { perm: false, phone: '5554', msg: 'Hola desde Android', status: '' }, dlg: null, freeze: false }; }
+        function cInit() { CS = { tab: 0, net: { st: 'idle' }, bt: { perm: false, scan: false, found: [], status: '', tm: null }, smsp: { perm: false, recvPerm: false, phone: '5554', msg: 'Hola desde Android', status: '', inbox: [] }, dlg: null, freeze: false }; }
         const btPerms = () => CE.api === '11' ? ['ACCESS_FINE_LOCATION'] : ['BLUETOOTH_SCAN', 'BLUETOOTH_CONNECT'];
         const gate = (txt, id, perms) => '<div class="c-center"><p>' + txt + '</p><div class="c-perms">' + perms.map(p => '<code>' + p + '</code>').join('') + '</div><button class="c-btn" id="' + id + '">Conceder permisos</button></div>';
 
@@ -5697,7 +5958,11 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
         function smsHtml() {
             const s = CS.smsp;
             return '<div class="c-pad"><input class="c-in" id="sPhone" value="' + attrE(s.phone) + '" placeholder="Teléfono"><textarea class="c-in" id="sMsg" rows="3">' + escH(s.msg) + '</textarea><div class="c-count" id="sCount"></div>'
-                + '<button class="c-btn alt" id="sIntent">Enviar con Intent (sin permiso)</button>' + (s.perm ? '<button class="c-btn" id="sMgr">Enviar con SmsManager</button>' : '<button class="c-btn" id="sGrant">Conceder permiso SEND_SMS</button>') + '<div class="c-status" id="sStatus">' + escH(s.status) + '</div></div>';
+                + '<button class="c-btn alt" id="sIntent">Enviar con Intent (sin permiso)</button>' + (s.perm ? '<button class="c-btn" id="sMgr">Enviar con SmsManager</button>' : '<button class="c-btn" id="sGrant">Conceder permiso SEND_SMS</button>') + '<div class="c-status" id="sStatus">' + escH(s.status) + '</div></div>'
+                + '<div class="c-pad" style="border-top:1px solid rgba(0,0,0,.10);margin-top:8px;padding-top:10px"><div class="c-count">📥 SMS ENTRANTES (apartado 6.5)</div>'
+                + (s.recvPerm ? '<button class="c-btn" id="sRecv">Simular SMS entrante</button>' : '<button class="c-btn" id="sRecvGrant">Conceder permiso RECEIVE_SMS</button>')
+                + (s.inbox.length ? '<div class="c-list">' + s.inbox.map(m => '<div class="c-li"><div><b>' + escH(m.from) + '</b><small>' + escH(m.body) + '</small></div></div>').join('') + '</div>' : '')
+                + '</div>';
         }
         function smsCount() { const c = smsCalc(CS.smsp.msg); $('sCount').textContent = c.enc + ' · ' + CS.smsp.msg.length + ' car. → ' + c.parts + ' parte' + (c.parts > 1 ? 's' : ''); }
 
@@ -5796,6 +6061,17 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                     else { clg('info', 'Nadie escucha SMS_SENT_ACTION: el usuario no sabe si ha funcionado (ver Reto 2)'); s.status = 'SMS enviado a la cola… sin confirmación visible.'; }
                     if (CS.tab === 2) $('sStatus').textContent = s.status;
                 }, 700);
+            };
+            if ($('sRecvGrant')) $('sRecvGrant').onclick = () => askPerm(['RECEIVE_SMS'], () => { s.recvPerm = true; });
+            if ($('sRecv')) $('sRecv').onclick = () => {
+                const from = '5556', body = 'Hola desde el otro emulador';
+                clg('sys', '$ adb -s emulator-5554 emu sms send ' + from + ' "' + body + '"');
+                clg('ok', 'broadcast android.provider.Telephony.SMS_RECEIVED → SmsReceiver.onReceive()');
+                clg('sys', 'Telephony.Sms.Intents.getMessagesFromIntent(intent) → 1 parte(s)');
+                clg('info', 'SmsBus.publish(from=' + from + ') → StateFlow → Snackbar');
+                s.inbox.unshift({ from: from, body: body });
+                toast('📩 SMS de ' + from + ': ' + body);
+                cRender();
             };
         }
         function toast(m) { const t = $('cToast'); t.textContent = m; t.classList.add('show'); clearTimeout(cToastT); cToastT = setTimeout(() => t.classList.remove('show'), 2200); }
