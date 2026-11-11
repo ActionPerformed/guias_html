@@ -421,6 +421,55 @@
             background: #f6f8fa
         }
 
+        /* Tabla de semáforos (autoevaluación): una casilla por fila */
+        table.sem td {
+            text-align: center;
+            width: 3.2rem
+        }
+
+        table.sem td:first-child {
+            text-align: left;
+            width: auto
+        }
+
+        table.sem input[type="radio"] {
+            width: 19px;
+            height: 19px;
+            cursor: pointer
+        }
+
+        table.sem input[value="r"] {
+            accent-color: var(--tomato)
+        }
+
+        table.sem input[value="a"] {
+            accent-color: var(--mustard)
+        }
+
+        table.sem input[value="v"] {
+            accent-color: var(--basil)
+        }
+
+        .btn-reset {
+            background: var(--paper);
+            color: var(--dim);
+            border: 1px solid var(--line);
+            border-radius: 99px;
+            padding: .3rem .9rem;
+            font: 600 .8rem var(--fb);
+            cursor: pointer
+        }
+
+        .btn-reset:hover {
+            border-color: var(--tomato);
+            color: var(--tomato)
+        }
+
+        .sem-info {
+            color: var(--dim);
+            font-size: .82rem;
+            margin-left: .4rem
+        }
 
         code {
             background: #eef1f5;
@@ -3374,9 +3423,12 @@ $media = calcularMedia($alumno["modulos"]);
                 <details class="item plain" open>
                     <summary><span class="ttl">11.1 Autoevaluación con niveles (no binaria)</span></summary>
                     <div class="ib">
-                        <p>Marca tu nivel real: 🟥 = no / 🟨 = a medias / 🟩 = sí.</p>
+                        <p>Marca <strong>una sola casilla por fila</strong> con tu nivel real: 🟥 = no / 🟨 = a medias
+                            / 🟩 = sí.</p>
+                        <p><button type="button" class="btn-reset" id="semReset">↺ Reiniciar las marcas</button>
+                            <span id="semInfo" class="sem-info"></span></p>
                         <div class="tw">
-                            <table>
+                            <table class="sem">
                                 <thead>
                                     <tr>
                                         <th>Afirmación</th>
@@ -3388,63 +3440,63 @@ $media = calcularMedia($alumno["modulos"]);
                                 <tbody>
                                     <tr>
                                         <td>Explico la diferencia HTML vs PHP</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem1" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem1" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem1" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Escribo un <code>.php</code> sin errores de sintaxis</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem2" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem2" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem2" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Uso variables de varios tipos y <code>echo</code></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem3" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem3" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem3" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Escribo <code>if / elseif / else</code> correctamente</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem4" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem4" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem4" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Escribo <code>for</code> y <code>while</code> sin bucles infinitos</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem5" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem5" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem5" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Recorro arrays con <code>foreach</code></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem6" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem6" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem6" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Defino funciones con parámetros y <code>return</code></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem7" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem7" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem7" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Uso 5+ funciones integradas</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem8" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem8" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem8" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>Leo y corrijo errores típicos</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem9" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem9" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem9" value="v" aria-label="Sí"></td>
                                     </tr>
                                     <tr>
                                         <td>He terminado el proyecto y funciona</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><input type="radio" name="sem10" value="r" aria-label="No"></td>
+                                        <td><input type="radio" name="sem10" value="a" aria-label="A medias"></td>
+                                        <td><input type="radio" name="sem10" value="v" aria-label="Sí"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -3580,6 +3632,15 @@ $media = calcularMedia($alumno["modulos"]);
                 $('#plabel').textContent = n + ' / ' + chks.length + ' tareas'; $('#pf').style.width = (n / chks.length * 100) + '%'
             }
             chks.forEach(function (c) { c.onchange = upd }); upd();
+            /* ---- semáforos de autoevaluación ---- */
+            var sems = $$('table.sem input[type="radio"]'), semRes = $('#semReset'), semInfo = $('#semInfo');
+            function semUpd() {
+                var c = { r: 0, a: 0, v: 0 };
+                sems.forEach(function (s) { if (s.checked) c[s.value]++ });
+                if (semInfo) semInfo.textContent = '🟥 ' + c.r + ' · 🟨 ' + c.a + ' · 🟩 ' + c.v + ' de ' + sems.length / 3 + ' afirmaciones';
+            }
+            sems.forEach(function (s) { s.onchange = semUpd }); semUpd();
+            if (semRes) semRes.onclick = function () { sems.forEach(function (s) { s.checked = false }); semUpd() };
             /* ---- navegación ---- */
             var secs = $$('.blk'), links = $$('aside a'), side = $('#side');
             $('#burger').onclick = function () { side.classList.toggle('open') }; links.forEach(function (a) { a.onclick = function () { side.classList.remove('open') } });
