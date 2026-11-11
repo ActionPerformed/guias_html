@@ -4623,7 +4623,7 @@ fun SmsScreen() {
     val smsPermission = rememberPermissionState(Manifest.permission.SEND_SMS)
     val hasTelephony = context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
 
-    var phone by remember { mutableStateOf("5554") } // 5554 = primer emulador
+    var phone by remember { mutableStateOf("5554") } // 5554 = puerto de consola del primer emulador (= su número por defecto)
     var message by remember { mutableStateOf("Hola desde Android") }
     var status by remember { mutableStateOf("") }
 
@@ -4692,13 +4692,83 @@ fun SmsScreen() {
                         instalada y no es «silencioso».</div>
                 </div>
                 <h3>6.4. ¿Cómo lo pruebo?</h3>
+                <p><strong>Para comprobar el <em>envío</em> te vale un único emulador.</strong> Antes de
+                    nada, averigua qué emuladores tienes abiertos y qué puerto tiene cada uno. El
+                    número que va tras <code>emulator-</code> es el <strong>puerto de consola</strong>
+                    del dispositivo y, por defecto, también su <strong>número de teléfono
+                    virtual</strong>:</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>bash</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="sh">$ adb devices
+List of devices attached
+emulator-5554   device
+emulator-5556   device</pre>
+                </div>
                 <ul>
-                    <li><strong>Con emuladores:</strong> lanza dos emuladores. El número de teléfono de cada uno es su
-                        <strong>puerto</strong> (visible en el título de la ventana: <code>5554</code>,
-                        <code>5556</code>…). Envía de uno a otro usando ese número.</li>
-                    <li>En un móvil real con SIM, usa un número válido (cuidado con el coste del SMS).</li>
-                    <li>El <code>PendingIntent</code> <code>SMS_SENT_ACTION</code> se dispara, pero <strong>nadie lo
-                            escucha</strong> todavía: eso es el Reto 2.</li>
+                    <li>El mismo número aparece en el título de la ventana del emulador:
+                        <code>Pixel8_API_34:5554</code>.</li>
+                    <li>Con <strong>dos emuladores, cada comando <code>adb</code> necesita
+                        <code>-s</code></strong> para saber a cuál te refieres:
+                        <code>adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk</code>.</li>
+                    <li>Para saber qué AVD es cada emulador:
+                        <code>adb -s emulator-5554 emu avd name</code>.</li>
+                </ul>
+                <p><strong>¿Y si quiero un segundo emulador?</strong> En Android Studio: <em>Device
+                        Manager</em> → pestaña <em>Virtual</em> → menú del AVD que ya tienes →
+                        <strong>Duplicate</strong> (o <em>Create Device</em> para uno nuevo). Desde la
+                    terminal:</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>bash</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="sh">$ emulator -list-avds
+Pixel8_API_34
+
+$ emulator -avd Pixel8_API_34 -port 5556</pre>
+                </div>
+                <p>El primer emulador que arranca se queda con el puerto <code>5554</code> (y
+                    <code>5555</code> reservado para <code>adb</code>); los siguientes van de dos en
+                    dos: <code>5556</code>, <code>5558</code>…</p>
+                <div class="callout warn"><strong>Trampa 1: dos emuladores <u>no</u> se escriben por
+                        SMS.</strong> Cada emulador tiene <strong>su propia radio GSM simulada</strong>
+                    y su propio «operador»: <strong>no hay ninguna red entre ellos</strong>. Si envías
+                    un SMS desde el emulador <code>5554</code> al <code>5556</code>, el mensaje se
+                    queda en el vacío y no llega a ninguna parte.</div>
+                <div class="callout "><strong>¿Y por qué a mí sí me funciona si me lo envío a mí
+                        mismo?</strong> Precisamente porque la radio del emulador <strong>devuelve el
+                    mensaje al mismo dispositivo</strong>: el SMS aparece en la app de Mensajes de ese
+                    emulador. Eso es justo lo que sirve para comprobar el <strong>envío</strong> (que
+                    la llamada a <code>SmsManager</code> sale de verdad), pero no sirve para probar la
+                    <strong>recepción</strong>.</div>
+                <h4>Cómo simular un SMS entrante de verdad</h4>
+                <p>La forma documentada es el comando de consola del emulador <code>sms send</code>:
+                    <strong>genera un SMS entrante</strong> en ese emulador, como si le llegara de ese
+                    número. El atajo <code>adb emu</code> lo ejecuta y vuelve al instante:</p>
+                <div class="code-wrap">
+                    <div class="code-label"><span>bash</span><span><button class="copy-btn"
+                                onclick="copyCode(this)">Copiar</button></span></div>
+                    <pre data-lang="sh">$ adb -s emulator-5554 emu sms send 5556 "Hola desde el otro emulador"</pre>
+                </div>
+                <ul>
+                    <li><code>sms send &lt;número-emisor&gt; &lt;texto&gt;</code>: el framework reparte
+                        ese SMS entre las apps que lo gestionan, como un SMS entrante más.</li>
+                    <li>Con varios emuladores, el <code>-s</code> es <strong>obligatorio</strong>: sin
+                        él, <code>adb emu</code> no sabe a cuál conectarse.</li>
+                    <li>Lo verás en la app de Mensajes del emulador <code>5554</code>.</li>
+                    <li>Comandos hermanos: <code>phonenumber 600123456</code> cambia el número del
+                        dispositivo y <code>gsm call 600123456</code> simula una llamada entrante.</li>
+                </ul>
+                <div class="callout "><strong>¿Y la consola completa?</strong> <code>adb emu</code> es el
+                    atajo «dispara y olvida». Si quieres ver todo lo que sabe hacer el emulador,
+                    conéctate con <code>telnet localhost 5554</code>, autentícate con
+                    <code>auth &lt;token&gt;</code> (el token está en
+                    <code>~/.emulator_console_auth_token</code>) y lista los comandos con
+                    <code>help</code>.</div>
+                <ul>
+                    <li>En un <strong>móvil real con SIM</strong>, usa un número válido (cuidado con
+                        el coste del SMS).</li>
+                    <li>El <code>PendingIntent</code> <code>SMS_SENT_ACTION</code> se dispara, pero
+                        <strong>nadie lo escucha</strong> todavía: eso es el Reto 2.</li>
                 </ul>
                 <h3>6.5. Comprueba la Fase 3</h3>
                 <ul>
@@ -4885,7 +4955,8 @@ fun SmsScreen() {
                     <li><input type="checkbox"><span>«Enviar con Intent» abre la app de mensajería con el texto.</span>
                     </li>
                     <li><input type="checkbox"><span>«Enviar con SmsManager» pide SEND_SMS la primera vez.</span></li>
-                    <li><input type="checkbox"><span>Entre dos emuladores (5554 ↔ 5556) el SMS llega.</span></li>
+                    <li><input type="checkbox"><span>Con <code>adb emu sms send</code> llega un SMS entrante a tu
+                            emulador.</span></li>
                     <li><input type="checkbox"><span>Un mensaje largo llega completo.</span></li>
                 </ul>
                 <div class="progress-track">
@@ -4976,7 +5047,15 @@ fun SmsScreen() {
                     <tr>
                         <td>El SMS no sale / <code>SecurityException</code> con <code>SEND_SMS</code></td>
                         <td>Permiso no concedido, sin telefonía o número inválido</td>
-                        <td>Concede el permiso; usa un dispositivo con SIM o dos emuladores (5554/5556).</td>
+                        <td>Concede el permiso; en un emulador, míralo en la app de Mensajes o con
+                            <code>adb logcat -s SmsManager</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>El SMS no llega al otro emulador</td>
+                        <td>Cada emulador tiene su propia radio simulada: <strong>no hay red entre
+                            ellos</strong></td>
+                        <td>Simula la entrada con <code>adb -s emulator-5554 emu sms send 5554
+                            "texto"</code>.</td>
                     </tr>
                     <tr>
                         <td><code>ActivityNotFoundException</code> al usar el <code>Intent</code> de SMS</td>
