@@ -4708,11 +4708,11 @@ fun SmsScreen() {
                         instalada y no es «silencioso».</div>
                 </div>
                 <h3>6.4. ¿Cómo lo pruebo?</h3>
-                <p><strong>Para comprobar el <em>envío</em> te vale un único emulador.</strong> Antes de
-                    nada, averigua qué emuladores tienes abiertos y qué puerto tiene cada uno. El
-                    número que va tras <code>emulator-</code> es el <strong>puerto de consola</strong>
-                    del dispositivo y, por defecto, también su <strong>número de teléfono
-                    virtual</strong>:</p>
+                <p><strong>Para comprobar el <em>envío</em> te vale un único emulador</strong>, y el
+                    truco es <strong>enviarte el SMS a ti mismo</strong>. Para eso necesitas saber
+                    qué número tiene tu emulador: el número que va tras <code>emulator-</code> en
+                    <code>adb devices</code> es el <strong>puerto de consola</strong> del dispositivo
+                    y, por defecto, también su <strong>número de teléfono virtual</strong>:</p>
                 <div class="code-wrap">
                     <div class="code-label"><span>bash</span><span><button class="copy-btn"
                                 onclick="copyCode(this)">Copiar</button></span></div>
@@ -4722,18 +4722,42 @@ emulator-5554   device
 emulator-5556   device</pre>
                 </div>
                 <ul>
+                    <li>Si solo tienes un emulador, verás una sola línea:
+                        <code>emulator-5554   device</code>.</li>
                     <li>El mismo número aparece en el título de la ventana del emulador:
                         <code>Pixel8_API_34:5554</code>.</li>
-                    <li>Con <strong>dos emuladores, cada comando <code>adb</code> necesita
-                        <code>-s</code></strong> para saber a cuál te refieres:
-                        <code>adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk</code>.</li>
-                    <li>Para saber qué AVD es cada emulador:
+                    <li>Para saber qué AVD hay detrás de cada emulador:
                         <code>adb -s emulator-5554 emu avd name</code>.</li>
                 </ul>
-                <p><strong>¿Y si quiero un segundo emulador?</strong> En Android Studio: <em>Device
-                        Manager</em> → pestaña <em>Virtual</em> → menú del AVD que ya tienes →
-                        <strong>Duplicate</strong> (o <em>Create Device</em> para uno nuevo). Desde la
-                    terminal:</p>
+                <h4>Comprobar el envío con un solo emulador</h4>
+                <p>En tu app, escribe en el campo <strong>Teléfono</strong> el número de tu emulador
+                    (<code>5554</code> si es el primero), pon un texto cualquiera y pulsa
+                    <strong>«Enviar con SmsManager»</strong> — o «Enviar con Intent», que abre la app
+                    de Mensajes con el texto ya escrito. Después abre <strong>la app de Mensajes del
+                    propio emulador</strong>: el SMS que acabas de escribir aparecerá allí, con tu
+                    texto.</p>
+                <div class="callout "><strong>¿Por qué funciona si te lo mandas a ti mismo?</strong>
+                    Precisamente porque la radio GSM simulada del emulador <strong>devuelve el
+                    mensaje al mismo dispositivo</strong>. El envío se hace de verdad (la llamada a
+                    <code>SmsManager</code> sale, con su <code>PendingIntent</code> y todo) y luego
+                    el mensaje aparece en la bandeja de entrada como si te lo hubiera mandado otro.
+                    <strong>Eso es lo que te confirma que el envío funciona.</strong> Lo que
+                    <u>no</u> te confirma es que tu app sepa <em>recibirlo</em>: de eso va el
+                    apartado 6.5.</div>
+                <ul>
+                    <li>Si prefieres verlo en el log de Android en lugar de en la app de Mensajes:
+                        <code>adb logcat -s SmsManager</code> mientras pulsas el botón.</li>
+                    <li>En un <strong>móvil real con SIM</strong>, usa un número válido (cuidado con
+                        el coste del SMS).</li>
+                    <li>El <code>PendingIntent</code> <code>SMS_SENT_ACTION</code> se dispara, pero
+                        <strong>nadie lo escucha</strong> todavía: eso es el Reto 2.</li>
+                </ul>
+                <h4>¿Y si quiero un segundo emulador?</h4>
+                <p><strong>No hace falta para comprobar el envío</strong>, pero tener dos emuladores
+                    abiertos es cómodo para probar la app en dos versiones de Android a la vez. Para
+                    crear el segundo: en Android Studio, <em>Device Manager</em> → pestaña
+                    <em>Virtual</em> → menú del AVD que ya tienes → <strong>Duplicate</strong> (o
+                    <em>Create Device</em> para uno nuevo). Desde la terminal:</p>
                 <div class="code-wrap">
                     <div class="code-label"><span>bash</span><span><button class="copy-btn"
                                 onclick="copyCode(this)">Copiar</button></span></div>
@@ -4745,17 +4769,18 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                 <p>El primer emulador que arranca se queda con el puerto <code>5554</code> (y
                     <code>5555</code> reservado para <code>adb</code>); los siguientes van de dos en
                     dos: <code>5556</code>, <code>5558</code>…</p>
+                <ul>
+                    <li>Con <strong>dos emuladores, cada comando <code>adb</code> necesita
+                        <code>-s</code></strong> para saber a cuál te refieres:
+                        <code>adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk</code>.</li>
+                </ul>
                 <div class="callout warn"><strong>Trampa 1: dos emuladores <u>no</u> se escriben por
                         SMS.</strong> Cada emulador tiene <strong>su propia radio GSM simulada</strong>
                     y su propio «operador»: <strong>no hay ninguna red entre ellos</strong>. Si envías
                     un SMS desde el emulador <code>5554</code> al <code>5556</code>, el mensaje se
-                    queda en el vacío y no llega a ninguna parte.</div>
-                <div class="callout "><strong>¿Y por qué a mí sí me funciona si me lo envío a mí
-                        mismo?</strong> Precisamente porque la radio del emulador <strong>devuelve el
-                    mensaje al mismo dispositivo</strong>: el SMS aparece en la app de Mensajes de ese
-                    emulador. Eso es justo lo que sirve para comprobar el <strong>envío</strong> (que
-                    la llamada a <code>SmsManager</code> sale de verdad), pero no sirve para probar la
-                    <strong>recepción</strong>.</div>
+                    queda en el vacío y no llega a ninguna parte. Por eso el autoenvío
+                    (<code>5554</code> → <code>5554</code>) <strong>sí</strong> funciona y el envío
+                    entre emuladores <strong>no</strong>.</div>
                 <h4>Cómo simular un SMS entrante de verdad</h4>
                 <p>La forma documentada es el comando de consola del emulador <code>sms send</code>:
                     <strong>genera un SMS entrante</strong> en ese emulador, como si le llegara de ese
@@ -4781,12 +4806,6 @@ $ emulator -avd Pixel8_API_34 -port 5556</pre>
                     <code>auth &lt;token&gt;</code> (el token está en
                     <code>~/.emulator_console_auth_token</code>) y lista los comandos con
                     <code>help</code>.</div>
-                <ul>
-                    <li>En un <strong>móvil real con SIM</strong>, usa un número válido (cuidado con
-                        el coste del SMS).</li>
-                    <li>El <code>PendingIntent</code> <code>SMS_SENT_ACTION</code> se dispara, pero
-                        <strong>nadie lo escucha</strong> todavía: eso es el Reto 2.</li>
-                </ul>
                 <h3>6.5. Recibir SMS</h3>
                 <p>Hasta ahora solo has <strong>enviado</strong> SMS. La otra mitad del criterio es
                     <strong>recibirlos</strong>: cuando entra un SMS, el sistema difunde un
