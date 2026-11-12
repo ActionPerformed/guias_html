@@ -543,6 +543,192 @@
             border-radius: 8px
         }
 
+        /* ===== Diagrama de flujo del apartado 0.1 (diagrama de secuencia en HTML/CSS) ===== */
+        .flujo {
+            position: relative;
+            margin: .9rem 0;
+            padding: 1rem .9rem 1.2rem;
+            background: #fffdf7;
+            border: 1px solid #e6dfcc;
+            border-radius: 10px;
+            font-size: .8rem;
+            line-height: 1.45
+        }
+
+        .flujo-cab {
+            position: relative;
+            z-index: 3;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin-bottom: .2rem
+        }
+
+        .actor {
+            justify-self: center;
+            width: 92%;
+            text-align: center;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: .4rem .3rem
+        }
+
+        .actor b {
+            display: block;
+            font: 700 .78rem var(--fb);
+            letter-spacing: .04em
+        }
+
+        .actor span {
+            display: block;
+            font-size: .68rem;
+            color: var(--dim)
+        }
+
+        .actor.tu { border-color: #eeb6a2 }
+        .actor.tu b { color: var(--tomato) }
+        .actor.srv { border-color: #aebbc9 }
+        .actor.srv b { color: var(--night) }
+        .actor.nav { border-color: #a9d7be }
+        .actor.nav b { color: var(--basil) }
+
+        .flujo-pasos {
+            position: relative
+        }
+
+        /* líneas de vida de cada actor */
+        .vida {
+            position: absolute;
+            top: -.6rem;
+            bottom: 0;
+            left: var(--x);
+            border-left: 1px dashed #d6ccb6;
+            z-index: 0
+        }
+
+        .flujo-lista {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            z-index: 1
+        }
+
+        .paso {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: center;
+            margin: .22rem 0
+        }
+
+        .paso .b {
+            grid-column: var(--gc);
+            justify-self: center;
+            width: 94%;
+            display: flex;
+            gap: .45rem;
+            align-items: flex-start;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--ac, var(--line));
+            border-radius: 8px;
+            padding: .45rem .55rem;
+            box-shadow: 0 1px 3px rgba(26, 35, 48, .07)
+        }
+
+        .paso .ns {
+            flex: 0 0 auto;
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 50%;
+            background: var(--ac, var(--night));
+            color: #fff;
+            font: 600 .72rem/1.35rem var(--fm);
+            text-align: center
+        }
+
+        .paso .tx { flex: 1 1 auto; min-width: 0 }
+        .paso .b b { color: var(--ac, var(--ink)) }
+        .paso .b code { font-size: .76rem }
+
+        /* flechas entre actores (petición y respuesta) */
+        .msg {
+            position: relative;
+            height: 2.35rem
+        }
+
+        .msg .ln {
+            position: absolute;
+            top: 1.5rem;
+            left: 50%;
+            width: 33.3333%;
+            border-top: 2px solid var(--ac, var(--ink));
+            opacity: .75
+        }
+
+        .msg .ln::after {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: -1px;
+            border: 6px solid transparent;
+            border-left-color: var(--ac, var(--ink));
+            border-right: 0
+        }
+
+        .msg.rev .ln::after {
+            right: auto;
+            left: -1px;
+            border-left: 0;
+            border-right: 6px solid var(--ac, var(--ink))
+        }
+
+        .msg .lbl {
+            position: absolute;
+            top: .5rem;
+            left: 50%;
+            width: 33.3333%;
+            text-align: center;
+            font-size: .76rem;
+            color: var(--dim)
+        }
+
+        .msg .lbl b { color: var(--ac, var(--ink)) }
+        .solo-movil { display: none }
+
+        @media(max-width:720px) {
+            .actor { width: 100%; padding: .35rem .2rem }
+            .actor b { font-size: .72rem; letter-spacing: 0 }
+            .actor span { display: none }
+            .vida { display: none }
+            .paso { display: block; margin: .35rem 0 }
+            .paso .b { width: auto; justify-self: stretch }
+            .msg { height: auto; margin: .3rem 0 }
+            .msg .ln { display: none }
+            .msg .lbl {
+                display: block;
+                position: relative;
+                top: 0;
+                left: 0;
+                width: auto;
+                text-align: left;
+                background: #fff;
+                border: 1px dashed var(--ac, var(--line));
+                border-radius: 8px;
+                padding: .4rem .5rem .4rem 1.8rem;
+                color: var(--ink)
+            }
+            .msg .lbl::before {
+                content: "↓";
+                position: absolute;
+                left: .6rem;
+                top: .35rem;
+                color: var(--ac, var(--ink));
+                font-weight: 700
+            }
+            .solo-movil { display: block; margin-top: .15rem }
+        }
+
         .k {
             color: #c3a6ff;
             font-weight: 500
@@ -929,30 +1115,57 @@
                 <details class="item plain" open>
                     <summary><span class="ttl">0.1 El flujo completo, con nombres</span></summary>
                     <div class="ib">
-                        <pre class="diagram">   TÚ (programador)              SERVIDOR (Apache+PHP)               NAVEGADOR
-       │                                  │                            │
-       │ 1. Escribes .php en VS Code      │                            │
-       │    y lo guardas en               │                            │
-       │    /var/www/html/...         │                            │
-       │                                  │                            │
-       │ 2. Abres el navegador y          │                            │
-       │    escribes la URL               │                            │
-       │                                  │                            │
-       │ ──── http://localhost/... ──────────────────────────────────▶ │
-       │                                  │                            │
-       │                                  │ 3. Apache recibe la URL    │
-       │                                  │ 4. Ve que acaba en .php    │
-       │                                  │ 5. Pasa el archivo a PHP   │
-       │                                  │ 6. PHP LEE y EJECUTA       │
-       │                                  │    el código               │
-       │                                  │ 7. PHP produce HTML puro   │
-       │                                  │                            │
-       │ ◀──────────────── HTML resultante ────────────────────────── │
-       │                                  │                            │
-       │                                  │ 8. El navegador muestra    │
-       │                                  │    el HTML (sin PHP)       │</pre>
+                                                <div class="flujo">
+                            <div class="flujo-cab">
+                                <div class="actor tu"><b>TÚ</b><span>programador</span></div>
+                                <div class="actor nav"><b>NAVEGADOR</b><span>lo que ves en pantalla</span></div>
+                                <div class="actor srv"><b>SERVIDOR</b><span>servidor web + PHP</span></div>
+                            </div>
+                            <div class="flujo-pasos">
+                                <span class="vida" aria-hidden="true" style="--x:16.6667%"></span>
+                                <span class="vida" aria-hidden="true" style="--x:50%"></span>
+                                <span class="vida" aria-hidden="true" style="--x:83.3333%"></span>
+                                <ol class="flujo-lista">
+                                    <li class="paso" style="--gc:1;--ac:var(--tomato)">
+                                        <div class="b"><span class="ns">1</span><span class="tx">Escribes <code>hola.php</code> en VS Code y lo guardas en <code>/var/www/html/</code>.</span></div>
+                                    </li>
+                                    <li class="paso" style="--gc:1;--ac:var(--tomato)">
+                                        <div class="b"><span class="ns">2</span><span class="tx">Abres el navegador y escribes la URL <code>http://localhost/hola.php</code>.</span></div>
+                                    </li>
+                                    <li class="msg" style="--ac:var(--tomato)">
+                                        <span class="ln"></span>
+                                        <span class="lbl"><b>petición HTTP</b> <code>GET /hola.php</code><i class="solo-movil"> → al servidor</i></span>
+                                    </li>
+                                    <li class="paso" style="--gc:3;--ac:var(--night)">
+                                        <div class="b"><span class="ns">3</span><span class="tx">El servidor web recibe la URL.</span></div>
+                                    </li>
+                                    <li class="paso" style="--gc:3;--ac:var(--night)">
+                                        <div class="b"><span class="ns">4</span><span class="tx">Ve que el archivo acaba en <code>.php</code>.</span></div>
+                                    </li>
+                                    <li class="paso" style="--gc:3;--ac:var(--night)">
+                                        <div class="b"><span class="ns">5</span><span class="tx">Pasa el archivo a <b>PHP</b>.</span></div>
+                                    </li>
+                                    <li class="paso" style="--gc:3;--ac:var(--plum)">
+                                        <div class="b"><span class="ns">6</span><span class="tx"><b>PHP lee y ejecuta</b> tu código.</span></div>
+                                    </li>
+                                    <li class="paso" style="--gc:3;--ac:var(--plum)">
+                                        <div class="b"><span class="ns">7</span><span class="tx"><b>PHP produce</b> el HTML puro.</span></div>
+                                    </li>
+                                    <li class="msg rev" style="--ac:var(--basil)">
+                                        <span class="ln"></span>
+                                        <span class="lbl"><b>respuesta HTTP</b> solo HTML<i class="solo-movil"> → al navegador</i></span>
+                                    </li>
+                                    <li class="paso" style="--gc:2;--ac:var(--basil)">
+                                        <div class="b"><span class="ns">8</span><span class="tx">El navegador muestra el HTML. <b>Nunca ve el PHP.</b></span></div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
                         <p><strong>Regla mental nº 1:</strong> <em>El navegador nunca ve PHP. Solo ve el HTML que PHP ha
                                 producido.</em></p>
+                        <p>Fíjate en las dos flechas: lo único que cruza de un lado a otro son
+                            <strong>peticiones</strong> y <strong>respuestas HTTP</strong>. El código PHP se queda siempre
+                            dentro del servidor.</p>
                     </div>
                 </details>
                 <details class="item plain" open>
