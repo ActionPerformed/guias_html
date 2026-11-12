@@ -34,7 +34,8 @@
     "IAW/IAW - ACT 1.1.html": "Actividad 1.1 · Stack LEMP con Docker",
     "IAW/IAW - ACT 2.1.html": "Actividad 2.1 · WordPress sobre LEMP",
     "IAW/IAW - ACT 3.1.html": "Actividad 3.1 · Personalización integral de WordPress",
-    "IAW/IAW - ACT 4.1.html": "Actividad 4.1 · Nextcloud sobre LEMP",
+    "IAW/IAW - ACT 4.1.html": "Actividad 4.1 · Nextcloud sobre LAMP",
+    "IAW/IAW - ACT 5.1.html": "Actividad 5.1 · PHP desde cero: sintaxis, control y funciones",
     "PMDM/PMDM - UT1 - Kotlin.html": "UT1 · Kotlin desde cero",
     "PMDM/PMDM - UT1 - Android.html": "UT1 · Fundamentos de desarrollo Android",
     "PMDM/PMDM - ACT 1.1.html": "Actividad 1.1 · Android Studio y Kotlin",
@@ -388,13 +389,26 @@
     },
     {
       "fichero": "IAW/IAW - ACT 4.1.html",
-      "lead": "La intranet del módulo: Nextcloud sobre LEMP, con usuarios, archivos compartidos y su parte de seguridad.",
+      "lead": "La intranet del módulo: Nextcloud sobre LAMP, con usuarios, archivos compartidos y su parte de seguridad.",
       "css": { "surface": "--bl", "ink": "--ink", "muted": "--mu", "line": "--bd", "accent": "--b", "radius": "14px", "dark": false },
       "enlaces": [
         { "tipo": "anterior", "destino": "IAW/IAW - ACT 3.1.html", "motivo": "La personalización de WordPress de la 3.1 es el antecedente directo." },
         { "tipo": "anterior", "destino": "IAW/IAW - UT4.html", "motivo": "La ofimática web de la UT4 es lo que aparece dentro de la intranet." },
+        { "tipo": "continua", "destino": "IAW/IAW - ACT 5.1.html", "motivo": "Después de la intranet, el paso natural es escribir PHP desde cero." },
         { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Copias de seguridad, permisos y procesos: todo se administra en la terminal." },
         { "tipo": "tema", "destino": "guia_sql.html", "motivo": "La base de datos detrás de usuarios y archivos compartidos." }
+      ]
+    },
+    {
+      "fichero": "IAW/IAW - ACT 5.1.html",
+      "lead": "La puerta de entrada a PHP: escribes tus primeras páginas dinámicas sobre un LEMP real (Nginx + PHP-FPM + MariaDB en Docker).",
+      "css": { "surface": "--paper", "ink": "--ink", "muted": "--dim", "line": "--line", "accent": "--tomato", "radius": "12px", "dark": false },
+      "enlaces": [
+        { "tipo": "anterior", "destino": "IAW/IAW - ACT 1.1.html", "motivo": "El stack LEMP que levantaste en la 1.1 es el que usa esta actividad (aquí, con PHP dentro)." },
+        { "tipo": "anterior", "destino": "IAW/IAW - UT1.html", "motivo": "La teoría de la arquitectura LEMP que da nombre a este stack." },
+        { "tipo": "tema", "destino": "guia_php.html", "motivo": "Sintaxis, funciones y tipos de PHP, con la referencia rápida al lado." },
+        { "tipo": "tema", "destino": "guia_linux.html", "motivo": "Terminal, contenedores y volúmenes: lo que hay detrás del compose de esta actividad." },
+        { "tipo": "tema", "destino": "guia_sql.html", "motivo": "El día que tu PHP necesite guardar datos, esto es lo que hay que saber." }
       ]
     },
     {
