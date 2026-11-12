@@ -1119,7 +1119,7 @@
                             <div class="flujo-cab">
                                 <div class="actor tu"><b>TÚ</b><span>programador</span></div>
                                 <div class="actor nav"><b>NAVEGADOR</b><span>lo que ves en pantalla</span></div>
-                                <div class="actor srv"><b>SERVIDOR</b><span>servidor web + PHP</span></div>
+                                <div class="actor srv"><b>SERVIDOR</b><span>Nginx + PHP-FPM</span></div>
                             </div>
                             <div class="flujo-pasos">
                                 <span class="vida" aria-hidden="true" style="--x:16.6667%"></span>
@@ -1127,29 +1127,29 @@
                                 <span class="vida" aria-hidden="true" style="--x:83.3333%"></span>
                                 <ol class="flujo-lista">
                                     <li class="paso" style="--gc:1;--ac:var(--tomato)">
-                                        <div class="b"><span class="ns">1</span><span class="tx">Escribes <code>hola.php</code> en VS Code y lo guardas en <code>/var/www/html/</code>.</span></div>
+                                        <div class="b"><span class="ns">1</span><span class="tx">Escribes <code>hola.php</code> en VS Code y lo guardas en la carpeta <code>html/</code> de tu PC (dentro del contenedor es <code>/var/www/html/</code>).</span></div>
                                     </li>
                                     <li class="paso" style="--gc:1;--ac:var(--tomato)">
-                                        <div class="b"><span class="ns">2</span><span class="tx">Abres el navegador y escribes la URL <code>http://localhost/hola.php</code>.</span></div>
+                                        <div class="b"><span class="ns">2</span><span class="tx">Abres el navegador y escribes la URL <code>http://localhost:8080/php-intro/hola.php</code>.</span></div>
                                     </li>
                                     <li class="msg" style="--ac:var(--tomato)">
                                         <span class="ln"></span>
                                         <span class="lbl"><b>petición HTTP</b> <code>GET /hola.php</code><i class="solo-movil"> → al servidor</i></span>
                                     </li>
                                     <li class="paso" style="--gc:3;--ac:var(--night)">
-                                        <div class="b"><span class="ns">3</span><span class="tx">El servidor web recibe la URL.</span></div>
+                                        <div class="b"><span class="ns">3</span><span class="tx">Nginx recibe la URL.</span></div>
                                     </li>
                                     <li class="paso" style="--gc:3;--ac:var(--night)">
                                         <div class="b"><span class="ns">4</span><span class="tx">Ve que el archivo acaba en <code>.php</code>.</span></div>
                                     </li>
                                     <li class="paso" style="--gc:3;--ac:var(--night)">
-                                        <div class="b"><span class="ns">5</span><span class="tx">Pasa el archivo a <b>PHP</b>.</span></div>
+                                        <div class="b"><span class="ns">5</span><span class="tx">Nginx no ejecuta PHP: se lo pasa a <b>PHP-FPM</b>.</span></div>
                                     </li>
                                     <li class="paso" style="--gc:3;--ac:var(--plum)">
-                                        <div class="b"><span class="ns">6</span><span class="tx"><b>PHP lee y ejecuta</b> tu código.</span></div>
+                                        <div class="b"><span class="ns">6</span><span class="tx"><b>PHP-FPM lee y ejecuta</b> tu código.</span></div>
                                     </li>
                                     <li class="paso" style="--gc:3;--ac:var(--plum)">
-                                        <div class="b"><span class="ns">7</span><span class="tx"><b>PHP produce</b> el HTML puro.</span></div>
+                                        <div class="b"><span class="ns">7</span><span class="tx"><b>PHP-FPM devuelve</b> el HTML puro a Nginx.</span></div>
                                     </li>
                                     <li class="msg rev" style="--ac:var(--basil)">
                                         <span class="ln"></span>
@@ -1194,7 +1194,7 @@
                                     </tr>
                                     <tr>
                                         <td>Cocinero</td>
-                                        <td>Apache + PHP</td>
+                                        <td>Nginx + PHP-FPM</td>
                                         <td>Servidor</td>
                                     </tr>
                                     <tr>
@@ -1221,24 +1221,143 @@
                     </div>
                 </details>
                 <details class="item plain" open>
-                    <summary><span class="ttl">0.3 Comprobación del entorno (tu LEMP en Docker)</span></summary>
+                    <summary><span class="ttl">0.3 Levanta tu LEMP (Docker)</span></summary>
                     <div class="ib">
-                        <div class="callout">
-                            <p>Damos por hecho que ya sabes levantar tu stack LEMP con <code>docker compose</code> y que
-                                una carpeta de tu equipo está montada como raíz web (dentro del contenedor suele ser
-                                <code>/var/www/html</code>). Los nombres de servicio (<code>web</code>,
-                                <code>php</code>…) dependen de tu <code>docker-compose.yml</code>: míralos con
-                                <code>docker compose ps</code>.
-                            </p>
+                        <p>Esta actividad se hace sobre un <strong>LEMP</strong>: <strong>L</strong>inux,
+                            <strong>E</strong>ngine-X (Nginx), <strong>M</strong>ariaDB y <strong>P</strong>HP. Todo en
+                            contenedores de Docker, con un único puerto publicado en tu PC: el <code>8080</code>.</p>
+                        <div class="tw">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Contenedor</th>
+                                        <th>Qué hace</th>
+                                        <th>Puerto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Nginx</strong></td>
+                                        <td>Recibe la petición y sirve los archivos estáticos. Si la URL acaba en
+                                            <code>.php</code>, <strong>no ejecuta PHP</strong>: se lo pasa a PHP-FPM.</td>
+                                        <td>80 (publicado como 8080 en tu PC)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>PHP-FPM</strong></td>
+                                        <td>Ejecuta tu código PHP y devuelve el HTML ya generado.</td>
+                                        <td>9000 (FastCGI, solo entre contenedores)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MariaDB</strong></td>
+                                        <td>Guarda los datos. En esta actividad todavía no lo vas a usar, pero forma
+                                            parte del LEMP.</td>
+                                        <td>3306 (solo entre contenedores)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <p><strong>Paso 1.</strong> En la carpeta de tu proyecto ejecuta
-                            <code>docker compose up -d</code>. Después <code>docker compose ps</code>: el servicio web
-                            debe aparecer como <em>running / Up</em>.
-                        </p>
-                        <p><strong>Paso 2.</strong> Abre VS Code sobre la carpeta <strong>montada</strong> (la que se ve
-                            como raíz web dentro del contenedor). Crea la subcarpeta <code>php-intro/</code>.</p>
-                        <p><strong>Paso 3.</strong> Dentro, crea <code>hola.php</code> con este contenido
-                            <strong>exacto</strong>:
+                        <div class="callout">
+                            <p><strong>Por qué dos contenedores y no uno:</strong> Nginx no sabe ejecutar PHP. Su
+                                trabajo es recibir la petición y decidir quién la resuelve. Por eso, sin el contenedor
+                                de PHP-FPM, tu <code>.php</code> llegaría al navegador tal cual, sin ejecutar.</p>
+                        </div>
+                        <p><strong>Paso 1 · La estructura de carpetas.</strong> Crea una carpeta para el proyecto
+                            (<code>mi-lemp/</code>) y dentro deja esto:</p>
+                        <ul>
+                            <li><code>mi-lemp/</code>
+                                <ul>
+                                    <li><code>docker-compose.yml</code> — los tres servicios.</li>
+                                    <li><code>config/nginx/default.conf</code> — la configuración de Nginx.</li>
+                                    <li><code>config/php/99-dev.ini</code> — los ajustes de PHP (errores visibles).</li>
+                                    <li><code>html/</code> — <strong>aquí dentro va tu código</strong>: es la raíz web.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p><strong>Paso 2 · <code>docker-compose.yml</code>.</strong></p>
+                        <div class="code">
+                            <div class="ch"><span>yaml</span><span class="cb"><button class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="yaml">services:
+  nginx:
+    image: nginx:alpine
+    container_name: mi-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./html:/var/www/html:ro
+    depends_on:
+      - php
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+  php:
+    image: php:8.3-fpm-alpine
+    container_name: mi-php
+    volumes:
+      - ./html:/var/www/html:ro
+      - ./config/php/99-dev.ini:/usr/local/etc/php/conf.d/99-dev.ini:ro
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:11
+    container_name: mi-mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: mi_app
+      MARIADB_USER: usuario
+      MARIADB_PASSWORD: userpass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - mi-red
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
+
+networks:
+  mi-red:</code></pre>
+                        </div>
+                        <p><strong>Paso 3 · <code>config/nginx/default.conf</code>.</strong> Es el fichero que le dice
+                            a Nginx qué hacer con cada URL. Lo importante es el bloque
+                            <code>location ~ \.php$</code>: sin él, Nginx no sabe que existe PHP-FPM.</p>
+                        <div class="code">
+                            <div class="ch"><span>nginx</span><span class="cb"><button class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="nginx">server {
+    listen 80;
+    server_name localhost;
+    root /var/www/html;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass php:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}</code></pre>
+                        </div>
+                        <p><strong>Paso 4 · <code>config/php/99-dev.ini</code>.</strong> En desarrollo quieres ver los
+                            errores de PHP en pantalla. Está explicado en el apartado 4.1.</p>
+                        <p><strong>Paso 5 · Arrancar el stack.</strong> En la carpeta del proyecto (donde está el
+                            <code>docker-compose.yml</code>) ejecuta:</p>
+                        <div class="code">
+                            <div class="ch"><span>bash</span><span class="cb"><button class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="bash">docker compose up -d
+docker compose ps</code></pre>
+                        </div>
+                        <p>La primera vez descargará las imágenes (Nginx Alpine, PHP-FPM y MariaDB): puede tardar
+                            unos minutos. Después, <code>docker compose ps</code> debe mostrar los <strong>tres</strong>
+                            contenedores en estado <em>running</em> (o <em>Up</em>).</p>
+                        <p><strong>Paso 6 · Tu primer script.</strong> Abre VS Code sobre la carpeta
+                            <code>mi-lemp/</code>, crea la subcarpeta <code>html/php-intro/</code> y dentro el fichero
+                            <code>hola.php</code> con este contenido <strong>exacto</strong>:
                         </p>
                         <div class="code">
                             <div class="ch"><span>php</span><span class="cb"><button class="copy">Copiar</button><button
@@ -1246,23 +1365,38 @@
                             <pre><code data-lang="php">&lt;?php
 echo "¡Hola, mundo!";</code></pre>
                         </div>
-                        <p><strong>Paso 4.</strong> Guarda (Ctrl+S). Comprueba que se llama <code>hola.php</code>,
+                        <p><strong>Paso 7.</strong> Guarda (Ctrl+S). Comprueba que se llama <code>hola.php</code>,
                             <strong>no</strong> <code>hola.php.txt</code>. En VS Code, abajo a la derecha, debe poner
                             <em>PHP</em>.
                         </p>
-                        <p><strong>Paso 5.</strong> Abre <code>http://localhost:PUERTO/php-intro/hola.php</code>, donde
-                            <code>PUERTO</code> es el que publicaste en el compose (por ejemplo <code>8080</code>; si es
-                            el 80, se omite).
-                        </p>
-                        <p><strong>Paso 6.</strong> Debes ver <code>¡Hola, mundo!</code> en pantalla, sin más.</p>
-                        <p><strong>Paso 7 (bonus).</strong> Ejecuta PHP directamente en el contenedor, sin navegador:
+                        <p><strong>Paso 8.</strong> Abre <code>http://localhost:8080/php-intro/hola.php</code>. Debes ver
+                            <code>¡Hola, mundo!</code> en pantalla, sin más.</p>
+                        <p><strong>Paso 9 (bonus).</strong> Ejecuta PHP directamente en el contenedor, sin navegador:
                         </p>
                         <div class="code">
                             <div class="ch"><span>bash</span><span class="cb"><button
                                         class="copy">Copiar</button></span></div>
-                            <pre><code data-lang="bash">docker compose exec web php -v
-docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
+                            <pre><code data-lang="bash">docker compose exec php php -v
+docker compose exec php php /var/www/html/php-intro/hola.php</code></pre>
                         </div>
+                        <details class="sol">
+                            <summary>¿Vienes de la Actividad 1.1? Entonces ya tienes medio stack</summary>
+                            <div>
+                                <p>Si hiciste la <strong>Actividad 1.1</strong> ya tienes los contenedores
+                                    <code>nginx</code> y <code>mariadb</code> funcionando. No hace falta crear el
+                                    proyecto desde cero: añade el servicio de PHP y cambia dos cosas.</p>
+                                <ol>
+                                    <li>Añade el servicio <code>php</code> al <code>docker-compose.yml</code> (el bloque
+                                        de arriba).</li>
+                                    <li>En el servicio <code>nginx</code>, cambia el montaje de la raíz web:
+                                        <code>./html:/usr/share/nginx/html:ro</code> →
+                                        <code>./html:/var/www/html:ro</code>.</li>
+                                    <li>Sustituye tu <code>config/nginx/default.conf</code> por el de arriba: es
+                                        quien añade el <code>location ~ \.php$</code> que hacía falta.</li>
+                                </ol>
+                                <p>Y ya está: <code>docker compose up -d</code> y a escribir PHP.</p>
+                            </div>
+                        </details>
                         <p><strong>Si algo falla:</strong></p>
                         <div class="tw">
                             <table>
@@ -1286,8 +1420,16 @@ docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
                                     </tr>
                                     <tr>
                                         <td>Se ve el código PHP o se descarga el archivo</td>
-                                        <td>No acaba en <code>.php</code>, o abres con <code>file:///</code></td>
-                                        <td>Abre siempre por <code>http://localhost...</code></td>
+                                        <td>No acaba en <code>.php</code>, abres con <code>file:///</code>, o falta el
+                                            bloque <code>location ~ \.php$</code> en el <code>default.conf</code></td>
+                                        <td>Abre siempre por <code>http://localhost:8080/...</code> y comprueba tu
+                                            <code>default.conf</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>"502 Bad Gateway"</td>
+                                        <td>PHP-FPM no está levantado, o el <code>fastcgi_pass</code> no apunta a
+                                            <code>php:9000</code></td>
+                                        <td><code>docker compose ps</code> y revisa el <code>default.conf</code></td>
                                     </tr>
                                     <tr>
                                         <td>"Parse error"</td>
@@ -1297,7 +1439,7 @@ docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
                                     <tr>
                                         <td>Página en blanco</td>
                                         <td>Error oculto (<code>display_errors</code> desactivado)</td>
-                                        <td>Sección 4.1 y <code>docker compose logs -f web</code></td>
+                                        <td>Sección 4.1 y <code>docker compose logs -f php</code></td>
                                     </tr>
                                     <tr>
                                         <td>Guardas pero no cambia nada</td>
@@ -1415,7 +1557,7 @@ docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
                         </div>
                         <div class="callout">
                             <p><strong>¿Por qué aprendemos PHP y no otro?</strong> Porque es el más implantado en pymes
-                                y administraciones, es fácil de desplegar (Apache+PHP en casi cualquier hosting), y su
+                                y administraciones, es fácil de desplegar (Nginx+PHP en casi cualquier hosting), y su
                                 sintaxis es permisiva. Una vez que sabes uno, los demás son variaciones.</p>
                         </div>
                     </div>
@@ -1474,13 +1616,14 @@ docker compose exec web php /var/www/html/php-intro/hola.php</code></pre>
                             <li>Menciona dos tareas que <strong>no se pueden</strong> hacer con HTML+CSS pero
                                 <strong>sí</strong> con PHP.
                             </li>
-                            <li>Si abres <code>dinamico.php</code> con doble clic (sin Apache), ¿qué pasa? ¿Por qué?
+                            <li>Si abres <code>dinamico.php</code> con doble clic (sin servidor web), ¿qué pasa?
+                                ¿Por qué?
                             </li>
                         </ol><label class="done"><input type="checkbox" class="chk"> Hecho</label>
                         <details class="sol">
                             <summary>Ver solución</summary>
                             <div>
-                                <p>Ideas clave: <br>(1) el <code>.html</code> lo sirve Apache tal cual; el
+                                <p>Ideas clave: <br>(1) el <code>.html</code> lo sirve Nginx tal cual; el
                                     <code>.php</code>
                                     pasa por el intérprete antes de enviarse. <br>(2) No: el navegador solo recibe el
                                     resultado. <br>(3) Guardar datos, leer una base de datos, reaccionar a la
@@ -2121,15 +2264,23 @@ error_reporting(E_ALL);</code></pre>
                         </div>
                         <p><strong>La forma de servidor</strong> (para todos los scripts): un fichero <code>.ini</code>
                             con estas líneas, montado en el contenedor en el directorio de configuración adicional de
-                            PHP (<code>conf.d</code>), y reiniciar con <code>docker compose restart</code>.</p>
+                            PHP (<code>/usr/local/etc/php/conf.d/</code>), y reiniciar el contenedor de PHP con
+                            <code>docker compose restart php</code>.</p>
                         <div class="code">
                             <div class="ch"><span>ini</span><span class="cb"><button class="copy">Copiar</button></span>
                             </div>
                             <pre><code data-lang="ini">display_errors = On
 error_reporting = E_ALL</code></pre>
                         </div>
+                        <p>Ese fichero es el <code>config/php/99-dev.ini</code> del apartado 0.3, y en el
+                            <code>docker-compose.yml</code> está montado así:</p>
+                        <div class="code">
+                            <div class="ch"><span>yaml</span><span class="cb"><button class="copy">Copiar</button></span></div>
+                            <pre><code data-lang="yaml">volumes:
+  - ./config/php/99-dev.ini:/usr/local/etc/php/conf.d/99-dev.ini:ro</code></pre>
+                        </div>
                         <p>En desarrollo se ven en pantalla; en producción se ocultan y se guardan en el log. Para
-                            leerlo: <code>docker compose logs -f web</code>.</p>
+                            leerlo: <code>docker compose logs -f php</code>.</p>
                     </div>
                 </details>
                 <details class="item plain" open>
@@ -2295,8 +2446,8 @@ echo $x / $y;
                     </summary>
                     <div class="ib">
                         <ol>
-                            <li>Pon <code>display_errors = Off</code>, reinicia el contenedor
-                                (<code>docker compose restart</code>), prueba el fragmento (a). ¿Qué ves?</li>
+                            <li>Pon <code>display_errors = Off</code>, reinicia el contenedor de PHP
+                                (<code>docker compose restart php</code>), prueba el fragmento (a). ¿Qué ves?</li>
                             <li>Vuelve a poner <code>On</code>. ¿Por qué en producción se pone <code>Off</code>? (Pista:
                                 seguridad, no revelar rutas del servidor).</li>
                         </ol><label class="done"><input type="checkbox" class="chk"> Hecho</label>
@@ -3801,7 +3952,7 @@ $media = calcularMedia($alumno["modulos"]);
                 <details class="item plain" open>
                     <summary><span class="ttl">12.3 Contexto profesional</span></summary>
                     <div class="ib">
-                        <p>PHP no vive solo: en producción se despliega con <strong>Apache/Nginx + PHP-FPM</strong>, se
+                        <p>PHP no vive solo: en producción se despliega con <strong>Nginx + PHP-FPM</strong>, se
                             versiona con <strong>Git</strong>, se testea con <strong>PHPUnit</strong>, y se empaqueta
                             con <strong>Composer</strong>. Todo eso son los siguientes módulos del ciclo. Esta guía es
                             la puerta de entrada.</p>
@@ -3825,6 +3976,8 @@ $media = calcularMedia($alumno["modulos"]);
             function hl(raw, lang) {
                 var e = esc(raw);
                 if (lang === 'ini') return e.replace(/^(;.*)$/gm, '<span class="c">$1</span>').replace(/^(\w+)(\s*=)/gm, '<span class="v">$1</span>$2');
+                if (lang === 'yaml') return e.replace(/^(\s*)(#.*)$/gm, '$1<span class="c">$2</span>').replace(/^(\s*-?\s*)([\w.\/-]+)(:)/gm, '$1<span class="v">$2</span>$3');
+                if (lang === 'nginx') return e.replace(/(#.*)$/gm, '<span class="c">$1</span>').replace(/(\$[\w]+)/g, '<span class="v">$1</span>');
                 if (lang === 'bash') return e.replace(/\b(docker|compose|exec|php|up|ps|logs|restart)\b/g, '<span class="k">$1</span>');
                 var rx = (lang === 'html' && !/&lt;\?php/.test(e)) ? RXH : RX;
                 if (lang === 'html' && rx === RXH && /&lt;\?/.test(e)) rx = RX;
