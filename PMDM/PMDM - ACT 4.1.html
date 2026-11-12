@@ -3692,13 +3692,40 @@ dependencies {
                 </div>
                 <div class="qcard">
                     <div class="qh">🧠 Reto de reflexión 0 (calentamiento)</div>
-                    <p>¿Por qué usamos el converter de <code>kotlinx.serialization</code> en lugar de Gson o Moshi?</p>
+                    <p>El servidor y tu app son <strong>dos programas distintos</strong> que no comparten memoria: solo
+                        pueden entenderse a través de un <strong>formato de intercambio</strong> (aquí, JSON). Por eso
+                        los datos viajan convertidos.</p>
+                    <p><strong>(a)</strong> ¿En qué se diferencia el <strong>texto</strong> que llega del servidor de un
+                        <strong>objeto</strong> <code>User</code> de Kotlin?</p>
+                    <p><strong>(b)</strong> ¿Quién hace esa traducción y <strong>cuándo</strong>? Nombra la pieza
+                        responsable y el momento en el que se prepara.</p>
+                    <p><strong>(c)</strong> Imagina que mañana el servidor <strong>cambia el formato</strong>: ¿qué
+                        parte de tu app se entera? ¿Y qué pasaría si el servidor añadiese un campo nuevo, o si dejara
+                        de enviar uno que tu app espera?</p>
                     <button class="sol-btn" onclick="toggleSol(this)">💡 Ver solución</button>
-                    <div class="sol-box"><code>kotlinx.serialization</code> es <strong>nativo de Kotlin</strong>:
-                        funciona en <strong>tiempo de compilación</strong> (sin reflexión), entiende
-                        <code>data class</code>, nulabilidad y valores por defecto, y es multiplataforma. Además, con
-                        <code>ignoreUnknownKeys = true</code> evitamos que un campo nuevo añadido por el servidor rompa
-                        el parseo.</div>
+                    <div class="sol-box">
+                        <p><strong>(a)</strong> El JSON es <strong>texto plano</strong>: no distingue tipos, todo es
+                            cadena hasta que alguien lo interpreta. Un <code>User</code> es un <strong>objeto en
+                            memoria</strong>, con campos ya tipados (<code>id: Int</code>, <code>name: String</code>).</p>
+                        <p><strong>(b)</strong> La traducción la hace la librería de serialización
+                            (<code>kotlinx-serialization-json</code>) junto con el <em>converter</em> que se le pasa
+                            a Retrofit. El <strong>plugin</strong> de Gradle genera el código de conversión
+                            <strong>en tiempo de compilación</strong> (no hay reflexión al ejecutar), así que tú solo
+                            anotas la clase con <code>@Serializable</code> y declaras
+                            <code>suspend fun getUsers(): List&lt;User&gt;</code>. Cuando llega la respuesta, la
+                            librería la <strong>deserializa</strong> y tú recibes objetos; cuando tú quieres enviar o
+                            guardar un <code>User</code>, la librería lo <strong>serializa</strong> a texto
+                            JSON.</p>
+                        <p><strong>(c)</strong> Se entera la <strong>capa de red</strong>, no la UI: si el formato
+                            cambia, la deserialización falla y salta una
+                            <code>SerializationException</code> (más adelante, en el apartado 4.3, verás el tipo
+                            exacto con el que se modela). La UI no se rompe: solo cambia el error que muestra. Y para
+                            que un cambio del servidor no te rompa la app, hay dos comodines: una opción del propio
+                            configurador de JSON (<code>ignoreUnknownKeys = true</code>, que verás en el 4.2) para
+                            ignorar los campos nuevos que no conoces, y un <strong>valor por defecto</strong> en el
+                            <code>data class</code> (como <code>val phone: String = ""</code>) para los campos que el
+                            servidor pueda dejar de enviar.</p>
+                    </div>
                 </div>
                 <h3>2.4. Esqueleto de la app (pestañas)</h3>
                 <p>Vamos a crear primero la estructura de la app con <strong>tres pestañas vacías</strong>. Después, en
