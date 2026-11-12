@@ -3632,7 +3632,8 @@ dependencies {
                     </tr>
                     <tr>
                         <td><code>kotlinx-serialization-json</code></td>
-                        <td>Serialización en tiempo de compilación (nativa de Kotlin).</td>
+                        <td>Convierte objetos Kotlin en texto JSON y el texto JSON en objetos
+                            (deserialización).</td>
                     </tr>
                     <tr>
                         <td><code>logging-interceptor</code> (OkHttp)</td>
@@ -3651,6 +3652,44 @@ dependencies {
                         <td>Pedir permisos en tiempo de ejecución desde Compose.</td>
                     </tr>
                 </table>
+                <div class="callout">
+                    <p><strong>Qué es la serialización y por qué la necesitas.</strong> Un
+                        <code>data class User</code> es un objeto que vive <strong>en la memoria</strong> del proceso:
+                        tiene campos con tipo (<code>id: Int</code>, <code>name: String</code>). No es un texto, no se
+                        puede enviar por la red ni guardar en un archivo tal cual.</p>
+                    <p>Por el cable HTTP solo viajan <strong>bytes</strong>. El servidor no te manda «un
+                            <code>User</code>»: te manda un <strong>texto</strong> con los mismos datos en notación
+                        JSON, algo así:</p>
+                    <div class="code-wrap">
+                        <div class="code-label"><span>Lo que devuelve el servidor (texto)</span></div>
+                        <pre data-lang="json">{ "id": 1, "name": "Leanne Graham", "email": "Sincere@april.biz" }</pre>
+                    </div>
+                    <p>Ese texto tiene que convertirse en objetos Kotlin, y al revés. A esas dos conversiones se las
+                        llama <strong>serialización</strong>:</p>
+                    <ul>
+                        <li><strong>Deserializar</strong> (texto → objeto): leer el JSON que llega del servidor y
+                            construir un <code>User</code> con sus campos ya tipados.</li>
+                        <li><strong>Serializar</strong> (objeto → texto): escribir un <code>User</code> como JSON, por
+                            ejemplo para enviarlo en una petición o para guardarlo en el disco.</li>
+                    </ul>
+                    <p><strong>¿Y por qué es necesaria aquí?</strong> Sin ella te quedaría con el texto crudo y
+                        tendrías que buscar cada campo a mano, comprobar que exista, convertir <code>"1"</code> en
+                        <code>1</code>… y el <code>List&lt;User&gt;</code> que devuelve <code>getUsers()</code> no
+                        existiría. En esta guía la hace <code>kotlinx.serialization</code> por ti:</p>
+                    <ul>
+                        <li>La anotación <code>@Serializable</code> sobre el <code>data class</code> le dice al
+                            compilador «esta clase se puede convertir»; el plugin genera el código de conversión
+                            <strong>en tiempo de compilación</strong>, sin reflexión en tiempo de ejecución.</li>
+                        <li>Retrofit llama a ese código por ti al recibir la respuesta: tú solo declaras
+                            <code>suspend fun getUsers(): List&lt;User&gt;</code>.</li>
+                        <li>La opción <code>ignoreUnknownKeys = true</code> (en <code>RetrofitClient.kt</code>) evita
+                            que la app reviente si el servidor añade un campo que tu <code>User</code> no
+                            conoce.</li>
+                        <li>La usarás también <strong>al revés</strong> en el <strong>Reto 3</strong>: para guardar la
+                            lista en DataStore serializas los objetos a texto y los guardas en una clave
+                            <code>String</code>.</li>
+                    </ul>
+                </div>
                 <div class="qcard">
                     <div class="qh">🧠 Reto de reflexión 0 (calentamiento)</div>
                     <p>¿Por qué usamos el converter de <code>kotlinx.serialization</code> en lugar de Gson o Moshi?</p>
@@ -3871,6 +3910,9 @@ class MainActivity : ComponentActivity() {
                         tu propia base de datos y la interfaz <strong>no cambiará ni una línea</strong>.</p>
                 </div>
                 <h3>4.1. Modelo de datos y servicio</h3>
+                <p>Ya has visto en el apartado 2.3 <strong>qué es la serialización y por qué hace falta</strong>. Aquí
+                    solo se usa: la clase <code>User</code> se marca con <code>@Serializable</code> y el
+                    <em>converter</em> que se le pasa a Retrofit se encarga de la conversión.</p>
                 <p><strong>Archivo nuevo:</strong> <code>ApiService.kt</code></p>
                 <div class="code-wrap">
                     <div class="code-label"><span>ApiService.kt</span><span><button class="copy-btn"
@@ -5938,6 +5980,10 @@ fun SmsScreen() {
             toml: {
                 rx: /(#[^\n]*)|("[^"\n]*")|(\[[^\]\n]+\])|(^[\w.-]+)(?=\s*=)/gm,
                 cls: ['tok-com', 'tok-str', 'tok-type', 'tok-attr']
+            },
+            json: {
+                rx: /("(?:[^"\\]|\\.)*")(?=\s*:)|("(?:[^"\\]|\\.)*")|(-?\b\d+(?:\.\d+)?\b)|\b(true|false|null)\b/g,
+                cls: ['tok-attr', 'tok-str', 'tok-num', 'tok-kw']
             }
         };
         function hl(raw, lang) {
