@@ -1292,53 +1292,65 @@
                 <details class="item plain" open>
                     <summary><span class="ttl">0.2 Analogía completa</span></summary>
                     <div class="ib">
-                        <p>Piensa en un <strong>restaurante</strong>:</p>
+                        <p>Piensa en un <strong>restaurante</strong> y en el recorrido de un pedido:</p>
                         <div class="tw">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Elemento</th>
-                                        <th>Restaurante</th>
-                                        <th>PHP/Web</th>
+                                        <th>En el restaurante</th>
+                                        <th>En el servidor web</th>
+                                        <th>Qué hace</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Menú impreso</td>
-                                        <td>Carta física</td>
-                                        <td>HTML estático</td>
+                                        <td>El comensal</td>
+                                        <td>El navegador</td>
+                                        <td>Pide una página. Eso es la <strong>petición HTTP</strong>: la URL que
+                                            escribes en la barra de direcciones.</td>
                                     </tr>
                                     <tr>
-                                        <td>Cliente que pide</td>
-                                        <td>Navegador</td>
-                                        <td>Petición HTTP</td>
+                                        <td>El camarero</td>
+                                        <td><strong>Nginx</strong></td>
+                                        <td>Recoge el pedido y decide a quién se lo pasa. Si ve que el plato es
+                                            «PHP» (la URL acaba en <code>.php</code>), no lo cocina: lo lleva a la
+                                            cocina. Si es un cartel impreso (un <code>.html</code>), lo sirve tal
+                                            cual.</td>
                                     </tr>
                                     <tr>
-                                        <td>Cocinero</td>
-                                        <td>Nginx + PHP-FPM</td>
-                                        <td>Servidor</td>
+                                        <td>El cocinero</td>
+                                        <td><strong>PHP-FPM</strong></td>
+                                        <td>Prepara el plato: ejecuta tu código y lo devuelve ya emplatado (el
+                                            HTML).</td>
                                     </tr>
                                     <tr>
-                                        <td>Cocina</td>
-                                        <td>Backend</td>
-                                        <td>Lógica PHP</td>
+                                        <td>La despensa</td>
+                                        <td><strong>MariaDB</strong></td>
+                                        <td>Guarda los ingredientes (los datos). El cocinero los consulta mientras
+                                            cocina.</td>
                                     </tr>
                                     <tr>
-                                        <td>Plato servido</td>
-                                        <td>HTML dinámico</td>
-                                        <td>Respuesta HTTP</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Comensal no ve la cocina</td>
-                                        <td>El navegador no ve PHP</td>
-                                        <td>✔️</td>
+                                        <td>El plato servido</td>
+                                        <td>El <strong>HTML</strong> de la respuesta</td>
+                                        <td>Es lo único que llega al comensal. <strong>El navegador nunca ve el
+                                            PHP.</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <p>Cuando pides "lo que sea", el cocinero <strong>decide</strong> cómo prepararlo según lo que
-                            tengas (alergias = parámetros, hora = fecha del sistema). Con HTML estático, el plato es
-                            siempre el mismo.</p>
+                        <p>La diferencia entre <strong>HTML estático</strong> y <strong>HTML dinámico</strong> está
+                            en <em>quién</em> cocina:</p>
+                        <ul>
+                            <li>Con <strong>HTML estático</strong>, el plato sale siempre igual: el comensal recibe
+                                un cartel impreso (un <code>.html</code> tal cual) y la cocina no interviene para
+                                nada.</li>
+                            <li>Con <strong>PHP</strong>, el plato se cocina <strong>en el momento</strong>: el
+                                cocinero decide qué poner según lo que se ha pedido (los parámetros) y según lo que
+                                hay en la despensa (los datos). Dos comensales que piden lo mismo en instantes
+                                distintos pueden recibir platos distintos.</li>
+                        </ul>
+                        <p>Esa es toda la diferencia entre una web estática y una dinámica: <strong>quién cocina y
+                            cuándo</strong>.</p>
                     </div>
                 </details>
                 <details class="item plain" open>
